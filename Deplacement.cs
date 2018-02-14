@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Deplacement : MonoBehaviour {
+public abstract class Deplacement : MonoBehaviour {
 
-    private Trajectoire t;
-    private Rigidbody2D r;
-    private Camera c;
+    public Trajectoire t;
+    public Rigidbody2D r;
+    public Camera c;
     public float strength;
-    private bool canJump, jumped, isImpulsing, isAttached;
-    public float propulseStrength;
+    public bool canJump, jumped, canAttach, isAttached;
     Animator anim;
-    [SerializeField]
-    private float propulseStrengthMax;
-    private float propulseStrengthSteps = 5f;
-    bool loadingProcess;
     private enum Ground { grabable, bumpy };
+    private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed = 2;
     Ground ground;
     
 
@@ -25,89 +21,19 @@ public class Deplacement : MonoBehaviour {
         c = GameObject.Find("Camera").GetComponent<Camera>();
         t = c.gameObject.GetComponent<Trajectoire>();
         anim = GetComponent<Animator>();
+        numberOfJumpsAllowed = maxNumberOfJumpsAllowed;
         
     }
 
-    // Use this for initialization
-    void Start () {
-        
-    }
-	
-	// Update is called once per frame
-	void Update () {
 
-        if (Input.GetButton("Fire1"))
-        {
-            t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, strength);
-        }
-        if (Input.GetButtonUp("Fire1"))
-        {
-            Detach();
-            Jump(Input.mousePosition);
-            StartCoroutine(t.FadeAway());
-        }
-       
-        
-        if (Input.GetButtonDown("Fire1") && jumped && isImpulsing == false && loadingProcess == false)
-        {
-            loadingProcess = true;
-            //Jump(Input.mousePosition);
-        }
-        else if (Input.GetButtonUp("Fire1") && jumped && isImpulsing == false && loadingProcess == true)
-        {
-            //Propulse(Input.mousePosition);
-            Jump(Input.mousePosition);
-            loadingProcess = false;
-            isImpulsing = true;
-            InitEnergy();
-        }
-
-        if (loadingProcess == true)
-        {
-            //r.velocity = new Vector2(0, 0);
-            GainEnergy();
-            //t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, propulseStrength);
-        }
-
-        if (propulseStrength >= propulseStrengthMax)
-        {
-            //Jump(Input.mousePosition);
-            Propulse(Input.mousePosition);
-            t.ClearTraject();
-            loadingProcess = false;
-            InitEnergy();
-        }
-
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    public virtual void Jump(Vector2 click, float strength)
     {
-        if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
-        {
-            ReactToGround(collision);
-            //t.ClearTraject();
-            //loadingProcess = false;
-            //InitEnergy();
-        }
-        
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "Wall")
-        {
-            Debug.Log("End jump");
-            canJump = false;
-        }
-    }
-
-    private void Jump(Vector2 click)
-    {
+        Detach();
+        StartCoroutine(t.FadeAway());
         r.velocity = new Vector2(0, 0);
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
         Vector2 forceToApply = new Vector2(transform.position.x, transform.position.y) - clickToWorld;
         r.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);
-        jumped = true;
     }
 
     private void Rope(Vector2 click)
@@ -115,22 +41,20 @@ public class Deplacement : MonoBehaviour {
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
     }
 
-    private void Attach(Rigidbody2D ri)
+    public void Attach(Rigidbody2D ri)
     {
-        if (isAttached == false)
+        if (canAttach && isAttached == false)
         {
             gameObject.AddComponent<FixedJoint2D>();
             gameObject.GetComponent<FixedJoint2D>().enableCollision = true;
             gameObject.GetComponent<FixedJoint2D>().connectedBody = ri;
             isAttached = true;
-            isImpulsing = false;
         }
         
     }
 
-    private void Detach()
+    public void Detach()
     {
-        r.gravityScale = 1;
         isAttached = false;
         if (gameObject.GetComponent<FixedJoint2D>() != null)
         {
@@ -138,43 +62,31 @@ public class Deplacement : MonoBehaviour {
         }
     }
 
-    private void Propulse(Vector2 click)
+    public void LoseJump()
     {
-        Debug.Log("Propulse !");
-        isImpulsing = true;
-        Detach();
-        r.velocity = new Vector2(0, 0);
-        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-        Vector2 forceToApply = new Vector2(transform.position.x, transform.position.y) - clickToWorld;
-        r.AddForce(forceToApply.normalized * propulseStrength, ForceMode2D.Impulse);
+        numberOfJumpsAllowed--;
     }
 
-    private void Propulse2(Vector2 click)
+
+    public int GetJumps()
     {
-        isImpulsing = true;
-        r.velocity = new Vector2(0, 0);
-        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-        Vector2 forceToApply = new Vector2(transform.position.x, transform.position.y) - clickToWorld;
-        r.AddForce(forceToApply * strength, ForceMode2D.Impulse);
+        return numberOfJumpsAllowed;
     }
 
-    private void GainEnergy()
+    public void SetMaxJumps(int amount)
     {
-        if (propulseStrength < propulseStrengthMax)
-        {
-            propulseStrength += propulseStrengthSteps;
-        }
+        maxNumberOfJumpsAllowed = amount;
     }
 
-    private void InitEnergy()
+    public void GainAllJumps()
     {
-        propulseStrength = 0;
+        numberOfJumpsAllowed = maxNumberOfJumpsAllowed;
     }
 
-    private void ReactToGround(Collision2D col)
+    public void ReactToGround(Collision2D col)
     {
         jumped = false;
-        isImpulsing = false;
+        GainAllJumps();
         anim.SetFloat("velocity", r.velocity.magnitude);
         anim.SetTrigger("hit");
         switch (col.gameObject.name)

@@ -96,7 +96,6 @@ GameObject:
   - component: {fileID: 70705476975053816}
   - component: {fileID: 70277534019663032}
   - component: {fileID: 114719345816288354}
-  - component: {fileID: 114531902769954508}
   - component: {fileID: 95441029152223022}
   m_Layer: 0
   m_Name: Ninjaspicot
@@ -317,20 +316,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ninja: {fileID: 0}
---- !u!114 &114531902769954508
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1738599933652524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efb9cac19af2aaa4e93d006ff8d0291a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  strength: 65
-  propulseStrength: 0
-  propulseStrengthMax: 300
 --- !u!114 &114599466098189234
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -401,7 +386,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -426,109 +411,31 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 1
+    widthMultiplier: 2
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 2
-        time: 0
+        time: 0.004852295
         value: 1
-        inSlope: 0
-        outSlope: 0
+        inSlope: -1.1318687
+        outSlope: -1.1318687
         tangentMode: 0
       - serializedVersion: 2
-        time: 0.09137072
-        value: 0.9999995
-        inSlope: 0
-        outSlope: 0
+        time: 0.257276
+        value: 0.7499953
+        inSlope: -1.072893
+        outSlope: -1.072893
         tangentMode: 0
       - serializedVersion: 2
-        time: 0.09644641
-        value: 0
-        inSlope: 0
-        outSlope: 0
+        time: 0.5485389
+        value: 0.4807651
+        inSlope: -0.89133674
+        outSlope: -0.89133674
         tangentMode: 0
       - serializedVersion: 2
-        time: 0.19289708
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.19797188
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.31471813
-        value: 0.9999995
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.3198002
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.43654662
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.4416235
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.5532985
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.55838144
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.680203
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.6852749
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.7817265
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.78680843
-        value: 0
-        inSlope: -0.19144794
-        outSlope: -0.19144794
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.9035533
-        value: 0.020408163
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-      - serializedVersion: 2
-        time: 0.908625
-        value: 1
+        time: 0.94174564
+        value: 0.36537758
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -537,7 +444,7 @@ LineRenderer:
       m_RotationOrder: 0
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
+      key0: {r: 0.50735295, g: 0.42914033, b: 0.22383219, a: 1}
       key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -567,7 +474,7 @@ LineRenderer:
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0

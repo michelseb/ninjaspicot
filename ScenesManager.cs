@@ -3,15 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+[System.Serializable]
+public class Scene
+{
+    public int sceneIndex;
+    public Sprite icon;
+}
+
+
 public class ScenesManager : MonoBehaviour {
 
+    private int numberOfLevels;
+    List<Scene> sceneList;
     private static int currentScene = 0, checkpoint = 0;
 
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        ResetScene();
+        numberOfLevels = SceneManager.sceneCountInBuildSettings - 2;
+        BackToBeginning();
+    }
+
+    public static void LevelSelectMenu()
+    {
+
+        SceneManager.LoadScene("LevelMenu");
     }
 
     public static void ResetScene()
@@ -21,7 +39,7 @@ public class ScenesManager : MonoBehaviour {
 
     public static void BackToBeginning()
     {
-        currentScene = 1;
+        currentScene = 0;
         SceneManager.LoadScene("level" + currentScene);
     }
     public static void BackToCheckpoint()
@@ -37,6 +55,11 @@ public class ScenesManager : MonoBehaviour {
     public void SetCheckpoint(int check)
     {
         checkpoint = check;
+    }
+
+    public int GetNumberOfLevels()
+    {
+        return numberOfLevels;
     }
 
 }

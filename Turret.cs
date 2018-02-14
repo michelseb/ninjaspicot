@@ -62,23 +62,33 @@ public class Turret : MonoBehaviour {
         hit = Physics2D.Raycast(bullet.transform.position, dir, 1000f, LayerMask.GetMask("Default"));
         Debug.DrawRay(bullet.transform.position, dir * 10, Color.green);
 
-        if (hit.collider.gameObject.tag == "ninja")
+        if (hit.collider != null)
         {
-            if (turretMode == Mode.Wait)
+            if (hit.collider.gameObject.tag == "ninja")
             {
-                StopCoroutine(search);
+                if (turretMode == Mode.Wait)
+                {
+                    StopCoroutine(search);
+                }
+                turretMode = Mode.Aim;
+
             }
-            turretMode = Mode.Aim;
-            
-        }
-        else
+            else
+            {
+                if (turretMode == Mode.Aim)
+                {
+                    turretMode = Mode.Wait;
+                    search = StartCoroutine(Search());
+                }
+
+            }
+        } else
         {
             if (turretMode == Mode.Aim)
             {
                 turretMode = Mode.Wait;
                 search = StartCoroutine(Search());
             }
-            
         }
 
        
