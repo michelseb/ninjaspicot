@@ -83,9 +83,12 @@
     <Compile Include="Assets\Scripts\Interfaces\IDestructable.cs" />
     <Compile Include="Assets\Scripts\Ninja\CameraBehaviour.cs" />
     <Compile Include="Assets\Scripts\Ninja\Deplacement.cs" />
+    <Compile Include="Assets\Scripts\Ninja\DeplacementFurtif.cs" />
+    <Compile Include="Assets\Scripts\Ninja\DeplacementPrecis.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
+    <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Turret.cs" />
