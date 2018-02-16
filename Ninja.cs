@@ -5,14 +5,16 @@ using UnityEngine;
 public class Ninja : MonoBehaviour, IDestructable {
 
     Deplacement d;
+    Rigidbody2D r;
     bool selectMode;
 	// Use this for initialization
     void Awake()
     {
-        SelectDeplacementMode();
+        //SelectDeplacementMode();
     }
 	void Start () {
         d = FindObjectOfType<Deplacement>();
+        r = GetComponent<Rigidbody2D>();
 	}
 	
 	// Update is called once per frame
@@ -21,8 +23,10 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             d = FindObjectOfType<Deplacement>();
         }
-		
-	}
+        
+
+
+    }
 
     public void Die()
     {
@@ -46,7 +50,7 @@ public class Ninja : MonoBehaviour, IDestructable {
             if (d != null)
             {
                 Debug.Log("End jump");
-                d.LoseJump();
+                //d.LoseJump();
             }
         }
     }

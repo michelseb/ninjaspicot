@@ -9,11 +9,13 @@ public class Trajectoire : MonoBehaviour {
     LineRenderer line;
     private bool disappeared;
     private int verts, vertsMax, vertsMaxConst = 80;
+    TimeManager t;
 
     private void Awake()
     {
         c = GetComponent<Camera>();
         line = this.GetComponent<LineRenderer>();
+        t = FindObjectOfType<TimeManager>();
     }
 
     private void Start()
@@ -21,8 +23,14 @@ public class Trajectoire : MonoBehaviour {
         vertsMax = vertsMaxConst;
     }
 
-    public void DrawTraject(Vector2 startPos, Vector2 startVelocity, Vector2 click, float speed)
+    public void DrawTraject(Vector2 startPos, Vector2 startVelocity, Vector2 click, Vector2 startClick, float speed)
     {
+        Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+        Vector2 pos = startPos;
+        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
+        Vector2 startClickToWorld = c.ScreenToWorldPoint(new Vector3(startClick.x, startClick.y, 0));
+        Vector2 strength = startClickToWorld - clickToWorld;
+        Vector2 vel = strength.normalized * speed;
 
         Appear();
         if (disappeared)
@@ -31,10 +39,10 @@ public class Trajectoire : MonoBehaviour {
             disappeared = false;
             Debug.Log("appear");
         }
-        
-        if (verts < vertsMax + 2)
+
+        if (verts < vertsMax + 3)
         {
-            verts++;
+            verts+=2;
         }
         if (verts > vertsMax - 1)
         {
@@ -43,17 +51,10 @@ public class Trajectoire : MonoBehaviour {
         vertsMax = vertsMaxConst;
         line.SetVertexCount(verts);
 
-        Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 pos = startPos;
-        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-        Vector2 strength = pos - clickToWorld;
-        Vector2 vel = strength.normalized * speed;
-        
-        
         for (var i = 0; i < verts; i++)
         {
-            vel = vel + grav * Time.fixedDeltaTime;
-            pos = pos + (vel * Time.fixedDeltaTime);
+            vel = vel + grav * Time.fixedUnscaledDeltaTime;
+            pos = pos + (vel * Time.fixedUnscaledDeltaTime);
             line.SetPosition(i, new Vector3(pos.x, pos.y, 0));
             if (i > 1)
             {
@@ -67,12 +68,16 @@ public class Trajectoire : MonoBehaviour {
                     }
                     
                 }
+                
             }
+
+            
         }
     }
 
     public IEnumerator FadeAway()
     {
+        StartCoroutine(t.RestoreTime());
         verts = 0;
         vertsMax = vertsMaxConst;
         disappeared = true;
@@ -92,6 +97,7 @@ public class Trajectoire : MonoBehaviour {
         Color col = line.material.color;
         col.a = 1f;
         line.material.color = col;
+        t.SlowDown();
     }
 
     public void ClearTraject()

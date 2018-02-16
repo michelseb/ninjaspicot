@@ -47,7 +47,7 @@ public class Turret : MonoBehaviour {
 
             case Mode.Scan:
 
-                transform.Rotate(0, 0, 2);
+                transform.Rotate(0, 0, 20 * Time.deltaTime);
                 break;
 
             case Mode.Wait:
