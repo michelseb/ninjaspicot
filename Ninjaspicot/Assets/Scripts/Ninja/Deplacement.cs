@@ -8,11 +8,12 @@ public abstract class Deplacement : MonoBehaviour {
     public Rigidbody2D r;
     public Camera c;
     public float strength;
-    public bool canJump, jumped, canAttach, isAttached;
+    public bool canJump, jumped, canAttach, isAttached, preciseJump;
     Animator anim;
     private enum Ground { grabable, bumpy };
     private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed = 2;
     Ground ground;
+    public Vector2 originClic;
     
 
     private void Awake()
@@ -28,12 +29,33 @@ public abstract class Deplacement : MonoBehaviour {
 
     public virtual void Jump(Vector2 click, float strength)
     {
+        LoseJump();
         Detach();
         StartCoroutine(t.FadeAway());
         r.velocity = new Vector2(0, 0);
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-        Vector2 forceToApply = new Vector2(transform.position.x, transform.position.y) - clickToWorld;
+        Vector2 originClickToWorld = c.ScreenToWorldPoint(new Vector3(originClic.x, originClic.y, 0));
+        Vector2 forceToApply = originClickToWorld - clickToWorld;
+        /*if (forceToApply.magnitude < 2)
+        {
+            if (click.x < Screen.width / 3)
+            {
+                r.AddForce((Vector2.up - Vector2.left) * strength/2, ForceMode2D.Impulse);
+            }
+            else if (click.x > Screen.width / 3 && click.x < 2 * Screen.width / 3)
+            {
+                r.AddForce(Vector2.up * strength / 2, ForceMode2D.Impulse);
+            }
+            else
+            {
+                r.AddForce((Vector2.up + Vector2.left) * strength / 2, ForceMode2D.Impulse);
+            }
+        }
+        else
+        {*/
         r.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);
+        //}
+        
     }
 
     private void Rope(Vector2 click)
@@ -48,9 +70,10 @@ public abstract class Deplacement : MonoBehaviour {
             gameObject.AddComponent<FixedJoint2D>();
             gameObject.GetComponent<FixedJoint2D>().enableCollision = true;
             gameObject.GetComponent<FixedJoint2D>().connectedBody = ri;
-            isAttached = true;
+            
         }
-        
+        isAttached = true;
+
     }
 
     public void Detach()
@@ -76,6 +99,11 @@ public abstract class Deplacement : MonoBehaviour {
     public void SetMaxJumps(int amount)
     {
         maxNumberOfJumpsAllowed = amount;
+    }
+
+    public void SetJumps(int amount)
+    {
+        numberOfJumpsAllowed = amount;
     }
 
     public void GainAllJumps()

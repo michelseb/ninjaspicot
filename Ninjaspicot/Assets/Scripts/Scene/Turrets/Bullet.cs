@@ -4,23 +4,35 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
+    Renderer r;
 	// Use this for initialization
 	void Start () {
-		
+        r = GetComponent<Renderer>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+
 	}
 
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.name == "Ninjaspicot")
         {
             Ninja n = GameObject.Find("Ninjaspicot").GetComponent<Ninja>();
-            n.Die();
+            n.Die(transform);
+            Destroy(gameObject);
         }
+        if (collision.gameObject.tag == "Wall")
+        {
+            Destroy(gameObject);
+        }
+
+    }
+
+    void OnBecameInvisible()
+    {
         Destroy(gameObject);
     }
 

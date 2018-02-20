@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameMaster\ScenesManager.cs" />
+    <Compile Include="Assets\Scripts\GameMaster\TimeManager.cs" />
     <Compile Include="Assets\Scripts\GameMaster\Timer.cs" />
     <Compile Include="Assets\Scripts\Interfaces\IDestructable.cs" />
     <Compile Include="Assets\Scripts\Ninja\CameraBehaviour.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Assets\Scripts\Ninja\DeplacementPrecis.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
+    <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />

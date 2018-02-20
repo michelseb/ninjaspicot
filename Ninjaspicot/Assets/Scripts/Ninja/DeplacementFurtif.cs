@@ -4,79 +4,69 @@ using UnityEngine;
 
 public class DeplacementFurtif : Deplacement {
 
-    [SerializeField]
-    private float propulseStrengthMax = 100;
-    private float propulseStrengthSteps = 2f;
-    bool loadingProcess;
-
+    Vector2 propulseVector;
+    bool jumpCapable;
+    TimeManager time;
+    Trigger tri;
     // Use this for initialization
     void Start () {
         SetMaxJumps(2);
-        strength = 10;
-        canAttach = false;
+        GainAllJumps();
+        strength = 80;
+        canAttach = true;
+        time = FindObjectOfType<TimeManager>();
+        tri = FindObjectOfType<Trigger>();
         //propulseStrengthMax = 100;
     }
-	
-	// Update is called once per frame
-	void Update () {
 
-        if (loadingProcess == true)
+    void Update()
+    {
+
+        if (Mathf.Abs(r.velocity.y) < 20)
         {
-            //GainEnergy();
-            Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
-            Vector2 forceToApply = (new Vector2(transform.position.x, transform.position.y) - clickToWorld) * strength;
-            if (forceToApply.magnitude > propulseStrengthMax)
+            if (jumpCapable == false)
             {
-                forceToApply = forceToApply.normalized * propulseStrengthMax;
+                GetComponent<SpriteRenderer>().color = Color.yellow;
+                tri.ActivateParticles();
+                jumpCapable = true;
+                
             }
-            t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, forceToApply.magnitude);
+            SetJumps(1);
         }
-
-        /*if (strength >= propulseStrengthMax)
+        else
         {
-            Jump(Input.mousePosition, strength);
-            loadingProcess = false;
-            //InitEnergy();
-        }*/
-
-        if (Input.GetButtonDown("Fire1") && GetJumps() > 0 && loadingProcess == false)
-        {
-            loadingProcess = true;
+            if (jumpCapable == true)
+            {
+                GetComponent<SpriteRenderer>().color = Color.white;
+                tri.DeactivateParticles();
+                jumpCapable = false;
+                StartCoroutine(time.RestoreTime());
+                SetJumps(0);
+            }
         }
-        else if (Input.GetButtonUp("Fire1") && GetJumps() > 0) //&& jumped == false)
+        if (Input.GetButtonDown("Fire1"))
+        {
+            originClic = Input.mousePosition;
+        }
+        if (Input.GetButton("Fire1") && GetJumps() > 0)
+        {
+            propulseVector = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            if ((propulseVector - originClic).magnitude * strength > 2 && jumpCapable) {
+                //if (Physics2D.Raycast(transform.position, propulseVector, 2) == false)
+                //{
+                    t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
+                //}
+            }
+        }
+        if (Input.GetButtonUp("Fire1") && GetJumps() > 0) //&& jumped == false)
         {
             Jump(Input.mousePosition, strength);
             jumped = true;
-            loadingProcess = false;
-            //InitEnergy();
         }
+
 
     }
 
-    public override void Jump(Vector2 click, float strength)
-    {
-        StartCoroutine(t.FadeAway());
-        r.velocity = new Vector2(0, 0);
-        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-        Vector2 forceToApply = (new Vector2(transform.position.x, transform.position.y) - clickToWorld) * strength;
-        if (forceToApply.magnitude > propulseStrengthMax)
-        {
-            forceToApply = forceToApply.normalized * propulseStrengthMax;
-        }
-        r.AddForce(forceToApply, ForceMode2D.Impulse);
-    }
-
-    /*private void GainEnergy()
-    {
-        if (strength < propulseStrengthMax)
-        {
-            strength += propulseStrengthSteps;
-        }
-    }
-
-    private void InitEnergy()
-    {
-        strength = 0;
-    }*/
+   
 
 }

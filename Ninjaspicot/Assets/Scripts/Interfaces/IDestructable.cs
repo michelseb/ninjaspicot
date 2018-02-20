@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface IDestructable {
 
-    void Die();
+    void Die(Transform killer);
+    IEnumerator Dying();
 
 }

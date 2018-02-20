@@ -44,4 +44,25 @@ public class CameraBehaviour : MonoBehaviour {
         transform.position = Vector3.Lerp(transform.position, new Vector3(ninja.transform.position.x, ninja.transform.position.y, transform.position.z), .1f);
     }
 
+    public IEnumerator zoomIn(int zoom)
+    {
+        while (cam.orthographicSize > zoom)
+        {
+            
+            cam.orthographicSize--;
+            yield return null;
+        }
+        
+    }
+
+    public IEnumerator zoomOut(int zoom)
+    {
+        while (cam.orthographicSize < zoom)
+        {
+            cam.orthographicSize++;
+            yield return null;
+        }
+
+    }
+
 }
