@@ -5,11 +5,13 @@ using UnityEngine;
 public class DeplacementFurtif : Deplacement {
 
     Vector2 propulseVector;
-    bool jumpCapable;
+    bool jumpCapable, readyToJump;
     TimeManager time;
     Trigger tri;
+    Ninja n;
     // Use this for initialization
     void Start () {
+        n = GetComponent<Ninja>();
         SetMaxJumps(2);
         GainAllJumps();
         strength = 80;
@@ -40,28 +42,37 @@ public class DeplacementFurtif : Deplacement {
                 GetComponent<SpriteRenderer>().color = Color.white;
                 tri.DeactivateParticles();
                 jumpCapable = false;
-                StartCoroutine(time.RestoreTime());
+                //StartCoroutine(time.RestoreTime());
                 SetJumps(0);
             }
         }
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && jumpCapable)
         {
+
             originClic = Input.mousePosition;
-        }
-        if (Input.GetButton("Fire1") && GetJumps() > 0)
+            readyToJump = true;
+            t.Reset();
+        }/*else if(Input.GetButtonDown("Fire1") && jumpCapable == false)
+        {
+            n.Die(null);
+        }*/
+        if (readyToJump && GetJumps() > 0)
         {
             propulseVector = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             if ((propulseVector - originClic).magnitude * strength > 2 && jumpCapable) {
                 //if (Physics2D.Raycast(transform.position, propulseVector, 2) == false)
                 //{
-                    t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
+                t.Reduce();
+                t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
                 //}
             }
         }
-        if (Input.GetButtonUp("Fire1") && GetJumps() > 0) //&& jumped == false)
+        if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump) //&& jumped == false)
         {
             Jump(Input.mousePosition, strength);
             jumped = true;
+            readyToJump = false;
+            
         }
 
 

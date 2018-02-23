@@ -4,19 +4,23 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour {
 
-    public float slowValue = .06f, increaseValue = .05f;
+    public float increaseValue = .05f;
 
 
-    public void SlowDown()
+    public void SlowDown(float slowValue)
     {
-        Time.timeScale = slowValue;
+        if (Time.timeScale > slowValue)
+        {
+            Time.timeScale = slowValue;
+        }
+        
         Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
     public void StopTime()
     {
         Time.timeScale = 0;
-        Time.fixedDeltaTime = Time.timeScale;
+        Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
     public IEnumerator RestoreTime()
@@ -25,6 +29,7 @@ public class TimeManager : MonoBehaviour {
         {
             Time.timeScale += increaseValue * Time.unscaledDeltaTime;
             increaseValue += .1f;
+            Time.fixedDeltaTime = Time.timeScale * .02f;
             yield return null;
         }
         Time.timeScale = 1;

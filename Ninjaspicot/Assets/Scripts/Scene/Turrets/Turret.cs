@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour {
 
+    public float rotationAngle;
+    private int sens = 1;
+    private float initRotationAngle;
     private GameObject ninja;
     private Deplacement ninjaScript;
     public GameObject canon;
@@ -29,6 +32,7 @@ public class Turret : MonoBehaviour {
         ninjaScript = FindObjectOfType<Deplacement>();
         turretMode = Mode.Scan;
         r = GetComponent<Renderer>();
+        initRotationAngle = transform.rotation.z;
 	}
 	
 	// Update is called once per frame
@@ -50,9 +54,13 @@ public class Turret : MonoBehaviour {
                 break;
 
             case Mode.Scan:
-
-                transform.Rotate(0, 0, 100 * Time.deltaTime);
-                break;
+                transform.Rotate(0, 0, 10 * Time.deltaTime * sens);
+                if (Mathf.Abs(transform.rotation.z - initRotationAngle) > rotationAngle)
+                {
+                    Debug.Log(sens);
+                    sens = -sens;
+                }
+                    break;
 
             case Mode.Wait:
 
@@ -68,8 +76,10 @@ public class Turret : MonoBehaviour {
 
         if (hit.collider != null)
         {
+            //Debug.Log(hit.collider.gameObject.tag);
             if (hit.collider.gameObject.tag == "ninja")
             {
+                
                 if (turretMode == Mode.Wait)
                 {
                     StopCoroutine(search);
@@ -106,6 +116,11 @@ public class Turret : MonoBehaviour {
        
 
 	}
+
+    private void OnDrawGizmos()
+    {
+       
+    }
 
     private void Shoot()
     {

@@ -80,6 +80,20 @@ public class Trajectoire : MonoBehaviour {
         }
     }
 
+    public void Reduce()
+    {
+        if (line.widthMultiplier > 0)
+        {
+            line.widthMultiplier -= .01f;
+        }
+        
+    }
+
+    public void Reset()
+    {
+        line.widthMultiplier = 2;
+    }
+
     public IEnumerator FadeAway()
     {
         StartCoroutine(t.RestoreTime());
@@ -102,8 +116,8 @@ public class Trajectoire : MonoBehaviour {
         Color col = line.material.color;
         col.a = 1f;
         line.material.color = col;
-        t.StopTime();
-        StartCoroutine(cam.zoomOut(60));
+        t.SlowDown(.2f);
+        //StartCoroutine(cam.zoomOut(60));
     }
 
     public void ClearTraject()

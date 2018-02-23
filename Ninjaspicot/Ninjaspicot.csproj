@@ -86,15 +86,21 @@
     <Compile Include="Assets\Scripts\Ninja\Deplacement.cs" />
     <Compile Include="Assets\Scripts\Ninja\DeplacementFurtif.cs" />
     <Compile Include="Assets\Scripts\Ninja\DeplacementPrecis.cs" />
+    <Compile Include="Assets\Scripts\Ninja\Ghost.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
+    <Compile Include="Assets\Scripts\Scene\Laser.cs" />
+    <Compile Include="Assets\Scripts\Scene\Limit.cs" />
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Turret.cs" />
     <Compile Include="Assets\Scripts\Scene\Wall.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Resources\Data\ghost.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

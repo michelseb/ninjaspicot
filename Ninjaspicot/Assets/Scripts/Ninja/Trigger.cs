@@ -20,7 +20,7 @@ public class Trigger : Ninja {
             {
                 GetComponent<CapsuleCollider2D>().size = new Vector2(12, 16);
                 StartCoroutine(cam.zoomIn(20));
-                t.SlowDown();
+                t.SlowDown(.05f);
 
             }
 

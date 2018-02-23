@@ -9,6 +9,8 @@ public class Ninja : MonoBehaviour, IDestructable {
     public Camera c;
     public CameraBehaviour cam;
     public TimeManager t;
+    Ghost g;
+    private float highestPoint;
     bool selectMode;
 	// Use this for initialization
     void Awake()
@@ -21,6 +23,7 @@ public class Ninja : MonoBehaviour, IDestructable {
         c = FindObjectOfType<Camera>();
         cam = FindObjectOfType<CameraBehaviour>();
         t = FindObjectOfType<TimeManager>();
+        g = FindObjectOfType<Ghost>();
     }
 	
 	// Update is called once per frame
@@ -30,21 +33,31 @@ public class Ninja : MonoBehaviour, IDestructable {
             d = FindObjectOfType<Deplacement>();
         }
         
-
+        if (transform.position.y > highestPoint)
+        {
+            highestPoint = transform.position.y;
+        }
 
     }
 
     public void Die(Transform killer)
     {
+        g.saveAll(highestPoint);
         Destroy(d);
         FixedJoint2D j = GetComponent<FixedJoint2D>();
         if (j != null)
         {
             Destroy(j);
         }
-        GetComponent<SpriteRenderer>().color = Color.red;
-        r.AddForce(killer.position-transform.position, ForceMode2D.Impulse);
-        r.AddTorque(20, ForceMode2D.Impulse);
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            GetComponent<SpriteRenderer>().color = Color.red;
+        }
+        if (killer != null)
+        {
+            r.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
+            r.AddTorque(20, ForceMode2D.Impulse);
+        }
         StartCoroutine(Dying());
     }
 
@@ -52,7 +65,6 @@ public class Ninja : MonoBehaviour, IDestructable {
     {
         t.RestoreTime();
         yield return new WaitForSeconds(2);
-        Debug.Log("Okay !");
         ScenesManager.BackToCheckpoint();
     }
 
