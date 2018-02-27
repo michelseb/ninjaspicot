@@ -11,7 +11,7 @@ public class Laser : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.Translate(Vector3.up * 10 * Time.unscaledDeltaTime);
+        transform.Translate(Vector3.up * 25 * Time.unscaledDeltaTime);
 	}
 
     private void OnTriggerEnter2D(Collider2D collision)

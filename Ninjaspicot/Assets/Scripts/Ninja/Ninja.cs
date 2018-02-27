@@ -64,6 +64,7 @@ public class Ninja : MonoBehaviour, IDestructable {
     public IEnumerator Dying()
     {
         t.RestoreTime();
+        t.activated = false;
         yield return new WaitForSeconds(2);
         ScenesManager.BackToCheckpoint();
     }

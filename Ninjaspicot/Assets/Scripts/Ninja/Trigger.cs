@@ -45,7 +45,7 @@ public class Trigger : Ninja {
         {
             bulletsColliding--;
             Debug.Log("Bullets left : " + bulletsColliding);
-            if (bulletsColliding == 0)
+            if (bulletsColliding <= 0)
             {
                 GetComponent<CapsuleCollider2D>().size = new Vector2(10, 14);
                 StartCoroutine(cam.zoomOut(60));

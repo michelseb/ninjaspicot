@@ -24,18 +24,18 @@ public class DeplacementFurtif : Deplacement {
     void Update()
     {
 
-        if (Mathf.Abs(r.velocity.y) < 20)
+        //if (Mathf.Abs(r.velocity.y) < 20)
+        //{
+        if (jumpCapable == false)
         {
-            if (jumpCapable == false)
-            {
-                GetComponent<SpriteRenderer>().color = Color.yellow;
-                tri.ActivateParticles();
-                jumpCapable = true;
+            GetComponent<SpriteRenderer>().color = Color.yellow;
+            tri.ActivateParticles();
+            jumpCapable = true;
                 
-            }
-            SetJumps(1);
         }
-        else
+        SetJumps(1);
+        //}
+        /*else
         {
             if (jumpCapable == true)
             {
@@ -45,7 +45,7 @@ public class DeplacementFurtif : Deplacement {
                 //StartCoroutine(time.RestoreTime());
                 SetJumps(0);
             }
-        }
+        }*/
         if (Input.GetButtonDown("Fire1") && jumpCapable)
         {
 

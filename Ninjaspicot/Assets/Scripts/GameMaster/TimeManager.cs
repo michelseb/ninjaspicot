@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour {
 
+    public bool activated;
     public float increaseValue = .05f;
 
+    private void Start()
+    {
+        activated = true;
+    }
 
     public void SlowDown(float slowValue)
     {
+        if (activated == false)
+        {
+            return;
+        }
         if (Time.timeScale > slowValue)
         {
             Time.timeScale = slowValue;

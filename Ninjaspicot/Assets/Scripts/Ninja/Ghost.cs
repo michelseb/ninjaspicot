@@ -17,7 +17,7 @@ public class Ghost : MonoBehaviour {
         //n = 
         oldPos = new List<Vector2>();
         positions = new List<Vector2>();
-        ghostPos = Resources.Load<TextAsset>(@"Data/ghost");
+        ghostPos = Resources.Load<TextAsset>(@"Data/ghost.txt");
         loadAll();
         if (oldPos.Count > 0)
         {
@@ -50,7 +50,7 @@ public class Ghost : MonoBehaviour {
         if (highest > this.highest)
         {
             StreamWriter sw = new StreamWriter(@"Assets/Resources/Data/ghost.txt");
-            Debug.Log(sw);
+            Debug.Log("Writing");
             sw.WriteLine("" + highest);
             foreach (Vector3 p in positions)
             {
