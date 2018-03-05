@@ -24,6 +24,7 @@ public class Ninja : MonoBehaviour, IDestructable {
         cam = FindObjectOfType<CameraBehaviour>();
         t = FindObjectOfType<TimeManager>();
         g = FindObjectOfType<Ghost>();
+        t.activated = true;
     }
 	
 	// Update is called once per frame
@@ -37,7 +38,6 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             highestPoint = transform.position.y;
         }
-
     }
 
     public void Die(Transform killer)

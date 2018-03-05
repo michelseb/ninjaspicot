@@ -11,6 +11,7 @@ public class Trajectoire : MonoBehaviour {
     private bool disappeared;
     private int verts, vertsMax, vertsMaxConst = 80;
     TimeManager t;
+    Deplacement d;
 
     private void Awake()
     {
@@ -18,6 +19,7 @@ public class Trajectoire : MonoBehaviour {
         cam = FindObjectOfType<CameraBehaviour>();
         line = this.GetComponent<LineRenderer>();
         t = FindObjectOfType<TimeManager>();
+        d = GameObject.Find("Ninjaspicot").GetComponent<DeplacementFurtif>();
     }
 
     private void Start()
@@ -32,8 +34,9 @@ public class Trajectoire : MonoBehaviour {
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
         Vector2 startClickToWorld = c.ScreenToWorldPoint(new Vector3(startClick.x, startClick.y, 0));
         Vector2 strength = startClickToWorld - clickToWorld;
-        Vector2 vel = strength.normalized * speed;
-
+        float power = (float)(d.GetJumps()) / d.GetMaxJumps();
+        Vector2 vel = strength.normalized * speed * power;
+        Debug.Log("P : " + power);
         Appear();
         if (disappeared)
         {
@@ -55,8 +58,8 @@ public class Trajectoire : MonoBehaviour {
 
         for (var i = 0; i < verts; i++)
         {
-            vel = vel + grav * Time.fixedUnscaledDeltaTime;
-            pos = pos + (vel * Time.fixedUnscaledDeltaTime);
+            vel = vel + grav * Time.fixedUnscaledDeltaTime * power;
+            pos = pos + (vel * Time.fixedUnscaledDeltaTime * power);
             line.SetPosition(i, new Vector3(pos.x, pos.y, 0));
             if (i > 1)
             {

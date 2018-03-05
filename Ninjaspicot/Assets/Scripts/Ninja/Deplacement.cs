@@ -5,13 +5,15 @@ using UnityEngine;
 public abstract class Deplacement : MonoBehaviour {
 
     public Trajectoire t;
+    TimeManager time;
+    CameraBehaviour cam;
     public Rigidbody2D r;
     public Camera c;
     public float strength;
     public bool canJump, jumped, canAttach, isAttached, preciseJump;
     Animator anim;
     private enum Ground { grabable, bumpy };
-    private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed = 2;
+    private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed;
     Ground ground;
     public Vector2 originClic;
     
@@ -20,8 +22,11 @@ public abstract class Deplacement : MonoBehaviour {
     {
         r = this.GetComponent<Rigidbody2D>();
         c = GameObject.Find("Camera").GetComponent<Camera>();
+        cam = c.GetComponent<CameraBehaviour>();
         t = c.gameObject.GetComponent<Trajectoire>();
+        time = FindObjectOfType<TimeManager>();
         anim = GetComponent<Animator>();
+        maxNumberOfJumpsAllowed = 4;
         numberOfJumpsAllowed = maxNumberOfJumpsAllowed;
         
     }
@@ -36,6 +41,12 @@ public abstract class Deplacement : MonoBehaviour {
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
         Vector2 originClickToWorld = c.ScreenToWorldPoint(new Vector3(originClic.x, originClic.y, 0));
         Vector2 forceToApply = originClickToWorld - clickToWorld;
+        if (GetJumps() <= 0)
+        {
+            StartCoroutine(time.RestoreTime());
+            cam.zoomOut(60);
+            
+        }
         /*if (forceToApply.magnitude < 2)
         {
             if (click.x < Screen.width / 3)
@@ -53,7 +64,7 @@ public abstract class Deplacement : MonoBehaviour {
         }
         else
         {*/
-        r.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);
+        r.AddForce(forceToApply.normalized * strength * (GetJumps()+1)/GetMaxJumps(), ForceMode2D.Impulse);
         //}
         
     }
@@ -96,6 +107,11 @@ public abstract class Deplacement : MonoBehaviour {
         return numberOfJumpsAllowed;
     }
 
+    public int GetMaxJumps()
+    {
+        return maxNumberOfJumpsAllowed;
+    }
+
     public void SetMaxJumps(int amount)
     {
         maxNumberOfJumpsAllowed = amount;
@@ -117,7 +133,7 @@ public abstract class Deplacement : MonoBehaviour {
         GainAllJumps();
         anim.SetFloat("velocity", r.velocity.magnitude);
         anim.SetTrigger("hit");
-        switch (col.gameObject.name)
+        switch (col.gameObject.tag)
         {
             case "GrabableWall":
                 ground = Ground.grabable;

@@ -17,7 +17,7 @@ public class Ghost : MonoBehaviour {
         //n = 
         oldPos = new List<Vector2>();
         positions = new List<Vector2>();
-        ghostPos = Resources.Load<TextAsset>(@"Data/ghost.txt");
+        ghostPos = Resources.Load<TextAsset>(@"Data/ghost");
         loadAll();
         if (oldPos.Count > 0)
         {

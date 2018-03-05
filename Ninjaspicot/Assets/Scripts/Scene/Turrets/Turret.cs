@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour {
 
+    public bool autoShoot;
     public float rotationAngle;
+    public float rotationSpeed;
     private int sens = 1;
     private float initRotationAngle;
     private GameObject ninja;
@@ -33,6 +35,7 @@ public class Turret : MonoBehaviour {
         turretMode = Mode.Scan;
         r = GetComponent<Renderer>();
         initRotationAngle = transform.rotation.z;
+        
 	}
 	
 	// Update is called once per frame
@@ -54,10 +57,18 @@ public class Turret : MonoBehaviour {
                 break;
 
             case Mode.Scan:
-                transform.Rotate(0, 0, 10 * Time.deltaTime * sens);
+                if (autoShoot)
+                {
+                    if (loaded)
+                    {
+                        Shoot();
+                        StartCoroutine(Load());
+                        loaded = false;
+                    }
+                }
+                transform.Rotate(0, 0, rotationSpeed * Time.deltaTime * sens);
                 if (Mathf.Abs(transform.rotation.z - initRotationAngle) > rotationAngle)
                 {
-                    Debug.Log(sens);
                     sens = -sens;
                 }
                     break;
@@ -79,13 +90,13 @@ public class Turret : MonoBehaviour {
             //Debug.Log(hit.collider.gameObject.tag);
             if (hit.collider.gameObject.tag == "ninja")
             {
-                
+
                 if (turretMode == Mode.Wait)
                 {
                     StopCoroutine(search);
                     turretMode = Mode.Aim;
                 }
-                else if(turretMode == Mode.Scan && ninjaScript.isAttached == false)
+                else if (turretMode == Mode.Scan && ninjaScript.isAttached == false)
                 {
                     turretMode = Mode.Aim;
                 }
@@ -99,7 +110,8 @@ public class Turret : MonoBehaviour {
                 }
 
             }
-        } else
+        }
+        else
         {
             if (turretMode == Mode.Aim)
             {

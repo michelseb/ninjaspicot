@@ -6,17 +6,16 @@ public class DeplacementFurtif : Deplacement {
 
     Vector2 propulseVector;
     bool jumpCapable, readyToJump;
-    TimeManager time;
+
     Trigger tri;
     Ninja n;
     // Use this for initialization
     void Start () {
         n = GetComponent<Ninja>();
-        SetMaxJumps(2);
+        SetMaxJumps(5);
         GainAllJumps();
         strength = 80;
         canAttach = true;
-        time = FindObjectOfType<TimeManager>();
         tri = FindObjectOfType<Trigger>();
         //propulseStrengthMax = 100;
     }
@@ -33,7 +32,6 @@ public class DeplacementFurtif : Deplacement {
             jumpCapable = true;
                 
         }
-        SetJumps(1);
         //}
         /*else
         {
