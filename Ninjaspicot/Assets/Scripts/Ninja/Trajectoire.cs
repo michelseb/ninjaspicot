@@ -7,9 +7,10 @@ public class Trajectoire : MonoBehaviour {
     public GameObject ninja;
     Camera c;
     CameraBehaviour cam;
-    LineRenderer line;
+    public LineRenderer line;
     private bool disappeared;
-    private int verts, vertsMax, vertsMaxConst = 80;
+    public int vertsMax, verts;
+    private int vertsMaxConst = 40;
     TimeManager t;
     Deplacement d;
 
@@ -36,8 +37,10 @@ public class Trajectoire : MonoBehaviour {
         Vector2 strength = startClickToWorld - clickToWorld;
         float power = (float)(d.GetJumps()) / d.GetMaxJumps();
         Vector2 vel = strength.normalized * speed * power;
-        Debug.Log("P : " + power);
-        Appear();
+        if (verts > 2)
+        {
+            Appear();
+        }
         if (disappeared)
         {
             StopCoroutine(FadeAway());
@@ -99,7 +102,7 @@ public class Trajectoire : MonoBehaviour {
 
     public IEnumerator FadeAway()
     {
-        StartCoroutine(t.RestoreTime());
+        t.NormalTime();
         verts = 0;
         vertsMax = vertsMaxConst;
         disappeared = true;
@@ -119,7 +122,7 @@ public class Trajectoire : MonoBehaviour {
         Color col = line.material.color;
         col.a = 1f;
         line.material.color = col;
-        t.SlowDown(.2f);
+        t.SlowDown(.1f);
         //StartCoroutine(cam.zoomOut(60));
     }
 

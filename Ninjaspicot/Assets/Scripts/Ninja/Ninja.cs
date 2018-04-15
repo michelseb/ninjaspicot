@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Ninja : MonoBehaviour, IDestructable {
 
+    public ContactPoint2D contact;
     public Deplacement d;
     public Rigidbody2D r;
     public Camera c;
@@ -55,6 +56,10 @@ public class Ninja : MonoBehaviour, IDestructable {
         }
         if (killer != null)
         {
+            if (killer.GetComponent<SpriteRenderer>() != null)
+            {
+                killer.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            }
             r.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
             r.AddTorque(20, ForceMode2D.Impulse);
         }
@@ -63,7 +68,7 @@ public class Ninja : MonoBehaviour, IDestructable {
 
     public IEnumerator Dying()
     {
-        t.RestoreTime();
+        t.NormalTime();
         t.activated = false;
         yield return new WaitForSeconds(2);
         ScenesManager.BackToCheckpoint();
@@ -76,7 +81,18 @@ public class Ninja : MonoBehaviour, IDestructable {
             if (d != null)
                 d.ReactToGround(collision);
         }
+        contact = collision.contacts[0];
 
+    }
+
+    public void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
+        {
+            if (d != null && d.isAttached != false)
+                d.ReactToGround(collision);
+        }
+        contact = collision.contacts[collision.contacts.Length-1];
     }
 
 

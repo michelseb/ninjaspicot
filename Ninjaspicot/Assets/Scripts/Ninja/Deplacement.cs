@@ -34,38 +34,43 @@ public abstract class Deplacement : MonoBehaviour {
 
     public virtual void Jump(Vector2 click, float strength)
     {
-        LoseJump();
-        Detach();
-        StartCoroutine(t.FadeAway());
-        r.velocity = new Vector2(0, 0);
+        
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
         Vector2 originClickToWorld = c.ScreenToWorldPoint(new Vector3(originClic.x, originClic.y, 0));
         Vector2 forceToApply = originClickToWorld - clickToWorld;
-        if (GetJumps() <= 0)
+        
         {
-            StartCoroutine(time.RestoreTime());
-            cam.zoomOut(60);
-            
-        }
-        /*if (forceToApply.magnitude < 2)
-        {
-            if (click.x < Screen.width / 3)
+            LoseJump();
+            Detach();
+            StartCoroutine(t.FadeAway());
+            r.velocity = new Vector2(0, 0);
+            if (GetJumps() <= 0)
             {
-                r.AddForce((Vector2.up - Vector2.left) * strength/2, ForceMode2D.Impulse);
+                StartCoroutine(time.RestoreTime());
+                cam.zoomOut(60);
+
             }
-            else if (click.x > Screen.width / 3 && click.x < 2 * Screen.width / 3)
+            /*if (forceToApply.magnitude < 2)
             {
-                r.AddForce(Vector2.up * strength / 2, ForceMode2D.Impulse);
+                if (click.x < Screen.width / 3)
+                {
+                    r.AddForce((Vector2.up - Vector2.left) * strength/2, ForceMode2D.Impulse);
+                }
+                else if (click.x > Screen.width / 3 && click.x < 2 * Screen.width / 3)
+                {
+                    r.AddForce(Vector2.up * strength / 2, ForceMode2D.Impulse);
+                }
+                else
+                {
+                    r.AddForce((Vector2.up + Vector2.left) * strength / 2, ForceMode2D.Impulse);
+                }
             }
             else
-            {
-                r.AddForce((Vector2.up + Vector2.left) * strength / 2, ForceMode2D.Impulse);
-            }
+            {*/
+            
+            r.AddForce(forceToApply.normalized * strength * (GetJumps() + 1) / GetMaxJumps(), ForceMode2D.Impulse);
+            //}
         }
-        else
-        {*/
-        r.AddForce(forceToApply.normalized * strength * (GetJumps()+1)/GetMaxJumps(), ForceMode2D.Impulse);
-        //}
         
     }
 
@@ -78,9 +83,11 @@ public abstract class Deplacement : MonoBehaviour {
     {
         if (canAttach && isAttached == false)
         {
-            gameObject.AddComponent<FixedJoint2D>();
-            gameObject.GetComponent<FixedJoint2D>().enableCollision = true;
-            gameObject.GetComponent<FixedJoint2D>().connectedBody = ri;
+            gameObject.AddComponent<HingeJoint2D>();
+            gameObject.GetComponent<HingeJoint2D>().enableCollision = true;
+            gameObject.GetComponent<HingeJoint2D>().connectedBody = ri;
+            //gameObject.GetComponent<HingeJoint2D>().connectedAnchor = new Vector2(0, -.1f);
+            //gameObject.GetComponent<HingeJoint2D>().anchor = new Vector2(0, -.1f);
             
         }
         isAttached = true;
@@ -90,9 +97,9 @@ public abstract class Deplacement : MonoBehaviour {
     public void Detach()
     {
         isAttached = false;
-        if (gameObject.GetComponent<FixedJoint2D>() != null)
+        if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
-            Destroy(gameObject.GetComponent<FixedJoint2D>());
+            Destroy(gameObject.GetComponent<HingeJoint2D>());
         }
     }
 

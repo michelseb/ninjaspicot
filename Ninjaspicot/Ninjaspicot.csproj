@@ -88,8 +88,10 @@
     <Compile Include="Assets\Scripts\Ninja\DeplacementPrecis.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ghost.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
+    <Compile Include="Assets\Scripts\Ninja\Perimeter.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
+    <Compile Include="Assets\Scripts\Scene\Door.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
     <Compile Include="Assets\Scripts\Scene\Laser.cs" />
     <Compile Include="Assets\Scripts\Scene\Limit.cs" />

@@ -44,4 +44,10 @@ public class TimeManager : MonoBehaviour {
         Time.timeScale = 1;
         increaseValue = .05f;
     }
+
+    public void NormalTime()
+    {
+        Time.timeScale = 1;
+        Time.fixedDeltaTime = Time.timeScale * .02f;
+    }
 }
