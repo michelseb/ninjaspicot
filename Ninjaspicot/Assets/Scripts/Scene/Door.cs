@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Door : MonoBehaviour {
-    bool activated;
+    private bool activated;
     public float timeToOpen;
     public GameObject leftDoor, rightDoor;
     Camera cam;
@@ -56,11 +56,9 @@ public class Door : MonoBehaviour {
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void Activate()
     {
-        if (collision.gameObject.tag == "ninja")
-        {
-            activated = true;
-        }
+        activated = true;
     }
+
 }

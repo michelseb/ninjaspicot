@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class Wall : MonoBehaviour {
 
+    public enum Direction
+    {
+        Left,
+        Right,
+        Up,
+        Down
+    }
+
+    public Direction myDir;
     private bool isGrabbed = false;
 
 	// Use this for initialization

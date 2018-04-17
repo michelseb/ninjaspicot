@@ -45,7 +45,7 @@ public class Ninja : MonoBehaviour, IDestructable {
     {
         g.saveAll(highestPoint);
         Destroy(d);
-        FixedJoint2D j = GetComponent<FixedJoint2D>();
+        HingeJoint2D j = GetComponent<HingeJoint2D>();
         if (j != null)
         {
             Destroy(j);
@@ -76,23 +76,50 @@ public class Ninja : MonoBehaviour, IDestructable {
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        if (d != null)
+        {
+            if (d.hinge != null)
+            {
+                if (d.hinge.motor.motorSpeed > 0)
+                {
+                    contact = collision.contacts[collision.contacts.Length - 1];
+                }
+                else
+                {
+                    contact = collision.contacts[0];
+                }
+            }
+        }
+        
         if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
         {
             if (d != null)
                 d.ReactToGround(collision);
         }
-        contact = collision.contacts[0];
-
     }
 
     public void OnCollisionStay2D(Collision2D collision)
     {
+        if (d != null)
+        {
+            if (d.hinge != null)
+            {
+                if (d.hinge.motor.motorSpeed > 0)
+                {
+                    contact = collision.contacts[collision.contacts.Length - 1];
+                }
+                else
+                {
+                    contact = collision.contacts[0];
+                }
+            }
+        }
+
         if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
         {
             if (d != null && d.isAttached != false)
                 d.ReactToGround(collision);
         }
-        contact = collision.contacts[collision.contacts.Length-1];
     }
 
 

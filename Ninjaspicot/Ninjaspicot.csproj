@@ -88,7 +88,6 @@
     <Compile Include="Assets\Scripts\Ninja\DeplacementPrecis.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ghost.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
-    <Compile Include="Assets\Scripts\Ninja\Perimeter.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
     <Compile Include="Assets\Scripts\Scene\Door.cs" />
@@ -98,8 +97,10 @@
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
+    <Compile Include="Assets\Scripts\Scene\Turrets\Perimeter.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Turret.cs" />
     <Compile Include="Assets\Scripts\Scene\Wall.cs" />
+    <Compile Include="Assets\Scripts\Scene\doorButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Resources\Data\ghost.txt" />

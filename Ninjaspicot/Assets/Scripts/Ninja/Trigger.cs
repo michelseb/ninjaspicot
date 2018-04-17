@@ -5,21 +5,20 @@ using UnityEngine;
 public class Trigger : Ninja {
 
     private int bulletsColliding = 0;
-    ParticleSystem p;
+
     bool attacked;
     private IEnumerator zoom;
 
-    private void Awake()
-    {
-        p = GetComponent<ParticleSystem>();
-    }
 
     private void Update()
     {
         if (bulletsColliding <= 0 && attacked)
         {
             GetComponent<CapsuleCollider2D>().size = new Vector2(10, 14);
-            StopCoroutine(zoom);
+            if (zoom != null)
+            {
+                StopCoroutine(zoom);
+            }
             zoom = cam.zoomOut(60);
             StartCoroutine(zoom);
             StartCoroutine(t.RestoreTime());
@@ -57,15 +56,6 @@ public class Trigger : Ninja {
         }
     }
 
-    public void ActivateParticles()
-    {
-        p.Play();
-    }
-
-    public void DeactivateParticles()
-    {
-        p.Stop();
-    }
 
 
 }

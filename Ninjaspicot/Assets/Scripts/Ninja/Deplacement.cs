@@ -16,7 +16,8 @@ public abstract class Deplacement : MonoBehaviour {
     private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed;
     Ground ground;
     public Vector2 originClic;
-    
+    public JointMotor2D motor;
+    public HingeJoint2D hinge;
 
     private void Awake()
     {
@@ -68,7 +69,7 @@ public abstract class Deplacement : MonoBehaviour {
             else
             {*/
             
-            r.AddForce(forceToApply.normalized * strength * (GetJumps() + 1) / GetMaxJumps(), ForceMode2D.Impulse);
+            r.AddForce(forceToApply.normalized * strength /** (GetJumps() + 1) / GetMaxJumps()*/, ForceMode2D.Impulse);
             //}
         }
         
@@ -83,12 +84,15 @@ public abstract class Deplacement : MonoBehaviour {
     {
         if (canAttach && isAttached == false)
         {
-            gameObject.AddComponent<HingeJoint2D>();
-            gameObject.GetComponent<HingeJoint2D>().enableCollision = true;
-            gameObject.GetComponent<HingeJoint2D>().connectedBody = ri;
+            HingeJoint2D h = gameObject.AddComponent<HingeJoint2D>();
+            h.enableCollision = true;
+            h.connectedBody = ri;
+            h.useMotor = true;
+            JointMotor2D motor = h.motor;
+            h.motor = motor;
             //gameObject.GetComponent<HingeJoint2D>().connectedAnchor = new Vector2(0, -.1f);
             //gameObject.GetComponent<HingeJoint2D>().anchor = new Vector2(0, -.1f);
-            
+
         }
         isAttached = true;
 

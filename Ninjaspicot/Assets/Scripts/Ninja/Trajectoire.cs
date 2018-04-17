@@ -36,7 +36,7 @@ public class Trajectoire : MonoBehaviour {
         Vector2 startClickToWorld = c.ScreenToWorldPoint(new Vector3(startClick.x, startClick.y, 0));
         Vector2 strength = startClickToWorld - clickToWorld;
         float power = (float)(d.GetJumps()) / d.GetMaxJumps();
-        Vector2 vel = strength.normalized * speed * power;
+        Vector2 vel = strength.normalized * speed; //* power;
         if (verts > 2)
         {
             Appear();
@@ -61,8 +61,8 @@ public class Trajectoire : MonoBehaviour {
 
         for (var i = 0; i < verts; i++)
         {
-            vel = vel + grav * Time.fixedUnscaledDeltaTime * power;
-            pos = pos + (vel * Time.fixedUnscaledDeltaTime * power);
+            vel = vel + grav * Time.fixedUnscaledDeltaTime; //* power;
+            pos = pos + (vel * Time.fixedUnscaledDeltaTime); //* power);
             line.SetPosition(i, new Vector3(pos.x, pos.y, 0));
             if (i > 1)
             {
