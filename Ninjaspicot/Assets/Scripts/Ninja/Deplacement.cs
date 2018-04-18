@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Deplacement : MonoBehaviour {
 
     public Trajectoire t;
-    TimeManager time;
+    public TimeManager time;
     CameraBehaviour cam;
     public Rigidbody2D r;
     public Camera c;
@@ -18,6 +18,15 @@ public abstract class Deplacement : MonoBehaviour {
     public Vector2 originClic;
     public JointMotor2D motor;
     public HingeJoint2D hinge;
+    public Ninja n;
+
+    public enum Dir
+    {
+        Left,
+        Right
+    }
+
+    public Dir ninjaDir;
 
     private void Awake()
     {
@@ -51,26 +60,9 @@ public abstract class Deplacement : MonoBehaviour {
                 cam.zoomOut(60);
 
             }
-            /*if (forceToApply.magnitude < 2)
-            {
-                if (click.x < Screen.width / 3)
-                {
-                    r.AddForce((Vector2.up - Vector2.left) * strength/2, ForceMode2D.Impulse);
-                }
-                else if (click.x > Screen.width / 3 && click.x < 2 * Screen.width / 3)
-                {
-                    r.AddForce(Vector2.up * strength / 2, ForceMode2D.Impulse);
-                }
-                else
-                {
-                    r.AddForce((Vector2.up + Vector2.left) * strength / 2, ForceMode2D.Impulse);
-                }
-            }
-            else
-            {*/
             
             r.AddForce(forceToApply.normalized * strength /** (GetJumps() + 1) / GetMaxJumps()*/, ForceMode2D.Impulse);
-            //}
+
         }
         
     }
@@ -84,15 +76,13 @@ public abstract class Deplacement : MonoBehaviour {
     {
         if (canAttach && isAttached == false)
         {
-            HingeJoint2D h = gameObject.AddComponent<HingeJoint2D>();
-            h.enableCollision = true;
-            h.connectedBody = ri;
-            h.useMotor = true;
-            JointMotor2D motor = h.motor;
-            h.motor = motor;
-            //gameObject.GetComponent<HingeJoint2D>().connectedAnchor = new Vector2(0, -.1f);
-            //gameObject.GetComponent<HingeJoint2D>().anchor = new Vector2(0, -.1f);
-
+            hinge = gameObject.AddComponent<HingeJoint2D>();
+            hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+            hinge.enableCollision = true;
+            hinge.connectedBody = ri;
+            hinge.useMotor = true;
+            JointMotor2D motor = hinge.motor;
+            hinge.motor = motor;
         }
         isAttached = true;
 
@@ -101,6 +91,7 @@ public abstract class Deplacement : MonoBehaviour {
     public void Detach()
     {
         isAttached = false;
+
         if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
             Destroy(gameObject.GetComponent<HingeJoint2D>());

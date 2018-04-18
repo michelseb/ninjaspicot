@@ -40,7 +40,7 @@ public class Turret : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-
+        transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
         dir = (bullet.transform.position - transform.position);
 
         switch (turretMode)
@@ -81,24 +81,35 @@ public class Turret : MonoBehaviour {
                 break;
         }
 
-        
-        hit = Physics2D.Raycast(bullet.transform.position, dir, 100f, LayerMask.GetMask("Default"));
-        Debug.DrawRay(bullet.transform.position, dir * 10, Color.green);
-
-        if (hit.collider != null)
+        if (autoShoot == false)
         {
-            //Debug.Log(hit.collider.gameObject.tag);
-            if (hit.collider.gameObject.tag == "ninja")
-            {
+            hit = Physics2D.Raycast(bullet.transform.position, dir, (dir*10).magnitude, LayerMask.GetMask("Default"));
+            Debug.DrawRay(bullet.transform.position, dir * 10, Color.green);
 
-                if (turretMode == Mode.Wait)
+            if (hit.collider != null)
+            {
+                //Debug.Log(hit.collider.gameObject.tag);
+                if (hit.collider.gameObject.tag == "ninja")
                 {
-                    StopCoroutine(search);
-                    turretMode = Mode.Aim;
+
+                    if (turretMode == Mode.Wait)
+                    {
+                        StopCoroutine(search);
+                        turretMode = Mode.Aim;
+                    }
+                    else if (turretMode == Mode.Scan)
+                    {
+                        turretMode = Mode.Aim;
+                    }
                 }
-                else if (turretMode == Mode.Scan && ninjaScript.isAttached == false)
+                else
                 {
-                    turretMode = Mode.Aim;
+                    if (turretMode == Mode.Aim)
+                    {
+                        turretMode = Mode.Wait;
+                        search = StartCoroutine(Search());
+                    }
+
                 }
             }
             else
@@ -108,18 +119,8 @@ public class Turret : MonoBehaviour {
                     turretMode = Mode.Wait;
                     search = StartCoroutine(Search());
                 }
-
             }
         }
-        else
-        {
-            if (turretMode == Mode.Aim)
-            {
-                turretMode = Mode.Wait;
-                search = StartCoroutine(Search());
-            }
-        }
-
         /*if (r.isVisible == false)
         {
             turretMode = Mode.Scan;
@@ -158,7 +159,7 @@ public class Turret : MonoBehaviour {
 
     private IEnumerator Search()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
         if (turretMode != Mode.Aim)
         {
             turretMode = Mode.Scan;

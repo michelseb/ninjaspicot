@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class DeplacementFurtif : Deplacement {
 
+    
     Vector2 propulseVector;
     bool jumpCapable, readyToJump;
-    
+    Collider2D col;
     Trigger tri;
-    Ninja n;
     Coroutine walkOnWalls;
-    
+    Wall wall = null;
     bool isWalking;
     // Use this for initialization
     void Start () {
@@ -49,7 +49,7 @@ public class DeplacementFurtif : Deplacement {
         //{
         if (jumpCapable == false)
         {
-            GetComponent<SpriteRenderer>().color = Color.yellow;
+            //GetComponent<SpriteRenderer>().color = Color.yellow;
             jumpCapable = true;
                 
         }
@@ -81,6 +81,23 @@ public class DeplacementFurtif : Deplacement {
             propulseVector = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             if (isAttached && hinge != null)
             {
+                col = n.contact.collider;
+                if (col != null)
+                {
+                    wall = col.gameObject.GetComponent<Wall>();
+                    if (wall != null)
+                    {
+                        if (wall.myDir == Wall.Direction.Left)
+                        {
+                            ninjaDir = Dir.Left;
+                        }
+                        else
+                        {
+                            ninjaDir = Dir.Right;
+                        }
+                    }
+                    
+                }
                 if ((propulseVector - originClic).magnitude < 20 && isWalking == false)
                 {
                     walkOnWalls = StartCoroutine(WalkOnWalls());
@@ -101,23 +118,30 @@ public class DeplacementFurtif : Deplacement {
                 }
             }
         }
-        if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump && (propulseVector - originClic).magnitude > 20) //&& jumped == false)
+        if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump) //&& jumped == false)
         {
             RaycastHit2D hit = Physics2D.Linecast(transform.position, t.line.GetPosition(2), LayerMask.GetMask("Default"));
             Debug.DrawLine(transform.position, t.line.GetPosition(2), Color.green);
-            if (hit == false)
+            if (hit && hit.collider.tag != "ninja")
             {
-                if (isWalking == true)
-                {
-                    StopCoroutine(walkOnWalls);
-                    isWalking = false;
-                }
-
-                Jump(Input.mousePosition, strength);
-                jumped = true;
-                readyToJump = false;
+                StartCoroutine(t.FadeAway());
+                StartCoroutine(time.RestoreTime());
             }
-            
+            else
+            {
+                if ((propulseVector - originClic).magnitude > 20)
+                {
+                    if (isWalking == true)
+                    {
+                        StopCoroutine(walkOnWalls);
+                        isWalking = false;
+                    }
+
+                    Jump(Input.mousePosition, strength);
+                }
+            }
+            jumped = true;
+            readyToJump = false;
         }
 
 
@@ -128,8 +152,13 @@ public class DeplacementFurtif : Deplacement {
     {
         
         isWalking = true;
-        hinge = gameObject.GetComponent<HingeJoint2D>();
-        Wall wall = n.contact.otherCollider.gameObject.GetComponent<Wall>();
+         
+        if (col != null)
+        {
+            wall = col.gameObject.GetComponent<Wall>();
+            Debug.Log(wall);
+        }
+        
         motor = hinge.motor;
         while (Input.GetButton("Fire1"))
         {
@@ -144,7 +173,9 @@ public class DeplacementFurtif : Deplacement {
             Debug.DrawLine(transform.position, transform.position + new Vector3(0, 2, 0), Color.blue);
             Debug.DrawLine(transform.position, transform.position + new Vector3(0, -2, 0), Color.yellow);*/
 
+            col = n.contact.collider;
             
+
             if (wall != null)
             {
                 if (wall.myDir == Wall.Direction.Right)
@@ -176,6 +207,9 @@ public class DeplacementFurtif : Deplacement {
             
             yield return null;
         }
+        motor.motorSpeed = 0;
+        hinge.motor = motor;
+        hinge.anchor = transform.InverseTransformPoint(n.contact.point);
         isWalking = false;
 
     }

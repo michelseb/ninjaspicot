@@ -76,26 +76,12 @@ public class Ninja : MonoBehaviour, IDestructable {
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (d != null)
-        {
-            if (d.hinge != null)
-            {
-                if (d.hinge.motor.motorSpeed > 0)
-                {
-                    contact = collision.contacts[collision.contacts.Length - 1];
-                }
-                else
-                {
-                    contact = collision.contacts[0];
-                }
-            }
-        }
-        
         if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
         {
             if (d != null)
                 d.ReactToGround(collision);
         }
+        contact = collision.contacts[0];
     }
 
     public void OnCollisionStay2D(Collision2D collision)
@@ -104,7 +90,8 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             if (d.hinge != null)
             {
-                if (d.hinge.motor.motorSpeed > 0)
+                d.hinge.anchor = transform.InverseTransformPoint(contact.point);
+                if (d.ninjaDir == Deplacement.Dir.Right)
                 {
                     contact = collision.contacts[collision.contacts.Length - 1];
                 }
@@ -114,13 +101,9 @@ public class Ninja : MonoBehaviour, IDestructable {
                 }
             }
         }
-
-        if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
-        {
-            if (d != null && d.isAttached != false)
-                d.ReactToGround(collision);
-        }
     }
+
+        
 
 
 
