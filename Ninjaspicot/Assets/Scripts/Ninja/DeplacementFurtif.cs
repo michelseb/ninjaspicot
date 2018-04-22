@@ -98,11 +98,11 @@ public class DeplacementFurtif : Deplacement {
                     }
                     
                 }
-                if ((propulseVector - originClic).magnitude < 20 && isWalking == false)
+                if ((propulseVector - originClic).magnitude < 40 && isWalking == false)
                 {
                     walkOnWalls = StartCoroutine(WalkOnWalls());
                 }
-                if ((propulseVector - originClic).magnitude> 10 && jumpCapable)
+                if ((propulseVector - originClic).magnitude> 40 && jumpCapable)
                 {
                     t.Reduce();
                     t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
@@ -111,7 +111,7 @@ public class DeplacementFurtif : Deplacement {
             }
             else
             {
-                if ((propulseVector - originClic).magnitude > 20 && jumpCapable)
+                if ((propulseVector - originClic).magnitude > 40 && jumpCapable)
                 {
                     t.Reduce();
                     t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
@@ -129,7 +129,7 @@ public class DeplacementFurtif : Deplacement {
             }
             else
             {
-                if ((propulseVector - originClic).magnitude > 20)
+                if ((propulseVector - originClic).magnitude > 40)
                 {
                     if (isWalking == true)
                     {
@@ -181,13 +181,13 @@ public class DeplacementFurtif : Deplacement {
                 if (wall.myDir == Wall.Direction.Right)
                 {
                     Debug.Log("right");
-                    motor.motorSpeed = 1000;
+                    motor.motorSpeed = 500;
                     //r.AddForce(new Vector2(.3f, 1).normalized * strength * 10, ForceMode2D.Force);
                 }
                 else if (wall.myDir == Wall.Direction.Left)
                 {
                     Debug.Log("left");
-                    motor.motorSpeed = -1000;
+                    motor.motorSpeed = -500;
                     //r.AddForce(new Vector2(-.3f, 1).normalized * strength * 10, ForceMode2D.Force);
                 }
             }

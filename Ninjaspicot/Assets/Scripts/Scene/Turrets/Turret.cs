@@ -23,6 +23,7 @@ public class Turret : MonoBehaviour {
     Vector3 dir;
     private Coroutine search;
     private enum Mode {Scan, Aim, Wait};
+    public int vision;
     Mode turretMode;
     
     
@@ -83,8 +84,8 @@ public class Turret : MonoBehaviour {
 
         if (autoShoot == false)
         {
-            hit = Physics2D.Raycast(bullet.transform.position, dir, (dir*10).magnitude, LayerMask.GetMask("Default"));
-            Debug.DrawRay(bullet.transform.position, dir * 10, Color.green);
+            hit = Physics2D.Raycast(bullet.transform.position, dir, (dir*10).magnitude * vision, LayerMask.GetMask("Default"));
+            Debug.DrawRay(bullet.transform.position, dir * 10 * vision, Color.green);
 
             if (hit.collider != null)
             {

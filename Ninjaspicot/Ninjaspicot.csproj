@@ -78,6 +78,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Oriental(lite)font\FontScene\Script\FontText_Script.cs" />
+    <Compile Include="Assets\Scripts\GameMaster\Intro.cs" />
     <Compile Include="Assets\Scripts\GameMaster\ScenesManager.cs" />
     <Compile Include="Assets\Scripts\GameMaster\TimeManager.cs" />
     <Compile Include="Assets\Scripts\GameMaster\Timer.cs" />

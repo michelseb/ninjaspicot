@@ -7,6 +7,7 @@ public class CameraBehaviour : MonoBehaviour {
     public GameObject ninja;
     private Camera cam;
 
+    public bool centerX;
     private float leftScreen = Screen.width / 6;
     private float rightScreen = Screen.width * 5 / 6;
     private float topScreen = Screen.height / 6;
@@ -41,7 +42,14 @@ public class CameraBehaviour : MonoBehaviour {
 
     private void Center()
     {
-        transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, ninja.transform.position.y, transform.position.z), .1f);
+        if (centerX)
+        {
+            transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, ninja.transform.position.y, transform.position.z), .1f);
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, new Vector3(ninja.transform.position.x, ninja.transform.position.y, transform.position.z), .1f);
+        }
     }
 
     public IEnumerator zoomIn(int zoom)

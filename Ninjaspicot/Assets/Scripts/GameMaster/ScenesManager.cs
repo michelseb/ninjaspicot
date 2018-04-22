@@ -39,8 +39,9 @@ public class ScenesManager : MonoBehaviour {
 
     public static void BackToBeginning()
     {
-        currentScene = 0;
-        SceneManager.LoadScene("level" + currentScene);
+        currentScene = -1;
+        SceneManager.LoadScene("intro");
+
     }
     public static void BackToCheckpoint()
     {
@@ -61,5 +62,7 @@ public class ScenesManager : MonoBehaviour {
     {
         return numberOfLevels;
     }
+
+
 
 }
