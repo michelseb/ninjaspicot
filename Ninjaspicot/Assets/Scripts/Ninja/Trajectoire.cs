@@ -18,7 +18,7 @@ public class Trajectoire : MonoBehaviour {
     {
         c = GetComponent<Camera>();
         cam = FindObjectOfType<CameraBehaviour>();
-        line = this.GetComponent<LineRenderer>();
+        line = GameObject.Find("Ninjaspicot").GetComponent<LineRenderer>();
         t = FindObjectOfType<TimeManager>();
         d = GameObject.Find("Ninjaspicot").GetComponent<DeplacementFurtif>();
     }

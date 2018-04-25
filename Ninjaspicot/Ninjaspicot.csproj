@@ -91,6 +91,7 @@
     <Compile Include="Assets\Scripts\Ninja\Ghost.cs" />
     <Compile Include="Assets\Scripts\Ninja\Ninja.cs" />
     <Compile Include="Assets\Scripts\Ninja\ScaleWidthCam.cs" />
+    <Compile Include="Assets\Scripts\Ninja\Touch.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
     <Compile Include="Assets\Scripts\Scene\Door.cs" />
