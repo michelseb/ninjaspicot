@@ -70,7 +70,7 @@ public class Trajectoire : MonoBehaviour {
                 
                 if (hit)
                 {
-                    if (hit.collider.gameObject.tag == "Wall")
+                    if (hit.collider.gameObject.tag == "GrabableWall")
                     {
                         vertsMax = i;
                         verts = i;

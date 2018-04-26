@@ -6,13 +6,14 @@ public class DeplacementFurtif : Deplacement {
 
     
     Vector2 propulseVector;
-    bool jumpCapable, readyToJump;
+    bool readyToJump;
     Collider2D col;
     Trigger tri;
     Coroutine walkOnWalls;
     Wall wall = null;
     bool isWalking;
-    // Use this for initialization
+    Touch to;
+
     void Start () {
         n = GetComponent<Ninja>();
         SetMaxJumps(2);
@@ -20,106 +21,76 @@ public class DeplacementFurtif : Deplacement {
         strength = 80;
         canAttach = true;
         tri = FindObjectOfType<Trigger>();
-        //propulseStrengthMax = 100;
+        to = FindObjectOfType<Touch>();
+        OriginalRapidite = rapidite;
     }
 
     void Update()
-    {
-
-        /*if (isAttached)
-        {
-            if (hinge == null)
-            {
-                hinge = gameObject.GetComponent<HingeJoint2D>();
-            }
-            if (n.contact.point.x < transform.position.x)
-            {
-                hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-                r.AddForce(new Vector2(1, 1) * strength * 5, ForceMode2D.Force);
-            }
-            else
-            {
-                hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-                r.AddForce(new Vector2(1, 1) * strength * 5, ForceMode2D.Force);
-            }
-
-            
-        }*/
-        //if (Mathf.Abs(r.velocity.y) < 20)
-        //{
-        if (jumpCapable == false)
-        {
-            //GetComponent<SpriteRenderer>().color = Color.yellow;
-            jumpCapable = true;
-                
-        }
-        //}
-        /*else
-        {
-            if (jumpCapable == true)
-            {
-                GetComponent<SpriteRenderer>().color = Color.white;
-                tri.DeactivateParticles();
-                jumpCapable = false;
-                //StartCoroutine(time.RestoreTime());
-                SetJumps(0);
-            }
-        }*/
-        if (Input.GetButtonDown("Fire1") && jumpCapable)
+    { 
+        
+        if (Input.GetButtonDown("Fire1"))
         {
             
             originClic = Input.mousePosition;
+            StartCoroutine(to.CreatePoints(originClic));
+            if (originClic.x < Screen.width / 2)
+            {
+                ninjaDir = Dir.Left;
+            }
+            else
+            {
+                ninjaDir = Dir.Right;
+            }
             readyToJump = true;
             t.Reset();
 
-        }/*else if(Input.GetButtonDown("Fire1") && jumpCapable == false)
-        {
-            n.Die(null);
-        }*/
+        }
+
         if (readyToJump && GetJumps() > 0)
         {
             propulseVector = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
+            Vector3 propulseVectorToWorld = c.ScreenToWorldPoint(propulseVector);
             if (isAttached && hinge != null)
             {
-                col = n.contact.collider;
-                if (col != null)
+                
+                if ((propulseVectorToWorld - originClicToWorld).magnitude < 5)
                 {
-                    wall = col.gameObject.GetComponent<Wall>();
-                    if (wall != null)
+                    if (isWalking == false)
                     {
-                        if (wall.myDir == Wall.Direction.Left)
-                        {
-                            ninjaDir = Dir.Left;
-                        }
-                        else
-                        {
-                            ninjaDir = Dir.Right;
-                        }
+                        walkOnWalls = StartCoroutine(WalkOnWalls());
                     }
                     
+                    StartCoroutine(t.FadeAway());
+                    time.NormalTime();
                 }
-                if ((propulseVector - originClic).magnitude < 40 && isWalking == false)
+                if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
                 {
-                    walkOnWalls = StartCoroutine(WalkOnWalls());
-                }
-                if ((propulseVector - originClic).magnitude> 40 && jumpCapable)
-                {
-                    t.Reduce();
+                    //t.Reduce();
                     t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
                 }
 
             }
             else
             {
-                if ((propulseVector - originClic).magnitude > 40 && jumpCapable)
+                if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
                 {
-                    t.Reduce();
+                    //t.Reduce();
                     t.DrawTraject(transform.position, GetComponent<Rigidbody2D>().velocity, Input.mousePosition, originClic, strength);
+                }
+
+                if ((propulseVectorToWorld - originClicToWorld).magnitude < 5)
+                {
+                    StartCoroutine(t.FadeAway());
+                    time.NormalTime();
                 }
             }
         }
-        if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump) //&& jumped == false)
+        if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump)
         {
+            to.Erase();
+            Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
+            Vector3 propulseVectorToWorld = c.ScreenToWorldPoint(propulseVector);
             RaycastHit2D hit = Physics2D.Linecast(transform.position, t.line.GetPosition(2), LayerMask.GetMask("Default"));
             Debug.DrawLine(transform.position, t.line.GetPosition(2), Color.green);
             if (hit && hit.collider.tag != "ninja")
@@ -129,7 +100,7 @@ public class DeplacementFurtif : Deplacement {
             }
             else
             {
-                if ((propulseVector - originClic).magnitude > 40)
+                if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
                 {
                     if (isWalking == true)
                     {
@@ -162,49 +133,20 @@ public class DeplacementFurtif : Deplacement {
         motor = hinge.motor;
         while (Input.GetButton("Fire1"))
         {
-
-            /*RaycastHit2D hitleft = Physics2D.Linecast(transform.position, transform.position+new Vector3(-15,0,0), LayerMask.GetMask("Default"));
-            RaycastHit2D hitright = Physics2D.Linecast(transform.position, transform.position + new Vector3(15, 0, 0), LayerMask.GetMask("Default"));
-            RaycastHit2D hitup = Physics2D.Linecast(transform.position, transform.position + new Vector3(0, 2, 0), LayerMask.GetMask("Default"));
-            RaycastHit2D hitdown = Physics2D.Linecast(transform.position, transform.position + new Vector3(0, -2, 0), LayerMask.GetMask("Default"));
-
-            Debug.DrawLine(transform.position, transform.position + new Vector3(15, 0, 0), Color.green);
-            Debug.DrawLine(transform.position, transform.position + new Vector3(-15, 0, 0), Color.red);
-            Debug.DrawLine(transform.position, transform.position + new Vector3(0, 2, 0), Color.blue);
-            Debug.DrawLine(transform.position, transform.position + new Vector3(0, -2, 0), Color.yellow);*/
-
             col = n.contact.collider;
-            
 
-            if (wall != null)
+            if (ninjaDir == Dir.Right)
             {
-                if (wall.myDir == Wall.Direction.Right)
-                {
-                    Debug.Log("right");
-                    motor.motorSpeed = 500;
-                    //r.AddForce(new Vector2(.3f, 1).normalized * strength * 10, ForceMode2D.Force);
-                }
-                else if (wall.myDir == Wall.Direction.Left)
-                {
-                    Debug.Log("left");
-                    motor.motorSpeed = -500;
-                    //r.AddForce(new Vector2(-.3f, 1).normalized * strength * 10, ForceMode2D.Force);
-                }
+                motor.motorSpeed = rapidite;
             }
-            /*else if (hitdown)
+            else if (ninjaDir == Dir.Left)
             {
-                r.AddForce(new Vector2(-.3f, 1).normalized * strength * 10, ForceMode2D.Force);
+                motor.motorSpeed = -rapidite;
             }
-            else if (hitup)
-            {
-                r.AddForce(new Vector2(1, .1f).normalized * strength * 10, ForceMode2D.Force);
-            }
-            */
+
             hinge.motor = motor; 
             hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-           
-            
-            
+
             yield return null;
         }
         motor.motorSpeed = 0;

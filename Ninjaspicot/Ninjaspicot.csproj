@@ -100,6 +100,7 @@
     <Compile Include="Assets\Scripts\Scene\Limit.cs" />
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
+    <Compile Include="Assets\Scripts\Scene\SpeedBoost.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Perimeter.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Turret.cs" />

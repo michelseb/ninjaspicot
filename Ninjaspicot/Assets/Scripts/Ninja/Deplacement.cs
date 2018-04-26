@@ -19,6 +19,7 @@ public abstract class Deplacement : MonoBehaviour {
     public JointMotor2D motor;
     public HingeJoint2D hinge;
     public Ninja n;
+    public int rapidite, OriginalRapidite;
 
     public enum Dir
     {
@@ -87,6 +88,14 @@ public abstract class Deplacement : MonoBehaviour {
         isAttached = true;
 
     }
+
+    public IEnumerator SpeedBoost(float time)
+    {
+        rapidite *= 2;
+        yield return new WaitForSeconds(time);
+        rapidite = OriginalRapidite;
+    }
+
 
     public void Detach()
     {

@@ -8,33 +8,50 @@ public class Touch : MonoBehaviour {
     public float xradius;
     public float yradius;
     LineRenderer line;
+    Camera c;
+    public bool canGo;
 
     void Start()
     {
+        canGo = false;
+        c = GetComponent<Camera>();
         line = GetComponent<LineRenderer>();
 
-        line.SetVertexCount(segments + 1);
+        line.SetVertexCount(0);
         line.useWorldSpace = false;
-        CreatePoints();
+
     }
 
 
-    void CreatePoints()
+    public IEnumerator CreatePoints(Vector3 mousePos)
     {
+
+        
+        Vector3 pos = c.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+        pos -= transform.position; 
         float x;
         float y;
         float z = 5f;
-
+        canGo = false;
         float angle = 20f;
 
         for (int i = 0; i < (segments + 1); i++)
         {
-            x = Mathf.Sin(Mathf.Deg2Rad * angle) * xradius;
-            y = Mathf.Cos(Mathf.Deg2Rad * angle) * yradius;
+            
+            line.SetVertexCount(i+1);
+            x = pos.x + Mathf.Sin(Mathf.Deg2Rad * angle) * xradius;
+            y = pos.y + Mathf.Cos(Mathf.Deg2Rad * angle) * yradius;
 
             line.SetPosition(i, new Vector3(x, y, z));
 
             angle += (360f / segments);
+            yield return new WaitForSeconds(.001f);
         }
+        canGo = true;
+    }
+
+    public void Erase()
+    {
+        line.SetVertexCount(0);
     }
 }
