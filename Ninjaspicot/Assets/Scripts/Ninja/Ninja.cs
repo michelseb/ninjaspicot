@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class Ninja : MonoBehaviour, IDestructable {
 
-    public ContactPoint2D contact;
+    public ContactPoint2D contact, previousContact;
+    public ContactPoint2D[] contacts;
     public Deplacement d;
     public Rigidbody2D r;
     public Camera c;
     public CameraBehaviour cam;
     public TimeManager t;
+    public Queue<GameObject> lastColliders;
+    public GameObject currCollider;
     Ghost g;
     private float highestPoint;
     bool selectMode;
-	// Use this for initialization
+    public bool getsCheckPoint;
+
+    // Use this for initialization
     void Awake()
     {
         //SelectDeplacementMode();
@@ -26,6 +31,12 @@ public class Ninja : MonoBehaviour, IDestructable {
         t = FindObjectOfType<TimeManager>();
         g = FindObjectOfType<Ghost>();
         t.activated = true;
+        lastColliders = new Queue<GameObject>();
+
+        if (getsCheckPoint)
+        {
+            ScenesManager.SetCheckpoint();
+        }
     }
 	
 	// Update is called once per frame
@@ -34,11 +45,17 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             d = FindObjectOfType<Deplacement>();
         }
-        
+
         if (transform.position.y > highestPoint)
         {
             highestPoint = transform.position.y;
         }
+        
+        if (lastColliders.Count > 5)
+        {
+            lastColliders.Dequeue();
+        }
+        
     }
 
     public void Die(Transform killer)
@@ -74,36 +91,20 @@ public class Ninja : MonoBehaviour, IDestructable {
         ScenesManager.BackToCheckpoint();
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.GetComponent<Rigidbody2D>() != null)
-        {
-            if (d != null)
-                d.ReactToGround(collision);
-        }
-        contact = collision.contacts[0];
-    }
-
+    
     public void OnCollisionStay2D(Collision2D collision)
     {
         if (d != null)
         {
-            if (d.hinge != null)
-            {
-                d.hinge.anchor = transform.InverseTransformPoint(contact.point);
-                if (d.ninjaDir == Deplacement.Dir.Right)
-                {
-                    contact = collision.contacts[collision.contacts.Length - 1];
-                }
-                else
-                {
-                    contact = collision.contacts[0];
-                }
-            }
-        }
-    }
 
-        
+            if (d.readyToJump)
+            {
+                contact = SelectContactPoint(collision.contacts, previousContact);
+            }
+            previousContact = contact;
+        }
+        contacts = collision.contacts;
+    }
 
 
 
@@ -131,4 +132,39 @@ public class Ninja : MonoBehaviour, IDestructable {
         }
     }
 
+    ContactPoint2D SelectContactPoint(ContactPoint2D[] contacts, ContactPoint2D previous) //WOOOOHOOO ça marche !!!!!
+    {
+        
+        ContactPoint2D cont = new ContactPoint2D();
+        float dist = 0;
+        foreach (ContactPoint2D c in contacts)
+        {
+            if (Vector3.Distance(previous.point, c.point) > dist)
+            {
+                dist = Vector3.Distance(previous.point, c.point);
+                cont = c;
+            }
+        }
+
+        return cont;
+    }
+
+    public bool CheckRecentCollider(GameObject col)
+    {
+        if (col != currCollider)
+        {
+            if (lastColliders.Contains(col))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+    void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 0, 0, .4f);
+        Gizmos.DrawSphere(contact.point, 1f);
+    }*/
 }

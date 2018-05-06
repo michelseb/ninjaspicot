@@ -13,7 +13,6 @@ public class DeplacementPrecis : Deplacement {
     void Start () {
         SetMaxJumps(1);
         strength = 70;
-        canAttach = true;
     }
 
     // Update is called once per frame

@@ -12,14 +12,22 @@ public class CameraBehaviour : MonoBehaviour {
     private float rightScreen = Screen.width * 5 / 6;
     private float topScreen = Screen.height / 6;
     private float bottomScreen = Screen.height * 5 / 6;
+    public int beginZoom;
+
 
     private void Awake()
     {
         cam = GetComponent<Camera>();
+        
     }
 
+    private void Start()
+    {
+        InstantZoom(beginZoom);
+    }
     private void Update()
     {
+        
         Center();
         //CheckPositionOnScreen(ninja.transform.position);
         leftScreen = Screen.width / 6;
@@ -54,7 +62,9 @@ public class CameraBehaviour : MonoBehaviour {
 
     public IEnumerator zoomIn(int zoom)
     {
-        while (cam.orthographicSize > zoom)
+        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        
+        while (cam.orthographicSize > height / ScaleWidthCam.pixelsToUnits / 2 - zoom)
         {
             
             cam.orthographicSize--;
@@ -63,9 +73,16 @@ public class CameraBehaviour : MonoBehaviour {
         
     }
 
+    public void InstantZoom(int zoom)
+    {
+        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        cam.orthographicSize = height / ScaleWidthCam.pixelsToUnits / 2 + zoom;
+    }
+
     public IEnumerator zoomOut(int zoom)
     {
-        while (cam.orthographicSize < zoom)
+        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        while (cam.orthographicSize < height / ScaleWidthCam.pixelsToUnits / 2 + zoom)
         {
             cam.orthographicSize++;
             yield return null;

@@ -15,6 +15,7 @@ public class Scene
 public class ScenesManager : MonoBehaviour {
 
     private int numberOfLevels;
+    public int startScene;
     List<Scene> sceneList;
     private static int currentScene = 0, checkpoint = 0;
 
@@ -23,7 +24,14 @@ public class ScenesManager : MonoBehaviour {
     {
         DontDestroyOnLoad(gameObject);
         numberOfLevels = SceneManager.sceneCountInBuildSettings - 2;
-        BackToBeginning();
+        if (startScene == 0)
+        {
+            BackToBeginning();
+        }else
+        {
+            currentScene = startScene;
+            ResetScene();
+        }
     }
 
     public static void LevelSelectMenu()
@@ -53,9 +61,9 @@ public class ScenesManager : MonoBehaviour {
         currentScene++;
         SceneManager.LoadScene("level" + currentScene);
     }
-    public void SetCheckpoint(int check)
+    public static void SetCheckpoint()
     {
-        checkpoint = check;
+        checkpoint = currentScene;
     }
 
     public int GetNumberOfLevels()

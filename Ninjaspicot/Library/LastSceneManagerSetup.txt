@@ -4,10 +4,10 @@ sceneSetups:
   isActive: 0
 - path: Assets/Levels/intro.unity
   isLoaded: 1
-  isActive: 1
+  isActive: 0
 - path: Assets/Levels/level0.unity
   isLoaded: 1
-  isActive: 0
+  isActive: 1
 - path: Assets/Levels/level1.unity
   isLoaded: 1
   isActive: 0

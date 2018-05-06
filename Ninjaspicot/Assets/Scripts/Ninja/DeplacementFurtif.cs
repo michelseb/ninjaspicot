@@ -6,31 +6,35 @@ public class DeplacementFurtif : Deplacement {
 
     
     Vector2 propulseVector;
-    bool readyToJump;
-    Collider2D col;
     Trigger tri;
     Coroutine walkOnWalls;
-    Wall wall = null;
-    bool isWalking;
+    bool isWalking, started;
     Touch to;
+    
 
     void Start () {
         n = GetComponent<Ninja>();
         SetMaxJumps(2);
         GainAllJumps();
         strength = 80;
-        canAttach = true;
         tri = FindObjectOfType<Trigger>();
         to = FindObjectOfType<Touch>();
         OriginalRapidite = rapidite;
     }
 
     void Update()
-    { 
+    {
+
         
-        if (Input.GetButtonDown("Fire1"))
+
+        //Debug.Log(n.contact.point.x + " " + n.contact.point.y);
+        if (Input.GetButtonDown("Fire1") && GetJumps() > 0)
         {
-            
+            if (!started)
+            {
+                StartCoroutine(cam.zoomIn(0));
+                started = true;
+            }
             originClic = Input.mousePosition;
             StartCoroutine(to.CreatePoints(originClic));
             if (originClic.x < Screen.width / 2)
@@ -124,16 +128,9 @@ public class DeplacementFurtif : Deplacement {
         
         isWalking = true;
          
-        if (col != null)
-        {
-            wall = col.gameObject.GetComponent<Wall>();
-            Debug.Log(wall);
-        }
-        
         motor = hinge.motor;
         while (Input.GetButton("Fire1"))
         {
-            col = n.contact.collider;
 
             if (ninjaDir == Dir.Right)
             {
@@ -146,20 +143,31 @@ public class DeplacementFurtif : Deplacement {
 
             hinge.motor = motor; 
             hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
 
             yield return null;
         }
         motor.motorSpeed = 0;
         hinge.motor = motor;
         hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+        hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
         isWalking = false;
 
     }
 
     /*void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = new Color(1,0,0,.6f);
+        if (hinge != null)
+        {
+            Gizmos.DrawSphere(transform.TransformPoint(hinge.anchor), 1f);
+        }
+        Gizmos.color = Color.blue;
         Gizmos.DrawSphere(n.contact.point, .5f);
+        /*foreach (ContactPoint2D c in n.contacts)
+        {
+            Gizmos.DrawSphere(c.point, .5f);
+        }
     }*/
 
 

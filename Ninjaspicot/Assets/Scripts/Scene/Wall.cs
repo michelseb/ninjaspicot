@@ -1,27 +1,71 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[DisallowMultipleComponent]
 public class Wall : MonoBehaviour {
 
-    public enum Direction
-    {
-        Left,
-        Right,
-        Up,
-        Down
-    }
-
-    public Direction myDir;
     private bool isGrabbed = false;
+    Ninja n;
+    Deplacement d;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+    // Use this for initialization
+    private void Awake()
+    {
+        n = FindObjectOfType<Ninja>();
+        d = FindObjectOfType<Deplacement>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        if (d == null)
+        {
+            d = FindObjectOfType<Deplacement>();
+        }
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "ninja")
+        {
+            if (n.currCollider == null)
+            {
+                n.currCollider = gameObject;
+            }
+
+            if (n.CheckRecentCollider(gameObject))
+            {
+                n.contact = collision.contacts[collision.contacts.Length - 1];
+                n.currCollider = gameObject;
+            }
+
+            if (d != null)
+            {
+                d.ReactToGround(gameObject);
+
+            }
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                Debug.DrawRay(contact.point, contact.normal, Color.green);
+            }
+        }
+    }
+
+
+    public void OnCollisionStay2D(Collision2D collision)
+    {
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            Debug.DrawRay(contact.point, contact.normal, Color.green);
+        }
+        n.lastColliders.Enqueue(gameObject);
+    }
+    /*
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        foreach (ContactPoint2D c in contacts)
+        {*
+    Gizmos.DrawSphere(c.point, .5f);
+        //}
+    }*/
 }

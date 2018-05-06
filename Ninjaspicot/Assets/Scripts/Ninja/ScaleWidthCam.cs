@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 public class ScaleWidthCam : MonoBehaviour {
 
-    public int targetWidth = 640;
-    public float pixelsToUnits = 100;
+    public static int targetWidth = 1080;
+    public static float pixelsToUnits = 20;
 
-	void Update () {
+	public void Awake() {
 
         int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
         GetComponent<Camera>().orthographicSize = height / pixelsToUnits / 2;

@@ -19,7 +19,7 @@ public class Trigger : Ninja {
             {
                 StopCoroutine(zoom);
             }
-            zoom = cam.zoomOut(60);
+            zoom = cam.zoomOut(0);
             StartCoroutine(zoom);
             StartCoroutine(t.RestoreTime());
             attacked = false;

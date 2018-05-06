@@ -6,20 +6,24 @@ public abstract class Deplacement : MonoBehaviour {
 
     public Trajectoire t;
     public TimeManager time;
-    CameraBehaviour cam;
+    public CameraBehaviour cam;
     public Rigidbody2D r;
     public Camera c;
     public float strength;
-    public bool canJump, jumped, canAttach, isAttached, preciseJump;
+    public bool jumped, isAttached, preciseJump;
     Animator anim;
     private enum Ground { grabable, bumpy };
-    private int numberOfJumpsAllowed, maxNumberOfJumpsAllowed;
+    private int numberOfJumpsAllowed; 
+    public int maxNumberOfJumpsAllowed;
     Ground ground;
     public Vector2 originClic;
     public JointMotor2D motor;
     public HingeJoint2D hinge;
     public Ninja n;
     public int rapidite, OriginalRapidite;
+    public bool readyToJump;
+   
+    
 
     public enum Dir
     {
@@ -50,21 +54,18 @@ public abstract class Deplacement : MonoBehaviour {
         Vector2 originClickToWorld = c.ScreenToWorldPoint(new Vector3(originClic.x, originClic.y, 0));
         Vector2 forceToApply = originClickToWorld - clickToWorld;
         
+        LoseJump();
+        Detach();
+        StartCoroutine(t.FadeAway());
+        r.velocity = new Vector2(0, 0);
+        if (GetJumps() <= 0)
         {
-            LoseJump();
-            Detach();
-            StartCoroutine(t.FadeAway());
-            r.velocity = new Vector2(0, 0);
-            if (GetJumps() <= 0)
-            {
-                StartCoroutine(time.RestoreTime());
-                cam.zoomOut(60);
-
-            }
-            
-            r.AddForce(forceToApply.normalized * strength /** (GetJumps() + 1) / GetMaxJumps()*/, ForceMode2D.Impulse);
+            StartCoroutine(time.RestoreTime());
+            cam.zoomOut(0);
 
         }
+            
+        r.AddForce(forceToApply.normalized * strength /** (GetJumps() + 1) / GetMaxJumps()*/, ForceMode2D.Impulse);
         
     }
 
@@ -75,10 +76,13 @@ public abstract class Deplacement : MonoBehaviour {
 
     public void Attach(Rigidbody2D ri)
     {
-        if (canAttach && isAttached == false)
+        if (isAttached == false)
         {
+            r.velocity = new Vector2(0, 0);
             hinge = gameObject.AddComponent<HingeJoint2D>();
+            hinge.useLimits = false;
             hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
             hinge.enableCollision = true;
             hinge.connectedBody = ri;
             hinge.useMotor = true;
@@ -138,34 +142,26 @@ public abstract class Deplacement : MonoBehaviour {
         numberOfJumpsAllowed = maxNumberOfJumpsAllowed;
     }
 
-    public void ReactToGround(Collision2D col)
+    public void ReactToGround(GameObject g)
     {
         jumped = false;
         GainAllJumps();
         anim.SetFloat("velocity", r.velocity.magnitude);
         anim.SetTrigger("hit");
-        switch (col.gameObject.tag)
+        switch (g.tag)
         {
             case "GrabableWall":
                 ground = Ground.grabable;
-                Attach(col.rigidbody);
-                canJump = true;
+                Attach(g.GetComponent<Rigidbody2D>());
                 break;
             case "BumpyWall":
                 ground = Ground.bumpy;
                 r.velocity = new Vector2(0, 0);
-                r.AddForce(new Vector2(col.gameObject.transform.position.x - transform.position.x, 0) * 100, ForceMode2D.Impulse);
-                break;
-            case "Wall":
-                canJump = true;
-                break;
-            case "Turret":
-                canJump = true;
+                r.AddForce(new Vector2(g.transform.position.x - transform.position.x, 0) * 100, ForceMode2D.Impulse);
                 break;
             case "GrabableTurret":
                 ground = Ground.grabable;
-                Attach(col.rigidbody);
-                canJump = true;
+                Attach(g.GetComponent<Rigidbody2D>());
                 break;
 
         }

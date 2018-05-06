@@ -99,6 +99,7 @@
     <Compile Include="Assets\Scripts\Scene\Laser.cs" />
     <Compile Include="Assets\Scripts\Scene\Limit.cs" />
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
+    <Compile Include="Assets\Scripts\Scene\Mist.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\SpeedBoost.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
