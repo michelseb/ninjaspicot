@@ -9,11 +9,9 @@ public class Touch : MonoBehaviour {
     public float yradius;
     LineRenderer line;
     Camera c;
-    public bool canGo;
 
     void Start()
     {
-        canGo = false;
         c = GetComponent<Camera>();
         line = GetComponent<LineRenderer>();
 
@@ -32,7 +30,6 @@ public class Touch : MonoBehaviour {
         float x;
         float y;
         float z = 5f;
-        canGo = false;
         float angle = 20f;
 
         for (int i = 0; i < (segments + 1); i++)
@@ -47,7 +44,6 @@ public class Touch : MonoBehaviour {
             angle += (360f / segments);
             yield return new WaitForSeconds(.001f);
         }
-        canGo = true;
     }
 
     public void Erase()

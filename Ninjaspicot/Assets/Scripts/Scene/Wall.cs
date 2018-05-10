@@ -43,20 +43,12 @@ public class Wall : MonoBehaviour {
                 d.ReactToGround(gameObject);
 
             }
-            foreach (ContactPoint2D contact in collision.contacts)
-            {
-                Debug.DrawRay(contact.point, contact.normal, Color.green);
-            }
         }
     }
 
 
     public void OnCollisionStay2D(Collision2D collision)
     {
-        foreach (ContactPoint2D contact in collision.contacts)
-        {
-            Debug.DrawRay(contact.point, contact.normal, Color.green);
-        }
         n.lastColliders.Enqueue(gameObject);
     }
     /*

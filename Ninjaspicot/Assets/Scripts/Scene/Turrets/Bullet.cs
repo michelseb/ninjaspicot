@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour {
             n.Die(transform);
             Destroy(gameObject);
         }
-        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "GrabableWall")
+        if (collision.gameObject.GetComponent<Wall>() != null)
         {
             Destroy(gameObject);
         }

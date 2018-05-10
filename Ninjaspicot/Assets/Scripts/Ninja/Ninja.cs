@@ -55,8 +55,11 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             lastColliders.Dequeue();
         }
-        
+
+        //r.velocity = currCollider.GetComponent<Rigidbody2D>().velocity;
     }
+
+    
 
     public void Die(Transform killer)
     {
@@ -96,11 +99,7 @@ public class Ninja : MonoBehaviour, IDestructable {
     {
         if (d != null)
         {
-
-            if (d.readyToJump)
-            {
-                contact = SelectContactPoint(collision.contacts, previousContact);
-            }
+            contact = SelectContactPoint(collision.contacts, previousContact);
             previousContact = contact;
         }
         contacts = collision.contacts;

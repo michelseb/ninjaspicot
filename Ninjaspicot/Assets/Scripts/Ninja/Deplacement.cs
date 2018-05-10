@@ -10,7 +10,7 @@ public abstract class Deplacement : MonoBehaviour {
     public Rigidbody2D r;
     public Camera c;
     public float strength;
-    public bool jumped, isAttached, preciseJump;
+    public bool isAttached, preciseJump, isSticking;
     Animator anim;
     private enum Ground { grabable, bumpy };
     private int numberOfJumpsAllowed; 
@@ -21,9 +21,10 @@ public abstract class Deplacement : MonoBehaviour {
     public HingeJoint2D hinge;
     public Ninja n;
     public int rapidite, OriginalRapidite;
-    public bool readyToJump;
-   
-    
+    public bool readyToJump, isWalking;
+    public bool started;
+
+
 
     public enum Dir
     {
@@ -53,7 +54,7 @@ public abstract class Deplacement : MonoBehaviour {
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
         Vector2 originClickToWorld = c.ScreenToWorldPoint(new Vector3(originClic.x, originClic.y, 0));
         Vector2 forceToApply = originClickToWorld - clickToWorld;
-        
+        isSticking = false;
         LoseJump();
         Detach();
         StartCoroutine(t.FadeAway());
@@ -85,9 +86,11 @@ public abstract class Deplacement : MonoBehaviour {
             hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
             hinge.enableCollision = true;
             hinge.connectedBody = ri;
+            
             hinge.useMotor = true;
             JointMotor2D motor = hinge.motor;
             hinge.motor = motor;
+            isSticking = true;
         }
         isAttached = true;
 
@@ -104,7 +107,6 @@ public abstract class Deplacement : MonoBehaviour {
     public void Detach()
     {
         isAttached = false;
-
         if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
             Destroy(gameObject.GetComponent<HingeJoint2D>());
@@ -144,27 +146,12 @@ public abstract class Deplacement : MonoBehaviour {
 
     public void ReactToGround(GameObject g)
     {
-        jumped = false;
         GainAllJumps();
         anim.SetFloat("velocity", r.velocity.magnitude);
         anim.SetTrigger("hit");
-        switch (g.tag)
-        {
-            case "GrabableWall":
-                ground = Ground.grabable;
-                Attach(g.GetComponent<Rigidbody2D>());
-                break;
-            case "BumpyWall":
-                ground = Ground.bumpy;
-                r.velocity = new Vector2(0, 0);
-                r.AddForce(new Vector2(g.transform.position.x - transform.position.x, 0) * 100, ForceMode2D.Impulse);
-                break;
-            case "GrabableTurret":
-                ground = Ground.grabable;
-                Attach(g.GetComponent<Rigidbody2D>());
-                break;
-
-        }
+        ground = Ground.grabable;
+        Attach(g.GetComponent<Rigidbody2D>());
+                
     }
 
 

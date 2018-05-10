@@ -51,7 +51,6 @@ public class DeplacementPrecis : Deplacement {
         else if (Input.GetButtonUp("Fire1") && GetJumps() > 0) //&& jumped == false)
         {
             Jump(Input.mousePosition, strength);
-            jumped = true;
             loadingProcess = false;
             //InitEnergy();
         }

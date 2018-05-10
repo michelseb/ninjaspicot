@@ -6,7 +6,7 @@ public class CameraBehaviour : MonoBehaviour {
 
     public GameObject ninja;
     private Camera cam;
-
+    Deplacement d;
     public bool centerX;
     private float leftScreen = Screen.width / 6;
     private float rightScreen = Screen.width * 5 / 6;
@@ -18,6 +18,7 @@ public class CameraBehaviour : MonoBehaviour {
     private void Awake()
     {
         cam = GetComponent<Camera>();
+        d = FindObjectOfType<Deplacement>();
         
     }
 
@@ -71,6 +72,20 @@ public class CameraBehaviour : MonoBehaviour {
             yield return null;
         }
         
+    }
+
+    public IEnumerator zoomIntro()
+    {
+        yield return new WaitForSecondsRealtime(3);
+        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+
+        while (cam.orthographicSize > height / ScaleWidthCam.pixelsToUnits / 2)
+        {
+
+            cam.orthographicSize--;
+            yield return null;
+        }
+        d.started = true;
     }
 
     public void InstantZoom(int zoom)
