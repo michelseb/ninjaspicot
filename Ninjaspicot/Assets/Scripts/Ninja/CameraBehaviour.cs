@@ -76,7 +76,7 @@ public class CameraBehaviour : MonoBehaviour {
 
     public IEnumerator zoomIntro()
     {
-        yield return new WaitForSecondsRealtime(3);
+        yield return new WaitForSecondsRealtime(2);
         int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
 
         while (cam.orthographicSize > height / ScaleWidthCam.pixelsToUnits / 2)

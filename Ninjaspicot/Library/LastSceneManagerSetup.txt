@@ -7,10 +7,13 @@ sceneSetups:
   isActive: 0
 - path: Assets/Levels/level0.unity
   isLoaded: 1
-  isActive: 0
-- path: Assets/Levels/level1.unity
-  isLoaded: 1
-  isActive: 0
-- path: Assets/Levels/level2.unity
-  isLoaded: 1
   isActive: 1
+- path: Assets/Levels/level3.unity
+  isLoaded: 1
+  isActive: 0
+- path: Assets/Levels/level4.unity
+  isLoaded: 1
+  isActive: 0
+- path: Assets/Levels/level5.unity
+  isLoaded: 1
+  isActive: 0

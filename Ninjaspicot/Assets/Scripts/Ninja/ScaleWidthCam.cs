@@ -5,7 +5,7 @@ using UnityEngine;
 public class ScaleWidthCam : MonoBehaviour {
 
     public static int targetWidth = 1080;
-    public static float pixelsToUnits = 10;
+    public static float pixelsToUnits = 13;
 
 	public void Awake() {
 
