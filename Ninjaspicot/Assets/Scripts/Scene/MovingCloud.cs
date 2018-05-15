@@ -14,7 +14,6 @@ public class MovingCloud : Cloud {
     Animation a;
     Ninja n;
     Deplacement d;
-    bool ninjaAttached;
     public float pullForce;
 
     // Use this for initialization
@@ -54,10 +53,6 @@ public class MovingCloud : Cloud {
             reachedY = false;
         }
 
-        if (d.isAttached == false && ninjaAttached == true)
-        {
-            ninjaAttached = false;
-        }
     }
 
     private void FixedUpdate()
@@ -65,35 +60,9 @@ public class MovingCloud : Cloud {
         
         if (n.currCollider == gameObject && d.isSticking) //&& n.gameObject.GetComponent<HingeJoint2D>() == null)
         {
-            Debug.Log("Gravity");
             Vector3 forceDirection = transform.position - n.transform.position;
-
-            // apply force on target towards me
             n.r.AddForce(forceDirection.normalized * pullForce * Time.fixedDeltaTime, ForceMode2D.Force);
         }
-    }
-
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "ninja" && ninjaAttached == false)
-        {
-            ninjaAttached = true;
-        }
-        /*if (collision.gameObject.GetComponent<HingeJoint2D>() == null)
-        {
-            HingeJoint2D hinge = collision.gameObject.AddComponent<HingeJoint2D>();
-            hinge.useLimits = false;
-            hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
-            hinge.enableCollision = true;
-            hinge.connectedBody = r;
-
-            hinge.useMotor = true;
-            JointMotor2D motor = hinge.motor;
-            hinge.motor = motor;
-            d.hinge = hinge;
-        }*/
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -105,5 +74,6 @@ public class MovingCloud : Cloud {
             Destroy(collision.gameObject.GetComponent<HingeJoint2D>());
         }
     }
+
 
 }
