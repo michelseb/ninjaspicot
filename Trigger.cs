@@ -68,12 +68,12 @@ public class Trigger : Ninja {
         {
             Debug.Log("Ok");
             d.isWalking = false;
-            currCollider = null;
+            //currCollider = null;
             d.Detach();
             d.LoseJump();
             if (d.readyToJump)
             {
-                //StartCoroutine(tr.FadeAway());
+                StartCoroutine(tr.FadeAway());
             }
         }
     }

@@ -28,11 +28,12 @@ public class Ninja : MonoBehaviour, IDestructable {
         cam = FindObjectOfType<CameraBehaviour>();
         t = FindObjectOfType<TimeManager>();
         g = FindObjectOfType<Ghost>();
+        lastColliders = new Queue<GameObject>();
     }
 	void Start () {
         
         t.activated = true;
-        lastColliders = new Queue<GameObject>();
+        
 
         if (getsCheckPoint)
         {

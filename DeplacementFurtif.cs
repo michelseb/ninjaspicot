@@ -96,7 +96,7 @@ public class DeplacementFurtif : Deplacement {
                     }
                 }
             }
-            if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump)
+            if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump && t.line.positionCount > 1)
             {
                 to.Erase();
                 Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
@@ -150,26 +150,30 @@ public class DeplacementFurtif : Deplacement {
             motor = hinge.motor;
             while (Input.GetButton("Fire1") && isWalking == true)
             {
-
-                if (ninjaDir == Dir.Right)
+                if (hinge != null)
                 {
-                    motor.motorSpeed = rapidite;
+                    if (ninjaDir == Dir.Right)
+                    {
+                        motor.motorSpeed = rapidite;
+                    }
+                    else if (ninjaDir == Dir.Left)
+                    {
+                        motor.motorSpeed = -rapidite;
+                    }
+                    hinge.motor = motor;
+                    hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+                    hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
                 }
-                else if (ninjaDir == Dir.Left)
-                {
-                    motor.motorSpeed = -rapidite;
-                }
+                yield return null;
+            }
+            if (hinge != null)
+            {
+                motor.motorSpeed = 0;
                 hinge.motor = motor;
                 hinge.anchor = transform.InverseTransformPoint(n.contact.point);
                 hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
-
-                yield return null;
+                isWalking = false;
             }
-            motor.motorSpeed = 0;
-            hinge.motor = motor;
-            hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
-            isWalking = false;
         }
 
     }
