@@ -105,9 +105,11 @@
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\SpeedBoost.cs" />
     <Compile Include="Assets\Scripts\Scene\StormCloud.cs" />
+    <Compile Include="Assets\Scripts\Scene\Turrets\Aim.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Perimeter.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Turret.cs" />
+    <Compile Include="Assets\Scripts\Scene\Turrets\ViewRange.cs" />
     <Compile Include="Assets\Scripts\Scene\Wall.cs" />
     <Compile Include="Assets\Scripts\Scene\Zoom.cs" />
     <Compile Include="Assets\Scripts\Scene\doorButton.cs" />

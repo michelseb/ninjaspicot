@@ -19,18 +19,19 @@ public class Turret : MonoBehaviour {
     [SerializeField]
     private float loadTime;
     private bool loaded = true;
-    private RaycastHit2D hit;
     Vector3 dir;
     private Coroutine search;
-    private enum Mode {Scan, Aim, Wait};
+    public enum Mode {Scan, Aim, Wait};
     public int vision;
-    Mode turretMode;
-    
-    
+    public Mode turretMode;
+    Vector3 dest;
+    public int facteur;
+
 
     // Use this for initialization
     void Start () {
 
+        facteur = 1;
         ninja = GameObject.Find("Ninjaspicot");
         ninjaScript = FindObjectOfType<Deplacement>();
         turretMode = Mode.Scan;
@@ -47,7 +48,9 @@ public class Turret : MonoBehaviour {
         switch (turretMode)
         {
             case Mode.Aim:
-                
+
+                dest = ninja.transform.position - bullet.transform.position;
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, dest), .1f);
                 if (loaded)
                 {
                     Shoot();
@@ -67,7 +70,7 @@ public class Turret : MonoBehaviour {
                         loaded = false;
                     }
                 }
-                transform.Rotate(0, 0, rotationSpeed * Time.deltaTime * sens);
+                transform.Rotate(0, 0, rotationSpeed * Time.deltaTime * sens * facteur);
                 if (Mathf.Abs(transform.rotation.z - initRotationAngle) > rotationAngle)
                 {
                     sens = -sens;
@@ -76,52 +79,13 @@ public class Turret : MonoBehaviour {
 
             case Mode.Wait:
 
-                Vector3 dest = ninja.transform.position - bullet.transform.position;
+                dest = ninja.transform.position - bullet.transform.position;
                 transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, dest), .1f);
 
                 break;
         }
 
-        if (autoShoot == false)
-        {
-            hit = Physics2D.Raycast(bullet.transform.position, dir, (dir*10).magnitude * vision, LayerMask.GetMask("Default"));
-            Debug.DrawRay(bullet.transform.position, dir * 10 * vision, Color.green);
-
-            if (hit.collider != null)
-            {
-                //Debug.Log(hit.collider.gameObject.tag);
-                if (hit.collider.gameObject.tag == "ninja")
-                {
-
-                    if (turretMode == Mode.Wait)
-                    {
-                        StopCoroutine(search);
-                        turretMode = Mode.Aim;
-                    }
-                    else if (turretMode == Mode.Scan)
-                    {
-                        turretMode = Mode.Aim;
-                    }
-                }
-                else
-                {
-                    if (turretMode == Mode.Aim)
-                    {
-                        turretMode = Mode.Wait;
-                        search = StartCoroutine(Search());
-                    }
-
-                }
-            }
-            else
-            {
-                if (turretMode == Mode.Aim)
-                {
-                    turretMode = Mode.Wait;
-                    search = StartCoroutine(Search());
-                }
-            }
-        }
+        
         /*if (r.isVisible == false)
         {
             turretMode = Mode.Scan;
@@ -134,6 +98,40 @@ public class Turret : MonoBehaviour {
     private void OnDrawGizmos()
     {
        
+    }
+
+    public void SelectMode(string evenement)
+    {
+        switch (evenement) {
+            case "aim":
+                if (turretMode == Mode.Wait)
+                {
+                    StopCoroutine(search);
+                    turretMode = Mode.Aim;
+                }
+                else if (turretMode == Mode.Scan)
+                {
+                    turretMode = Mode.Aim;
+                }
+                
+                else
+                {
+                    if (turretMode == Mode.Aim)
+                    {
+                        turretMode = Mode.Wait;
+                        search = StartCoroutine(Search());
+                    }
+                }
+                break;
+
+            case "search":
+                if (turretMode == Mode.Aim)
+                {
+                    turretMode = Mode.Wait;
+                    search = StartCoroutine(Search());
+                }
+                break;
+        }
     }
 
     private void Shoot()

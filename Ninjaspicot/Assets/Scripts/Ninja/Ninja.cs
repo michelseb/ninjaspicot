@@ -22,16 +22,18 @@ public class Ninja : MonoBehaviour, IDestructable {
     void Awake()
     {
         //SelectDeplacementMode();
-    }
-	void Start () {
         d = FindObjectOfType<Deplacement>();
         r = GetComponent<Rigidbody2D>();
         c = FindObjectOfType<Camera>();
         cam = FindObjectOfType<CameraBehaviour>();
         t = FindObjectOfType<TimeManager>();
         g = FindObjectOfType<Ghost>();
-        t.activated = true;
         lastColliders = new Queue<GameObject>();
+    }
+	void Start () {
+        
+        t.activated = true;
+        
 
         if (getsCheckPoint)
         {

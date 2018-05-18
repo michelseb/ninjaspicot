@@ -4,7 +4,6 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class Wall : MonoBehaviour {
 
-    private bool isGrabbed = false;
     Ninja n;
     Deplacement d;
 
@@ -49,7 +48,10 @@ public class Wall : MonoBehaviour {
 
     public void OnCollisionStay2D(Collision2D collision)
     {
-        n.lastColliders.Enqueue(gameObject);
+        if (collision.gameObject.tag == "ninja")
+        {
+            n.lastColliders.Enqueue(gameObject);
+        }
     }
     /*
     void OnDrawGizmos()

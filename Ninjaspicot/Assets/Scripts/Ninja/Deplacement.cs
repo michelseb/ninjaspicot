@@ -85,8 +85,10 @@ public abstract class Deplacement : MonoBehaviour {
             hinge.anchor = transform.InverseTransformPoint(n.contact.point);
             hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
             hinge.enableCollision = true;
-            hinge.connectedBody = ri;
-            
+            if (ri != null)
+            {
+                hinge.connectedBody = ri;
+            }
             hinge.useMotor = true;
             JointMotor2D motor = hinge.motor;
             hinge.motor = motor;
@@ -106,6 +108,7 @@ public abstract class Deplacement : MonoBehaviour {
 
     public void Detach()
     {
+        Debug.Log("Detach");
         isAttached = false;
         if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
@@ -150,8 +153,10 @@ public abstract class Deplacement : MonoBehaviour {
         anim.SetFloat("velocity", r.velocity.magnitude);
         anim.SetTrigger("hit");
         ground = Ground.grabable;
-        Attach(g.GetComponent<Rigidbody2D>());
-                
+        if (g.tag != "Wall")
+        {
+            Attach(g.GetComponent<Rigidbody2D>());
+        }
     }
 
 

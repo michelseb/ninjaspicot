@@ -2,13 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trigger : Ninja {
+public class Trigger : MonoBehaviour {
 
+    Trajectoire tr;
+    public Camera c;
+    public CameraBehaviour cam;
+    Ninja n;
+    Deplacement d;
+    TimeManager t;
+    Touch to;
     private int bulletsColliding = 0;
 
     bool attacked;
     private IEnumerator zoom;
 
+    private void Start()
+    {
+        to = FindObjectOfType<Touch>();
+        d = FindObjectOfType<Deplacement>();
+        c = FindObjectOfType<Camera>();
+        n = FindObjectOfType<Ninja>();
+        t = FindObjectOfType<TimeManager>();
+        cam = FindObjectOfType<CameraBehaviour>();
+        tr = c.gameObject.GetComponent<Trajectoire>();
+    }
 
     private void Update()
     {
@@ -31,6 +48,7 @@ public class Trigger : Ninja {
         bulletsColliding = 0;
     }
 
+    
 
     public void OnTriggerStay2D(Collider2D collision)
     {
@@ -56,6 +74,20 @@ public class Trigger : Ninja {
         }
     }
 
-
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject == n.currCollider || collision.gameObject.tag == "Wall" || n.currCollider.tag == "Wall")
+        {
+            if (d.readyToJump)
+            {
+                StartCoroutine(tr.FadeAway());
+            }
+            d.isWalking = false;
+            n.currCollider = null;
+            d.Detach();
+            d.LoseJump();
+            
+        }
+    }
 
 }
