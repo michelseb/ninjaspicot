@@ -97,6 +97,8 @@
     <Compile Include="Assets\Scripts\Scene\Cloud.cs" />
     <Compile Include="Assets\Scripts\Scene\Door.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
+    <Compile Include="Assets\Scripts\Scene\Knife.cs" />
+    <Compile Include="Assets\Scripts\Scene\KnifePivot.cs" />
     <Compile Include="Assets\Scripts\Scene\Laser.cs" />
     <Compile Include="Assets\Scripts\Scene\Limit.cs" />
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
@@ -104,6 +106,8 @@
     <Compile Include="Assets\Scripts\Scene\MovingCloud.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\SpeedBoost.cs" />
+    <Compile Include="Assets\Scripts\Scene\StickyBody.cs" />
+    <Compile Include="Assets\Scripts\Scene\StickyFloor.cs" />
     <Compile Include="Assets\Scripts\Scene\StormCloud.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Aim.cs" />
     <Compile Include="Assets\Scripts\Scene\Turrets\Bullet.cs" />
@@ -116,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Resources\Data\ghost.txt" />
+    <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

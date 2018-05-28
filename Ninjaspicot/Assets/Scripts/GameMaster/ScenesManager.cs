@@ -13,7 +13,7 @@ public class Scene
 
 
 public class ScenesManager : MonoBehaviour {
-
+    public static bool alreadyPlayed;
     private int numberOfLevels;
     public int startScene;
     List<Scene> sceneList;
@@ -22,6 +22,7 @@ public class ScenesManager : MonoBehaviour {
 
     private void Awake()
     {
+        
         DontDestroyOnLoad(gameObject);
         numberOfLevels = SceneManager.sceneCountInBuildSettings - 2;
         if (startScene == 0)
@@ -42,6 +43,7 @@ public class ScenesManager : MonoBehaviour {
 
     public static void ResetScene()
     {
+        alreadyPlayed = true;
         SceneManager.LoadScene("level" + currentScene);
     }
 
@@ -53,11 +55,13 @@ public class ScenesManager : MonoBehaviour {
     }
     public static void BackToCheckpoint()
     {
+        alreadyPlayed = true;
         currentScene = checkpoint;
         SceneManager.LoadScene("level" + currentScene);
     }
     public static void NextScene()
     {
+        alreadyPlayed = false;
         currentScene++;
         SceneManager.LoadScene("level" + currentScene);
     }

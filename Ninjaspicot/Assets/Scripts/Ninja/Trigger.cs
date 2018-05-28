@@ -72,6 +72,16 @@ public class Trigger : MonoBehaviour {
 
             }
         }
+
+        if (collision.gameObject.tag == "Wall")
+        {
+            if (d.readyToJump)
+            {
+                StartCoroutine(tr.FadeAway());
+            }
+            d.isWalking = false;
+            d.Detach();
+        }
     }
 
     public void OnTriggerExit2D(Collider2D collision)
@@ -83,7 +93,6 @@ public class Trigger : MonoBehaviour {
                 StartCoroutine(tr.FadeAway());
             }
             d.isWalking = false;
-            n.currCollider = null;
             d.Detach();
             d.LoseJump();
             

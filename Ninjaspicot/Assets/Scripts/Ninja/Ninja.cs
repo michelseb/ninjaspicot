@@ -13,7 +13,7 @@ public class Ninja : MonoBehaviour, IDestructable {
     public TimeManager t;
     public Queue<GameObject> lastColliders;
     public GameObject currCollider;
-    Ghost g;
+    public HingeJoint2D h;
     private float highestPoint;
     bool selectMode;
     public bool getsCheckPoint;
@@ -27,7 +27,7 @@ public class Ninja : MonoBehaviour, IDestructable {
         c = FindObjectOfType<Camera>();
         cam = FindObjectOfType<CameraBehaviour>();
         t = FindObjectOfType<TimeManager>();
-        g = FindObjectOfType<Ghost>();
+        h = GetComponent<HingeJoint2D>();
         lastColliders = new Queue<GameObject>();
     }
 	void Start () {
@@ -65,7 +65,7 @@ public class Ninja : MonoBehaviour, IDestructable {
 
     public void Die(Transform killer)
     {
-        g.saveAll(highestPoint);
+        //g.saveAll(highestPoint);
         Destroy(d);
         HingeJoint2D j = GetComponent<HingeJoint2D>();
         if (j != null)
@@ -162,10 +162,6 @@ public class Ninja : MonoBehaviour, IDestructable {
         return true;
     }
 
-    /*
-    void OnDrawGizmos()
-    {
-        Gizmos.color = new Color(1, 0, 0, .4f);
-        Gizmos.DrawSphere(contact.point, 1f);
-    }*/
+    
+
 }

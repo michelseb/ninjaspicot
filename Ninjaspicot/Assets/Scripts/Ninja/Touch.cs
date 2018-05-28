@@ -48,6 +48,7 @@ public class Touch : MonoBehaviour {
 
     public void Erase()
     {
+        StopAllCoroutines();
         line.SetVertexCount(0);
     }
 }

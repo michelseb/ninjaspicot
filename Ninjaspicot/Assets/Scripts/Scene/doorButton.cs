@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class doorButton : MonoBehaviour {
 
-    bool enabled;
+    bool actif;
     Door d;
     Material m;
 	// Use this for initialization
@@ -17,7 +17,7 @@ public class doorButton : MonoBehaviour {
     {
         if (collision.gameObject.tag == "ninja")
         {
-            if (enabled)
+            if (actif)
             {
                 Close();
             }
@@ -31,13 +31,13 @@ public class doorButton : MonoBehaviour {
 
     private void Open()
     {
-        enabled = true;
+        actif = true;
         m.color = Color.green;
         d.Activate();
     }
     private void Close()
     {
-        enabled = false;
+        actif = false;
         m.color = Color.red;
         //d.Activate();
     }

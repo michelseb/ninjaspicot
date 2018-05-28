@@ -19,6 +19,7 @@ public abstract class Deplacement : MonoBehaviour {
     public Vector2 originClic;
     public JointMotor2D motor;
     public HingeJoint2D hinge;
+    FixedJoint2D f;
     public Ninja n;
     public int rapidite, OriginalRapidite;
     public bool readyToJump, isWalking;
@@ -75,14 +76,27 @@ public abstract class Deplacement : MonoBehaviour {
         Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
     }
 
-    public void Attach(Rigidbody2D ri)
+    public void Attach(Rigidbody2D ri, Wall w)
     {
         if (isAttached == false)
         {
+
+            if (ri.gameObject.GetComponent<StickyBody>())
+            {
+                if (f == null)
+                {
+                    f = gameObject.AddComponent<FixedJoint2D>();
+                    f.anchor = transform.InverseTransformPoint(n.contact.point);
+                    f.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
+                    f.enableCollision = true;
+                    f.connectedBody = r;
+                }
+            }
             r.velocity = new Vector2(0, 0);
             hinge = gameObject.AddComponent<HingeJoint2D>();
             hinge.useLimits = false;
             hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+            w.PositionContact(w.c.point);
             hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
             hinge.enableCollision = true;
             if (ri != null)
@@ -93,6 +107,7 @@ public abstract class Deplacement : MonoBehaviour {
             JointMotor2D motor = hinge.motor;
             hinge.motor = motor;
             isSticking = true;
+            n.h = hinge;
         }
         isAttached = true;
 
@@ -108,11 +123,14 @@ public abstract class Deplacement : MonoBehaviour {
 
     public void Detach()
     {
-        Debug.Log("Detach");
         isAttached = false;
         if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
             Destroy(gameObject.GetComponent<HingeJoint2D>());
+        }
+        if (f != null)
+        {
+            Destroy(f);
         }
     }
 
@@ -155,10 +173,14 @@ public abstract class Deplacement : MonoBehaviour {
         ground = Ground.grabable;
         if (g.tag != "Wall")
         {
-            Attach(g.GetComponent<Rigidbody2D>());
+            Attach(g.GetComponent<Rigidbody2D>(), g.GetComponent<Wall>());
         }
     }
-
-
+    /*
+    void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 0, 0, .4f);
+        Gizmos.DrawSphere(transform.TransformPoint(hinge.anchor), 1f);
+    }*/
 
 }

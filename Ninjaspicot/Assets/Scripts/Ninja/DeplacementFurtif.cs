@@ -8,6 +8,7 @@ public class DeplacementFurtif : Deplacement {
     Vector2 propulseVector;
     Trigger tri;
     Coroutine walkOnWalls;
+    Coroutine drawTouch;
     public int maxJumps;
     
     Touch to;
@@ -21,7 +22,9 @@ public class DeplacementFurtif : Deplacement {
         tri = FindObjectOfType<Trigger>();
         to = FindObjectOfType<Touch>();
         OriginalRapidite = rapidite;
-        StartCoroutine(cam.zoomIntro());
+        if (ScenesManager.alreadyPlayed == false) {
+            StartCoroutine(cam.zoomIntro());
+        }
     }
 
     void Update()
@@ -31,10 +34,11 @@ public class DeplacementFurtif : Deplacement {
         if (started)
         {
             //Debug.Log(n.contact.point.x + " " + n.contact.point.y);
-            if (Input.GetButtonDown("Fire1") && GetJumps() > 0)
+            if (Input.GetButtonDown("Fire1"))
             {
                 originClic = Input.mousePosition;
-                StartCoroutine(to.CreatePoints(originClic));
+                if (isAttached)
+                    drawTouch = StartCoroutine(to.CreatePoints(originClic));
                 if (originClic.x < Screen.width / 2)
                 {
                     ninjaDir = Dir.Left;
@@ -48,7 +52,7 @@ public class DeplacementFurtif : Deplacement {
 
             }
 
-            if (readyToJump && GetJumps() > 0)
+            if (readyToJump)
             {
                 propulseVector = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
                 Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
@@ -66,7 +70,7 @@ public class DeplacementFurtif : Deplacement {
                         StartCoroutine(t.FadeAway());
                         time.NormalTime();
                     }
-                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
+                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5 && GetJumps()> 0)
                     {
                         if (isWalking == true)
                         {
@@ -79,7 +83,7 @@ public class DeplacementFurtif : Deplacement {
                 }
                 else
                 {
-                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
+                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5 && GetJumps() > 0)
                     {
                         if (isWalking == true)
                         {
@@ -98,6 +102,7 @@ public class DeplacementFurtif : Deplacement {
             }
             if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump && t.line.positionCount > 1)
             {
+                StopCoroutine(drawTouch);
                 to.Erase();
                 Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
                 Vector3 propulseVectorToWorld = c.ScreenToWorldPoint(propulseVector);
@@ -122,6 +127,11 @@ public class DeplacementFurtif : Deplacement {
                 }
                 readyToJump = false;
             }
+            else if (Input.GetButtonUp("Fire1") && GetJumps() == 0 && readyToJump)
+            {
+                StopCoroutine(drawTouch);
+                to.Erase();
+            }
         }
 
     }
@@ -135,8 +145,8 @@ public class DeplacementFurtif : Deplacement {
 
         if (hinge != null)
         {
-            hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
+            //hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+            //hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
         }
     }
 

@@ -5,22 +5,17 @@ using UnityEngine;
 public class MovingCloud : Cloud {
 
     Vector2 originPos;
-    public 
-    int xWay = 1, yWay = 1;
+    public int xWay = 1, yWay = 1;
     public int moveX, moveY;
     bool reachedX, reachedY;
     public float speed;
     Rigidbody2D r;
-    Animation a;
-    Ninja n;
-    Deplacement d;
-    public float pullForce;
+    
 
     // Use this for initialization
     void Start () {
         r = GetComponent<Rigidbody2D>();
-        n = FindObjectOfType<Ninja>();
-        d = FindObjectOfType<Deplacement>();
+
         //a = GetComponent<Animation>();
         originPos = r.position;
         if (moveX == 0)
@@ -55,25 +50,7 @@ public class MovingCloud : Cloud {
 
     }
 
-    private void FixedUpdate()
-    {
-        
-        if (n.currCollider == gameObject && d.isSticking) //&& n.gameObject.GetComponent<HingeJoint2D>() == null)
-        {
-            Vector3 forceDirection = transform.position - n.transform.position;
-            n.r.AddForce(forceDirection.normalized * pullForce * Time.fixedDeltaTime, ForceMode2D.Force);
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        d.isAttached = false;
-        d.isWalking = false;
-        if (collision.gameObject.GetComponent<HingeJoint2D>() != null)
-        {
-            Destroy(collision.gameObject.GetComponent<HingeJoint2D>());
-        }
-    }
+    
 
 
 }

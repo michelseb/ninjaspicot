@@ -6,6 +6,8 @@ public class Wall : MonoBehaviour {
 
     Ninja n;
     Deplacement d;
+    public GameObject contact;
+    public ContactPoint2D c;
 
     // Use this for initialization
     private void Awake()
@@ -13,9 +15,16 @@ public class Wall : MonoBehaviour {
         n = FindObjectOfType<Ninja>();
         d = FindObjectOfType<Deplacement>();
     }
-	
-	// Update is called once per frame
-	void Update () {
+    private void Start()
+    {
+        contact = new GameObject();
+        contact.transform.position = transform.position;
+        contact.transform.parent = transform;
+        
+    }
+
+    // Update is called once per frame
+    void Update () {
         if (d == null)
         {
             d = FindObjectOfType<Deplacement>();
@@ -26,6 +35,7 @@ public class Wall : MonoBehaviour {
     {
         if (collision.gameObject.tag == "ninja")
         {
+            c = collision.contacts[collision.contacts.Length - 1];
             if (n.currCollider == null)
             {
                 n.currCollider = gameObject;
@@ -50,16 +60,29 @@ public class Wall : MonoBehaviour {
     {
         if (collision.gameObject.tag == "ninja")
         {
+            c = collision.contacts[collision.contacts.Length - 1];
             n.lastColliders.Enqueue(gameObject);
+            PositionContact(c.point);
         }
+        
     }
-    /*
-    void OnDrawGizmos()
+
+    public void PositionContact(Vector3 pos)
     {
-        Gizmos.color = Color.yellow;
-        foreach (ContactPoint2D c in contacts)
-        {*
-    Gizmos.DrawSphere(c.point, .5f);
-        //}
-    }*/
+        contact.transform.position = pos;
+    }
+    /* void OnDrawGizmos()
+     {
+         Gizmos.color = Color.yellow;
+         Gizmos.DrawSphere(contact.transform.position, 1f);
+     }
+
+         void OnDrawGizmos()
+         {
+             Gizmos.color = Color.yellow;
+             foreach (ContactPoint2D c in contacts)
+             {*
+         Gizmos.DrawSphere(c.point, .5f);
+             //}
+         }*/
 }

@@ -25,6 +25,10 @@ public class CameraBehaviour : MonoBehaviour {
     private void Start()
     {
         InstantZoom(beginZoom);
+        if (ScenesManager.alreadyPlayed)
+        {
+            zoomIntroFast();
+        }
     }
     private void Update()
     {
@@ -72,6 +76,13 @@ public class CameraBehaviour : MonoBehaviour {
             yield return null;
         }
         
+    }
+
+    public void zoomIntroFast()
+    {
+        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        cam.orthographicSize = height / ScaleWidthCam.pixelsToUnits / 2;
+        d.started = true;
     }
 
     public IEnumerator zoomIntro()
