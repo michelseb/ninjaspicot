@@ -13,17 +13,33 @@ public class CameraBehaviour : MonoBehaviour {
     private float topScreen = Screen.height / 6;
     private float bottomScreen = Screen.height * 5 / 6;
     public int beginZoom;
-
+    public int screenOrientation;
+    public static int targetWidth;
+    public static float pixelsToUnits;
 
     private void Awake()
     {
         cam = GetComponent<Camera>();
         d = FindObjectOfType<Deplacement>();
-        
+        switch (screenOrientation)
+        {
+            case 0:
+                Screen.orientation = ScreenOrientation.Portrait;
+                targetWidth = 1080;
+                pixelsToUnits = 13;
+                break;
+            case 1:
+                Screen.orientation = ScreenOrientation.LandscapeLeft;
+                targetWidth = 1920;
+                pixelsToUnits = 15;
+                break;
+        }
+
     }
 
     private void Start()
     {
+        
         InstantZoom(beginZoom);
         if (ScenesManager.alreadyPlayed)
         {
@@ -67,9 +83,9 @@ public class CameraBehaviour : MonoBehaviour {
 
     public IEnumerator zoomIn(int zoom)
     {
-        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
         
-        while (cam.orthographicSize > height / ScaleWidthCam.pixelsToUnits / 2 - zoom)
+        while (cam.orthographicSize > height / pixelsToUnits / 2 - zoom)
         {
             
             cam.orthographicSize--;
@@ -80,17 +96,17 @@ public class CameraBehaviour : MonoBehaviour {
 
     public void zoomIntroFast()
     {
-        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
-        cam.orthographicSize = height / ScaleWidthCam.pixelsToUnits / 2;
+        int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
+        cam.orthographicSize = height / pixelsToUnits / 2;
         d.started = true;
     }
 
     public IEnumerator zoomIntro()
     {
         yield return new WaitForSecondsRealtime(2);
-        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
+        int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
 
-        while (cam.orthographicSize > height / ScaleWidthCam.pixelsToUnits / 2)
+        while (cam.orthographicSize > height / pixelsToUnits / 2)
         {
 
             cam.orthographicSize--;
@@ -101,14 +117,14 @@ public class CameraBehaviour : MonoBehaviour {
 
     public void InstantZoom(int zoom)
     {
-        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
-        cam.orthographicSize = height / ScaleWidthCam.pixelsToUnits / 2 + zoom;
+        int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
+        cam.orthographicSize = height / pixelsToUnits / 2 + zoom;
     }
 
     public IEnumerator zoomOut(int zoom)
     {
-        int height = Mathf.RoundToInt(ScaleWidthCam.targetWidth / (float)Screen.width * Screen.height);
-        while (cam.orthographicSize < height / ScaleWidthCam.pixelsToUnits / 2 + zoom)
+        int height = Mathf.RoundToInt(targetWidth / (float)Screen.width * Screen.height);
+        while (cam.orthographicSize < height / pixelsToUnits / 2 + zoom)
         {
             cam.orthographicSize++;
             yield return null;

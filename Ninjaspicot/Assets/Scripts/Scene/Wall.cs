@@ -8,7 +8,7 @@ public class Wall : MonoBehaviour {
     Deplacement d;
     public GameObject contact;
     public ContactPoint2D c;
-
+    bool isBeingTouched;
     // Use this for initialization
     private void Awake()
     {
@@ -35,6 +35,11 @@ public class Wall : MonoBehaviour {
     {
         if (collision.gameObject.tag == "ninja")
         {
+            if (d != null)
+            {
+                d.ReactToGround(gameObject);
+
+            }
             c = collision.contacts[collision.contacts.Length - 1];
             if (n.currCollider == null)
             {
@@ -46,12 +51,6 @@ public class Wall : MonoBehaviour {
                 n.contact = collision.contacts[collision.contacts.Length - 1];
                 n.currCollider = gameObject;
             }
-
-            if (d != null)
-            {
-                d.ReactToGround(gameObject);
-
-            }
         }
     }
 
@@ -60,11 +59,27 @@ public class Wall : MonoBehaviour {
     {
         if (collision.gameObject.tag == "ninja")
         {
+            isBeingTouched = true;
             c = collision.contacts[collision.contacts.Length - 1];
             n.lastColliders.Enqueue(gameObject);
             PositionContact(c.point);
+            if (d != null)
+            {
+                if (d.isAttached == false)
+                {
+                    StartCoroutine(WaitBeforeReact());
+                }
+            }
         }
         
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "ninja")
+        {
+            isBeingTouched = false;
+        }
     }
 
     public void PositionContact(Vector3 pos)
@@ -85,4 +100,10 @@ public class Wall : MonoBehaviour {
          Gizmos.DrawSphere(c.point, .5f);
              //}
          }*/
+    IEnumerator WaitBeforeReact()
+    {
+        yield return new WaitForSecondsRealtime(.5f);
+        if (isBeingTouched)
+            d.ReactToGround(gameObject);
+    }
 }

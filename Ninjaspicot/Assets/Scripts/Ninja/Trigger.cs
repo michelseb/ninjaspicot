@@ -57,6 +57,18 @@ public class Trigger : MonoBehaviour {
             bulletsColliding++;
             attacked = true;
         }
+
+        if (collision.gameObject.tag == "Wall")
+        {
+            if (n.HasBeenCurrentCollider(collision.gameObject))
+            {
+                if (d.isAttached)
+                {
+                    d.isWalking = false;
+                    d.Detach();
+                }
+            }
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -75,27 +87,36 @@ public class Trigger : MonoBehaviour {
 
         if (collision.gameObject.tag == "Wall")
         {
-            if (d.readyToJump)
+            if (n.HasBeenCurrentCollider(collision.gameObject))
             {
-                StartCoroutine(tr.FadeAway());
+                if (d.readyToJump)
+                {
+                    StartCoroutine(tr.FadeAway());
+                }
+                d.isWalking = false;
+                d.Detach();
             }
-            d.isWalking = false;
-            d.Detach();
         }
     }
 
     public void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject == n.currCollider || collision.gameObject.tag == "Wall" || n.currCollider.tag == "Wall")
+        if (n.currCollider != null)
         {
-            if (d.readyToJump)
+            if (collision.gameObject == n.currCollider || collision.gameObject.tag == "Wall" || n.currCollider.tag == "Wall")
             {
-                StartCoroutine(tr.FadeAway());
+                if (n.HasBeenCurrentCollider(collision.gameObject))
+                {
+                    if (d.readyToJump)
+                    {
+                        StartCoroutine(tr.FadeAway());
+                    }
+                    d.isWalking = false;
+                    d.Detach();
+                    d.LoseJump();
+                }
+
             }
-            d.isWalking = false;
-            d.Detach();
-            d.LoseJump();
-            
         }
     }
 

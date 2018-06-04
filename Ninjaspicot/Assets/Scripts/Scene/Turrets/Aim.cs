@@ -17,14 +17,20 @@ public class Aim : MonoBehaviour {
 		
 	}
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "ninja")
         {
             v.s.material.color = new Color(1, 0, 0, .8f);
-            if (t.autoShoot == false)
+            RaycastHit2D r = Physics2D.Linecast(t.gameObject.transform.position, collision.gameObject.transform.position, ~(1 << 10));
+            Debug.DrawLine(t.gameObject.transform.position, collision.gameObject.transform.position, Color.red);
+            Debug.Log(r.transform.gameObject.name);
+            if (r.transform.gameObject.tag == "ninja")
             {
-                t.SendMessage("SelectMode", "aim");
+                if (t.autoShoot == false)
+                {
+                    t.SendMessage("SelectMode", "aim");
+                }
             }
             
         }

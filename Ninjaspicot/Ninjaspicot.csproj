@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>5.6.3p2</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -94,6 +96,8 @@
     <Compile Include="Assets\Scripts\Ninja\Touch.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trajectoire.cs" />
     <Compile Include="Assets\Scripts\Ninja\Trigger.cs" />
+    <Compile Include="Assets\Scripts\Scene\CarGenerator.cs" />
+    <Compile Include="Assets\Scripts\Scene\CarKiller.cs" />
     <Compile Include="Assets\Scripts\Scene\Cloud.cs" />
     <Compile Include="Assets\Scripts\Scene\Door.cs" />
     <Compile Include="Assets\Scripts\Scene\Exit.cs" />
@@ -104,6 +108,7 @@
     <Compile Include="Assets\Scripts\Scene\MenuLevels.cs" />
     <Compile Include="Assets\Scripts\Scene\Mist.cs" />
     <Compile Include="Assets\Scripts\Scene\MovingCloud.cs" />
+    <Compile Include="Assets\Scripts\Scene\ParkingDoor.cs" />
     <Compile Include="Assets\Scripts\Scene\RandomMoves.cs" />
     <Compile Include="Assets\Scripts\Scene\SpeedBoost.cs" />
     <Compile Include="Assets\Scripts\Scene\StickyBody.cs" />

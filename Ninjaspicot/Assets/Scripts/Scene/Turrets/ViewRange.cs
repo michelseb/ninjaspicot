@@ -23,7 +23,6 @@ public class ViewRange : MonoBehaviour {
         if (collision.gameObject.tag == "ninja")
         {
             s.material.color = new Color(.6f, 0, 1, .8f);
-            t.facteur = 4;
         }
         
     }

@@ -14,9 +14,8 @@ public class Ninja : MonoBehaviour, IDestructable {
     public Queue<GameObject> lastColliders;
     public GameObject currCollider;
     public HingeJoint2D h;
-    private float highestPoint;
-    bool selectMode;
     public bool getsCheckPoint;
+    
 
     // Use this for initialization
     void Awake()
@@ -47,25 +46,18 @@ public class Ninja : MonoBehaviour, IDestructable {
         {
             d = FindObjectOfType<Deplacement>();
         }
-
-        if (transform.position.y > highestPoint)
-        {
-            highestPoint = transform.position.y;
-        }
         
         if (lastColliders.Count > 5)
         {
             lastColliders.Dequeue();
         }
 
-        //r.velocity = currCollider.GetComponent<Rigidbody2D>().velocity;
     }
 
     
 
     public void Die(Transform killer)
     {
-        //g.saveAll(highestPoint);
         Destroy(d);
         HingeJoint2D j = GetComponent<HingeJoint2D>();
         if (j != null)
@@ -108,31 +100,6 @@ public class Ninja : MonoBehaviour, IDestructable {
     }
 
 
-
-    private void SelectDeplacementMode()
-    {
-        selectMode = true;
-
-    }
-
-    void OnGUI()
-    {
-        if (selectMode)
-        {
-            if (GUI.Button(new Rect(0, Screen.height/2 - 20, Screen.width/2, 40), "Discrete mode"))
-            {
-                gameObject.AddComponent<DeplacementPrecis>();
-                selectMode = false;
-
-            }
-            else if(GUI.Button(new Rect(Screen.width / 2, Screen.height / 2 - 20, Screen.width / 2, 40), "Furtive mode"))
-            {
-                gameObject.AddComponent<DeplacementFurtif>();
-                selectMode = false;
-            }  
-        }
-    }
-
     ContactPoint2D SelectContactPoint(ContactPoint2D[] contacts, ContactPoint2D previous) //WOOOOHOOO ça marche !!!!!
     {
         
@@ -162,6 +129,17 @@ public class Ninja : MonoBehaviour, IDestructable {
         return true;
     }
 
+    public bool HasBeenCurrentCollider(GameObject col)
+    {
+        if (col != currCollider)
+        {
+            if (!lastColliders.Contains(col))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     
 
 }

@@ -10,7 +10,6 @@ public class Knife : MonoBehaviour {
     {
         if (collision.gameObject.GetComponent<Wall>() != null)
         {
-            Debug.Log("Touch");
             touched = true;
         }
     }

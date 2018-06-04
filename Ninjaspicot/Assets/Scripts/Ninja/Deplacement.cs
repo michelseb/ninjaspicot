@@ -11,11 +11,8 @@ public abstract class Deplacement : MonoBehaviour {
     public Camera c;
     public float strength;
     public bool isAttached, preciseJump, isSticking;
-    Animator anim;
-    private enum Ground { grabable, bumpy };
     private int numberOfJumpsAllowed; 
     public int maxNumberOfJumpsAllowed;
-    Ground ground;
     public Vector2 originClic;
     public JointMotor2D motor;
     public HingeJoint2D hinge;
@@ -42,7 +39,6 @@ public abstract class Deplacement : MonoBehaviour {
         cam = c.GetComponent<CameraBehaviour>();
         t = c.gameObject.GetComponent<Trajectoire>();
         time = FindObjectOfType<TimeManager>();
-        anim = GetComponent<Animator>();
         maxNumberOfJumpsAllowed = 4;
         numberOfJumpsAllowed = maxNumberOfJumpsAllowed;
         
@@ -71,44 +67,36 @@ public abstract class Deplacement : MonoBehaviour {
         
     }
 
-    private void Rope(Vector2 click)
-    {
-        Vector2 clickToWorld = c.ScreenToWorldPoint(new Vector3(click.x, click.y, 0));
-    }
 
     public void Attach(Rigidbody2D ri, Wall w)
     {
-        if (isAttached == false)
-        {
 
-            if (ri.gameObject.GetComponent<StickyBody>())
+        if (ri.gameObject.GetComponent<StickyBody>())
+        {
+            if (f == null)
             {
-                if (f == null)
-                {
-                    f = gameObject.AddComponent<FixedJoint2D>();
-                    f.anchor = transform.InverseTransformPoint(n.contact.point);
-                    f.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
-                    f.enableCollision = true;
-                    f.connectedBody = r;
-                }
+                f = gameObject.AddComponent<FixedJoint2D>();
+                f.anchor = transform.InverseTransformPoint(n.contact.point);
+                f.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
+                f.enableCollision = true;
+                f.connectedBody = r;
             }
-            r.velocity = new Vector2(0, 0);
-            hinge = gameObject.AddComponent<HingeJoint2D>();
-            hinge.useLimits = false;
-            hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-            w.PositionContact(w.c.point);
-            hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
-            hinge.enableCollision = true;
-            if (ri != null)
-            {
-                hinge.connectedBody = ri;
-            }
-            hinge.useMotor = true;
-            JointMotor2D motor = hinge.motor;
-            hinge.motor = motor;
-            isSticking = true;
-            n.h = hinge;
         }
+        r.velocity = new Vector2(0, 0);
+        hinge = gameObject.AddComponent<HingeJoint2D>();
+        hinge.useLimits = false;
+        hinge.anchor = transform.InverseTransformPoint(n.contact.point);
+        w.PositionContact(w.c.point);
+        hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
+        hinge.enableCollision = true;
+        hinge.connectedBody = ri;
+        hinge.useMotor = true;
+        JointMotor2D motor = hinge.motor;
+        hinge.motor = motor;
+        isSticking = true;
+        n.h = hinge;
+        Debug.Log("Attached");
+
         isAttached = true;
 
     }
@@ -123,7 +111,9 @@ public abstract class Deplacement : MonoBehaviour {
 
     public void Detach()
     {
+        
         isAttached = false;
+        isWalking = false;
         if (gameObject.GetComponent<HingeJoint2D>() != null)
         {
             Destroy(gameObject.GetComponent<HingeJoint2D>());
@@ -132,6 +122,7 @@ public abstract class Deplacement : MonoBehaviour {
         {
             Destroy(f);
         }
+        Debug.Log("Detached");
     }
 
     public void LoseJump()
@@ -168,12 +159,13 @@ public abstract class Deplacement : MonoBehaviour {
     public void ReactToGround(GameObject g)
     {
         GainAllJumps();
-        anim.SetFloat("velocity", r.velocity.magnitude);
-        anim.SetTrigger("hit");
-        ground = Ground.grabable;
         if (g.tag != "Wall")
         {
-            Attach(g.GetComponent<Rigidbody2D>(), g.GetComponent<Wall>());
+            if (isAttached==false || g != n.currCollider)
+            {
+                Detach();
+                Attach(g.GetComponent<Rigidbody2D>(), g.GetComponent<Wall>());
+            }
         }
     }
     /*

@@ -37,8 +37,7 @@ public class DeplacementFurtif : Deplacement {
             if (Input.GetButtonDown("Fire1"))
             {
                 originClic = Input.mousePosition;
-                if (isAttached)
-                    drawTouch = StartCoroutine(to.CreatePoints(originClic));
+                drawTouch = StartCoroutine(to.CreatePoints(originClic));
                 if (originClic.x < Screen.width / 2)
                 {
                     ninjaDir = Dir.Left;
@@ -100,14 +99,18 @@ public class DeplacementFurtif : Deplacement {
                     }
                 }
             }
-            if (Input.GetButtonUp("Fire1") && GetJumps() > 0 && readyToJump && t.line.positionCount > 1)
+            if (Input.GetButtonUp("Fire1") && readyToJump && t.line.positionCount > 1)
             {
-                StopCoroutine(drawTouch);
-                to.Erase();
+                if (drawTouch != null)
+                {
+                    StopCoroutine(drawTouch);
+                    to.Erase();
+                }
                 Vector3 originClicToWorld = c.ScreenToWorldPoint(originClic);
                 Vector3 propulseVectorToWorld = c.ScreenToWorldPoint(propulseVector);
                 RaycastHit2D hit = Physics2D.Linecast(transform.position, t.line.GetPosition(2), LayerMask.GetMask("Default"));
                 Debug.DrawLine(transform.position, t.line.GetPosition(2), Color.green);
+
                 if (hit && hit.collider.tag != "ninja")
                 {
                     StartCoroutine(t.FadeAway());
@@ -115,7 +118,7 @@ public class DeplacementFurtif : Deplacement {
                 }
                 else
                 {
-                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5)
+                    if ((propulseVectorToWorld - originClicToWorld).magnitude > 5 && GetJumps() > 0)
                     {
                         if (isWalking == true)
                         {
@@ -141,12 +144,6 @@ public class DeplacementFurtif : Deplacement {
         if (isAttached && readyToJump == false)
         {
             r.velocity = new Vector2(0, 0);
-        }
-
-        if (hinge != null)
-        {
-            //hinge.anchor = transform.InverseTransformPoint(n.contact.point);
-            //hinge.connectedAnchor = transform.InverseTransformPoint(n.contact.point);
         }
     }
 
