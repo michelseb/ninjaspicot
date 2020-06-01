@@ -9,17 +9,31 @@ public enum ZoomType
     Intro = 3
 }
 
+public enum CameraMode
+{
+    Follow = 0,
+    Center = 1
+}
+
+
 public class CameraBehaviour : MonoBehaviour
 {
     [SerializeField]
     private int _beginZoom;
-    public bool Centered { get; set; }
-    public Transform Position { get; private set; }
+    public Transform Transform { get; private set; }
     public Camera Camera { get; private set; }
+    public CameraMode CameraMode { get; private set; }
     private Hero _hero;
     private Vector2 _previousHeroPos, _heroPos;
     private float _positionInterpolation, _colorInterpolation;
     private Color _targetColor;
+    private Transform _tracker;
+
+    //Center mode
+    private float _centerStart;
+    private float _centerDuration;
+    private Vector3 _centerOrigin;
+    private Vector3 _centerDestination;
 
     private int _screenOrientation;
 
@@ -40,7 +54,7 @@ public class CameraBehaviour : MonoBehaviour
         Camera = GetComponent<Camera>();
         _scenesManager = ScenesManager.Instance;
         _timeManager = TimeManager.Instance;
-        Position = transform.parent.transform;
+        Transform = transform.parent.transform;
 
         switch (_screenOrientation)
         {
@@ -61,6 +75,7 @@ public class CameraBehaviour : MonoBehaviour
     private void Start()
     {
         _hero = Hero.Instance;
+        _tracker = _hero.transform;
         InstantZoom(_beginZoom);
         if (_scenesManager.AlreadyPlayed)
         {
@@ -72,16 +87,35 @@ public class CameraBehaviour : MonoBehaviour
     {
         _heroPos = new Vector2(_hero.Pos.position.x, _hero.Pos.position.y);
 
-        if (Vector3.Distance(_previousHeroPos, _heroPos) > MOVEMENT_THRESHOLD && _positionInterpolation >= 1)
+        switch (CameraMode)
         {
-            _positionInterpolation = 0;
-            _previousHeroPos = _heroPos;
+            case CameraMode.Follow:
+
+                if (Vector3.Distance(_previousHeroPos, _heroPos) > MOVEMENT_THRESHOLD && _positionInterpolation >= 1)
+                {
+                    _positionInterpolation = 0;
+                    _previousHeroPos = _heroPos;
+                }
+
+                if (_positionInterpolation < 1)
+                {
+                    Follow(_tracker);
+                }
+
+                break;
+
+
+            case CameraMode.Center:
+
+                if (_positionInterpolation < 1)
+                {
+                    Center(_centerOrigin, _centerDestination, _centerDuration);
+                }
+
+                break;
         }
 
-        if (_positionInterpolation < 1)
-        {
-            Follow();
-        }
+
 
         var newCol = Color.white * _timeManager.TimeScale;
         _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
@@ -98,24 +132,33 @@ public class CameraBehaviour : MonoBehaviour
     }
 
 
-
-    private void Follow()
+    private void Follow(Transform tracker)
     {
-        _positionInterpolation += Time.deltaTime / 3000;
-        if (Centered)
-        {
-            Position.position = Vector3.Lerp(Position.position, new Vector3(Position.position.x, _hero.Pos.position.y, Position.position.z), _positionInterpolation);
-        }
-        else
-        {
-            Position.position = Vector3.Lerp(Position.position, new Vector3(_hero.Pos.position.x, _hero.Pos.position.y, Position.position.z), _positionInterpolation);
-        }
-
+        _positionInterpolation += Time.unscaledDeltaTime / 3000;
+        Transform.position = Vector3.Lerp(Transform.position, new Vector3(tracker.position.x, tracker.position.y, Transform.position.z), _positionInterpolation);
     }
 
-    public void Center()
+    private void Center(Vector3 origin, Vector3 destination, float duration)
     {
-        Position.position = new Vector3(_hero.Pos.position.x, _hero.Pos.position.y, Position.position.z);
+        _positionInterpolation = (Time.time - _centerStart) / duration;
+        Transform.position = Vector3.Lerp(origin, destination, _positionInterpolation);
+    }
+
+    public void SetFollowMode(Transform tracker)
+    {
+        CameraMode = CameraMode.Follow;
+        _tracker = tracker;
+    }
+
+    public void SetCenterMode(Transform tracker, float duration)
+    {
+        CameraMode = CameraMode.Center;
+        _tracker = tracker;
+        _centerDuration = duration;
+        _positionInterpolation = 0;
+        _centerOrigin = Transform.position;
+        _centerDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
+        _centerStart = Time.time;
     }
 
     private void Colorize(Color color)

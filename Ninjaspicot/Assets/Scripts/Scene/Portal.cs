@@ -133,22 +133,26 @@ public class Portal : DynamicEntity
 
         yield return new WaitForSeconds(1);
 
-        var cam = _cameraBehaviour.Position;
-        var pos0 = cam.position;
-        var pos1 = new Vector3(Other.transform.position.x, Other.transform.position.y, cam.position.z);
-        var dist = Vector3.Distance(pos0, pos1);
-        var startTime = Time.time;
+        _cameraBehaviour.SetCenterMode(Other.transform, TRANSFER_SPEED);
 
-        float journey = 0;
+        yield return new WaitForSeconds(TRANSFER_SPEED);
+        //var cam = _cameraBehaviour.Transform;
+        //var pos0 = cam.position;
+        //var pos1 = new Vector3(Other.transform.position.x, Other.transform.position.y, cam.position.z);
+        //var dist = Vector3.Distance(pos0, pos1);
+        //var startTime = Time.time;
 
-        while (journey < 1)
-        {
-            float distCovered = (Time.time - startTime) * dist / TRANSFER_SPEED;
-            journey = distCovered / dist;
-            cam.position = Vector3.Lerp(pos0, pos1, journey);
-            yield return null;
-        }
+        //float journey = 0;
 
+        //while (journey < 1)
+        //{
+        //    float distCovered = (Time.time - startTime) * dist / TRANSFER_SPEED;
+        //    journey = distCovered / dist;
+        //    cam.position = Vector3.Lerp(pos0, pos1, journey);
+        //    yield return null;
+        //}
+
+        _cameraBehaviour.SetFollowMode(Hero.transform);
         Hero.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);
 
         yield return new WaitForSeconds(1);

@@ -30,14 +30,18 @@ public class Hero : Ninja
         _timeManager.SetNormalTime();
         _timeManager.SetActive(false);
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
 
         SetCapeActivation(false);
         _spawnManager.Respawn();
         SetCapeActivation(true);
-        _cameraBehaviour.Center();
+        _cameraBehaviour.SetCenterMode(transform, 2f);
+        
+        yield return new WaitForSeconds(2f);
+
+        _cameraBehaviour.SetFollowMode(transform);
         _timeManager.SetActive(true);
-        Movement.enabled = true;
+        SetMovementActivation(true);
     }
 
     public void SetCapeActivation(bool active)

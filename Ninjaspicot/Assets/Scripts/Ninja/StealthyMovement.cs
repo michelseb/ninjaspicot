@@ -78,7 +78,7 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
 
         if (Input.GetButtonUp("Fire1"))
         {
-            _touchManager.Erase();
+            //_touchManager.Erase();
 
             if (CanJump())
             {

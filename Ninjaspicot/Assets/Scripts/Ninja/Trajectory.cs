@@ -84,7 +84,7 @@ public class Trajectory : MonoBehaviour
             var pos = _line.GetPosition(i);
             RaycastHit2D hit = Physics2D.Linecast(origin, pos, layer != 0 ? layer : LayerMask.GetMask("Default"));
 
-            if (hit && !hit.collider.CompareTag("hero"))
+            if (hit && !hit.collider.CompareTag("hero") && !hit.collider.isTrigger)
                 return false;
         }
 

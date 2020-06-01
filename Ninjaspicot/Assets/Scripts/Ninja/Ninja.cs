@@ -19,7 +19,7 @@ public class Ninja : DynamicEntity, IDestructable
 
     public virtual void Die(Transform killer)
     {
-        Movement.enabled = false;
+        SetMovementActivation(false);
 
         var joint = GetComponent<Joint2D>();
         if (joint != null)
@@ -47,5 +47,10 @@ public class Ninja : DynamicEntity, IDestructable
     public virtual IEnumerator Dying()
     {
         yield return null;
+    }
+
+    public void SetMovementActivation(bool active)
+    {
+        Movement.enabled = active;
     }
 }

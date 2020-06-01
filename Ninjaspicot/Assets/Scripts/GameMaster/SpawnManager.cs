@@ -8,7 +8,7 @@ public class SpawnManager : MonoBehaviour
 
     private Vector3 _spawnPosition;
     private CheckPoint[] _checkPoints;
-    
+
     private static SpawnManager _instance;
     public static SpawnManager Instance { get { if (_instance == null) _instance = FindObjectOfType<SpawnManager>(); return _instance; } }
 
