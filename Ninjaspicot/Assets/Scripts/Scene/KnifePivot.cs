@@ -1,31 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class KnifePivot : MonoBehaviour {
 
-    public float speed;
-    float initSpeed;
-    Knife k;
-    Rigidbody2D r;
-	// Use this for initialization
-	void Start () {
-        k = transform.GetComponentInChildren<Knife>();
-        r = GetComponent<Rigidbody2D>();
-        initSpeed = speed;
+    [SerializeField]
+    private float _speed;
+
+    private float _initSpeed;
+    private Knife _knife;
+    private Rigidbody2D _rigidBody;
+
+    private void Awake ()
+    {
+        _knife = GetComponentInChildren<Knife>();
+        _rigidBody = GetComponent<Rigidbody2D>();
+        _initSpeed = _speed;
 	}
 	
-	// Update is called once per frame
-	void FixedUpdate () {
-        r.MoveRotation(r.rotation + speed * Time.deltaTime);
-        //transform.Rotate(new Vector3(0, 0, speed * Time.deltaTime));
-        if (speed > -200)
+	private void FixedUpdate ()
+    {
+        _rigidBody.MoveRotation(_rigidBody.rotation + _speed * Time.deltaTime);
+
+        if (_speed > -200)
         {
-            speed += initSpeed * Time.deltaTime;
+            _speed += _initSpeed * Time.deltaTime;
         }
-		if (k.touched)
+
+        if (_knife.touched)
         {
-            speed = -initSpeed;
+            _speed = -_initSpeed;
         }
 	}
 }

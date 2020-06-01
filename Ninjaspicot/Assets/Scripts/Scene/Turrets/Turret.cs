@@ -10,7 +10,7 @@ public class Turret : MonoBehaviour {
     private int sens = 1;
     private float initRotationAngle;
     private GameObject ninja;
-    private Deplacement ninjaScript;
+    private Movement ninjaScript;
     public GameObject canon;
     public GameObject bullet;
     private Renderer r;
@@ -33,7 +33,7 @@ public class Turret : MonoBehaviour {
 
         facteur = 1;
         ninja = GameObject.Find("Ninjaspicot");
-        ninjaScript = FindObjectOfType<Deplacement>();
+        ninjaScript = FindObjectOfType<Movement>();
         turretMode = Mode.Scan;
         r = GetComponent<Renderer>();
         initRotationAngle = transform.rotation.z;

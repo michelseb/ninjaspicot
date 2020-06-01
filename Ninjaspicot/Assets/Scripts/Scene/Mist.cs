@@ -1,18 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [ExecuteInEditMode]
 public class Mist : MonoBehaviour {
-    ParticleSystem p;
-	// Use this for initialization
-	void Start () {
-        p = GetComponent<ParticleSystem>();
-        p.GetComponent<Renderer>().sortingLayerName = "Foreground";
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        
+
+    private ParticleSystem _particles;
+    private Renderer _renderer;
+
+    private void Start () {
+        _particles = GetComponent<ParticleSystem>();
+        _renderer = _particles.GetComponent<Renderer>();
+        _renderer.sortingLayerName = "Foreground";
     }
 }

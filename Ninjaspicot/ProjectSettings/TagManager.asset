@@ -11,6 +11,9 @@ TagManager:
   - GrabableWall
   - Moving
   - Enemy
+  - Bullet
+  - hero
+  - Spawn
   layers:
   - Default
   - TransparentFX
@@ -25,8 +28,8 @@ TagManager:
   - Car
   - Background
   - Objects
-  - 
-  - 
+  - Teleported
+  - Teleporter
   - 
   - 
   - 

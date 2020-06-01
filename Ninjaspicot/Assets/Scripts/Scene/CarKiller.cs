@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CarKiller : MonoBehaviour {
 
@@ -8,7 +6,7 @@ public class CarKiller : MonoBehaviour {
     {
         if (collision.gameObject.name == "auto")
         {
-            Destroy(collision.gameObject.transform.parent.gameObject);
+            Destroy(collision.transform.parent.gameObject);
         }
     }
 }

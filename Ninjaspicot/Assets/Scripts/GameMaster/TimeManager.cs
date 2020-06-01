@@ -1,28 +1,33 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TimeManager : MonoBehaviour {
+public class TimeManager : MonoBehaviour
+{
 
-    public bool activated;
-    public float increaseValue = .05f;
+    private bool _active;
+    private float _increaseValue;
+
+    public float TimeScale => Time.timeScale;
+
+    private static TimeManager _instance;
+    public static TimeManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TimeManager>(); return _instance; } }
 
     private void Start()
     {
-        activated = true;
+        _active = true;
+        _increaseValue = .5f;
     }
 
     public void SlowDown(float slowValue)
     {
-        if (activated == false)
-        {
+        if (!_active)
             return;
-        }
+
         if (Time.timeScale > slowValue)
         {
             Time.timeScale = slowValue;
         }
-        
+
         Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
@@ -32,20 +37,31 @@ public class TimeManager : MonoBehaviour {
         Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
-    public IEnumerator RestoreTime()
+    private IEnumerator RestoreTime()
     {
+        yield return new WaitForSecondsRealtime(.2f);
+
         while (Time.timeScale < 1)
         {
-            Time.timeScale += increaseValue * Time.unscaledDeltaTime;
-            increaseValue += .1f;
+            Time.timeScale += _increaseValue * Time.unscaledDeltaTime;
             Time.fixedDeltaTime = Time.timeScale * .02f;
             yield return null;
         }
+
         Time.timeScale = 1;
-        increaseValue = .05f;
     }
 
-    public void NormalTime()
+    public void StartTimeRestore()
+    {
+        StartCoroutine(RestoreTime());
+    }
+
+    public void SetActive(bool active)
+    {
+        _active = active;
+    }
+
+    public void SetNormalTime()
     {
         Time.timeScale = 1;
         Time.fixedDeltaTime = Time.timeScale * .02f;

@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Door : MonoBehaviour {
-    private bool activated;
-    public float timeToOpen;
+    private bool _active;
+    private float _timeToOpen;
     public GameObject leftDoor, rightDoor;
     Camera cam;
     GUIStyle style;
@@ -17,19 +16,19 @@ public class Door : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (activated)
+		if (_active)
         {
-            timeToOpen -= Time.unscaledDeltaTime;
-            if (timeToOpen < 1)
+            _timeToOpen -= Time.unscaledDeltaTime;
+            if (_timeToOpen < 1)
             {
                 StartCoroutine(Open());
-                activated = false;
-                timeToOpen = 0;
+                _active = false;
+                _timeToOpen = 0;
             }
         }
 	}
 
-    public IEnumerator Open()
+    private IEnumerator Open()
     {
         Color col = leftDoor.GetComponent<Renderer>().material.color;
         Destroy(leftDoor.GetComponent<BoxCollider2D>());
@@ -50,15 +49,15 @@ public class Door : MonoBehaviour {
     private void OnGUI()
     {
         GUI.color = Color.black;
-        if (activated) { 
+        if (_active) { 
             Vector2 pos = cam.WorldToScreenPoint(new Vector2(leftDoor.transform.position.x + 3f, leftDoor.transform.position.y + 1.3f));
-            GUI.Label(new Rect(pos.x, Screen.height - pos.y, 100, 20), Mathf.FloorToInt(timeToOpen).ToString(), style);
+            GUI.Label(new Rect(pos.x, Screen.height - pos.y, 100, 20), Mathf.FloorToInt(_timeToOpen).ToString(), style);
         }
     }
 
-    public void Activate()
+    public void SetActive(bool active)
     {
-        activated = true;
+        _active = active;
     }
 
 }

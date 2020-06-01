@@ -1,23 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class doorButton : MonoBehaviour {
+public class DoorButton : MonoBehaviour {
 
-    bool actif;
-    Door d;
-    Material m;
-	// Use this for initialization
-	void Start () {
-        d = transform.GetComponentInParent<Door>();
-        m = GetComponent<SpriteRenderer>().material;
+    private bool _active;
+    private Door _door;
+    private Material _material;
+
+	private void Start ()
+    {
+        _door = transform.GetComponentInParent<Door>();
+        _material = GetComponent<SpriteRenderer>().material;
 	}
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "ninja")
         {
-            if (actif)
+            if (_active)
             {
                 Close();
             }
@@ -31,14 +30,15 @@ public class doorButton : MonoBehaviour {
 
     private void Open()
     {
-        actif = true;
-        m.color = Color.green;
-        d.Activate();
+        _active = true;
+        _material.color = Color.green;
+        _door.SetActive(true);
     }
+
     private void Close()
     {
-        actif = false;
-        m.color = Color.red;
-        //d.Activate();
+        _active = false;
+        _material.color = Color.red;
+        _door.SetActive(false);
     }
 }

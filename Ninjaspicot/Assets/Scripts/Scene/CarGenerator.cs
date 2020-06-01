@@ -1,34 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CarGenerator : MonoBehaviour {
 
-    public float coolDown;
-    private float timer;
-    private bool canGenerate;
+    private float _coolDown;
+    private float _timer;
+    private bool _canGenerate;
     public GameObject car;
 
-	// Use this for initialization
-	void Start () {
-        timer = coolDown;
-        canGenerate = true;
+    private void Start () {
+        _timer = _coolDown;
+        _canGenerate = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (timer > 0)
+
+	private void Update () {
+		if (_timer > 0)
         {
-            timer -= Time.deltaTime;
-            canGenerate = true;
+            _timer -= Time.deltaTime;
+            _canGenerate = true;
         }
         else
         {
-            if (canGenerate)
+            if (_canGenerate)
             {
-                timer = coolDown;
+                _timer = _coolDown;
                 GenerateCar();
-                canGenerate = false;
+                _canGenerate = false;
             }
         }
 	}

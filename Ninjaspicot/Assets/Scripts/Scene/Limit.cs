@@ -1,21 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Limit : MonoBehaviour {
 
-    Ninja n;
+    private Hero _hero;
 
     private void Awake()
     {
-        n = FindObjectOfType<Ninja>();
+        _hero = Hero.Instance;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "ninja")
+        if(collision.gameObject.name == "Ninjaspicot")
         {
-            n.Die(null);
+            _hero.Die(null);
         }
         
     }

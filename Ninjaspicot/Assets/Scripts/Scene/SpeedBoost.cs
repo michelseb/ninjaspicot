@@ -1,14 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpeedBoost : MonoBehaviour {
 
-    Deplacement d;
+    Movement d;
 
     private void Start()
     {
-        d = FindObjectOfType<Deplacement>();
+        d = FindObjectOfType<Movement>();
     }
 
 

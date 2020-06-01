@@ -1,123 +1,117 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Trigger : MonoBehaviour {
+public class Trigger : MonoBehaviour
+{
+    private CapsuleCollider2D _collider;
+    private Trajectory _trajectory;
+    private CameraBehaviour _cameraBehaviour;
+    private Hero _hero;
+    private StealthyMovement _movement;
+    private TimeManager _timeManager;
+    private int _bulletsColliding;
 
-    Trajectoire tr;
-    public Camera c;
-    public CameraBehaviour cam;
-    Ninja n;
-    Deplacement d;
-    TimeManager t;
-    Touch to;
-    private int bulletsColliding = 0;
+    private bool _attacked;
 
-    bool attacked;
-    private IEnumerator zoom;
+    private void Awake()
+    {
+        _hero = Hero.Instance;
+        _movement = _hero.Movement;
+        _timeManager = TimeManager.Instance;
+        _cameraBehaviour = CameraBehaviour.Instance;
+        _trajectory = Trajectory.Instance;
+        _collider = GetComponent<CapsuleCollider2D>();
+    }
 
     private void Start()
     {
-        to = FindObjectOfType<Touch>();
-        d = FindObjectOfType<Deplacement>();
-        c = FindObjectOfType<Camera>();
-        n = FindObjectOfType<Ninja>();
-        t = FindObjectOfType<TimeManager>();
-        cam = FindObjectOfType<CameraBehaviour>();
-        tr = c.gameObject.GetComponent<Trajectoire>();
+        _bulletsColliding = 0;
     }
 
     private void Update()
     {
-        if (bulletsColliding <= 0 && attacked)
+        if (_bulletsColliding <= 0 && _attacked)
         {
-            GetComponent<CapsuleCollider2D>().size = new Vector2(10, 14);
-            if (zoom != null)
-            {
-                StopCoroutine(zoom);
-            }
-            zoom = cam.zoomOut(0);
-            StartCoroutine(zoom);
-            StartCoroutine(t.RestoreTime());
-            attacked = false;
+            _collider.size = new Vector2(10, 14);
+            _cameraBehaviour.Zoom(ZoomType.Out);
+            _timeManager.StartTimeRestore();
+            _attacked = false;
         }
     }
 
     private void FixedUpdate()
     {
-        bulletsColliding = 0;
+        _bulletsColliding = 0;
     }
 
-    
+
 
     public void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.name == "bullet(Clone)")
+        if (collision.gameObject.CompareTag("Bullet"))
         {
-            bulletsColliding++;
-            attacked = true;
+            _bulletsColliding++;
+            _attacked = true;
         }
 
-        if (collision.gameObject.tag == "Wall")
-        {
-            if (n.HasBeenCurrentCollider(collision.gameObject))
-            {
-                if (d.isAttached)
-                {
-                    d.isWalking = false;
-                    d.Detach();
-                }
-            }
-        }
+        //if (collision.gameObject.CompareTag("Wall")) ????????????????????? What.
+        //{
+        //    if (_hero.HasBeenCurrentCollider(collision.gameObject))
+        //    {
+        //        if (_movement.isAttached)
+        //        {
+        //            _movement._walking = false;
+        //            _movement.Detach();
+        //        }
+        //    }
+        //}
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.name == "bullet(Clone)")
         {
-            if (d != null && d.GetJumps() > 0)
+            if (_movement != null && _movement.GetJumps() > 0)
             {
-                GetComponent<CapsuleCollider2D>().size = new Vector2(12, 16);
-                zoom = cam.zoomIn(20);
-                StartCoroutine(zoom);
+                _collider.size = new Vector2(12, 16);
+                _cameraBehaviour.Zoom(ZoomType.In, 20);
                 //t.SlowDown(.03f);
 
             }
         }
 
-        if (collision.gameObject.tag == "Wall")
-        {
-            if (n.HasBeenCurrentCollider(collision.gameObject))
-            {
-                if (d.readyToJump)
-                {
-                    StartCoroutine(tr.FadeAway());
-                }
-                d.isWalking = false;
-                d.Detach();
-            }
-        }
+        //if (collision.gameObject.tag == "Wall") ??????????????????????????????????????
+        //{
+        //    if (_hero.HasBeenCurrentCollider(collision.gameObject))
+        //    {
+        //        if (_movement.readyToJump)
+        //        {
+        //            _trajectory.ReinitTrajectory();
+        //        }
+        //        _movement._walking = false;
+        //        _movement.Detach();
+        //    }
+        //}
     }
 
     public void OnTriggerExit2D(Collider2D collision)
     {
-        if (n.currCollider != null)
-        {
-            if (collision.gameObject == n.currCollider || collision.gameObject.tag == "Wall" || n.currCollider.tag == "Wall")
-            {
-                if (n.HasBeenCurrentCollider(collision.gameObject))
-                {
-                    if (d.readyToJump)
-                    {
-                        StartCoroutine(tr.FadeAway());
-                    }
-                    d.isWalking = false;
-                    d.Detach();
-                    d.LoseJump();
-                }
+        //if (_hero.CurrentAttachment != null) ??????????????????????????????????????
+        //{
+        //    if (collision.gameObject == _hero.CurrentAttachment || collision.gameObject.tag == "Wall" || _hero.CurrentAttachment.tag == "Wall")
+        //    {
+        //        if (_hero.HasBeenCurrentCollider(collision.gameObject))
+        //        {
+        //            if (_movement.readyToJump)
+        //            {
+        //                _trajectory.ReinitTrajectory();
+        //            }
+        //            _movement._walking = false;
+        //            _movement.Detach();
+        //            _movement.LoseJump();
+        //        }
 
-            }
-        }
+        //    }
+        //}
     }
 
 }

@@ -1,109 +1,76 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-[DisallowMultipleComponent]
-public class Wall : MonoBehaviour {
+﻿using UnityEngine;
 
-    Ninja n;
-    Deplacement d;
-    public GameObject contact;
-    public ContactPoint2D c;
-    bool isBeingTouched;
-    // Use this for initialization
-    private void Awake()
-    {
-        n = FindObjectOfType<Ninja>();
-        d = FindObjectOfType<Deplacement>();
-    }
+[DisallowMultipleComponent]
+public class Wall : DynamicEntity
+{
+    public bool IsBeingTouched { get; private set; }
+
+    private GameObject _contact;
+    private ContactPoint2D _contactPoint;
+
+    private Ninja _ninjaTemp;
+
     private void Start()
     {
-        contact = new GameObject();
-        contact.transform.position = transform.position;
-        contact.transform.parent = transform;
-        
+        _contact = new GameObject();
+        _contact.transform.position = transform.position;
+        _contact.transform.parent = transform;
+
     }
 
-    // Update is called once per frame
-    void Update () {
-        if (d == null)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    {
+        var ninja = collision.gameObject.GetComponent<Ninja>();
+
+        if (ninja == null)
+            return;
+
+        _ninjaTemp = ninja;
+
+        ninja.Movement.GainAllJumps();
+        ninja.Stickiness.ReactToCollider(Rigidbody);
+
+        _contactPoint = collision.contacts[collision.contacts.Length - 1];
+        if (ninja.Stickiness.CurrentAttachment == null)
         {
-            d = FindObjectOfType<Deplacement>();
+            ninja.Stickiness.CurrentAttachment = transform;
         }
+
+        if (ninja.Stickiness.CheckRecentCollider(transform))
+        {
+            ninja.Stickiness.SetContactPoint(collision.contacts[collision.contacts.Length - 1]);
+            ninja.Stickiness.CurrentAttachment = transform;
+        }
+
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+
+    protected virtual void OnCollisionStay2D(Collision2D collision)
+    {
+        if (_ninjaTemp == null)
+            return;
+
+        IsBeingTouched = true;
+        _contactPoint = collision.contacts[collision.contacts.Length - 1];
+        _ninjaTemp.Stickiness.AddToColliders(transform);
+        PositionContact(_contactPoint.point);
+    }
+
+    protected virtual void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "ninja")
         {
-            if (d != null)
-            {
-                d.ReactToGround(gameObject);
-
-            }
-            c = collision.contacts[collision.contacts.Length - 1];
-            if (n.currCollider == null)
-            {
-                n.currCollider = gameObject;
-            }
-
-            if (n.CheckRecentCollider(gameObject))
-            {
-                n.contact = collision.contacts[collision.contacts.Length - 1];
-                n.currCollider = gameObject;
-            }
-        }
-    }
-
-
-    public void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "ninja")
-        {
-            isBeingTouched = true;
-            c = collision.contacts[collision.contacts.Length - 1];
-            n.lastColliders.Enqueue(gameObject);
-            PositionContact(c.point);
-            if (d != null)
-            {
-                if (d.isAttached == false)
-                {
-                    StartCoroutine(WaitBeforeReact());
-                }
-            }
-        }
-        
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "ninja")
-        {
-            isBeingTouched = false;
+            IsBeingTouched = false;
         }
     }
 
     public void PositionContact(Vector3 pos)
     {
-        contact.transform.position = pos;
+        _contact.transform.position = pos;
     }
-    /* void OnDrawGizmos()
-     {
-         Gizmos.color = Color.yellow;
-         Gizmos.DrawSphere(contact.transform.position, 1f);
-     }
 
-         void OnDrawGizmos()
-         {
-             Gizmos.color = Color.yellow;
-             foreach (ContactPoint2D c in contacts)
-             {*
-         Gizmos.DrawSphere(c.point, .5f);
-             //}
-         }*/
-    IEnumerator WaitBeforeReact()
+    public Vector3 GetContactPoint()
     {
-        yield return new WaitForSecondsRealtime(.5f);
-        if (isBeingTouched)
-            d.ReactToGround(gameObject);
+        return _contactPoint.point;
     }
 }

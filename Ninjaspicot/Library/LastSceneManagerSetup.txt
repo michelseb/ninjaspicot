@@ -1,4 +1,9 @@
 sceneSetups:
-- path: Assets/Levels/main.unity
+- path: Assets/Levels/Master.unity
   isLoaded: 1
   isActive: 1
+  isSubScene: 0
+- path: Assets/Levels/Lobby.unity
+  isLoaded: 0
+  isActive: 0
+  isSubScene: 0
