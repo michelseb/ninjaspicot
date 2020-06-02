@@ -1,134 +1,151 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Turret : MonoBehaviour {
+public class Turret : MonoBehaviour, IActivable
+{
+    public enum Mode { Scan, Aim, Wait };
 
-    public bool autoShoot;
-    public float rotationAngle;
-    public float rotationSpeed;
-    private int sens = 1;
-    private float initRotationAngle;
-    private GameObject ninja;
-    private Movement ninjaScript;
-    public GameObject canon;
-    public GameObject bullet;
-    private Renderer r;
-    [SerializeField]
-    private float strength, loadProgress;
-    [SerializeField]
-    private float loadTime;
-    private bool loaded = true;
-    Vector3 dir;
-    private Coroutine search;
-    public enum Mode {Scan, Aim, Wait};
-    public int vision;
-    public Mode turretMode;
-    Vector3 dest;
-    public int facteur;
+    [SerializeField] private bool _autoShoot;
+    [SerializeField] private float _viewAngle;
+    [SerializeField] private float _rotationSpeed;
+    [SerializeField] private bool _clockWise;
+    [SerializeField] private float _strength;
+    [SerializeField] private float _loadTime;
+    [SerializeField] private GameObject _bullet;
+    
+    public bool Loaded { get; private set; }
+    public Mode TurretMode { get; private set; }
+    public bool AutoShoot => _autoShoot;
 
+    private bool _active;
+    private float _initRotation;
+    private float _loadProgress;
+    
+    private Transform _target;
+    private Coroutine _search;
 
-    // Use this for initialization
-    void Start () {
+    private void Start()
+    {
+        TurretMode = Mode.Scan;
+        _initRotation = transform.rotation.z;
+        Loaded = true;
+        _active = true;
+    }
 
-        facteur = 1;
-        ninja = GameObject.Find("Ninjaspicot");
-        ninjaScript = FindObjectOfType<Movement>();
-        turretMode = Mode.Scan;
-        r = GetComponent<Renderer>();
-        initRotationAngle = transform.rotation.z;
-        
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+    private void Update()
+    {
+        if (!_active)
+            return;
+
         transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
-        dir = (bullet.transform.position - transform.position);
-
-        switch (turretMode)
+        
+        switch (TurretMode)
         {
             case Mode.Aim:
 
-                dest = ninja.transform.position - bullet.transform.position;
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, dest), .1f);
-                if (loaded)
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, _target.transform.position - _bullet.transform.position), .1f);
+                if (Loaded)
                 {
                     Shoot();
                     StartCoroutine(Load());
-                    loaded = false;
+                    Loaded = false;
                 }
 
                 break;
 
+
             case Mode.Scan:
-                if (autoShoot)
+
+                if (_autoShoot)
                 {
-                    if (loaded)
+                    if (Loaded)
                     {
                         Shoot();
                         StartCoroutine(Load());
-                        loaded = false;
+                        Loaded = false;
                     }
                 }
-                transform.Rotate(0, 0, rotationSpeed * Time.deltaTime * sens * facteur);
-                if (Mathf.Abs(transform.rotation.z - initRotationAngle) > rotationAngle)
+                
+                var dir = _clockWise ? 1 : -1;
+                
+                transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+                if (Mathf.Abs(transform.rotation.z - _initRotation) > _viewAngle)
                 {
-                    sens = -sens;
+                    _clockWise = !_clockWise;
                 }
-                    break;
+
+                break;
+
 
             case Mode.Wait:
 
-                dest = ninja.transform.position - bullet.transform.position;
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, dest), .1f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, _target.transform.position - _bullet.transform.position), .1f);
 
                 break;
         }
 
-        
+
         /*if (r.isVisible == false)
         {
             turretMode = Mode.Scan;
         }*/
 
-       
 
-	}
 
-    private void OnDrawGizmos()
-    {
-       
     }
 
-    public void SelectMode(string evenement)
+
+    public void StartAim(Transform target)
     {
-        switch (evenement) {
+        _target = target;
+        TurretMode = Mode.Aim;
+
+        if (_search != null)
+        {
+            StopCoroutine(_search);
+            _search = null;
+        }
+    }
+
+    public void StartSearch()
+    {
+        if (TurretMode == Mode.Aim)
+        {
+            TurretMode = Mode.Wait;
+            _search = StartCoroutine(Search());
+        }
+    }
+
+    public void SelectMode(string evenement, Transform target = null)
+    {
+        switch (evenement)
+        {
             case "aim":
-                if (turretMode == Mode.Wait)
+                _target = target;
+                if (TurretMode == Mode.Wait)
                 {
-                    StopCoroutine(search);
-                    turretMode = Mode.Aim;
+                    StopCoroutine(_search);
+                    TurretMode = Mode.Aim;
                 }
-                else if (turretMode == Mode.Scan)
+                else if (TurretMode == Mode.Scan)
                 {
-                    turretMode = Mode.Aim;
+                    TurretMode = Mode.Aim;
                 }
-                
                 else
                 {
-                    if (turretMode == Mode.Aim)
+                    if (TurretMode == Mode.Aim)
                     {
-                        turretMode = Mode.Wait;
-                        search = StartCoroutine(Search());
+                        TurretMode = Mode.Wait;
+                        _search = StartCoroutine(Search());
                     }
                 }
                 break;
 
             case "search":
-                if (turretMode == Mode.Aim)
+                if (TurretMode == Mode.Aim)
                 {
-                    turretMode = Mode.Wait;
-                    search = StartCoroutine(Search());
+                    TurretMode = Mode.Wait;
+                    _search = StartCoroutine(Search());
                 }
                 break;
         }
@@ -136,34 +153,42 @@ public class Turret : MonoBehaviour {
 
     private void Shoot()
     {
-        
-        GameObject b = Instantiate(bullet, bullet.transform.position + dir/2, Quaternion.identity);
+        var direction = _bullet.transform.position - transform.position;
+        GameObject b = Instantiate(_bullet, _bullet.transform.position + direction / 2, Quaternion.identity);
         b.transform.parent = null;
         b.AddComponent<Rigidbody2D>();
         b.AddComponent<Bullet>();
         b.GetComponent<Rigidbody2D>().gravityScale = 0;
-        b.GetComponent<Rigidbody2D>().AddForce( dir * strength, ForceMode2D.Impulse);
+        b.GetComponent<Rigidbody2D>().AddForce(direction * _strength, ForceMode2D.Impulse);
     }
+
     private IEnumerator Load()
     {
-        while (loadProgress < loadTime){
-            loadProgress += 10* Time.deltaTime;
+        while (_loadProgress < _loadTime)
+        {
+            _loadProgress += Time.deltaTime;
             yield return null;
 
         }
-        loaded = true;
-        loadProgress = 0;
-        
+
+        Loaded = true;
+        _loadProgress = 0;
+
     }
 
     private IEnumerator Search()
     {
         yield return new WaitForSeconds(2);
-        if (turretMode != Mode.Aim)
+
+        if (TurretMode != Mode.Aim)
         {
-            turretMode = Mode.Scan;
+            TurretMode = Mode.Scan;
         }
-        
+
     }
 
+    public void SetActive(bool active)
+    {
+        _active = active;
+    }
 }

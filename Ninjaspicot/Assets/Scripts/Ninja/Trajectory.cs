@@ -16,13 +16,19 @@ public class Trajectory : MonoBehaviour
 
     private void Start()
     {
-        _line = Hero.Instance.GetComponent<LineRenderer>();
+        _line = Hero.Instance?.GetComponent<LineRenderer>();
         _timeManager = TimeManager.Instance;
         _lineMax = VERTEX_LIMIT;
     }
 
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
     {
+        if (_line == null)
+        {
+            _line = Hero.Instance?.GetComponent<LineRenderer>();
+            if (_line == null)
+                return;
+        }
         Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
         Vector2 pos = startPos;
         Vector2 strength = startClick - click;

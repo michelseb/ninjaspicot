@@ -1,16 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Perimeter : MonoBehaviour {
-
-
+public class Perimeter : MonoBehaviour
+{
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ninja")
+        if (collision.CompareTag("hero"))
         {
-            Ninja n = GameObject.Find("Ninjaspicot").GetComponent<Ninja>();
-            n.Die(transform);
+            collision.GetComponent<Hero>().Die(transform);
         }
     }
 }

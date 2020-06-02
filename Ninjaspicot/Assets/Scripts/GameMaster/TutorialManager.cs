@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -17,8 +18,10 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private GameObject _instructionsContainer;
     [SerializeField] private TextMeshProUGUI _instructionText;
     [SerializeField] private GameObject _clickText;
-    private float _duration;
-    private int _index;
+    [SerializeField] private List<GameObject> _itemsToAppear;
+    private float _actionDuration;
+    private int _itemIndex, _previousItemIndex;
+    private int _tutorialIndex;
     private Queue<string> _instructions;
 
     private Hero _hero;
@@ -39,6 +42,12 @@ public class TutorialManager : MonoBehaviour
         if (!_started)
             return;
 
+        if (_itemIndex > _previousItemIndex)
+        {
+            ActivateItems(_previousItemIndex, _itemIndex - _previousItemIndex);
+            _previousItemIndex = _itemIndex;
+        }
+
         if (_instructions.Count() > 1)
         {
             if (Input.GetButtonDown("Fire1"))
@@ -46,10 +55,10 @@ public class TutorialManager : MonoBehaviour
                 SetNextInstruction();
             }
         }
-        else if(CheckComplete(ref _index, ref _duration))
+        else if(CheckComplete(ref _tutorialIndex, ref _actionDuration))
         {
-            _index++;
-            LaunchTutorial(_index);
+            _tutorialIndex++;
+            InitTutorial(_tutorialIndex);
         }
     }
 
@@ -57,9 +66,14 @@ public class TutorialManager : MonoBehaviour
     {
         if (!_started && collision.CompareTag("hero") && _hero.Stickiness.Attached)
         {
-            LaunchTutorial(0);
+            StartCoroutine(LaunchTutorial());
             _started = true;
         }
+    }
+
+    private void ActivateItems(int startIndex, int count)
+    {
+        _itemsToAppear.Skip(startIndex).Take(count).ToList().ForEach(i => i.SetActive(true));
     }
 
     private void SetNextInstruction()
@@ -80,7 +94,7 @@ public class TutorialManager : MonoBehaviour
 
     private void SetInstruction()
     {
-        var pos = _cameraBehaviour.Camera.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 3));
+        var pos = _hero.transform.position + Vector3.down * 5;
         transform.position = new Vector3(pos.x, pos.y, transform.position.z);
         _instructionText.text = _instructions.Peek();
     }
@@ -91,14 +105,14 @@ public class TutorialManager : MonoBehaviour
             return true;
             
 
-        if (index == 0)
+        if (index == 0) // Déplacement
         {
             if (_touchManager.Touching)
             {
                 duration -= Time.deltaTime;
             }
         }
-        else if (index == 1)
+        else if (index == 1) // Saut
         {
             if (_touchManager.Dragging && duration > 1)
             {
@@ -111,9 +125,26 @@ public class TutorialManager : MonoBehaviour
             }
 
         }
-        else if (index == 2)
+        else if (index == 2) // Saut vers l'autre plateforme
         {
-            if (!_hero.Stickiness.Attached)
+            _itemIndex = 1;
+            if (_hero.Stickiness.Attached && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 1].transform)
+            {
+                duration = 0;
+            }
+        }
+        else if (index == 3) // Pièce
+        {
+            _itemIndex = 2;
+            if (_itemsToAppear[_itemIndex - 1] == null)
+            {
+                duration = 0;
+            }
+        }
+        else if (index == 4) // Monter tout en haut
+        {
+            _itemIndex = 4;
+            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 2].transform)
             {
                 duration = 0;
             }
@@ -122,7 +153,15 @@ public class TutorialManager : MonoBehaviour
         return false;
     }
 
-    private void LaunchTutorial(int tutorialId)
+    private IEnumerator LaunchTutorial()
+    {
+        _itemsToAppear.ForEach(i => i.SetActive(false));
+        yield return new WaitForSeconds(2);
+
+        InitTutorial(0);
+    }
+
+    private void InitTutorial(int tutorialId)
     {
         if (tutorialId >= _tutorials.Count)
             return;
@@ -130,7 +169,7 @@ public class TutorialManager : MonoBehaviour
         _hero.SetMovementActivation(false);
         _instructionsContainer.SetActive(true);
         _clickText.SetActive(true);
-        _duration = _tutorials[tutorialId].Duration;
+        _actionDuration = _tutorials[tutorialId].Duration;
         _instructions = new Queue<string>(_tutorials[tutorialId].Instructions);
         SetInstruction();
     }

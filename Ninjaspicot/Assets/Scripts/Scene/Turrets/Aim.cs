@@ -1,48 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Aim : MonoBehaviour {
+public class Aim : MonoBehaviour
+{
+    private Turret _turret;
 
-    ViewRange v;
-    Turret t;
-	// Use this for initialization
-	void Start () {
-        v = FindObjectOfType<ViewRange>();
-        t = transform.parent.gameObject.GetComponent<Turret>();
-    }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private void OnTriggerStay2D(Collider2D collision)
+    private void Start()
     {
-        if (collision.gameObject.tag == "ninja")
+        _turret = transform.parent.GetComponent<Turret>();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("hero"))
         {
-            v.s.material.color = new Color(1, 0, 0, .8f);
-            RaycastHit2D r = Physics2D.Linecast(t.gameObject.transform.position, collision.gameObject.transform.position, ~(1 << 10));
-            Debug.DrawLine(t.gameObject.transform.position, collision.gameObject.transform.position, Color.red);
-            Debug.Log(r.transform.gameObject.name);
-            if (r.transform.gameObject.tag == "ninja")
+            var hit = Utils.LineCast(_turret.gameObject.transform.position, collision.gameObject.transform.position, gameObject.GetInstanceID(), false, true, true);
+
+            if (hit.transform.CompareTag("hero"))
             {
-                if (t.autoShoot == false)
+                if (!_turret.AutoShoot)
                 {
-                    t.SendMessage("SelectMode", "aim");
+                    _turret.StartAim(hit.transform);
                 }
             }
-            
+
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ninja")
+        if (collision.CompareTag("hero"))
         {
-            if (t.autoShoot == false)
+            if (!_turret.AutoShoot)
             {
-                t.SendMessage("SelectMode", "search");
+                _turret.StartSearch();
             }
         }
     }

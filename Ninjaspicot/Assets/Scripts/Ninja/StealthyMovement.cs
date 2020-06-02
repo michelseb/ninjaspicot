@@ -39,11 +39,7 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
         GainAllJumps();
         _strength = 100;
         _touchManager = TouchManager.Instance;
-
-        if (_scenesManager.AlreadyPlayed == false)
-        {
-            _cameraBehaviour.Zoom(ZoomType.Intro);
-        }
+        _cameraBehaviour.Zoom(ZoomType.Intro);
     }
 
     protected void Update()
