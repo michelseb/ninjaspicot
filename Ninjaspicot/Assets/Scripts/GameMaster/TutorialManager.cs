@@ -23,6 +23,7 @@ public class TutorialManager : MonoBehaviour
     private int _itemIndex, _previousItemIndex;
     private int _tutorialIndex;
     private Queue<string> _instructions;
+    private Coroutine _tutorialLauncher;
 
     private Hero _hero;
     private TouchManager _touchManager;
@@ -64,10 +65,9 @@ public class TutorialManager : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (!_started && collision.CompareTag("hero") && _hero.Stickiness.Attached)
+        if (_tutorialLauncher == null && !_started && collision.CompareTag("hero") && _hero.Stickiness.Attached)
         {
-            StartCoroutine(LaunchTutorial());
-            _started = true;
+            _tutorialLauncher = StartCoroutine(LaunchTutorial());
         }
     }
 
@@ -94,7 +94,7 @@ public class TutorialManager : MonoBehaviour
 
     private void SetInstruction()
     {
-        var pos = _hero.transform.position + Vector3.down * 5;
+        var pos = _hero.transform.position + Vector3.down;
         transform.position = new Vector3(pos.x, pos.y, transform.position.z);
         _instructionText.text = _instructions.Peek();
     }
@@ -159,6 +159,8 @@ public class TutorialManager : MonoBehaviour
         yield return new WaitForSeconds(2);
 
         InitTutorial(0);
+        _started = true;
+        _tutorialLauncher = null;
     }
 
     private void InitTutorial(int tutorialId)

@@ -1,43 +1,51 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Bullet : MonoBehaviour {
+public class Bullet : MonoBehaviour, IPoolable
+{
+    public float Speed { get; set; }
+    private float _currentLifeTime;
+    private const float LIFE_TIME = 5;
 
-    Renderer r;
-	// Use this for initialization
-	void Start () {
-        r = GetComponent<Renderer>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-
-	}
-
-
-    public void OnTriggerEnter2D(Collider2D collision)
+    private void Start()
     {
-        if (collision.gameObject.name == "Ninjaspicot")
+        _currentLifeTime = LIFE_TIME;
+    }
+
+    private void Update()
+    {
+        transform.Translate(0, Speed, 0);
+        _currentLifeTime -= Time.deltaTime;
+        if (_currentLifeTime <= 0)
         {
-            Ninja n = GameObject.Find("Ninjaspicot").GetComponent<Ninja>();
-            n.Die(transform);
-            Destroy(gameObject);
+            Deactivate();
         }
-        if (collision.gameObject.GetComponent<Wall>() != null)
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
+        if (hero != null)
         {
-            Destroy(gameObject);
+            hero.Die(transform);
+            Deactivate();
+        }
+        if (collision.CompareTag("Wall"))
+        {
+            Deactivate();
         }
 
     }
 
-    void OnBecameInvisible()
+    public void Pool(Vector3 position, Quaternion rotation)
     {
-        Destroy(gameObject);
+        gameObject.SetActive(true);
+        transform.position = new Vector3(position.x, position.y, -5);
+        transform.rotation = rotation;
+        _currentLifeTime = LIFE_TIME;
     }
 
-    private void Fragment()
+    public void Deactivate()
     {
-
+        gameObject.SetActive(false);
     }
 }

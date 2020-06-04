@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
 [DisallowMultipleComponent]
-public abstract class Cloud : MonoBehaviour {
+public class Cloud : MonoBehaviour {
 
 }

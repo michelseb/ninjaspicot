@@ -1,25 +1,29 @@
 ﻿using UnityEngine;
 
-public class Aim : MonoBehaviour
+public class Aim : MonoBehaviour, IRaycastable
 {
+    [SerializeField] private float _size;
+    public float Size => _size;
     private Turret _turret;
+    public Turret Turret { get { if (_turret == null) _turret = transform.parent.GetComponent<Turret>(); return _turret; } }
+    public int Id => Turret.Id;
 
     private void Start()
     {
-        _turret = transform.parent.GetComponent<Turret>();
+        transform.localScale = Vector3.one * _size;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("hero"))
         {
-            var hit = Utils.LineCast(_turret.gameObject.transform.position, collision.gameObject.transform.position, gameObject.GetInstanceID(), false, true, true);
+            var hit = Utils.LineCast(Turret.gameObject.transform.position, collision.gameObject.transform.position, Turret.Id);
 
             if (hit.transform.CompareTag("hero"))
             {
-                if (!_turret.AutoShoot)
+                if (!Turret.AutoShoot)
                 {
-                    _turret.StartAim(hit.transform);
+                    Turret.StartAim(hit.transform);
                 }
             }
 
@@ -30,9 +34,9 @@ public class Aim : MonoBehaviour
     {
         if (collision.CompareTag("hero"))
         {
-            if (!_turret.AutoShoot)
+            if (!Turret.AutoShoot)
             {
-                _turret.StartSearch();
+                Turret.StartSearch();
             }
         }
     }

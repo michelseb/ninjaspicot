@@ -6,7 +6,7 @@ public class Knife : MonoBehaviour {
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.GetComponent<Wall>() != null)
+        if (collision.gameObject.GetComponent<Obstacle>() != null)
         {
             touched = true;
         }
@@ -14,7 +14,7 @@ public class Knife : MonoBehaviour {
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.GetComponent<Wall>() != null)
+        if (collision.gameObject.GetComponent<Obstacle>() != null)
         {
             touched = false;
         }

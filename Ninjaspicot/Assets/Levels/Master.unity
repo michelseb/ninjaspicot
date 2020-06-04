@@ -121,6 +121,36 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &117308929
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 117308930}
+  m_Layer: 0
+  m_Name: Poolables
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &117308930
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117308929}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 780851353}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &461663412
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,6 +516,8 @@ GameObject:
   - component: {fileID: 780851354}
   - component: {fileID: 780851356}
   - component: {fileID: 780851357}
+  - component: {fileID: 780851358}
+  - component: {fileID: 780851359}
   m_Layer: 0
   m_Name: GameMaster
   m_TagString: Untagged
@@ -527,6 +559,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 461663413}
+  - {fileID: 117308930}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -583,6 +616,34 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97ca311b9b1822548ae26aabee3b28b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &780851358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780851351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee50fea04ca87b4396f8edfbcaf33a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolableModels:
+  - {fileID: 8316369346179846109, guid: 67785b611b871384380faf90736cdc57, type: 3}
+  - {fileID: 7365273808307741137, guid: 9166b306d0ab1da4dba8ccf1b00f7cbe, type: 3}
+  _poolableParent: {fileID: 117308930}
+--- !u!114 &780851359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780851351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f944873d5ca8448be5ee546e7266a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1018486837

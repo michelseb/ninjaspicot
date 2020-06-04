@@ -8,6 +8,7 @@ public class SpawnManager : MonoBehaviour
 
     private Vector3 _spawnPosition;
     private CheckPoint[] _checkPoints;
+    private TimeManager _timeManager;
 
     private static SpawnManager _instance;
     public static SpawnManager Instance { get { if (_instance == null) _instance = FindObjectOfType<SpawnManager>(); return _instance; } }
@@ -15,6 +16,7 @@ public class SpawnManager : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
+        _timeManager = TimeManager.Instance;
     }
 
     private void Start()
@@ -36,14 +38,26 @@ public class SpawnManager : MonoBehaviour
 
     public void Respawn()
     {
+        var hero = Hero.Instance;
+
+        if (hero == null)
+            return;
+
+        hero.Rigidbody.velocity = Vector2.zero;
+        hero.Rigidbody.rotation = 0;
+        hero.Stickiness.CurrentAttachment = null;
+        hero.Dead = false;
+        hero.Renderer.color = Color.white;
+        _timeManager.SetNormalTime();
+
         if (!_checkPoints.Any(c => c.Attained))
         {
-            Hero.Instance.transform.position = _spawnPosition;
+            hero.transform.position = _spawnPosition;
             return;
         }
 
         var pos = _checkPoints.Last(c => c.Attained).transform.position;
-        Hero.Instance.transform.position = pos;
+        hero.transform.position = pos;
     }
 
     public void InitSpawns()

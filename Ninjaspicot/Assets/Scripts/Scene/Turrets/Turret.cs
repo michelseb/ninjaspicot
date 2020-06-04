@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour, IActivable
 {
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public enum Mode { Scan, Aim, Wait };
 
     [SerializeField] private bool _autoShoot;
@@ -11,8 +13,7 @@ public class Turret : MonoBehaviour, IActivable
     [SerializeField] private bool _clockWise;
     [SerializeField] private float _strength;
     [SerializeField] private float _loadTime;
-    [SerializeField] private GameObject _bullet;
-    
+
     public bool Loaded { get; private set; }
     public Mode TurretMode { get; private set; }
     public bool AutoShoot => _autoShoot;
@@ -20,9 +21,18 @@ public class Turret : MonoBehaviour, IActivable
     private bool _active;
     private float _initRotation;
     private float _loadProgress;
-    
+
+    private Aim _aim;
     private Transform _target;
     private Coroutine _search;
+
+    private PoolManager _poolManager;
+
+    private void Awake()
+    {
+        _poolManager = PoolManager.Instance;
+        _aim = GetComponentInChildren<Aim>();
+    }
 
     private void Start()
     {
@@ -38,17 +48,20 @@ public class Turret : MonoBehaviour, IActivable
             return;
 
         transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
-        
+
         switch (TurretMode)
         {
             case Mode.Aim:
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, _target.transform.position - _bullet.transform.position), .1f);
-                if (Loaded)
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f); 
+                
+                //Raycast of the size of the aim component (12 is the right value apparently)
+                var aim = Utils.RayCast(transform.position, transform.up, _aim.Size * 12, Id).collider;
+                var centered = aim != null && aim.CompareTag("hero");
+                
+                if (Loaded && centered)
                 {
                     Shoot();
-                    StartCoroutine(Load());
-                    Loaded = false;
                 }
 
                 break;
@@ -61,14 +74,13 @@ public class Turret : MonoBehaviour, IActivable
                     if (Loaded)
                     {
                         Shoot();
-                        StartCoroutine(Load());
-                        Loaded = false;
                     }
                 }
-                
+
                 var dir = _clockWise ? 1 : -1;
-                
+
                 transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+
                 if (Mathf.Abs(transform.rotation.z - _initRotation) > _viewAngle)
                 {
                     _clockWise = !_clockWise;
@@ -79,7 +91,7 @@ public class Turret : MonoBehaviour, IActivable
 
             case Mode.Wait:
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.FromToRotation(Vector3.up, _target.transform.position - _bullet.transform.position), .1f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
 
                 break;
         }
@@ -153,13 +165,10 @@ public class Turret : MonoBehaviour, IActivable
 
     private void Shoot()
     {
-        var direction = _bullet.transform.position - transform.position;
-        GameObject b = Instantiate(_bullet, _bullet.transform.position + direction / 2, Quaternion.identity);
-        b.transform.parent = null;
-        b.AddComponent<Rigidbody2D>();
-        b.AddComponent<Bullet>();
-        b.GetComponent<Rigidbody2D>().gravityScale = 0;
-        b.GetComponent<Rigidbody2D>().AddForce(direction * _strength, ForceMode2D.Impulse);
+        var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation);
+        bullet.Speed = _strength;
+        Loaded = false;
+        StartCoroutine(Load());
     }
 
     private IEnumerator Load()
@@ -168,7 +177,6 @@ public class Turret : MonoBehaviour, IActivable
         {
             _loadProgress += Time.deltaTime;
             yield return null;
-
         }
 
         Loaded = true;

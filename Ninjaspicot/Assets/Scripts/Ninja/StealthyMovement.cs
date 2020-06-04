@@ -9,18 +9,13 @@ public enum Dir
 
 public class StealthyMovement : Movement // Movement that includes walking on walls
 {
-    [SerializeField]
-    private int _maxJumps;
-    [SerializeField]
-    private GameObject _dashParticles;
-
-    public bool Started { get; set; }
+    [SerializeField] private int _maxJumps;
+    public bool Active { get; set; }
 
     private Coroutine _walkOnWalls;
     private TouchManager _touchManager;
     private Stickiness _stickiness;
-
-    private ScenesManager _scenesManager;
+    private PoolManager _poolManager;
 
     private Dir _ninjaDir;
 
@@ -28,7 +23,7 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
     {
         base.Awake();
         _stickiness = GetComponent<Stickiness>();
-        _scenesManager = ScenesManager.Instance;
+        _poolManager = PoolManager.Instance;
     }
 
     protected override void Start()
@@ -44,20 +39,16 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
 
     protected void Update()
     {
-
-        if (!Started)
+        if (!Active)
             return;
 
-        //Debug.Log(n.contact.point.x + " " + n.contact.point.y);
         if (_touchManager.Touching)
         {
-            _ninjaDir = _touchManager.RawTouchOrigin.x < Screen.width / 2 ? Dir.Left : Dir.Right;
-            _trajectory.Reset();
+            _ninjaDir = _touchManager.TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
 
             if (CanJump())
             {
-                //StopWalking();
-                //t.Reduce();
+                StopWalking();
                 _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouchOrigin, _strength);
             }
             else
@@ -105,18 +96,18 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
     {
         _stickiness.Detach();
         base.Jump(origin, drag, strength);
-        Instantiate(_dashParticles, transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
+        _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
         _cameraBehaviour.DoShake(.3f, .1f);
     }
 
 
-    private void StopWalking()
+    public void StopWalking()
     {
         if (_walkOnWalls != null)
         {
             StopCoroutine(_walkOnWalls);
         }
-
+        _stickiness.WallJoint.useMotor = false;
         _walkOnWalls = null;
     }
 
@@ -126,8 +117,9 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
             yield break;
 
         var jointMotor = hinge.motor;
+        _stickiness.WallJoint.useMotor = true;
 
-        while (Input.GetButton("Fire1") && hinge != null)
+        while (Input.GetButton("Fire1"))
         {
 
             if (_ninjaDir == Dir.Right)
@@ -145,14 +137,8 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
             yield return null;
         }
 
-        if (hinge != null)
-        {
-            jointMotor.motorSpeed = 0;
-            hinge.motor = jointMotor;
-            hinge.anchor = transform.InverseTransformPoint(_stickiness.GetContactPosition());
-            hinge.connectedAnchor = hinge.anchor;
-        }
 
+        _stickiness.WallJoint.useMotor = false;
         _walkOnWalls = null;
     }
 

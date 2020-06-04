@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Ninja : DynamicEntity, IDestructable
+public class Ninja : DynamicEntity, IKillable
 {
+    public bool Dead { get; set; }
     public StealthyMovement Movement { get; private set; }
     public Stickiness Stickiness { get; private set; }
+    public SpriteRenderer Renderer { get; private set; }
+
     protected CameraBehaviour _cameraBehaviour;
 
 
@@ -14,33 +17,32 @@ public class Ninja : DynamicEntity, IDestructable
         Movement = GetComponent<StealthyMovement>() ?? GetComponentInChildren<StealthyMovement>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
+        Renderer = GetComponent<SpriteRenderer>();
     }
 
 
     public virtual void Die(Transform killer)
     {
-        SetMovementActivation(false);
+        if (Dead)
+            return;
 
-        var joint = GetComponent<Joint2D>();
-        if (joint != null)
-        {
-            Destroy(joint);
-        }
+        Dead = true;
+        Stickiness.Detach();
+        SetMovementAndStickinessActivation(false);
 
-        if (GetComponent<SpriteRenderer>() != null)
-        {
-            GetComponent<SpriteRenderer>().color = Color.red;
-        }
+        Renderer.color = Color.red;
 
         if (killer != null)
         {
-            if (killer.GetComponent<SpriteRenderer>() != null)
+            var killerRenderer = killer.GetComponent<SpriteRenderer>();
+            if (killerRenderer != null)
             {
-                killer.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                killerRenderer.color = Color.red;
             }
             _rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
             _rigidbody.AddTorque(20, ForceMode2D.Impulse);
         }
+
         StartCoroutine(Dying());
     }
 
@@ -51,6 +53,18 @@ public class Ninja : DynamicEntity, IDestructable
 
     public void SetMovementActivation(bool active)
     {
-        Movement.enabled = active;
+        Movement.StopWalking();
+        Movement.Active = active;
+    }
+
+    public void SetStickinessActivation(bool active)
+    {
+        Stickiness.Active = active;
+    }
+
+    public void SetMovementAndStickinessActivation(bool active)
+    {
+        SetMovementActivation(active);
+        SetStickinessActivation(active);
     }
 }

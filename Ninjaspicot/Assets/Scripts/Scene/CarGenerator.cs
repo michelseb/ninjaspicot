@@ -1,19 +1,21 @@
 ﻿using UnityEngine;
 
-public class CarGenerator : MonoBehaviour {
-
+public class CarGenerator : MonoBehaviour
+{
     private float _coolDown;
     private float _timer;
     private bool _canGenerate;
     public GameObject car;
 
-    private void Start () {
+    private void Start()
+    {
         _timer = _coolDown;
         _canGenerate = true;
-	}
+    }
 
-	private void Update () {
-		if (_timer > 0)
+    private void Update()
+    {
+        if (_timer > 0)
         {
             _timer -= Time.deltaTime;
             _canGenerate = true;
@@ -27,7 +29,7 @@ public class CarGenerator : MonoBehaviour {
                 _canGenerate = false;
             }
         }
-	}
+    }
 
     private void GenerateCar()
     {

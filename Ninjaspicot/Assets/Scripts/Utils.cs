@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -85,7 +87,7 @@ public static class Utils
         {
             actualHits = hits.Where(x => x.collider.gameObject.GetInstanceID() != ignore).ToArray();
         }
-        
+
         return actualHits;
     }
 
@@ -111,9 +113,9 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, bool ignoreChildren = false, bool ignoreParent = false)
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false)
     {
-        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers, ignoreChildren, ignoreParent);
+        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers);
 
         RaycastHit2D hit = new RaycastHit2D();
         if (hits.Length > 0)
@@ -133,39 +135,43 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false, bool ignoreChildren = false, bool ignoreParent = false)
+    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false)
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(origin, direction, distance);
 
-        var actualHits = hits.Where(x => x.collider.gameObject.GetInstanceID() != ignore);
-        if (includeTriggers)
+        var actualHits = new List<RaycastHit2D>();
+
+        foreach (var hit in hits)
         {
-            actualHits = actualHits.Where(x => !x.collider.isTrigger);
-        }
-        if (ignoreChildren)
-        {
-            actualHits = actualHits.Where(x => !x.transform.Cast<Transform>().Any(t => t.gameObject.GetInstanceID() == ignore));
+            var raycastable = hit.collider.GetComponent<IRaycastable>();
+
+            if (raycastable == null || 
+                raycastable.Id == ignore ||
+                (!includeTriggers && hit.collider.isTrigger))
+                continue;
+
+            actualHits.Add(hit);
         }
 
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, bool ignoreChildren = false, bool ignoreParent = false)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false)
     {
         RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination);
 
-        var actualHits = hits.Where(x => x.collider.gameObject.GetInstanceID() != ignore);
-        if (includeTriggers)
+        var actualHits = new List<RaycastHit2D>();
+
+        foreach (var hit in hits)
         {
-            actualHits = actualHits.Where(x => !x.collider.isTrigger);
-        }
-        if (ignoreChildren)
-        {
-            actualHits = actualHits.Where(x => !x.transform.Cast<Transform>().Any(t => t.gameObject.GetInstanceID() == ignore));
-        }
-        if (ignoreParent)
-        {
-            actualHits = actualHits.Where(x => x.transform.parent?.transform.gameObject.GetInstanceID() != ignore);
+            var raycastable = hit.collider.GetComponent<IRaycastable>();
+
+            if (raycastable == null ||
+                raycastable.Id == ignore ||
+                (!includeTriggers && hit.collider.isTrigger))
+                continue;
+
+            actualHits.Add(hit);
         }
 
         return actualHits.ToArray();

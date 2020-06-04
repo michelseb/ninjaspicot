@@ -23,13 +23,13 @@ TagManager:
   - UI
   - 
   - 
+  - Hero
+  - Obstacle
   - Bullet
-  - Ninja
-  - Car
-  - Background
-  - Objects
   - Teleported
   - Teleporter
+  - Enemy
+  - 
   - 
   - 
   - 

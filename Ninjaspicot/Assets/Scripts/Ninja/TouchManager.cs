@@ -1,5 +1,10 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+
+public enum TouchArea
+{
+    Left = 0,
+    Right = 1
+}
 
 public class TouchManager : MonoBehaviour
 {
@@ -9,6 +14,7 @@ public class TouchManager : MonoBehaviour
     public Vector3 TouchOrigin { get; private set; }
     public Vector3 RawTouchOrigin { get; private set; }
     public Vector3 TouchDrag { get; private set; }
+    public TouchArea TouchArea => RawTouchOrigin.x < Screen.width / 2 ? TouchArea.Left : TouchArea.Right;
 
     private bool _touchInitialized;
     private LineRenderer _touchLine;

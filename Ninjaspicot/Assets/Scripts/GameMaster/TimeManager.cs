@@ -5,17 +5,18 @@ public class TimeManager : MonoBehaviour
 {
 
     private bool _active;
-    private float _increaseValue;
 
     public float TimeScale => Time.timeScale;
 
     private static TimeManager _instance;
     public static TimeManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TimeManager>(); return _instance; } }
 
+    private const float INCREASE_INTERPOLATION = .5f;
+    private const float DECREASE_INTERPOLATION = .8f;
+
     private void Start()
     {
         _active = true;
-        _increaseValue = .5f;
     }
 
     public void SlowDown(float slowValue)
@@ -31,6 +32,18 @@ public class TimeManager : MonoBehaviour
         Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
+    private IEnumerator SlowDownProgressive(float slowValue)
+    {
+        while (Time.timeScale > slowValue)
+        {
+            Time.timeScale -= DECREASE_INTERPOLATION * Time.unscaledDeltaTime;
+            Time.fixedDeltaTime = Time.timeScale * .02f;
+            yield return null;
+        }
+
+        Time.timeScale = slowValue;
+    }
+
     public void StopTime()
     {
         Time.timeScale = 0;
@@ -43,12 +56,17 @@ public class TimeManager : MonoBehaviour
 
         while (Time.timeScale < 1)
         {
-            Time.timeScale += _increaseValue * Time.unscaledDeltaTime;
+            Time.timeScale += INCREASE_INTERPOLATION * Time.unscaledDeltaTime;
             Time.fixedDeltaTime = Time.timeScale * .02f;
             yield return null;
         }
 
         Time.timeScale = 1;
+    }
+
+    public void StartSlowDownProgressive(float value)
+    {
+        StartCoroutine(SlowDownProgressive(value));
     }
 
     public void StartTimeRestore()

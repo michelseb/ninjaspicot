@@ -41,7 +41,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private int _targetWidth;
     private float _pixelsToUnits;
-    private const float ZOOM_SPEED = 100;
+    private const float ZOOM_SPEED = .5f;
     private const float FOLLOW_SPEED = .004f;
     private const float COLOR_THRESHOLD = .01f;
 
@@ -169,11 +169,11 @@ public class CameraBehaviour : MonoBehaviour
         while (Camera.orthographicSize > height / _pixelsToUnits)
         {
 
-            Camera.orthographicSize -= Time.unscaledDeltaTime * speed;
+            Camera.orthographicSize -= speed;
             yield return null;
         }
         SetFollowMode(_hero.transform);
-        _hero.Movement.Started = true;
+        _hero.Movement.Active = true;
     }
 
     private void InstantZoom(int zoom)

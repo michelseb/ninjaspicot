@@ -1,21 +1,22 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Hero : Ninja
+public class Hero : Ninja, IRaycastable
 {
-
     [SerializeField] private bool _getsCheckPoint;
-    [SerializeField] private Transform _pos;
-    public Transform Pos => _pos;
-    public bool Triggered { get; private set; }
-    private int _lastTrigger;
 
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
+    public bool Triggered { get; private set; }
+
+    private int _lastTrigger;
     private Cloth _cape;
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
 
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
+
 
     protected override void Awake()
     {
@@ -26,23 +27,28 @@ public class Hero : Ninja
         _cape = GetComponentInChildren<Cloth>();
     }
 
+    public override void Die(Transform killer)
+    {
+        if (Dead)
+            return;
+
+        base.Die(killer);
+        _timeManager.StartSlowDownProgressive(.3f);
+    }
+
     public override IEnumerator Dying()
     {
-        _timeManager.SetNormalTime();
-        _timeManager.SetActive(false);
-
         yield return new WaitForSeconds(1);
 
         SetCapeActivation(false);
         _spawnManager.Respawn();
-        SetCapeActivation(true);
+        SetMovementAndStickinessActivation(true);
         _cameraBehaviour.SetCenterMode(transform, 1f);
-        
+        SetCapeActivation(true);
+
         yield return new WaitForSeconds(1f);
 
         _cameraBehaviour.SetFollowMode(transform);
-        _timeManager.SetActive(true);
-        SetMovementActivation(true);
     }
 
     public void SetCapeActivation(bool active)

@@ -66,7 +66,7 @@ public class Trajectory : MonoBehaviour
 
                 if (hit)
                 {
-                    if (hit.collider.gameObject.GetComponent<Wall>() != null)
+                    if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
                     {
                         _lineMax = i;
                         _targetLineCount = i;
@@ -95,20 +95,6 @@ public class Trajectory : MonoBehaviour
         }
 
         return true;
-    }
-
-    public void Reduce()
-    {
-        if (_line.widthMultiplier > 0)
-        {
-            _line.widthMultiplier -= .01f;
-        }
-
-    }
-
-    public void Reset()
-    {
-        _line.widthMultiplier = 2;
     }
 
     public void ReinitTrajectory()
@@ -146,7 +132,5 @@ public class Trajectory : MonoBehaviour
         Color col = _line.material.color;
         col.a = 1f;
         _line.material.color = col;
-
-        //StartCoroutine(cam.zoomOut(60));
     }
 }
