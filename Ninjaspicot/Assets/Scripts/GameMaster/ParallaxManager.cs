@@ -11,10 +11,11 @@ public class ParallaxManager : MonoBehaviour
     private static ParallaxManager _instance;
     public static ParallaxManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ParallaxManager>(); return _instance; } }
 
-    public const int MIN_DEPTH = 3;
+    public const int MIN_DEPTH = 5;
     public const int MAX_DEPTH = 20;
-    public const float PARALLAX_XFACTOR = .2f;
-    public const float PARALLAX_YFACTOR = .05f;
+    public const float PARALLAX_FACTOR = 1.5f;
+    public const float SCALE_AMPLITUDE = 1;
+
 
     private void Awake()
     {
@@ -24,28 +25,32 @@ public class ParallaxManager : MonoBehaviour
 
     private void Start()
     {
-        _previousCameraPosition = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR,
-            _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR,
-            _cameraBehaviour.transform.position.z);
+        //_previousCameraPosition = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR,
+        //    _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR,
+        //    _cameraBehaviour.transform.position.z);
+
+        _previousCameraPosition = _cameraBehaviour.transform.position;
     }
 
     private void Update()
     {
-        var position = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR, 
-            _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR, 
-            _cameraBehaviour.transform.position.z);
+        var deltaPosition = _cameraBehaviour.transform.position - _previousCameraPosition;
+        //var position = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR, 
+        //    _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR, 
+        //    _cameraBehaviour.transform.position.z);
 
-        if (position == _previousCameraPosition)
+        if (deltaPosition.magnitude == 0)
             return;
 
         foreach (var parallaxObject in _parallaxObjects)
         {
 
-            var translate =  position - _previousCameraPosition;
-            parallaxObject.transform.Translate(-translate / parallaxObject.Depth, Space.World);
+            //var translate =  position - _previousCameraPosition;
+            parallaxObject.transform.position += new Vector3(deltaPosition.x, deltaPosition.y, 0) * parallaxObject.ParallaxFactor;
+            //parallaxObject.transform.Translate(-translate * parallaxObject.ParallaxFactor, Space.World);
         }
 
-        _previousCameraPosition = position;
+        _previousCameraPosition = _cameraBehaviour.transform.position;
     }
 
     public void AddObject(ParallaxObject parallaxObject)

@@ -39,7 +39,7 @@ public abstract class Movement : MonoBehaviour
         if (GetJumps() <= 0)
         {
             _timeManager.SetNormalTime();
-            _cameraBehaviour.Zoom(ZoomType.Out);
+            //_cameraBehaviour.Zoom(ZoomType.Progressive);
         }
 
         _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);

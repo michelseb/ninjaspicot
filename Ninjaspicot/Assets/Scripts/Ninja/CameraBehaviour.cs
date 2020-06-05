@@ -3,10 +3,9 @@ using UnityEngine;
 
 public enum ZoomType
 {
-    In = 0,
-    Out = 1,
-    Instant = 2,
-    Intro = 3
+    Progressive = 0,
+    Instant = 1,
+    Intro = 2
 }
 
 public enum CameraMode
@@ -41,8 +40,8 @@ public class CameraBehaviour : MonoBehaviour
 
     private int _targetWidth;
     private float _pixelsToUnits;
-    private const float ZOOM_SPEED = .5f;
-    private const float FOLLOW_SPEED = .004f;
+    private const float ZOOM_SPEED = 2f;
+    private const float FOLLOW_SPEED = .01f;
     private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
@@ -93,7 +92,7 @@ public class CameraBehaviour : MonoBehaviour
                 break;
 
             case CameraMode.Center:
-                
+
                 Center(_movementOrigin, _movementDestination, _centerDuration);
                 break;
         }
@@ -148,27 +147,26 @@ public class CameraBehaviour : MonoBehaviour
         Camera.backgroundColor = Color.Lerp(Camera.backgroundColor, color, _colorInterpolation);
     }
 
-    private IEnumerator ZoomIn(int zoom)
+    private IEnumerator ZoomProgressive(int zoom)
     {
-        int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
+        //int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
 
-        while (Camera.orthographicSize > height / _pixelsToUnits / 2 - zoom)
+        float _initSize = Camera.orthographicSize;
+
+        while (Mathf.Abs(Camera.orthographicSize - _initSize) < Mathf.Abs(zoom))
         {
-
-            Camera.orthographicSize--;
+            Camera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED;
             yield return null;
         }
-
     }
 
     private IEnumerator ZoomIntro(float speed)
     {
-        yield return new WaitForSecondsRealtime(2);
+        yield return new WaitForSecondsRealtime(4);
         int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
 
         while (Camera.orthographicSize > height / _pixelsToUnits)
         {
-
             Camera.orthographicSize -= speed;
             yield return null;
         }
@@ -182,28 +180,14 @@ public class CameraBehaviour : MonoBehaviour
         Camera.orthographicSize = height / _pixelsToUnits / 2 + zoom;
     }
 
-    private IEnumerator ZoomOut(int zoom)
-    {
-        int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
-        while (Camera.orthographicSize < height / _pixelsToUnits / 2 + zoom)
-        {
-            Camera.orthographicSize++;
-            yield return null;
-        }
-    }
-
     public void Zoom(ZoomType type, int zoomAmount = 0)
     {
         StopAllCoroutines();
 
         switch (type)
         {
-            case ZoomType.In:
-                StartCoroutine(ZoomIn(zoomAmount));
-                break;
-
-            case ZoomType.Out:
-                StartCoroutine(ZoomOut(zoomAmount));
+            case ZoomType.Progressive:
+                StartCoroutine(ZoomProgressive(zoomAmount));
                 break;
 
             case ZoomType.Instant:

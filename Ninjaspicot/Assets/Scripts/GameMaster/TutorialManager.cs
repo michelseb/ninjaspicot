@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class Tutorial
@@ -22,8 +23,11 @@ public class TutorialManager : MonoBehaviour
     private float _actionDuration;
     private int _itemIndex, _previousItemIndex;
     private int _tutorialIndex;
+
+    private float _initialDistanceToInstruction;
     private Queue<string> _instructions;
     private Coroutine _tutorialLauncher;
+    private Image _containerImage;
 
     private Hero _hero;
     private TouchManager _touchManager;
@@ -36,6 +40,7 @@ public class TutorialManager : MonoBehaviour
         _hero = Hero.Instance;
         _touchManager = TouchManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
+        _containerImage = _instructionsContainer.GetComponent<Image>();
     }
 
     private void Update()
@@ -56,10 +61,15 @@ public class TutorialManager : MonoBehaviour
                 SetNextInstruction();
             }
         }
-        else if(CheckComplete(ref _tutorialIndex, ref _actionDuration))
+        else
         {
-            _tutorialIndex++;
-            InitTutorial(_tutorialIndex);
+            var dist = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude) +.01f;
+            _containerImage.color = new Color(1, 1, 1, _initialDistanceToInstruction / dist);
+            if (CheckComplete(ref _tutorialIndex, ref _actionDuration))
+            {
+                _tutorialIndex++;
+                InitTutorial(_tutorialIndex);
+            }
         }
     }
 
@@ -86,6 +96,7 @@ public class TutorialManager : MonoBehaviour
 
         if (_instructions.Count == 1)
         {
+            _initialDistanceToInstruction = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude);
             _hero.SetMovementActivation(true);
             _clickText.SetActive(false);
         }
@@ -103,7 +114,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (duration <= 0)
             return true;
-            
+
 
         if (index == 0) // Déplacement
         {
@@ -143,8 +154,8 @@ public class TutorialManager : MonoBehaviour
         }
         else if (index == 4) // Monter tout en haut
         {
-            _itemIndex = 4;
-            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 2].transform)
+            _itemIndex = 5;
+            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 3].transform)
             {
                 duration = 0;
             }
@@ -155,7 +166,10 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator LaunchTutorial()
     {
-        _itemsToAppear.ForEach(i => i.SetActive(false));
+        foreach (var item in _itemsToAppear)
+        {
+            item.SetActive(false);
+        }
         yield return new WaitForSeconds(2);
 
         InitTutorial(0);
@@ -168,6 +182,7 @@ public class TutorialManager : MonoBehaviour
         if (tutorialId >= _tutorials.Count)
             return;
 
+        _containerImage.color = Color.white;
         _hero.SetMovementActivation(false);
         _instructionsContainer.SetActive(true);
         _clickText.SetActive(true);

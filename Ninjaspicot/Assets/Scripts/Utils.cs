@@ -91,7 +91,7 @@ public static class Utils
         return actualHits;
     }
 
-    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
     {
         RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
 
@@ -135,9 +135,18 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
     {
-        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, direction, distance);
+        RaycastHit2D[] hits;
+
+        if (distance > 0)
+        {
+            hits = Physics2D.RaycastAll(origin, direction, distance);
+        }
+        else
+        {
+            hits = Physics2D.RaycastAll(origin, direction);
+        }
 
         var actualHits = new List<RaycastHit2D>();
 
@@ -145,7 +154,7 @@ public static class Utils
         {
             var raycastable = hit.collider.GetComponent<IRaycastable>();
 
-            if (raycastable == null || 
+            if (raycastable == null ||
                 raycastable.Id == ignore ||
                 (!includeTriggers && hit.collider.isTrigger))
                 continue;

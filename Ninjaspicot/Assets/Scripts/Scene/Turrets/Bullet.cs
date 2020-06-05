@@ -23,10 +23,9 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
-        if (hero != null)
+        if (collision.CompareTag("hero"))
         {
-            hero.Die(transform);
+            collision.GetComponent<Hero>().Die(transform);
             Deactivate();
         }
         if (collision.CompareTag("Wall"))

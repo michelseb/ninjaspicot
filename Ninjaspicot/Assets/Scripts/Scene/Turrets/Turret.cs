@@ -22,7 +22,6 @@ public class Turret : MonoBehaviour, IActivable
     private float _initRotation;
     private float _loadProgress;
 
-    private Aim _aim;
     private Transform _target;
     private Coroutine _search;
 
@@ -31,7 +30,6 @@ public class Turret : MonoBehaviour, IActivable
     private void Awake()
     {
         _poolManager = PoolManager.Instance;
-        _aim = GetComponentInChildren<Aim>();
     }
 
     private void Start()
@@ -56,7 +54,7 @@ public class Turret : MonoBehaviour, IActivable
                 transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f); 
                 
                 //Raycast of the size of the aim component (12 is the right value apparently)
-                var aim = Utils.RayCast(transform.position, transform.up, _aim.Size * 12, Id).collider;
+                var aim = Utils.RayCast(transform.position, transform.up, ignore: Id).collider;
                 var centered = aim != null && aim.CompareTag("hero");
                 
                 if (Loaded && centered)
