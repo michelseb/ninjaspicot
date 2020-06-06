@@ -59,7 +59,7 @@ MonoBehaviour:
   _viewAngle: 360
   _rotationSpeed: 100
   _clockWise: 0
-  _strength: 0.2
+  _strength: 200
   _loadTime: 0.2
 --- !u!120 &120504747507087020
 LineRenderer:

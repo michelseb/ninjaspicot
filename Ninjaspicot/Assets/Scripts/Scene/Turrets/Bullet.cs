@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void Update()
     {
-        transform.Translate(0, Speed, 0);
+        transform.Translate(0, Speed * Time.deltaTime, 0);
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {

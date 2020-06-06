@@ -29,7 +29,7 @@ public class CameraCatcher : MonoBehaviour
     {
         if (collision.CompareTag("hero") && _activated)
         {
-            _cameraBehaviour.Zoom(ZoomType.Progressive, -_zoomAmount);
+            _cameraBehaviour.Zoom(ZoomType.Init);
             _cameraBehaviour.SetFollowMode(Hero.Instance.transform);
         }
         _activated = false;

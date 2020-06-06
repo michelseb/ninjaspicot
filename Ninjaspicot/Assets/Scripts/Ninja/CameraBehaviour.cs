@@ -5,7 +5,8 @@ public enum ZoomType
 {
     Progressive = 0,
     Instant = 1,
-    Intro = 2
+    Intro = 2,
+    Init = 3
 }
 
 public enum CameraMode
@@ -43,6 +44,7 @@ public class CameraBehaviour : MonoBehaviour
     private const float ZOOM_SPEED = 2f;
     private const float FOLLOW_SPEED = .01f;
     private const float COLOR_THRESHOLD = .01f;
+    private const float INITIAL_CAMERA_SIZE = 45f;
 
     private static CameraBehaviour _instance;
     public static CameraBehaviour Instance { get { if (_instance == null) _instance = FindObjectOfType<CameraBehaviour>(); return _instance; } }
@@ -160,12 +162,23 @@ public class CameraBehaviour : MonoBehaviour
         }
     }
 
+    private IEnumerator ReinitZoom()
+    {
+        var delta = INITIAL_CAMERA_SIZE - Camera.orthographicSize;
+
+        while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - Camera.orthographicSize) > 0)
+        {
+            Camera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED;
+            yield return null;
+        }
+        Camera.orthographicSize = INITIAL_CAMERA_SIZE;
+    }
+
     private IEnumerator ZoomIntro(float speed)
     {
-        yield return new WaitForSecondsRealtime(4);
-        int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
+        //yield return new WaitForSecondsRealtime(4);
 
-        while (Camera.orthographicSize > height / _pixelsToUnits)
+        while (Camera.orthographicSize > INITIAL_CAMERA_SIZE)
         {
             Camera.orthographicSize -= speed;
             yield return null;
@@ -176,8 +189,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private void InstantZoom(int zoom)
     {
-        int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
-        Camera.orthographicSize = height / _pixelsToUnits / 2 + zoom;
+        Camera.orthographicSize = INITIAL_CAMERA_SIZE + zoom;
     }
 
     public void Zoom(ZoomType type, int zoomAmount = 0)
@@ -196,6 +208,10 @@ public class CameraBehaviour : MonoBehaviour
 
             case ZoomType.Intro:
                 StartCoroutine(ZoomIntro(ZOOM_SPEED));
+                break;
+
+            case ZoomType.Init:
+                StartCoroutine(ReinitZoom());
                 break;
         }
     }

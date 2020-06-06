@@ -9,6 +9,7 @@ public class Trajectory : MonoBehaviour
     private Coroutine _disappearing;
     private bool _appeared;
 
+    private const float TIME_SLOW = .01f;
     private const int VERTEX_LIMIT = 40;
 
     private static Trajectory _instance;
@@ -124,7 +125,7 @@ public class Trajectory : MonoBehaviour
     {
         if (!_appeared)
         {
-            _timeManager.SlowDown(.05f);
+            _timeManager.SlowDown(TIME_SLOW);
             _timeManager.StartTimeRestore();
         }
 
