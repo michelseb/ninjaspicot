@@ -16,6 +16,7 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
     private TouchManager _touchManager;
     private Stickiness _stickiness;
     private PoolManager _poolManager;
+    protected Trajectory _trajectory;
 
     private Dir _ninjaDir;
 
@@ -49,6 +50,8 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
             if (CanJump())
             {
                 StopWalking();
+
+                _trajectory = GetTrajectory();
                 _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouchOrigin, _strength);
             }
             else
@@ -58,8 +61,8 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
                     _walkOnWalls = StartCoroutine(WalkOnWalls(_stickiness.WallJoint));
                 }
 
-                _trajectory.ReinitTrajectory();
-                _timeManager.SetNormalTime();
+                //_trajectory.ReinitTrajectory();
+                //_timeManager.SetNormalTime();
             }
         }
 
@@ -97,9 +100,21 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
         _stickiness.Detach();
         base.Jump(origin, drag, strength);
         _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
+        _trajectory.ReinitTrajectory();
+        _trajectory = null;
         _cameraBehaviour.DoShake(.3f, .1f);
     }
 
+
+    private Trajectory GetTrajectory()
+    {
+        if (_trajectory == null)
+        {
+            return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity);
+        }
+
+        return _trajectory;
+    }
 
     public void StopWalking()
     {
@@ -141,22 +156,6 @@ public class StealthyMovement : Movement // Movement that includes walking on wa
         _stickiness.WallJoint.useMotor = false;
         _walkOnWalls = null;
     }
-
-
-    //void OnDrawGizmos()
-    //{
-    //    Gizmos.color = new Color(1, 0, 0, .6f);
-    //    if (hinge != null)
-    //    {
-    //        Gizmos.DrawSphere(transform.TransformPoint(hinge.anchor), 1f);
-    //    }
-    //    Gizmos.color = Color.blue;
-    //    Gizmos.DrawSphere(n.contact.point, .5f);
-    //    foreach (ContactPoint2D c in n.contacts)
-    //    {
-    //        Gizmos.DrawSphere(c.point, .5f);
-    //    }
-    //}
 
     private bool CanJump()
     {

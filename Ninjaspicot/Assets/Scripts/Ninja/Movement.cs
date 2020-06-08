@@ -3,7 +3,6 @@ using UnityEngine;
 
 public abstract class Movement : MonoBehaviour
 {
-    protected Trajectory _trajectory;
     protected TimeManager _timeManager;
     protected CameraBehaviour _cameraBehaviour;
     protected DynamicEntity _dynamicEntity;
@@ -16,7 +15,6 @@ public abstract class Movement : MonoBehaviour
     protected virtual void Awake()
     {
         _cameraBehaviour = CameraBehaviour.Instance;
-        _trajectory = Trajectory.Instance;
         _timeManager = TimeManager.Instance;
         _dynamicEntity = GetComponent<DynamicEntity>();
     }
@@ -34,12 +32,10 @@ public abstract class Movement : MonoBehaviour
     {
         Vector2 forceToApply = origin - drag;
         LoseJump();
-        _trajectory.ReinitTrajectory();
         _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
         if (GetJumps() <= 0)
         {
             _timeManager.SetNormalTime();
-            //_cameraBehaviour.Zoom(ZoomType.Progressive);
         }
 
         _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);

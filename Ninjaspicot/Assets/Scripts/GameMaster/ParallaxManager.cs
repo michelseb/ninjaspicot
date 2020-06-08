@@ -25,30 +25,17 @@ public class ParallaxManager : MonoBehaviour
 
     private void Start()
     {
-        //_previousCameraPosition = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR,
-        //    _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR,
-        //    _cameraBehaviour.transform.position.z);
-
         _previousCameraPosition = _cameraBehaviour.transform.position;
     }
 
     private void Update()
     {
         var deltaPosition = _cameraBehaviour.transform.position - _previousCameraPosition;
-        //var position = new Vector3(_cameraBehaviour.transform.position.x * PARALLAX_XFACTOR, 
-        //    _cameraBehaviour.transform.position.y * PARALLAX_YFACTOR, 
-        //    _cameraBehaviour.transform.position.z);
 
         if (deltaPosition.magnitude == 0)
             return;
 
-        foreach (var parallaxObject in _parallaxObjects)
-        {
-
-            //var translate =  position - _previousCameraPosition;
-            parallaxObject.transform.position += new Vector3(deltaPosition.x, deltaPosition.y, 0) * parallaxObject.ParallaxFactor;
-            //parallaxObject.transform.Translate(-translate * parallaxObject.ParallaxFactor, Space.World);
-        }
+        OperateParallax(deltaPosition);
 
         _previousCameraPosition = _cameraBehaviour.transform.position;
     }
@@ -59,5 +46,21 @@ public class ParallaxManager : MonoBehaviour
             return;
 
         _parallaxObjects.Add(parallaxObject);
+    }
+
+    private void OperateParallax(Vector3 delta)
+    {
+        _parallaxObjects.RemoveAll(o => o == null);
+
+        foreach (var parallaxObject in _parallaxObjects)
+        {
+            if (parallaxObject == null)
+            {
+                _parallaxObjects.Remove(parallaxObject);
+                continue;
+            }
+
+            parallaxObject.transform.position += new Vector3(delta.x, delta.y, 0) * parallaxObject.ParallaxFactor;
+        }
     }
 }

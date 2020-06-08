@@ -633,6 +633,7 @@ MonoBehaviour:
   _poolableModels:
   - {fileID: 8316369346179846109, guid: 67785b611b871384380faf90736cdc57, type: 3}
   - {fileID: 7365273808307741137, guid: 9166b306d0ab1da4dba8ccf1b00f7cbe, type: 3}
+  - {fileID: 8664879602893635422, guid: 099cdade1e7758546964b06e62784cc3, type: 3}
   _poolableParent: {fileID: 117308930}
 --- !u!114 &780851359
 MonoBehaviour:

@@ -1,35 +1,33 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Trajectory : MonoBehaviour
+public class Trajectory : MonoBehaviour, IPoolable
 {
-    private LineRenderer _line;
     private int _lineMax, _targetLineCount;
-    private TimeManager _timeManager;
-    private Coroutine _disappearing;
     private bool _appeared;
 
+    private LineRenderer _line;
+    private Coroutine _disappearing;
+
+    private TimeManager _timeManager;
+
     private const float TIME_SLOW = .01f;
+    private const float FADE_SPEED = 1.5f;
     private const int VERTEX_LIMIT = 40;
 
-    private static Trajectory _instance;
-    public static Trajectory Instance { get { if (_instance == null) _instance = FindObjectOfType<Trajectory>(); return _instance; } }
+    private void Awake()
+    {
+        _timeManager = TimeManager.Instance;
+        _line = GetComponent<LineRenderer>();
+    }
 
     private void Start()
     {
-        _line = Hero.Instance?.GetComponent<LineRenderer>();
-        _timeManager = TimeManager.Instance;
         _lineMax = VERTEX_LIMIT;
     }
 
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
     {
-        if (_line == null)
-        {
-            _line = Hero.Instance?.GetComponent<LineRenderer>();
-            if (_line == null)
-                return;
-        }
         Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
         Vector2 pos = startPos;
         Vector2 strength = startClick - click;
@@ -114,11 +112,12 @@ public class Trajectory : MonoBehaviour
         while (col.a > 0)
         {
             col = _line.material.color;
-            col.a -= 0.01f;
+            col.a -= Time.deltaTime * FADE_SPEED;
             _line.material.color = col;
             yield return null;
         }
         _disappearing = null;
+        Deactivate();
     }
 
     private void Appear()
@@ -133,5 +132,18 @@ public class Trajectory : MonoBehaviour
         Color col = _line.material.color;
         col.a = 1f;
         _line.material.color = col;
+    }
+
+    public void Pool(Vector3 position, Quaternion rotation)
+    {
+        gameObject.SetActive(true);
+        transform.position = new Vector3(position.x, position.y, -5);
+        transform.rotation = rotation;
+        Appear();
+    }
+
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 }

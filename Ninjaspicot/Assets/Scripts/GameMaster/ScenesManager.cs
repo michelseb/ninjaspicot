@@ -74,7 +74,7 @@ public class ScenesManager : MonoBehaviour
         {
             SceneManager.MoveGameObjectToScene(Hero.Instance.gameObject, sceneToLoad);
             SceneManager.SetActiveScene(sceneToLoad);
-            _spawnManager.InitSpawns();
+            _spawnManager.InitActiveSceneSpawns();
         }
     }
 

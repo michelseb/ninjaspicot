@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class SpawnManager : MonoBehaviour
     private Vector3 _spawnPosition;
     private CheckPoint[] _checkPoints;
     private TimeManager _timeManager;
+    private CameraBehaviour _cameraBehaviour;
 
     private static SpawnManager _instance;
     public static SpawnManager Instance { get { if (_instance == null) _instance = FindObjectOfType<SpawnManager>(); return _instance; } }
@@ -17,11 +18,12 @@ public class SpawnManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         _timeManager = TimeManager.Instance;
+        _cameraBehaviour = CameraBehaviour.Instance;
     }
 
     private void Start()
     {
-        InitSpawns();
+        InitActiveSceneSpawns();
         if (Hero.Instance == null)
         {
             Instantiate(_spawnEntity, _spawnPosition, Quaternion.identity);
@@ -49,6 +51,7 @@ public class SpawnManager : MonoBehaviour
         hero.Dead = false;
         hero.Renderer.color = Color.white;
         _timeManager.SetNormalTime();
+        _cameraBehaviour.Zoom(ZoomType.Init);
 
         if (!_checkPoints.Any(c => c.Attained))
         {
@@ -60,10 +63,19 @@ public class SpawnManager : MonoBehaviour
         hero.transform.position = pos;
     }
 
-    public void InitSpawns()
+    public void InitActiveSceneSpawns()
     {
-        _checkPoints = FindObjectsOfType<CheckPoint>();
-        var spawn = GameObject.FindGameObjectWithTag("Spawn").transform.position;
-        _spawnPosition = new Vector3(spawn.x, spawn.y, -5);
+        var scene = SceneManager.GetActiveScene();
+        var sceneObjects = scene.GetRootGameObjects();
+
+        _checkPoints = FindObjectsOfType<CheckPoint>(); //TODO : make checkpoint specific to scene => Add property in class to link to scene
+
+
+        var spawn = sceneObjects.FirstOrDefault(s => s.CompareTag("Spawn"))?.transform.position;
+
+        if (!spawn.HasValue)
+            return;
+
+        _spawnPosition = new Vector3(spawn.Value.x, spawn.Value.y, -5);
     }
 }
