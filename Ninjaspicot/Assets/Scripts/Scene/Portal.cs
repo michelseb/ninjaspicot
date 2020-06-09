@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Portal : DynamicEntity
+public class Portal : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _imgInside;
     [SerializeField] public SpriteMask Mask;

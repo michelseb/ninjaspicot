@@ -1,30 +1,24 @@
 ﻿using UnityEngine;
 
-public class StickyFloor : MonoBehaviour {
-
-    private Movement _movement;
-
-    private void Start()
+public class StickyFloor : MonoBehaviour
+{
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        _movement = FindObjectOfType<Movement>();
-    }
+        var jumpManager = collision.GetComponent<JumpManager>();
 
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "ninja")
-        {
-            if (_movement.GetJumps() > 0)
-            {
-                _movement.LoseJump();
-            }
-        }
+        if (jumpManager == null)
+            return;
+
+        jumpManager.LoseAllJumps();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ninja")
-        {
-            _movement.GainAllJumps();
-        }
+        var jumpManager = collision.GetComponent<JumpManager>();
+
+        if (jumpManager == null)
+            return;
+
+        jumpManager.GainAllJumps();
     }
 }

@@ -1,52 +1,55 @@
 ﻿using UnityEngine;
 
-public class MovingCloud : Cloud {
+public class MovingCloud : DynamicObstacle
+{
+    [SerializeField] private int _xAmplitude;
+    [SerializeField] private int _yAmplitude;
+    [SerializeField] private float _speed;
 
-    private Vector2 _originPos;
-    private int _xWay = 1, _yWay = 1;
-    private int _moveX, _moveY;
-    private bool _reachedX, _reachedY;
-    private float _speed;
+    private int _xDir;
+    private int _yDir;
+    private float _xWay;
+    private float _yWay;
+
+    private Vector2 _initialPosition;
     private Rigidbody2D _rigidBody;
-    
-    private void Start ()
+
+    private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
-
-        _originPos = _rigidBody.position;
-        if (_moveX == 0)
-        {
-            _xWay = 0;
-        }
-
-        if (_moveY == 0)
-        {
-            _yWay = 0;
-        }
     }
-	
-	private void FixedUpdate ()
-    {
-        _rigidBody.MovePosition(_rigidBody.position + new Vector2(_xWay, _yWay)*_speed*Time.deltaTime);//AddForce(new Vector2(xWay * speed * Time.deltaTime, yWay * speed * Time.deltaTime), ForceMode2D.Force);
 
-        if (_rigidBody.position.x - _originPos.x > _moveX && _reachedX == false)
+    protected override void Start()
+    {
+        base.Start();
+
+        _xDir = 1;
+        _yDir = 1;
+
+        _initialPosition = _rigidBody.position;
+    }
+
+    private void FixedUpdate()
+    {
+        var xMove = _xAmplitude > 0 ? _speed * _xDir : 0;
+        var yMove = _yAmplitude > 0 ? _speed * _yDir : 0;
+
+        _rigidBody.MovePosition(_rigidBody.position + new Vector2(xMove, yMove) * Time.deltaTime);
+
+        var xSign = Mathf.Sign(_rigidBody.position.x - _initialPosition.x);
+        var ySign = Mathf.Sign(_rigidBody.position.y - _initialPosition.y);
+
+
+        if (Mathf.Abs(_rigidBody.position.x - _initialPosition.x) > _xAmplitude && xSign != _xWay)
         {
-            _xWay = -1;
-            _reachedX = true;
-        }else if (_rigidBody.position.x - _originPos.x < -_moveX && _reachedX == true)
-        {
-            _xWay = 1;
-            _reachedX = false;
+            _xDir = -_xDir;
+            _xWay = xSign;
         }
-        if (_rigidBody.position.y - _originPos.y > _moveY && _reachedY == false)
+
+        if (Mathf.Abs(_rigidBody.position.y - _initialPosition.y) > _yAmplitude && ySign != _yWay)
         {
-            _yWay = -1;
-            _reachedY = true;
-        }
-        else if (_rigidBody.position.y - _originPos.y < -_moveY && _reachedY == true)
-        {
-            _yWay = 1;
-            _reachedY = false;
+            _yDir = -_yDir;
+            _yWay = ySign;
         }
     }
 }

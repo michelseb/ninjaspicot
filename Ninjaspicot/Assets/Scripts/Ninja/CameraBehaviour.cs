@@ -76,6 +76,7 @@ public class CameraBehaviour : MonoBehaviour
         _hero = Hero.Instance;
         _tracker = _hero?.transform;
         InstantZoom(_beginZoom);
+        Zoom(ZoomType.Intro);
     }
 
     private void Update()
@@ -184,7 +185,7 @@ public class CameraBehaviour : MonoBehaviour
             yield return null;
         }
         SetFollowMode(_hero.transform);
-        _hero.Movement.Active = true;
+        _hero.JumpManager.Active = true;
     }
 
     private void InstantZoom(int zoom)

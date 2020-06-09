@@ -4,10 +4,10 @@ public class ExtraJump : MonoBehaviour
 {
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        var movement = collision.GetComponent<Movement>() ?? collision.GetComponentInParent<Movement>();
-        if (movement != null)
+        var jumpManager = collision.GetComponent<JumpManager>() ?? collision.GetComponentInParent<JumpManager>();
+        if (jumpManager != null)
         {
-            movement.GainJumps(1);
+            jumpManager.GainJumps(1);
         }
 
         Destroy(gameObject);

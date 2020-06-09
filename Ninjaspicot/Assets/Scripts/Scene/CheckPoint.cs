@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CheckPoint : DynamicEntity
+public class CheckPoint : MonoBehaviour
 {
     public bool Attained { get; private set; }
     private SpawnManager _spawnManager;

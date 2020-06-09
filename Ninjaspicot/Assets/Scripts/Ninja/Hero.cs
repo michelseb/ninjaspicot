@@ -42,7 +42,7 @@ public class Hero : Ninja, IRaycastable
 
         SetCapeActivation(false);
         _spawnManager.Respawn();
-        SetMovementAndStickinessActivation(true);
+        SetAllBehavioursActivation(true);
         _cameraBehaviour.SetCenterMode(transform, 1f);
         SetCapeActivation(true);
 

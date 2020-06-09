@@ -1,20 +1,21 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Ninja : DynamicEntity, IKillable
+public class Ninja : MonoBehaviour, IDynamic, IKillable
 {
+    private Rigidbody2D _rigidbody;
     public bool Dead { get; set; }
-    public StealthyMovement Movement { get; private set; }
+    public JumpManager JumpManager { get; private set; }
     public Stickiness Stickiness { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
+    public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
 
     protected CameraBehaviour _cameraBehaviour;
 
 
     protected virtual void Awake()
     {
-        //SelectDeplacementMode();
-        Movement = GetComponent<StealthyMovement>() ?? GetComponentInChildren<StealthyMovement>();
+        JumpManager = GetComponent<JumpManager>() ?? GetComponentInChildren<JumpManager>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
@@ -28,7 +29,7 @@ public class Ninja : DynamicEntity, IKillable
 
         Dead = true;
         Stickiness.Detach();
-        SetMovementAndStickinessActivation(false);
+        SetAllBehavioursActivation(false);
 
         Renderer.color = Color.red;
 
@@ -39,8 +40,8 @@ public class Ninja : DynamicEntity, IKillable
             {
                 killerRenderer.color = Color.red;
             }
-            _rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
-            _rigidbody.AddTorque(20, ForceMode2D.Impulse);
+            Rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
+            Rigidbody.AddTorque(20, ForceMode2D.Impulse);
         }
 
         StartCoroutine(Dying());
@@ -51,10 +52,9 @@ public class Ninja : DynamicEntity, IKillable
         yield return null;
     }
 
-    public void SetMovementActivation(bool active)
+    public void SetJumpingActivation(bool active)
     {
-        Movement.StopWalking();
-        Movement.Active = active;
+        JumpManager.Active = active;
     }
 
     public void SetStickinessActivation(bool active)
@@ -62,9 +62,20 @@ public class Ninja : DynamicEntity, IKillable
         Stickiness.Active = active;
     }
 
-    public void SetMovementAndStickinessActivation(bool active)
+    public void SetWalkingActivation(bool active)
     {
-        SetMovementActivation(active);
+        if (!active)
+        {
+            Stickiness.StopWalking();
+        }
+
+        Stickiness.CanWalk = active;
+    }
+
+    public void SetAllBehavioursActivation(bool active)
+    {
+        SetJumpingActivation(active);
         SetStickinessActivation(active);
+        SetWalkingActivation(active);
     }
 }

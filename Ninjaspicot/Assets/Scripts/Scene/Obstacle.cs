@@ -1,23 +1,22 @@
 ﻿using UnityEngine;
 
 [DisallowMultipleComponent]
-public class Obstacle : DynamicEntity, IRaycastable
+public class Obstacle : MonoBehaviour, IRaycastable
 {
-    private int _id;
+    protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool IsBeingTouched { get; private set; }
 
-    private GameObject _contact;
-    private ContactPoint2D _contactPoint;
+    protected GameObject _contact;
+    protected ContactPoint2D _contactPoint;
 
-    private Ninja _ninjaTemp;
+    protected Ninja _ninjaTemp;
 
-    private void Start()
+    protected virtual void Start()
     {
         _contact = new GameObject();
         _contact.transform.position = transform.position;
         _contact.transform.parent = transform;
-
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -29,7 +28,6 @@ public class Obstacle : DynamicEntity, IRaycastable
 
         _ninjaTemp = ninja;
 
-        ninja.Movement.GainAllJumps();
         ninja.Stickiness.ReactToObstacle(transform);
 
         _contactPoint = collision.contacts[collision.contacts.Length - 1];
