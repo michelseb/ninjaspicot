@@ -30,6 +30,7 @@ public class Ninja : MonoBehaviour, IKillable
         Dead = true;
         DynamicInteraction.StopInteraction(false);
         Stickiness.Detach();
+        JumpManager.ReinitJump();
         SetAllBehavioursActivation(false);
 
         Renderer.color = Color.red;

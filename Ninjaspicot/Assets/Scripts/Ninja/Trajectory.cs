@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Trajectory : MonoBehaviour, IPoolable
 {
-    private int _lineMax, _targetLineCount;
+    private int _lineMax;
     private bool _appeared;
 
     private LineRenderer _line;
@@ -13,7 +13,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     private const float TIME_SLOW = .01f;
     private const float FADE_SPEED = 1.5f;
-    private const int VERTEX_LIMIT = 40;
+    private const int MAX_VERTEX = 50;
 
     private void Awake()
     {
@@ -23,56 +23,51 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     private void Start()
     {
-        _lineMax = VERTEX_LIMIT;
+        _lineMax = MAX_VERTEX;
+        Appear();
     }
 
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
     {
-        Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 pos = startPos;
-        Vector2 strength = startClick - click;
-        Vector2 vel = strength.normalized * speed;
-        if (_targetLineCount > 2)
-        {
-            Appear();
-        }
         if (_disappearing != null)
         {
             StopCoroutine(FadeAway());
             _disappearing = null;
         }
 
-        if (_targetLineCount < _lineMax + 3)
-        {
-            _targetLineCount += 2;
-        }
-        if (_targetLineCount > _lineMax - 2)
-        {
-            _targetLineCount = _lineMax;
-        }
-        _line.positionCount = _targetLineCount;
-        _lineMax = VERTEX_LIMIT;
+        Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+        Vector2 pos = startPos;
+        Vector2 strength = startClick - click;
+        Vector2 vel = strength.normalized * speed;
 
-
-        for (var i = 0; i < _targetLineCount; i++)
+        if (_line.positionCount < _lineMax)
         {
-            vel = vel + grav * Time.fixedUnscaledDeltaTime; //* power;
-            pos = pos + (vel * Time.fixedUnscaledDeltaTime); //* power);
+            _line.positionCount++;
+        }
+
+        for (var i = 0; i < _line.positionCount; i++)
+        {
+            vel = vel + grav * Time.fixedUnscaledDeltaTime;
+            pos = pos + vel * Time.fixedUnscaledDeltaTime;
             _line.SetPosition(i, new Vector3(pos.x, pos.y, 0));
+
             if (i > 1)
             {
-                RaycastHit2D hit = Physics2D.CircleCast(_line.GetPosition(i - 1), 1, _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f, LayerMask.GetMask("Default"));
+                RaycastHit2D hit = Physics2D.CircleCast(_line.GetPosition(i - 1), 1, _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f,
+                    (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
 
                 if (hit)
                 {
                     if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
                     {
                         _lineMax = i;
-                        _targetLineCount = i;
-                        _line.positionCount = _targetLineCount;
+                        _line.positionCount = i;
                         break;
                     }
-
+                }
+                else
+                {
+                    _lineMax = MAX_VERTEX;
                 }
 
             }
@@ -81,7 +76,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public bool IsClear(Vector3 origin, int lineIndex, int layer = 0)
     {
-        if (_targetLineCount < 1)
+        if (_line.positionCount < 1)
             return false;
 
         for (int i = 0; i < lineIndex; i++)
@@ -106,8 +101,8 @@ public class Trajectory : MonoBehaviour, IPoolable
     private IEnumerator FadeAway()
     {
         _timeManager.SetNormalTime();
-        _targetLineCount = 0;
-        _lineMax = VERTEX_LIMIT;
+        _line.positionCount = 0;
+        _lineMax = MAX_VERTEX;
         Color col = _line.material.color;
         while (col.a > 0)
         {
@@ -122,16 +117,16 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     private void Appear()
     {
-        if (!_appeared)
-        {
-            _timeManager.SlowDown(TIME_SLOW);
-            _timeManager.StartTimeRestore();
-        }
+        if (_appeared)
+            return;
+
+        _timeManager.SlowDown(TIME_SLOW);
+        _timeManager.StartTimeRestore();
+
+        Color col = _line.material.color;
+        _line.material.color = new Color(col.r, col.g, col.b, 1);
 
         _appeared = true;
-        Color col = _line.material.color;
-        col.a = 1f;
-        _line.material.color = col;
     }
 
     public void Pool(Vector3 position, Quaternion rotation)

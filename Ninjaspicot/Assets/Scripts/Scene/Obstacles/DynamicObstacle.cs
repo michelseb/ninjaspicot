@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[DisallowMultipleComponent]
 public class DynamicObstacle : Obstacle, IDynamic
 {
     [SerializeField] protected float _speed;

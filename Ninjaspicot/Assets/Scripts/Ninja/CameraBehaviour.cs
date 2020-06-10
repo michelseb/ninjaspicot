@@ -35,8 +35,6 @@ public class CameraBehaviour : MonoBehaviour
     private float _centerStart;
     private float _centerDuration;
 
-    private int _screenOrientation;
-
     private TimeManager _timeManager;
 
     private int _targetWidth;
@@ -55,20 +53,9 @@ public class CameraBehaviour : MonoBehaviour
         _timeManager = TimeManager.Instance;
         Transform = transform.parent.transform;
 
-        switch (_screenOrientation)
-        {
-            case 0:
-                Screen.orientation = ScreenOrientation.Portrait;
-                _targetWidth = 1080;
-                _pixelsToUnits = 13;
-                break;
-            case 1:
-                Screen.orientation = ScreenOrientation.LandscapeLeft;
-                _targetWidth = 1920;
-                _pixelsToUnits = 15;
-                break;
-        }
-
+        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        _targetWidth = 1920;
+        _pixelsToUnits = 15;
     }
 
     private void Start()

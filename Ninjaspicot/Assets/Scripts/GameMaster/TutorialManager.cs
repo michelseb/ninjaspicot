@@ -140,7 +140,7 @@ public class TutorialManager : MonoBehaviour
         else if (index == 2) // Saut vers l'autre plateforme
         {
             _itemIndex = 1;
-            if (_hero.Stickiness.Attached && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 1].transform)
+            if (_hero.Stickiness.Attached && _hero.Stickiness.CurrentAttachment.transform == _itemsToAppear[_itemIndex - 1].transform)
             {
                 duration = 0;
             }
@@ -156,7 +156,7 @@ public class TutorialManager : MonoBehaviour
         else if (index == 4) // Monter tout en haut
         {
             _itemIndex = 5;
-            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment == _itemsToAppear[_itemIndex - 3].transform)
+            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment.transform == _itemsToAppear[_itemIndex - 3].transform)
             {
                 duration = 0;
             }

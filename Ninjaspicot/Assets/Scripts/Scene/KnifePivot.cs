@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-public class KnifePivot : MonoBehaviour {
-
+public class KnifePivot : MonoBehaviour
+{
     [SerializeField]
     private float _speed;
 
@@ -9,14 +9,14 @@ public class KnifePivot : MonoBehaviour {
     private Knife _knife;
     private Rigidbody2D _rigidBody;
 
-    private void Awake ()
+    private void Awake()
     {
         _knife = GetComponentInChildren<Knife>();
         _rigidBody = GetComponent<Rigidbody2D>();
         _initSpeed = _speed;
-	}
-	
-	private void FixedUpdate ()
+    }
+
+    private void FixedUpdate()
     {
         _rigidBody.MoveRotation(_rigidBody.rotation + _speed * Time.deltaTime);
 
@@ -25,9 +25,9 @@ public class KnifePivot : MonoBehaviour {
             _speed += _initSpeed * Time.deltaTime;
         }
 
-        if (_knife.touched)
+        if (_knife.Touched)
         {
             _speed = -_initSpeed;
         }
-	}
+    }
 }

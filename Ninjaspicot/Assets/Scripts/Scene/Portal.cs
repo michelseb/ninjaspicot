@@ -43,6 +43,9 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!collision.CompareTag("hero"))
+            return;
+
         if (_portalMovement != null) StopCoroutine(_portalMovement);
         _portalMovement = StartCoroutine(StartPortal());
 
@@ -136,21 +139,6 @@ public class Portal : MonoBehaviour
         _cameraBehaviour.SetCenterMode(Other.transform, TRANSFER_SPEED);
 
         yield return new WaitForSeconds(TRANSFER_SPEED);
-        //var cam = _cameraBehaviour.Transform;
-        //var pos0 = cam.position;
-        //var pos1 = new Vector3(Other.transform.position.x, Other.transform.position.y, cam.position.z);
-        //var dist = Vector3.Distance(pos0, pos1);
-        //var startTime = Time.time;
-
-        //float journey = 0;
-
-        //while (journey < 1)
-        //{
-        //    float distCovered = (Time.time - startTime) * dist / TRANSFER_SPEED;
-        //    journey = distCovered / dist;
-        //    cam.position = Vector3.Lerp(pos0, pos1, journey);
-        //    yield return null;
-        //}
 
         _cameraBehaviour.SetFollowMode(Hero.transform);
         Hero.Stickiness.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);

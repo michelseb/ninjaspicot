@@ -59,11 +59,11 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         if (_touchManager.Touching)
         {
-            if (_jumpManager.CanJump())
+            if (_jumpManager.ReadyToJump())
             {
                 StopWalking();
             }
-            else if (_walkOnWalls == null && Attached && CanWalk)
+            else if (_walkOnWalls == null && Attached && CanWalk && !_touchManager.Dragging)
             {
                 _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
             }
@@ -175,7 +175,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         {
             StopCoroutine(_walkOnWalls);
         }
-        Hero.Instance.Renderer.color = Color.white;
+
         WallJoint.useMotor = false;
         _walkOnWalls = null;
     }
@@ -184,8 +184,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     {
         if (hinge == null)
             yield break;
-
-        Hero.Instance.Renderer.color = Color.green;
 
         var jointMotor = hinge.motor;
         WallJoint.useMotor = true;
@@ -199,7 +197,6 @@ public class Stickiness : MonoBehaviour, IDynamic
             yield return null;
         }
 
-        Hero.Instance.Renderer.color = Color.white;
         WallJoint.useMotor = false;
         _walkOnWalls = null;
     }

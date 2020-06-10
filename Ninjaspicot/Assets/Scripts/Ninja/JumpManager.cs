@@ -50,14 +50,13 @@ public class JumpManager : MonoBehaviour
             }
             else if (_trajectory != null)
             {
-                _trajectory.ReinitTrajectory();
-                _trajectory = null;
+                ReinitJump();
             }
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
-            if (CanJump())
+            if (ReadyToJump())
             {
                 if (_trajectory != null && !_trajectory.IsClear(transform.position, 2))//Add ninja to new layer
                 {
@@ -98,13 +97,20 @@ public class JumpManager : MonoBehaviour
 
         if (_trajectory != null)
         {
-            _trajectory.ReinitTrajectory();
-            _trajectory = null;
+            ReinitJump();
         }
 
         _cameraBehaviour.DoShake(.3f, .1f);
     }
 
+    public void ReinitJump()
+    {
+        if (_trajectory == null)
+            return;
+
+        _trajectory.ReinitTrajectory();
+        _trajectory = null;
+    }
 
     private Trajectory GetTrajectory()
     {
@@ -163,6 +169,20 @@ public class JumpManager : MonoBehaviour
 
     public bool CanJump()
     {
-        return GetJumps() > 0 && _touchManager.Dragging;
+        if (CompareTag("Dynamic"))
+            return Hero.Instance.JumpManager.CanJump();
+
+        var boxCast = Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouchOrigin - _touchManager.TouchDrag, 5f, Hero.Instance.Id/*, display: true*/,
+             layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+
+        return GetJumps() > 0 && _touchManager.Dragging && !boxCast;
+    }
+
+    public bool ReadyToJump()
+    {
+        if (CompareTag("Dynamic"))
+            return Hero.Instance.JumpManager.ReadyToJump();
+
+        return CanJump() && _trajectory != null;
     }
 }
