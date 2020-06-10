@@ -21,8 +21,8 @@ public class Stickiness : MonoBehaviour, IDynamic
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
 
     private IDynamic _dynamicEntity;
-    private ContactPoint2D _contactPoint;
-    private ContactPoint2D _previousContactPoint;
+    private Transform _contactPoint;
+    private Vector3 _previousContactPoint;
     private Coroutine _walkOnWalls;
     private Dir _ninjaDir;
 
@@ -31,6 +31,9 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public void Awake()
     {
+        if (Active)
+            return;
+
         WallJoint = GetComponent<HingeJoint2D>();
         _touchManager = TouchManager.Instance;
         _dynamicEntity = GetComponent<IDynamic>();
@@ -39,8 +42,15 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public void Start()
     {
+        if (Active)
+            return;
+
         Active = true;
         CanWalk = true;
+        _contactPoint = new GameObject("ContactPoint").transform;
+        _contactPoint.position = transform.position;
+        _contactPoint.SetParent(transform);
+        _previousContactPoint = _contactPoint.position;
     }
 
     private void Update()
@@ -83,7 +93,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     {
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = transform.InverseTransformPoint(GetContactPosition());
+        WallJoint.anchor = GetContactPosition();
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
@@ -120,15 +130,15 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
     }
 
-    private ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, ContactPoint2D previous) //WOOOOHOOO ça marche !!!!!
+    private ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
     {
         ContactPoint2D resultContact = new ContactPoint2D();
         float dist = 0;
         foreach (ContactPoint2D contact in contacts)
         {
-            if (Vector3.Distance(previous.point, contact.point) > dist)
+            if (Vector3.Distance(previousPos, contact.point) > dist)
             {
-                dist = Vector3.Distance(previous.point, contact.point);
+                dist = Vector3.Distance(previousPos, contact.point);
                 resultContact = contact;
             }
         }
@@ -136,15 +146,27 @@ public class Stickiness : MonoBehaviour, IDynamic
         return resultContact;
     }
 
-    public void SetContactPoint(ContactPoint2D point)
+    public void SetContactPoint(ContactPoint2D contact)
     {
-        _previousContactPoint = _contactPoint;
-        _contactPoint = point;
+        _previousContactPoint = _contactPoint.position;
+        _contactPoint.position = contact.point;
     }
 
-    public Vector3 GetContactPosition(bool local = false)
+    public Vector3 GetContactPosition(bool local = true)
     {
-        return local ? transform.InverseTransformPoint(_contactPoint.point) : new Vector3(_contactPoint.point.x, _contactPoint.point.y);
+        return local ? transform.InverseTransformPoint(_contactPoint.position) : _contactPoint.position;
+    }
+
+    public void SetContactPosition(Vector3 position, bool local = true)
+    {
+        if (local)
+        {
+            _contactPoint.localPosition = position;
+        }
+        else
+        {
+            _contactPoint.position = position;
+        }
     }
 
     public void StopWalking()
@@ -172,7 +194,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         {
             jointMotor.motorSpeed = _ninjaDir == Dir.Left ? -_speed : _speed;
             hinge.motor = jointMotor;
-            hinge.anchor = GetContactPosition(true);
+            hinge.anchor = GetContactPosition();
 
             yield return null;
         }
