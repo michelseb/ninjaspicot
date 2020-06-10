@@ -7,24 +7,29 @@ public enum Dir
     Right
 }
 
-public class Stickiness : MonoBehaviour
+public class Stickiness : MonoBehaviour, IDynamic
 {
     [SerializeField] private int _speed;
+    private Rigidbody2D _rigidbody;
 
     public HingeJoint2D WallJoint { get; set; }
-    public Transform CurrentAttachment { get; set; }
+    public Obstacle CurrentAttachment { get; set; }
     public bool Attached { get; private set; }
     public bool Active { get; set; }
     public bool CanWalk { get; set; }
+
+    public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
+
     private IDynamic _dynamicEntity;
     private ContactPoint2D _contactPoint;
     private ContactPoint2D _previousContactPoint;
     private Coroutine _walkOnWalls;
     private Dir _ninjaDir;
+
     private TouchManager _touchManager;
     private JumpManager _jumpManager;
 
-    private void Awake()
+    public void Awake()
     {
         WallJoint = GetComponent<HingeJoint2D>();
         _touchManager = TouchManager.Instance;
@@ -32,7 +37,7 @@ public class Stickiness : MonoBehaviour
         _jumpManager = GetComponent<JumpManager>();
     }
 
-    private void Start()
+    public void Start()
     {
         Active = true;
         CanWalk = true;
@@ -65,14 +70,12 @@ public class Stickiness : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        _contactPoint = GetContactPoint(collision.contacts, _previousContactPoint);
-        _previousContactPoint = _contactPoint;
+        SetContactPoint(GetContactPoint(collision.contacts, _previousContactPoint));
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        _contactPoint = GetContactPoint(collision.contacts, _previousContactPoint);
-        _previousContactPoint = _contactPoint;
+        SetContactPoint(GetContactPoint(collision.contacts, _previousContactPoint));
     }
 
 
@@ -80,7 +83,7 @@ public class Stickiness : MonoBehaviour
     {
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = transform.InverseTransformPoint(_contactPoint.point);
+        WallJoint.anchor = transform.InverseTransformPoint(GetContactPosition());
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
@@ -91,18 +94,24 @@ public class Stickiness : MonoBehaviour
 
     public void Detach()
     {
+        CurrentAttachment?.LaunchQuickDeactivate();
         _dynamicEntity.Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
         Attached = false;
     }
 
-    public void ReactToObstacle(Transform obstacle)
+    public void ReactToObstacle(Obstacle obstacle)
     {
         if (!Active || obstacle == CurrentAttachment)
             return;
 
         _jumpManager.GainAllJumps();
+
+        if (tag == "Dynamic")
+        {
+            Hero.Instance?.JumpManager.GainAllJumps();
+        }
 
         if (obstacle.CompareTag("Wall"))
         {
@@ -133,9 +142,9 @@ public class Stickiness : MonoBehaviour
         _contactPoint = point;
     }
 
-    public Vector2 GetContactPosition()
+    public Vector3 GetContactPosition(bool local = false)
     {
-        return _contactPoint.point;
+        return local ? transform.InverseTransformPoint(_contactPoint.point) : new Vector3(_contactPoint.point.x, _contactPoint.point.y);
     }
 
     public void StopWalking()
@@ -144,6 +153,7 @@ public class Stickiness : MonoBehaviour
         {
             StopCoroutine(_walkOnWalls);
         }
+        Hero.Instance.Renderer.color = Color.white;
         WallJoint.useMotor = false;
         _walkOnWalls = null;
     }
@@ -153,28 +163,21 @@ public class Stickiness : MonoBehaviour
         if (hinge == null)
             yield break;
 
+        Hero.Instance.Renderer.color = Color.green;
+
         var jointMotor = hinge.motor;
         WallJoint.useMotor = true;
 
         while (Input.GetButton("Fire1"))
         {
-
-            if (_ninjaDir == Dir.Right)
-            {
-                jointMotor.motorSpeed = _speed;
-            }
-            else if (_ninjaDir == Dir.Left)
-            {
-                jointMotor.motorSpeed = -_speed;
-            }
+            jointMotor.motorSpeed = _ninjaDir == Dir.Left ? -_speed : _speed;
             hinge.motor = jointMotor;
-            hinge.anchor = transform.InverseTransformPoint(GetContactPosition());
-            hinge.connectedAnchor = hinge.anchor;
+            hinge.anchor = GetContactPosition(true);
 
             yield return null;
         }
 
-
+        Hero.Instance.Renderer.color = Color.white;
         WallJoint.useMotor = false;
         _walkOnWalls = null;
     }

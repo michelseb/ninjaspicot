@@ -126,10 +126,10 @@ public class Portal : MonoBehaviour
     private IEnumerator Teleport()
     {
         var transferredPoint = transform.InverseTransformPoint(Hero.transform.position);
-        var transferredVelocity = -transform.InverseTransformDirection(Hero.Rigidbody.velocity);
+        var transferredVelocity = -transform.InverseTransformDirection(Hero.Stickiness.Rigidbody.velocity);
 
-        Hero.Rigidbody.velocity = Vector2.zero;
-        Hero.Rigidbody.isKinematic = true;
+        Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
+        Hero.Stickiness.Rigidbody.isKinematic = true;
 
         yield return new WaitForSeconds(1);
 
@@ -153,14 +153,14 @@ public class Portal : MonoBehaviour
         //}
 
         _cameraBehaviour.SetFollowMode(Hero.transform);
-        Hero.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);
+        Hero.Stickiness.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);
 
         yield return new WaitForSeconds(1);
 
         Reinit(true);
         Other.Reinit(true);
-        Hero.Rigidbody.isKinematic = false;
-        Hero.Rigidbody.velocity = Other.transform.TransformDirection(transferredVelocity);
+        Hero.Stickiness.Rigidbody.isKinematic = false;
+        Hero.Stickiness.Rigidbody.velocity = Other.transform.TransformDirection(transferredVelocity);
         Hero.SetCapeActivation(true);
     }
 

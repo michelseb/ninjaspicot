@@ -1,14 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Ninja : MonoBehaviour, IDynamic, IKillable
+public class Ninja : MonoBehaviour, IKillable
 {
-    private Rigidbody2D _rigidbody;
     public bool Dead { get; set; }
     public JumpManager JumpManager { get; private set; }
     public Stickiness Stickiness { get; private set; }
+    public DynamicInteraction DynamicInteraction { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
-    public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
 
     protected CameraBehaviour _cameraBehaviour;
 
@@ -17,6 +16,7 @@ public class Ninja : MonoBehaviour, IDynamic, IKillable
     {
         JumpManager = GetComponent<JumpManager>() ?? GetComponentInChildren<JumpManager>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
+        DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
     }
@@ -28,6 +28,7 @@ public class Ninja : MonoBehaviour, IDynamic, IKillable
             return;
 
         Dead = true;
+        DynamicInteraction.StopInteraction(false);
         Stickiness.Detach();
         SetAllBehavioursActivation(false);
 
@@ -40,8 +41,8 @@ public class Ninja : MonoBehaviour, IDynamic, IKillable
             {
                 killerRenderer.color = Color.red;
             }
-            Rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
-            Rigidbody.AddTorque(20, ForceMode2D.Impulse);
+            Stickiness.Rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
+            Stickiness.Rigidbody.AddTorque(20, ForceMode2D.Impulse);
         }
 
         StartCoroutine(Dying());
@@ -62,6 +63,11 @@ public class Ninja : MonoBehaviour, IDynamic, IKillable
         Stickiness.Active = active;
     }
 
+    public void SetInteractionActivation(bool active)
+    {
+        DynamicInteraction.Active = active;
+    }
+
     public void SetWalkingActivation(bool active)
     {
         if (!active)
@@ -77,5 +83,6 @@ public class Ninja : MonoBehaviour, IDynamic, IKillable
         SetJumpingActivation(active);
         SetStickinessActivation(active);
         SetWalkingActivation(active);
+        SetInteractionActivation(active);
     }
 }

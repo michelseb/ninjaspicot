@@ -14,15 +14,14 @@ public class MovingCloud : DynamicObstacle
     private Vector2 _initialPosition;
     private Rigidbody2D _rigidBody;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         _rigidBody = GetComponent<Rigidbody2D>();
     }
 
-    protected override void Start()
+    public virtual void Start()
     {
-        base.Start();
-
         _xDir = 1;
         _yDir = 1;
 

@@ -78,7 +78,7 @@ public class JumpManager : MonoBehaviour
     {
         if (_dynamicInteraction.Interacting)
         {
-            _dynamicInteraction.StopInteraction();
+            _dynamicInteraction.StopInteraction(true);
         }
 
         _stickiness.Detach();
