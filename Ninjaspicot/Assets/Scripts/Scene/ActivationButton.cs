@@ -3,7 +3,6 @@
 public class ActivationButton : MonoBehaviour
 {
     [SerializeField] private GameObject _activableObject;
-    //[SerializeField] private CircleCollider2D _perimeter;
     public bool Pressing { get; set; }
 
     private IActivable _activable;

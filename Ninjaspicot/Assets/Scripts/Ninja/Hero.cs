@@ -3,16 +3,14 @@ using UnityEngine;
 
 public class Hero : Ninja, IRaycastable
 {
-    [SerializeField] private bool _getsCheckPoint;
-
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool Triggered { get; private set; }
+    public DynamicInteraction DynamicInteraction { get; private set; }
 
     private int _lastTrigger;
     private Cloth _cape;
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
+    private TouchManager _touchManager;
 
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
@@ -24,7 +22,10 @@ public class Hero : Ninja, IRaycastable
         _timeManager = TimeManager.Instance;
         _spawnManager = SpawnManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
+        _touchManager = TouchManager.Instance;
         _cape = GetComponentInChildren<Cloth>();
+        DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
+
     }
 
     public override void Die(Transform killer)
@@ -33,7 +34,10 @@ public class Hero : Ninja, IRaycastable
             return;
 
         base.Die(killer);
+        Renderer.color = Color.red;
         _timeManager.StartSlowDownProgressive(.3f);
+        DynamicInteraction.StopInteraction(false);
+
     }
 
     public override IEnumerator Dying()
@@ -75,5 +79,21 @@ public class Hero : Ninja, IRaycastable
     public bool IsTriggeredBy(int id)
     {
         return _lastTrigger == id;
+    }
+
+    public void SetInteractionActivation(bool active)
+    {
+        DynamicInteraction.Active = active;
+    }
+
+    public override void SetAllBehavioursActivation(bool active)
+    {
+        base.SetAllBehavioursActivation(active);
+        SetInteractionActivation(active);
+    }
+
+    public override bool NeedsToWalk()
+    {
+        return _touchManager.Touching;
     }
 }

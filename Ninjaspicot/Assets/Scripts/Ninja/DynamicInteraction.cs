@@ -2,23 +2,24 @@
 
 public class DynamicInteraction : MonoBehaviour
 {
-    [SerializeField] private GameObject _clone;
-
     public bool Active { get; set; }
     public bool Interacting { get; set; }
 
     private IDynamic _tempDynamic;
     private Hero _hero;
 
-    private GameObject _cloneHero;
+    private DynamicCollider _cloneHero;
     private GameObject _cloneDynamic;
 
     private Vector3 _previousPosition;
-    private Vector3 _clonePosition = new Vector3(1000, 1000);
+    private Vector3 _clonePosition = new Vector3(0, 100000);
+
+    private PoolManager _poolManager;
 
     private void Awake()
     {
         _hero = GetComponent<Hero>();
+        _poolManager = PoolManager.Instance;
     }
 
     private void Start()
@@ -49,7 +50,7 @@ public class DynamicInteraction : MonoBehaviour
 
         var dynamicEntity = collision.collider.GetComponent<IDynamic>();
 
-        if (dynamicEntity == null)
+        if (dynamicEntity == null || !dynamicEntity.DynamicActive)
             return;
 
         StartInteraction(dynamicEntity);
@@ -75,9 +76,9 @@ public class DynamicInteraction : MonoBehaviour
         var otherObstacle = _cloneDynamic.AddComponent<Obstacle>();
         otherObstacle.Awake();
 
-        _cloneHero = Instantiate(_clone, transform.position + _clonePosition, transform.rotation);
-        _cloneHero.tag = "Dynamic";
+        _cloneHero = _poolManager.GetPoolable<DynamicCollider>(transform.position + _clonePosition, transform.rotation);
         var stickiness = _cloneHero.GetComponent<Stickiness>();
+
         stickiness.Awake();
         stickiness.Start();
 
@@ -106,9 +107,12 @@ public class DynamicInteraction : MonoBehaviour
         _hero.Stickiness.Rigidbody.isKinematic = false;
         Interacting = false;
 
-        Destroy(_cloneHero);
-        Destroy(_cloneDynamic);
-
+        if (_cloneDynamic != null)
+        {
+            _cloneHero.transform.SetParent(null);
+            _cloneHero.Deactivate();
+            Destroy(_cloneDynamic);
+        }
     }
 
 }

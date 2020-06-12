@@ -25,6 +25,9 @@ public class TouchManager : MonoBehaviour
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
 
+    private Stickiness _stickiness;
+    private Jumper _jumpManager;
+
     private const float DRAG_THRESHOLD = 50;
     //private const int SEGMENTS = 12;
     //private const float RADIUS_X = 10;
@@ -41,13 +44,25 @@ public class TouchManager : MonoBehaviour
     {
         _touchLine.positionCount = 0;
         _touchLine.useWorldSpace = true;
+        _stickiness = Hero.Instance?.Stickiness;
+        _jumpManager = Hero.Instance?.JumpManager;
     }
 
     private void Update()
     {
+        //Waiting for hero to spawn
+        if (_stickiness == null)
+        {
+            _stickiness = Hero.Instance?.Stickiness;
+            _jumpManager = Hero.Instance?.JumpManager;
+            if (_stickiness == null)
+                return;
+        }
 
         if (Touching)
         {
+            _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
+
             if (!_touchInitialized)
             {
                 RawTouchOrigin = Input.mousePosition;
@@ -58,6 +73,23 @@ public class TouchManager : MonoBehaviour
             }
 
             TouchDrag = Input.mousePosition;
+
+
+            if (_jumpManager.ReadyToJump())
+            {
+                _stickiness.StopWalking();
+            }
+            else if (!Dragging && _stickiness.Attached && _stickiness.CanWalk)
+            {
+                _stickiness.StartWalking();
+            }
+        }
+        else
+        {
+            if (_stickiness.Attached)
+            {
+                _stickiness.Rigidbody.velocity = new Vector2(0, 0);
+            }
         }
 
         if (!Touching && _touchInitialized)

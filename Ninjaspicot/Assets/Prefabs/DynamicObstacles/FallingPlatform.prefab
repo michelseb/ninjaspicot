@@ -153,4 +153,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 1
   _maxSpeed: 20
-  _fallTime: 4
+  _fallTime: 10

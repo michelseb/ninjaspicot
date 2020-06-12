@@ -37,12 +37,11 @@ public class CameraBehaviour : MonoBehaviour
 
     private TimeManager _timeManager;
 
-    private int _targetWidth;
-    private float _pixelsToUnits;
+    private float _screenRatio;
+    private float INITIAL_CAMERA_SIZE;
     private const float ZOOM_SPEED = 2f;
     private const float FOLLOW_SPEED = .01f;
     private const float COLOR_THRESHOLD = .01f;
-    private const float INITIAL_CAMERA_SIZE = 45f;
 
     private static CameraBehaviour _instance;
     public static CameraBehaviour Instance { get { if (_instance == null) _instance = FindObjectOfType<CameraBehaviour>(); return _instance; } }
@@ -54,8 +53,9 @@ public class CameraBehaviour : MonoBehaviour
         Transform = transform.parent.transform;
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
-        _targetWidth = 1920;
-        _pixelsToUnits = 15;
+
+        _screenRatio = (float)Screen.height / Screen.width * .5f;
+        INITIAL_CAMERA_SIZE = 200f * _screenRatio;
     }
 
     private void Start()
@@ -139,13 +139,11 @@ public class CameraBehaviour : MonoBehaviour
 
     private IEnumerator ZoomProgressive(int zoom)
     {
-        //int height = Mathf.RoundToInt(_targetWidth / (float)Screen.width * Screen.height);
-
         float _initSize = Camera.orthographicSize;
 
-        while (Mathf.Abs(Camera.orthographicSize - _initSize) < Mathf.Abs(zoom))
+        while (Mathf.Abs(Camera.orthographicSize - _initSize) < Mathf.Abs(zoom * _screenRatio))
         {
-            Camera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED;
+            Camera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
     }
@@ -156,7 +154,7 @@ public class CameraBehaviour : MonoBehaviour
 
         while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - Camera.orthographicSize) > 0)
         {
-            Camera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED;
+            Camera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
         Camera.orthographicSize = INITIAL_CAMERA_SIZE;
@@ -164,7 +162,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private IEnumerator ZoomIntro(float speed)
     {
-        //yield return new WaitForSecondsRealtime(4);
+        yield return new WaitForSecondsRealtime(2);
 
         while (Camera.orthographicSize > INITIAL_CAMERA_SIZE)
         {
@@ -177,7 +175,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private void InstantZoom(int zoom)
     {
-        Camera.orthographicSize = INITIAL_CAMERA_SIZE + zoom;
+        Camera.orthographicSize = INITIAL_CAMERA_SIZE + zoom * _screenRatio;
     }
 
     public void Zoom(ZoomType type, int zoomAmount = 0)

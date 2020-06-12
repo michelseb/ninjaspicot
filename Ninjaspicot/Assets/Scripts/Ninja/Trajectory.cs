@@ -24,7 +24,6 @@ public class Trajectory : MonoBehaviour, IPoolable
     private void Start()
     {
         _lineMax = MAX_VERTEX;
-        Appear();
     }
 
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)

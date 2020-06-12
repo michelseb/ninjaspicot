@@ -3,20 +3,19 @@ using UnityEngine;
 
 public class Ninja : MonoBehaviour, IKillable
 {
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool Dead { get; set; }
-    public JumpManager JumpManager { get; private set; }
+    public Jumper JumpManager { get; private set; }
     public Stickiness Stickiness { get; private set; }
-    public DynamicInteraction DynamicInteraction { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
 
     protected CameraBehaviour _cameraBehaviour;
 
-
     protected virtual void Awake()
     {
-        JumpManager = GetComponent<JumpManager>() ?? GetComponentInChildren<JumpManager>();
+        JumpManager = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
-        DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
     }
@@ -28,20 +27,12 @@ public class Ninja : MonoBehaviour, IKillable
             return;
 
         Dead = true;
-        DynamicInteraction.StopInteraction(false);
         Stickiness.Detach();
         JumpManager.ReinitJump();
         SetAllBehavioursActivation(false);
 
-        Renderer.color = Color.red;
-
         if (killer != null)
         {
-            var killerRenderer = killer.GetComponent<SpriteRenderer>();
-            if (killerRenderer != null)
-            {
-                killerRenderer.color = Color.red;
-            }
             Stickiness.Rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
             Stickiness.Rigidbody.AddTorque(20, ForceMode2D.Impulse);
         }
@@ -64,11 +55,6 @@ public class Ninja : MonoBehaviour, IKillable
         Stickiness.Active = active;
     }
 
-    public void SetInteractionActivation(bool active)
-    {
-        DynamicInteraction.Active = active;
-    }
-
     public void SetWalkingActivation(bool active)
     {
         if (!active)
@@ -79,11 +65,15 @@ public class Ninja : MonoBehaviour, IKillable
         Stickiness.CanWalk = active;
     }
 
-    public void SetAllBehavioursActivation(bool active)
+    public virtual void SetAllBehavioursActivation(bool active)
     {
         SetJumpingActivation(active);
         SetStickinessActivation(active);
         SetWalkingActivation(active);
-        SetInteractionActivation(active);
+    }
+
+    public virtual bool NeedsToWalk()
+    {
+        return false;
     }
 }

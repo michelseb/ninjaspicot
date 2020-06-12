@@ -17,17 +17,17 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Attached { get; private set; }
     public bool Active { get; set; }
     public bool CanWalk { get; set; }
+    public Dir NinjaDir { get; set; }
 
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
 
-    private IDynamic _dynamicEntity;
+    public bool DynamicActive => true;
+
+    private Ninja _ninja;
     private Transform _contactPoint;
     private Vector3 _previousContactPoint;
     private Coroutine _walkOnWalls;
-    private Dir _ninjaDir;
-
-    private TouchManager _touchManager;
-    private JumpManager _jumpManager;
+    private Jumper _jumpManager;
 
     public void Awake()
     {
@@ -35,9 +35,12 @@ public class Stickiness : MonoBehaviour, IDynamic
             return;
 
         WallJoint = GetComponent<HingeJoint2D>();
-        _touchManager = TouchManager.Instance;
-        _dynamicEntity = GetComponent<IDynamic>();
-        _jumpManager = GetComponent<JumpManager>();
+        _jumpManager = GetComponent<Jumper>();
+        _ninja = GetComponent<Ninja>();
+        _contactPoint = new GameObject("ContactPoint").transform;
+        _contactPoint.position = transform.position;
+        _contactPoint.SetParent(transform);
+        _previousContactPoint = _contactPoint.position;
     }
 
     public void Start()
@@ -47,35 +50,6 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         Active = true;
         CanWalk = true;
-        _contactPoint = new GameObject("ContactPoint").transform;
-        _contactPoint.position = transform.position;
-        _contactPoint.SetParent(transform);
-        _previousContactPoint = _contactPoint.position;
-    }
-
-    private void Update()
-    {
-        _ninjaDir = _touchManager.TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
-
-        if (_touchManager.Touching)
-        {
-            if (_jumpManager.ReadyToJump())
-            {
-                StopWalking();
-            }
-            else if (_walkOnWalls == null && Attached && CanWalk && !_touchManager.Dragging)
-            {
-                _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (Attached && !_touchManager.Touching)
-        {
-            _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -98,14 +72,14 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         Attached = true;
 
-        _dynamicEntity.Rigidbody.gravityScale = 0;
-        _dynamicEntity.Rigidbody.velocity = Vector2.zero;
+        Rigidbody.gravityScale = 0;
+        Rigidbody.velocity = Vector2.zero;
     }
 
     public void Detach()
     {
         CurrentAttachment?.LaunchQuickDeactivate();
-        _dynamicEntity.Rigidbody.gravityScale = 1;
+        Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
         Attached = false;
@@ -180,6 +154,14 @@ public class Stickiness : MonoBehaviour, IDynamic
         _walkOnWalls = null;
     }
 
+    public void StartWalking()
+    {
+        if (_walkOnWalls != null)
+            return;
+
+        _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
+    }
+
     public IEnumerator WalkOnWalls(HingeJoint2D hinge)
     {
         if (hinge == null)
@@ -188,9 +170,9 @@ public class Stickiness : MonoBehaviour, IDynamic
         var jointMotor = hinge.motor;
         WallJoint.useMotor = true;
 
-        while (Input.GetButton("Fire1"))
+        while (_ninja.NeedsToWalk())
         {
-            jointMotor.motorSpeed = _ninjaDir == Dir.Left ? -_speed : _speed;
+            jointMotor.motorSpeed = NinjaDir == Dir.Left ? -_speed : _speed;
             hinge.motor = jointMotor;
             hinge.anchor = GetContactPosition();
 

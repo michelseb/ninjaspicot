@@ -27,7 +27,7 @@ public class CameraCatcher : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("hero") && _activated)
+        if (collision.CompareTag("hero"))
         {
             _cameraBehaviour.Zoom(ZoomType.Init);
             _cameraBehaviour.SetFollowMode(Hero.Instance.transform);

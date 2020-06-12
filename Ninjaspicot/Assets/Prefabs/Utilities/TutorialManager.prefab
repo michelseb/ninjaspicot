@@ -324,12 +324,43 @@ MonoBehaviour:
   - Instructions:
     - C'est haut hein ?
     - Tu vois cet engin qui tourne au-dessus de toi ? C'est une tourelle
-    - Et c'est pas une amie.
+    - "Je te conseille de faire gaffe \xE0 ces machins-l\xE0."
+    - "La zone transparente repr\xE9sente la vision de la tourelle."
+    - "Si tu p\xE9n\xE8tres cette zone, la tourelles cherchera \xE0 t'abattre"
+    - Et lorsque tu la quittes, elle attendra quelques secondes avant de repasser
+      en mode patrouille
+    - "Agrippe-toi \xE0 la tourelle et essaye de passer de l'autre c\xF4t\xE9 sans
+      te faire avoir"
+    - "Fais aussi attention \xE0 ne pas toucher le canon de la tourelle !"
+    Duration: 1
+  - Instructions:
+    - "Bien jou\xE9."
+    - "On continue ! Je t'attends l\xE0-haut."
+    Duration: 1
+  - Instructions:
+    - Ce drapeau que tu vois, c'est un point de sauvegarde.
+    - "Si tu tombes, tu r\xE9appara\xEEtras ici. Pratique hein ?"
+    - "Pour l'activer, passe dessus. Ensuite, saute sur le nuage \xE0 ta gauche"
+    - "Fais-moi confiance, \xE7a va bien se passer :)"
+    Duration: 1
+  - Instructions:
+    - "T'inqui\xE8te pas. Ces nuages c'est du solide."
+    - "Je me fierais moins aux nuages jaunes si j'\xE9tais toi."
+    - Ils sont un peu malades...
+    - Tu vois cette petite boule au milieu ?
+    - Il te permet de regagner un saut.
+    - Pratique ;)
+    - "Allez, je t'attends de l'autre c\xF4t\xE9 !"
+    Duration: 1
+  - Instructions: []
     Duration: 1
   _instructionsContainer: {fileID: 7136473480198684949}
   _instructionText: {fileID: 7136473480726466004}
   _clickText: {fileID: 7136473480136425245}
   _itemsToAppear:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

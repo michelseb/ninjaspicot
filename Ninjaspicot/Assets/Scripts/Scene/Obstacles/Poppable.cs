@@ -3,6 +3,7 @@
 public class Poppable : DynamicObstacle 
 {
     [SerializeField] private float _maxSpeed;
+    [SerializeField] private Transform _bottom;
 
     private float _currentSpeed;
     private bool _active;
@@ -21,15 +22,12 @@ public class Poppable : DynamicObstacle
         _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _maxSpeed);
 
         Rigidbody.MovePosition(Rigidbody.position + new Vector2(0, -_currentSpeed));
-    }
 
-    protected override void OnCollisionEnter2D(Collision2D collision)
-    {
-        base.OnCollisionEnter2D(collision);
-
-        if (!collision.collider.CompareTag("hero"))
+        var hit = Utils.RayCast(_bottom.position, Vector2.down, .1f, Id);
+        if (hit && !hit.collider.CompareTag("hero"))
         {
             _active = false;
+            DynamicActive = false;
         }
     }
 }

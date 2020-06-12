@@ -4,7 +4,7 @@ public class StickyFloor : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var jumpManager = collision.GetComponent<JumpManager>();
+        var jumpManager = collision.GetComponent<Jumper>();
 
         if (jumpManager == null)
             return;
@@ -14,7 +14,7 @@ public class StickyFloor : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        var jumpManager = collision.GetComponent<JumpManager>();
+        var jumpManager = collision.GetComponent<Jumper>();
 
         if (jumpManager == null)
             return;
