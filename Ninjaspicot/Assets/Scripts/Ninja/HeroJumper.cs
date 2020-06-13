@@ -56,8 +56,6 @@ public class HeroJumper : Jumper
 
     public override void Jump(Vector2 origin, Vector2 drag, float strength)
     {
-        base.Jump(origin, drag, strength);
-
         if (_dynamicInteraction.Interacting)
         {
             _dynamicInteraction.StopInteraction(true);
@@ -69,6 +67,7 @@ public class HeroJumper : Jumper
         }
 
         _cameraBehaviour.DoShake(.3f, .1f);
+        base.Jump(origin, drag, strength);
     }
 
     public override bool CanJump()

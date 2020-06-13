@@ -163,7 +163,7 @@ public class Turret : MonoBehaviour, IActivable
 
     private void Shoot()
     {
-        var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation);
+        var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation, PoolableType.Bullet);
         bullet.Speed = _strength;
         Loaded = false;
         StartCoroutine(Load());

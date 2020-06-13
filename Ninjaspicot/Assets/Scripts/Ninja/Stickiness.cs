@@ -23,6 +23,8 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public bool DynamicActive => true;
 
+    public PoolableType PoolableType => PoolableType.HeroCollider;
+
     private Ninja _ninja;
     private Transform _contactPoint;
     private Vector3 _previousContactPoint;
@@ -34,6 +36,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (Active)
             return;
 
+        Active = true;
         WallJoint = GetComponent<HingeJoint2D>();
         _jumpManager = GetComponent<Jumper>();
         _ninja = GetComponent<Ninja>();
@@ -45,10 +48,9 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public void Start()
     {
-        if (Active)
+        if (CanWalk)
             return;
 
-        Active = true;
         CanWalk = true;
     }
 
@@ -170,7 +172,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         var jointMotor = hinge.motor;
         WallJoint.useMotor = true;
 
-        while (_ninja.NeedsToWalk())
+        while (_ninja?.NeedsToWalk() ?? Input.GetButton("Fire1"))
         {
             jointMotor.motorSpeed = NinjaDir == Dir.Left ? -_speed : _speed;
             hinge.motor = jointMotor;

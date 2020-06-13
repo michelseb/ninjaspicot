@@ -18,13 +18,26 @@ public class PoolManager : MonoBehaviour
     }
 
     //Returns first deactivated poolable of chosen type. If none, instanciate one
-    public T GetPoolable<T>(Vector3 position, Quaternion rotation) where T : IPoolable 
+    public T GetPoolable<T>(Vector3 position, Quaternion rotation, PoolableType type) where T : IPoolable 
     {
-        var poolable = (T)_poolables.FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
+        var poolable = (T)_poolables.Where(x => x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
 
         if (poolable == null)
         {
-            var poolableModel = _poolableModels.FirstOrDefault(p => p.GetComponent<IPoolable>() is T);
+            GameObject poolableModel = null;
+
+            foreach (var model in _poolableModels)
+            {
+                var pool = model.GetComponent<IPoolable>();
+                if (pool == null)
+                    continue;
+
+                if (pool is T && pool.PoolableType == type)
+                {
+                    poolableModel = model;
+                    break;
+                }
+            }
 
             if (poolableModel == null)
                 return default;

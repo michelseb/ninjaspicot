@@ -2,11 +2,11 @@
 
 public class ActivationButton : MonoBehaviour
 {
+    [SerializeField] private bool _active;
     [SerializeField] private GameObject _activableObject;
     public bool Pressing { get; set; }
 
     private IActivable _activable;
-    private bool _active;
     private SpriteRenderer _renderer;
 
     private void Awake()
@@ -17,6 +17,8 @@ public class ActivationButton : MonoBehaviour
     private void Start()
     {
         _activable = _activableObject.GetComponent<IActivable>();
+        _renderer.color = _active ? Color.red : Color.green;
+        _activable.SetActive(_active);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -36,7 +38,7 @@ public class ActivationButton : MonoBehaviour
     private void SetActive(ref bool active)
     {
         active = !active;
-        _renderer.color = active ? Color.green : Color.red;
+        _renderer.color = active ? Color.red : Color.green;
         _activable.SetActive(active);
     }
 }

@@ -6,6 +6,8 @@ public class EnemyNinja : Ninja, IRaycastable, IPoolable
     [SerializeField] private bool _patrolling;
     [SerializeField] private Dir _direction;
 
+    public PoolableType PoolableType => PoolableType.EnemyNinja;
+
     protected virtual void Start()
     {
         Stickiness.NinjaDir = _direction;

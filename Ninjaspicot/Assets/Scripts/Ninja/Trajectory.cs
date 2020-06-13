@@ -12,8 +12,10 @@ public class Trajectory : MonoBehaviour, IPoolable
     private TimeManager _timeManager;
 
     private const float TIME_SLOW = .01f;
-    private const float FADE_SPEED = 1.5f;
+    private const float FADE_SPEED = .5f;
     private const int MAX_VERTEX = 50;
+
+    public PoolableType PoolableType => PoolableType.Trajectory;
 
     private void Awake()
     {
@@ -41,7 +43,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
         if (_line.positionCount < _lineMax)
         {
-            _line.positionCount++;
+            _line.positionCount = _lineMax;
         }
 
         for (var i = 0; i < _line.positionCount; i++)
@@ -100,8 +102,6 @@ public class Trajectory : MonoBehaviour, IPoolable
     private IEnumerator FadeAway()
     {
         _timeManager.SetNormalTime();
-        _line.positionCount = 0;
-        _lineMax = MAX_VERTEX;
         Color col = _line.material.color;
         while (col.a > 0)
         {

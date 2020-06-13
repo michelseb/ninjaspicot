@@ -4,15 +4,16 @@ public class DynamicInteraction : MonoBehaviour
 {
     public bool Active { get; set; }
     public bool Interacting { get; set; }
+    public Stickiness CloneHeroStickiness { get; private set; }
 
     private IDynamic _tempDynamic;
     private Hero _hero;
 
     private DynamicCollider _cloneHero;
-    private GameObject _cloneDynamic;
+    private DynamicCollider _cloneDynamic;
 
     private Vector3 _previousPosition;
-    private Vector3 _clonePosition = new Vector3(0, 100000);
+    private Vector3 _clonePosition = new Vector3(10000, 10000);
 
     private PoolManager _poolManager;
 
@@ -67,23 +68,25 @@ public class DynamicInteraction : MonoBehaviour
         var otherCollider = ((MonoBehaviour)otherDynamic).GetComponent<Collider2D>();
 
 
-        _cloneDynamic = new GameObject("Clone dynamic");
+        _cloneDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position + _clonePosition, otherCollider.transform.rotation, otherDynamic.PoolableType);
         _cloneDynamic.transform.localScale = otherCollider.transform.localScale;
-        _cloneDynamic.transform.position = otherCollider.transform.position + _clonePosition;
-        _cloneDynamic.transform.rotation = otherCollider.transform.rotation;
-        Utils.CopyComponent(otherCollider, _cloneDynamic);
 
-        var otherObstacle = _cloneDynamic.AddComponent<Obstacle>();
-        otherObstacle.Awake();
+        //new GameObject("Clone dynamic");
+        //_cloneDynamic.transform.localScale = otherCollider.transform.localScale;
+        //_cloneDynamic.transform.position = otherCollider.transform.position + _clonePosition;
+        //_cloneDynamic.transform.rotation = otherCollider.transform.rotation;
+        //Utils.CopyComponent(otherCollider, _cloneDynamic);
 
-        _cloneHero = _poolManager.GetPoolable<DynamicCollider>(transform.position + _clonePosition, transform.rotation);
-        var stickiness = _cloneHero.GetComponent<Stickiness>();
+        _cloneDynamic.Awake();
 
-        stickiness.Awake();
-        stickiness.Start();
+        _cloneHero = _poolManager.GetPoolable<DynamicCollider>(transform.position + _clonePosition, transform.rotation, PoolableType.HeroCollider);
+        CloneHeroStickiness = _cloneHero.GetComponent<Stickiness>();
 
-        stickiness.ReactToObstacle(otherObstacle);
-        stickiness.SetContactPosition(_hero.Stickiness.GetContactPosition());
+        CloneHeroStickiness.Awake();
+        CloneHeroStickiness.Start();
+
+        CloneHeroStickiness.ReactToObstacle(_cloneDynamic);
+        CloneHeroStickiness.SetContactPosition(_hero.Stickiness.GetContactPosition());
 
         _cloneHero.transform.SetParent(_cloneDynamic.transform);
         _previousPosition = _cloneHero.transform.localPosition;
@@ -107,11 +110,12 @@ public class DynamicInteraction : MonoBehaviour
         _hero.Stickiness.Rigidbody.isKinematic = false;
         Interacting = false;
 
-        if (_cloneDynamic != null)
+        if (_cloneDynamic.Active)
         {
+            CloneHeroStickiness = null;
             _cloneHero.transform.SetParent(null);
             _cloneHero.Deactivate();
-            Destroy(_cloneDynamic);
+            _cloneDynamic.Deactivate();
         }
     }
 

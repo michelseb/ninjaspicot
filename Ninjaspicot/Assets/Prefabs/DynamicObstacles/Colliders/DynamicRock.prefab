@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3146863854814608041
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3146863854814608036}
+  - component: {fileID: 3146863854814608038}
+  - component: {fileID: 3146863854814608042}
+  m_Layer: 15
+  m_Name: DynamicRock
+  m_TagString: Wall
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3146863854814608036
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3146863854814608041}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -982.1141, y: 65.79073, z: -5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!60 &3146863854814608038
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3146863854814608041}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 4.7055664, y: -0.17056274}
+      - {x: 3.779663, y: 0.66386795}
+      - {x: 0.5522461, y: 1.7544975}
+      - {x: 0.51416016, y: 2.9382553}
+      - {x: 1.7954102, y: 2.9594383}
+      - {x: 1.819458, y: 2.3545685}
+      - {x: 1.9865723, y: 2.3735008}
+      - {x: 3.7514648, y: 3.4834442}
+      - {x: 3.7559814, y: 3.5880356}
+      - {x: 2.0317383, y: 5.068859}
+      - {x: 1.8183594, y: 5.08263}
+      - {x: 1.7944336, y: 3.9689293}
+      - {x: 1.2071533, y: 3.965248}
+      - {x: 1.0656738, y: 4.0657616}
+      - {x: -1.1153564, y: 4.0348854}
+      - {x: -1.319458, y: 4.1388283}
+      - {x: -2.6966553, y: 4.158886}
+      - {x: -2.8651123, y: 4.075531}
+      - {x: -2.8654785, y: 2.931961}
+      - {x: -2.6358643, y: 2.6883469}
+      - {x: -0.5202637, y: 2.7212296}
+      - {x: -0.49353027, y: 1.8316956}
+      - {x: -4.230835, y: 0.49816513}
+      - {x: -4.864746, y: -2.3458138}
+      - {x: -2.3520508, y: -4.054817}
+      - {x: -0.39001465, y: -4.4177856}
+      - {x: 4.741577, y: -4.0099564}
+      - {x: 4.907593, y: -2.1023407}
+--- !u!114 &3146863854814608042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3146863854814608041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecad08fb9e848d84c91843bed1588bef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolableType: 7

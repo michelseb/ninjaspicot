@@ -3,6 +3,9 @@
 public class Bullet : MonoBehaviour, IPoolable
 {
     public float Speed { get; set; }
+
+    public PoolableType PoolableType => PoolableType.Bullet;
+
     private float _currentLifeTime;
     private const float LIFE_TIME = 5;
 

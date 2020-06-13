@@ -27,6 +27,7 @@ public class TouchManager : MonoBehaviour
 
     private Stickiness _stickiness;
     private Jumper _jumpManager;
+    private DynamicInteraction _dynamicInteraction;
 
     private const float DRAG_THRESHOLD = 50;
     //private const int SEGMENTS = 12;
@@ -46,18 +47,22 @@ public class TouchManager : MonoBehaviour
         _touchLine.useWorldSpace = true;
         _stickiness = Hero.Instance?.Stickiness;
         _jumpManager = Hero.Instance?.JumpManager;
+        _dynamicInteraction = Hero.Instance?.DynamicInteraction;
     }
 
     private void Update()
     {
         //Waiting for hero to spawn
-        if (_stickiness == null)
+        if (_jumpManager == null)
         {
-            _stickiness = Hero.Instance?.Stickiness;
             _jumpManager = Hero.Instance?.JumpManager;
-            if (_stickiness == null)
+            _stickiness = Hero.Instance?.Stickiness;
+            _dynamicInteraction = Hero.Instance?.DynamicInteraction;
+            if (_jumpManager == null)
                 return;
         }
+
+        _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
         if (Touching)
         {
