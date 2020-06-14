@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 7483669839225159207}
   m_Layer: 15
   m_Name: DynamicRock
-  m_TagString: Wall
+  m_TagString: DynamicWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

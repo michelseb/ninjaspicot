@@ -99,7 +99,7 @@ public class Stickiness : MonoBehaviour, IDynamic
             Hero.Instance?.JumpManager.GainAllJumps();
         }
 
-        if (obstacle.CompareTag("Wall"))
+        if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall"))
         {
             Detach();
             Attach();

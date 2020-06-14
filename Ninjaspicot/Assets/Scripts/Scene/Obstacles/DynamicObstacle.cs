@@ -11,9 +11,8 @@ public class DynamicObstacle : Obstacle, IDynamic
 
     public PoolableType PoolableType => _poolableType;
 
-    public override void Awake()
+    public virtual void Awake()
     {
-        base.Awake();
         DynamicActive = true;
     }
 }

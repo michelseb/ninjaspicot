@@ -91,22 +91,30 @@ public static class Utils
         return actualHits;
     }
 
-    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D RayCast(Collider2D originCollider, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
     {
-        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
+        RaycastHit2D hit;
 
-        RaycastHit2D hit = new RaycastHit2D();
-        if (hits.Length > 0)
+        while (true)
         {
-            var dist = float.PositiveInfinity;
-            foreach (var actualHit in hits)
+            if (distance > 0)
             {
-                var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
-                if (newDist < dist)
-                {
-                    hit = actualHit;
-                    dist = newDist;
-                }
+                hit = Physics2D.Raycast(originCollider.transform.position, direction, distance);
+            }
+            else
+            {
+                hit = Physics2D.Raycast(originCollider.transform.position, direction);
+            }
+
+
+            if (!hit)
+                return hit;
+
+            IRaycastable raycastable = hit.collider.GetComponent<IRaycastable>();
+
+            if (raycastable == null || raycastable.Id == ignore || !includeTriggers && hit.collider.isTrigger)
+            {
+                Physics2D.IgnoreCollision(hit.collider, )
             }
         }
 

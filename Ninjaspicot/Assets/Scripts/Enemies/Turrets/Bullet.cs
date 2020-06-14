@@ -26,13 +26,13 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.CompareTag("Wall") || collision.CompareTag("DynamicWall"))
+        {
+            Deactivate();
+        }
         if (collision.CompareTag("hero"))
         {
             collision.GetComponent<Hero>().Die(transform);
-            Deactivate();
-        }
-        if (collision.CompareTag("Wall"))
-        {
             Deactivate();
         }
 

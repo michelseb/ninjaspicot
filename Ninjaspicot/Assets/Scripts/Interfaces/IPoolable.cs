@@ -2,9 +2,8 @@
 
 public enum PoolableType
 {
+    None,
     EnemyNinja,
-    DashEffect,
-    Trajectory,
     Bullet,
     CloudCollider,
     RockyPlatformCollider,

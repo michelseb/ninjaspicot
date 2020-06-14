@@ -8,19 +8,15 @@ public class PoolManager : MonoBehaviour
     [SerializeField] private Transform _poolableParent;
 
     private List<IPoolable> _poolables;
+    public List<IPoolable> Poolables { get { if (_poolables == null) _poolables = new List<IPoolable>(); return _poolables; } }
 
     private static PoolManager _instance;
     public static PoolManager Instance { get { if (_instance == null) _instance = FindObjectOfType<PoolManager>(); return _instance; } }
 
-    private void Awake()
-    {
-        _poolables = new List<IPoolable>();
-    }
-
     //Returns first deactivated poolable of chosen type. If none, instanciate one
-    public T GetPoolable<T>(Vector3 position, Quaternion rotation, PoolableType type) where T : IPoolable 
+    public T GetPoolable<T>(Vector3 position, Quaternion rotation, PoolableType type, bool attach = true) where T : IPoolable
     {
-        var poolable = (T)_poolables.Where(x => x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
+        var poolable = (T)Poolables.Where(x => type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
 
         if (poolable == null)
         {
@@ -32,7 +28,7 @@ public class PoolManager : MonoBehaviour
                 if (pool == null)
                     continue;
 
-                if (pool is T && pool.PoolableType == type)
+                if (pool is T && (type == PoolableType.None || pool.PoolableType == type))
                 {
                     poolableModel = model;
                     break;
@@ -42,8 +38,16 @@ public class PoolManager : MonoBehaviour
             if (poolableModel == null)
                 return default;
 
-            poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
-            _poolables.Add(poolable);
+            if (attach)
+            {
+                poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
+            }
+            else
+            {
+                poolable = Instantiate(poolableModel).GetComponent<T>();
+            }
+
+            Poolables.Add(poolable);
         }
 
         poolable.Pool(position, rotation);

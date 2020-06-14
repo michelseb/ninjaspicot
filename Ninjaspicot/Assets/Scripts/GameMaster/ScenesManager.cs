@@ -22,6 +22,7 @@ public class ScenesManager : MonoBehaviour
 
     private AsyncOperation _operation;
     private SpawnManager _spawnManager;
+    private ColliderManager _colliderManager;
     public Coroutine SceneLoad { get; private set; }
 
     private static ScenesManager _instance;
@@ -31,6 +32,7 @@ public class ScenesManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
+        _colliderManager = ColliderManager.Instance;
         _spawnManager = SpawnManager.Instance;
         LoadLobby();
     }
@@ -40,6 +42,7 @@ public class ScenesManager : MonoBehaviour
         var lobby = FindSceneByName("Lobby");
         SceneManager.LoadScene(lobby.Name);
         lobby.Loaded = true;
+        StartCoroutine(DelayedSceneAction());
     }
 
     private IEnumerator LoadAdditionalZone(int portalId)
@@ -65,9 +68,16 @@ public class ScenesManager : MonoBehaviour
         EnableScene(scene);
         scene.Loaded = true;
         SceneLoad = null;
+        StartCoroutine(DelayedSceneAction());
     }
 
-    void EnableScene(SceneInfos sceneInfos)
+    private IEnumerator DelayedSceneAction()
+    {
+        yield return new WaitForSeconds(.5f);
+        _colliderManager.InitCompositeColliders();
+    }
+
+    private void EnableScene(SceneInfos sceneInfos)
     {
         Scene sceneToLoad = SceneManager.GetSceneByName(sceneInfos.Name);
         if (sceneToLoad.IsValid())
@@ -106,6 +116,11 @@ public class ScenesManager : MonoBehaviour
     private SceneInfos FindSceneByName(string name)
     {
         return _scenes.FirstOrDefault(s => s.Name == name);
+    }
+
+    public void MoveObjectToCurrentScene(GameObject obj)
+    {
+        SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
     }
 
 }

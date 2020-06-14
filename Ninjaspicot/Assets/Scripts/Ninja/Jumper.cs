@@ -38,7 +38,7 @@ public class Jumper : MonoBehaviour
 
         _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);
 
-        _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin), PoolableType.DashEffect);
+        _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin), PoolableType.None);
 
         if (_trajectory != null)
         {
@@ -59,7 +59,7 @@ public class Jumper : MonoBehaviour
     {
         if (_trajectory == null)
         {
-            return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity, PoolableType.Trajectory);
+            return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity, PoolableType.None);
         }
 
         return _trajectory;

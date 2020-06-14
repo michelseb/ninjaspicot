@@ -15,7 +15,7 @@ public class Trajectory : MonoBehaviour, IPoolable
     private const float FADE_SPEED = .5f;
     private const int MAX_VERTEX = 50;
 
-    public PoolableType PoolableType => PoolableType.Trajectory;
+    public PoolableType PoolableType => PoolableType.None;
 
     private void Awake()
     {
@@ -40,6 +40,11 @@ public class Trajectory : MonoBehaviour, IPoolable
         Vector2 pos = startPos;
         Vector2 strength = startClick - click;
         Vector2 vel = strength.normalized * speed;
+
+        if (_lineMax == 0)
+        {
+            _lineMax = MAX_VERTEX;
+        }
 
         if (_line.positionCount < _lineMax)
         {

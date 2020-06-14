@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5648845789806948836}
   - component: {fileID: 653173607067513560}
   - component: {fileID: -6516791787831878942}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HeroCollider
   m_TagString: Dynamic
   m_Icon: {fileID: 0}
@@ -181,4 +181,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecad08fb9e848d84c91843bed1588bef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolableType: 6
+  _poolableType: 5

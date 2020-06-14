@@ -1,19 +1,10 @@
 ﻿using System.Collections;
-using System.Linq;
 using UnityEngine;
 
-[DisallowMultipleComponent]
 public class Obstacle : MonoBehaviour, IRaycastable
 {
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-
-    protected Collider2D _collider;
-
-    public virtual void Awake()
-    {
-        _collider = GetComponents<Collider2D>().FirstOrDefault(c => !c.isTrigger);
-    }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
@@ -35,8 +26,9 @@ public class Obstacle : MonoBehaviour, IRaycastable
 
     private IEnumerator QuickDeactivate()
     {
-        _collider.enabled = false;
+        var layer = gameObject.layer;
+        gameObject.layer = LayerMask.NameToLayer("IgnoreCollisions");
         yield return new WaitForSecondsRealtime(.1f);
-        _collider.enabled = true;
+        gameObject.layer = layer;
     }
 }

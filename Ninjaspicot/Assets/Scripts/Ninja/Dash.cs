@@ -6,7 +6,7 @@ public class Dash : MonoBehaviour, IPoolable
     private float _currentLifeTime;
     private const float LIFE_TIME = 1;
 
-    public PoolableType PoolableType => PoolableType.DashEffect;
+    public PoolableType PoolableType => PoolableType.None;
 
     private void Start()
     {

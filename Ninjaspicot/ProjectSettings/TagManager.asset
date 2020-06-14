@@ -15,6 +15,7 @@ TagManager:
   - hero
   - Spawn
   - Dynamic
+  - DynamicWall
   layers:
   - Default
   - TransparentFX
@@ -32,7 +33,7 @@ TagManager:
   - Enemy
   - DynamicObstacle
   - PoppingObstacle
-  - 
+  - IgnoreCollisions
   - 
   - 
   - 

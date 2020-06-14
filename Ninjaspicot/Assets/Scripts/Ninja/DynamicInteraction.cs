@@ -77,8 +77,6 @@ public class DynamicInteraction : MonoBehaviour
         //_cloneDynamic.transform.rotation = otherCollider.transform.rotation;
         //Utils.CopyComponent(otherCollider, _cloneDynamic);
 
-        _cloneDynamic.Awake();
-
         _cloneHero = _poolManager.GetPoolable<DynamicCollider>(transform.position + _clonePosition, transform.rotation, PoolableType.HeroCollider);
         CloneHeroStickiness = _cloneHero.GetComponent<Stickiness>();
 
@@ -110,7 +108,7 @@ public class DynamicInteraction : MonoBehaviour
         _hero.Stickiness.Rigidbody.isKinematic = false;
         Interacting = false;
 
-        if (_cloneDynamic.Active)
+        if (_cloneDynamic != null && _cloneDynamic.Active)
         {
             CloneHeroStickiness = null;
             _cloneHero.transform.SetParent(null);

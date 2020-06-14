@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6760226904812930777}
   m_Layer: 14
   m_Name: FallingPlatform
-  m_TagString: Wall
+  m_TagString: DynamicWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e29a1bbbe3525f41baa243a63985792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolableType: 5
+  _poolableType: 4
   _speed: 1
   _maxSpeed: 20
   _fallTime: 10
