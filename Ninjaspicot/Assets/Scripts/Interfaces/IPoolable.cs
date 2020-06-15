@@ -4,6 +4,7 @@ public enum PoolableType
 {
     None,
     EnemyNinja,
+    Marauder,
     Bullet,
     CloudCollider,
     RockyPlatformCollider,

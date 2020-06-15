@@ -1,13 +1,29 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class Cannon : MonoBehaviour, IRaycastable
 {
     private Turret _turret;
-    public Turret Turret { get { if (_turret == null) _turret = transform.parent.GetComponent<Turret>(); return _turret; } }
+    public Turret Turret { get { if (_turret == null) _turret = GetComponentInParent<Turret>() ?? GetComponentInChildren<Turret>(); return _turret; } }
     public int Id => Turret.Id;
+
+    private Image _image;
+
+    private void Awake()
+    {
+        _image = GetComponent<Image>();
+    }
+
+    private void Update()
+    {
+        _image.color = Turret.Active ? ColorUtils.Red : ColorUtils.White;
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (!Turret.Active)
+            return;
+
         var hero = collision.collider.GetComponent<Hero>() ?? collision.collider.GetComponentInParent<Hero>();
         if (hero != null)
         {

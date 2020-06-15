@@ -34,7 +34,7 @@ public class Hero : Ninja, IRaycastable
             return;
 
         base.Die(killer);
-        Renderer.color = Color.red;
+        Renderer.color = ColorUtils.Red;
         _timeManager.StartSlowDownProgressive(.3f);
         DynamicInteraction.StopInteraction(false);
 

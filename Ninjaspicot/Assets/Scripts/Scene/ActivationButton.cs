@@ -17,7 +17,7 @@ public class ActivationButton : MonoBehaviour
     private void Start()
     {
         _activable = _activableObject.GetComponent<IActivable>();
-        _renderer.color = _active ? Color.red : Color.green;
+        _renderer.color = _active ? ColorUtils.Red : ColorUtils.Green;
         _activable.SetActive(_active);
     }
 

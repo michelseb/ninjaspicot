@@ -152,6 +152,7 @@ public class Stickiness : MonoBehaviour, IDynamic
             StopCoroutine(_walkOnWalls);
         }
 
+        Rigidbody.velocity = Vector2.zero;
         WallJoint.useMotor = false;
         _walkOnWalls = null;
     }

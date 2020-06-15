@@ -54,6 +54,11 @@ public class DynamicInteraction : MonoBehaviour
         if (dynamicEntity == null || !dynamicEntity.DynamicActive)
             return;
 
+        var ninja = collision.collider.GetComponent<EnemyNinja>();
+
+        if (ninja != null)
+            return;
+
         StartInteraction(dynamicEntity);
     }
 

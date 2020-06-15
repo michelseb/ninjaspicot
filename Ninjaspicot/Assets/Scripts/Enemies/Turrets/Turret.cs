@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Turret : MonoBehaviour, IActivable
 {
@@ -17,11 +18,12 @@ public class Turret : MonoBehaviour, IActivable
     public bool Loaded { get; private set; }
     public Mode TurretMode { get; private set; }
     public bool AutoShoot => _autoShoot;
+    public bool Active { get; private set; }
 
-    private bool _active;
     private float _initRotation;
     private float _loadProgress;
 
+    private Image _image;
     private Transform _target;
     private Coroutine _search;
 
@@ -30,6 +32,7 @@ public class Turret : MonoBehaviour, IActivable
     private void Awake()
     {
         _poolManager = PoolManager.Instance;
+        _image = GetComponent<Image>();
     }
 
     private void Start()
@@ -37,12 +40,13 @@ public class Turret : MonoBehaviour, IActivable
         TurretMode = Mode.Scan;
         _initRotation = transform.rotation.z;
         Loaded = true;
-        _active = true;
+        Active = true;
     }
 
     private void Update()
     {
-        if (!_active)
+        _image.color = Active ? ColorUtils.Red : ColorUtils.White;
+        if (!Active)
             return;
 
         transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
@@ -99,14 +103,6 @@ public class Turret : MonoBehaviour, IActivable
 
                 break;
         }
-
-
-        /*if (r.isVisible == false)
-        {
-            turretMode = Mode.Scan;
-        }*/
-
-
 
     }
 
@@ -201,6 +197,6 @@ public class Turret : MonoBehaviour, IActivable
 
     public void SetActive(bool active)
     {
-        _active = active;
+        Active = active;
     }
 }
