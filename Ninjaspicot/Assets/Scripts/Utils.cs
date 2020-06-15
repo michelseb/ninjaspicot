@@ -91,39 +91,39 @@ public static class Utils
         return actualHits;
     }
 
-    public static RaycastHit2D RayCast(Collider2D originCollider, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
     {
-        RaycastHit2D hit;
+        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
 
-        while (true)
+        RaycastHit2D hit = new RaycastHit2D();
+        if (hits.Length > 0)
         {
-            if (distance > 0)
+            var dist = float.PositiveInfinity;
+            foreach (var actualHit in hits)
             {
-                hit = Physics2D.Raycast(originCollider.transform.position, direction, distance);
-            }
-            else
-            {
-                hit = Physics2D.Raycast(originCollider.transform.position, direction);
-            }
-
-
-            if (!hit)
-                return hit;
-
-            IRaycastable raycastable = hit.collider.GetComponent<IRaycastable>();
-
-            if (raycastable == null || raycastable.Id == ignore || !includeTriggers && hit.collider.isTrigger)
-            {
-                Physics2D.IgnoreCollision(hit.collider, )
+                var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
+                if (newDist < dist)
+                {
+                    hit = actualHit;
+                    dist = newDist;
+                }
             }
         }
 
         return hit;
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "")
     {
         RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers);
+
+        if (!string.IsNullOrEmpty(target))
+        {
+            var wrongHit = hits.FirstOrDefault(h => h.transform.tag != target);
+
+            if (wrongHit)
+                return wrongHit;
+        }
 
         RaycastHit2D hit = new RaycastHit2D();
         if (hits.Length > 0)

@@ -51,13 +51,19 @@ public class Turret : MonoBehaviour, IActivable
         {
             case Mode.Aim:
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f); 
-                
-                //Raycast of the size of the aim component (12 is the right value apparently)
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
+
                 var aim = Utils.RayCast(transform.position, transform.up, ignore: Id).collider;
+                var blocked = false;
+
+                if (Hero.Instance != null && !Utils.LineCast(transform.position, Hero.Instance.transform.position, Id, false, "hero").transform.CompareTag("hero"))
+                {
+                    blocked = true;
+                }
+
                 var centered = aim != null && aim.CompareTag("hero");
-                
-                if (Loaded && centered)
+
+                if (Loaded && centered && !blocked)
                 {
                     Shoot();
                 }
