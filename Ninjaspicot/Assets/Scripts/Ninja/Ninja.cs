@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 {
@@ -9,6 +10,7 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
     public Jumper JumpManager { get; private set; }
     public Stickiness Stickiness { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
+    public Image Image { get; private set; } 
 
     protected CameraBehaviour _cameraBehaviour;
 
@@ -18,6 +20,7 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
+        Image = GetComponent<Image>();
     }
 
 

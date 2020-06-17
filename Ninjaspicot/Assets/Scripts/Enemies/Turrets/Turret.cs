@@ -112,9 +112,9 @@ public class Turret : MonoBehaviour, IActivable, IRaycastable
 
             case Mode.Wait:
 
-                if (_target != null && _aim.TargetAimedAt(_target))
+                if (_target != null && _aim.TargetAimedAt(_target, Id))
                 {
-                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
+                    StartAim(_target);
                 }
                 break;
         }

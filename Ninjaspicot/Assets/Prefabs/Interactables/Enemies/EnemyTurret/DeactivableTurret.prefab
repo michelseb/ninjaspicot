@@ -719,8 +719,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eec79f845e4cd6347bb30e5d5ddc2ad8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 100
+  _size: 200
   _viewAngle: 45
-  _detailAmount: 20
-  _offset: {x: 0, y: 2, z: 0}
+  _detailAmount: 30
+  _offset: {x: 0, y: 10, z: 0}
   _startAngle: 90

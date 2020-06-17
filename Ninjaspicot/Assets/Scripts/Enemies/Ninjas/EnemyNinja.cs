@@ -11,14 +11,21 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     protected virtual void Start()
     {
         Stickiness.NinjaDir = _direction;
-    } 
+    }
 
     protected virtual void Update()
     {
         if (Dead)
             return;
 
-        Renderer.color = Attacking ? ColorUtils.Red : ColorUtils.White;
+        if (Renderer != null)
+        {
+            Renderer.color = Attacking ? ColorUtils.Red : ColorUtils.White;
+        }
+        if (Image != null)
+        {
+            Image.color = Attacking ? ColorUtils.Red : ColorUtils.White;
+        }
     }
 
     public void Pool(Vector3 position, Quaternion rotation)
@@ -52,10 +59,21 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public override IEnumerator Dying()
     {
-        while (Renderer.color.a > 0)
+        if (Renderer != null)
         {
-            Renderer.color = new Color(Renderer.color.r, Renderer.color.g, Renderer.color.b, Renderer.color.a - Time.deltaTime);
-            yield return null;
+            while (Renderer.color.a > 0)
+            {
+                Renderer.color = new Color(Renderer.color.r, Renderer.color.g, Renderer.color.b, Renderer.color.a - Time.deltaTime);
+                yield return null;
+            }
+        }
+        else if (Image != null)
+        {
+            while (Image.color.a > 0)
+            {
+                Image.color = new Color(Image.color.r, Image.color.g, Image.color.b, Image.color.a - Time.deltaTime);
+                yield return null;
+            }
         }
         Deactivate();
         yield return base.Dying();
