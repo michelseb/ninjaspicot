@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ActivationButton : MonoBehaviour
 {
@@ -7,11 +8,11 @@ public class ActivationButton : MonoBehaviour
     public bool Pressing { get; set; }
 
     private IActivable _activable;
-    private SpriteRenderer _renderer;
+    private Image _renderer;
 
     private void Awake()
     {
-        _renderer = GetComponent<SpriteRenderer>();
+        _renderer = GetComponent<Image>();
     }
 
     private void Start()

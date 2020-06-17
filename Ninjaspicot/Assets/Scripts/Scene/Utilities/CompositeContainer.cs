@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 
-public class CompositeContainer : MonoBehaviour, IPoolable
+public class CompositeContainer : MonoBehaviour, IPoolable, IRaycastable
 {
+    private int _id;
     public PoolableType PoolableType => PoolableType.None;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
+
     private ScenesManager _scenesManager;
 
     private void Awake()

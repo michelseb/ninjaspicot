@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Turret : MonoBehaviour, IActivable
+public class Turret : MonoBehaviour, IActivable, IRaycastable
 {
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
@@ -23,6 +23,7 @@ public class Turret : MonoBehaviour, IActivable
     private float _initRotation;
     private float _loadProgress;
 
+    private Aim _aim;
     private Image _image;
     private Transform _target;
     private Coroutine _search;
@@ -31,6 +32,8 @@ public class Turret : MonoBehaviour, IActivable
 
     private void Awake()
     {
+        _aim = GetComponentInChildren<Aim>();
+        _aim.CurrentTarget = "hero";
         _poolManager = PoolManager.Instance;
         _image = GetComponent<Image>();
     }
@@ -46,10 +49,24 @@ public class Turret : MonoBehaviour, IActivable
     private void Update()
     {
         _image.color = Active ? ColorUtils.Red : ColorUtils.White;
+
         if (!Active)
             return;
 
-        transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z);
+        //Loading weapon
+        if (!Loaded)
+        {
+            if (_loadProgress >= _loadTime)
+            {
+                Loaded = true;
+                _loadProgress = 0;
+            }
+            else
+            {
+                _loadProgress += Time.deltaTime;
+            }
+        }
+
 
         switch (TurretMode)
         {
@@ -57,21 +74,17 @@ public class Turret : MonoBehaviour, IActivable
 
                 transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
 
-                var aim = Utils.RayCast(transform.position, transform.up, ignore: Id).collider;
-                var blocked = false;
-
-                if (Hero.Instance != null && !Utils.LineCast(transform.position, Hero.Instance.transform.position, Id, false, "hero").transform.CompareTag("hero"))
+                if (_target != null && _aim.TargetAimedAt(_target, Id))
                 {
-                    blocked = true;
+                    if (Loaded && _aim.TargetCentered(transform, _target.tag, Id))
+                    {
+                        Shoot();
+                    }
                 }
-
-                var centered = aim != null && aim.CompareTag("hero");
-
-                if (Loaded && centered && !blocked)
+                else
                 {
-                    Shoot();
+                    StartWait();
                 }
-
                 break;
 
 
@@ -99,8 +112,10 @@ public class Turret : MonoBehaviour, IActivable
 
             case Mode.Wait:
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
-
+                if (_target != null && _aim.TargetAimedAt(_target))
+                {
+                    transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
+                }
                 break;
         }
 
@@ -119,48 +134,10 @@ public class Turret : MonoBehaviour, IActivable
         }
     }
 
-    public void StartSearch()
+    public void StartWait()
     {
-        if (TurretMode == Mode.Aim)
-        {
-            TurretMode = Mode.Wait;
-            _search = StartCoroutine(Search());
-        }
-    }
-
-    public void SelectMode(string evenement, Transform target = null)
-    {
-        switch (evenement)
-        {
-            case "aim":
-                _target = target;
-                if (TurretMode == Mode.Wait)
-                {
-                    StopCoroutine(_search);
-                    TurretMode = Mode.Aim;
-                }
-                else if (TurretMode == Mode.Scan)
-                {
-                    TurretMode = Mode.Aim;
-                }
-                else
-                {
-                    if (TurretMode == Mode.Aim)
-                    {
-                        TurretMode = Mode.Wait;
-                        _search = StartCoroutine(Search());
-                    }
-                }
-                break;
-
-            case "search":
-                if (TurretMode == Mode.Aim)
-                {
-                    TurretMode = Mode.Wait;
-                    _search = StartCoroutine(Search());
-                }
-                break;
-        }
+        TurretMode = Mode.Wait;
+        _search = StartCoroutine(Wait());
     }
 
     private void Shoot()
@@ -168,23 +145,9 @@ public class Turret : MonoBehaviour, IActivable
         var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation, PoolableType.Bullet);
         bullet.Speed = _strength;
         Loaded = false;
-        StartCoroutine(Load());
     }
 
-    private IEnumerator Load()
-    {
-        while (_loadProgress < _loadTime)
-        {
-            _loadProgress += Time.deltaTime;
-            yield return null;
-        }
-
-        Loaded = true;
-        _loadProgress = 0;
-
-    }
-
-    private IEnumerator Search()
+    private IEnumerator Wait()
     {
         yield return new WaitForSeconds(2);
 
@@ -192,7 +155,6 @@ public class Turret : MonoBehaviour, IActivable
         {
             TurretMode = Mode.Scan;
         }
-
     }
 
     public void SetActive(bool active)

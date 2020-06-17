@@ -1,27 +1,16 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
-public class Aim : MonoBehaviour, IRaycastable
+public class Aim : FieldOfView
 {
-    [SerializeField] private float _size;
-    public float Size => _size;
     private Turret _turret;
     public Turret Turret { get { if (_turret == null) _turret = GetComponentInParent<Turret>() ?? GetComponentInChildren<Turret>(); return _turret; } }
-    public int Id => Turret.Id;
-    private Image _image;
 
-    private void Awake()
-    {
-        _image = GetComponent<Image>();
-    }
+    public string CurrentTarget { get; set; }
+    public bool TargetInRange { get; internal set; }
+
     private void Update()
     {
-        _image.enabled = Turret.Active;
-    }
-
-    private void Start()
-    {
-        transform.localScale = Vector3.one * _size;
+        Active = Turret.Active;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -29,32 +18,47 @@ public class Aim : MonoBehaviour, IRaycastable
         if (!Turret.Active)
             return;
 
-        if (collision.CompareTag("hero"))
+        if (!string.IsNullOrEmpty(CurrentTarget) && collision.CompareTag(CurrentTarget))
         {
-            var hit = Utils.LineCast(Turret.gameObject.transform.position, collision.gameObject.transform.position, Turret.Id);
-
-            if (hit.transform.CompareTag("hero"))
+            TargetInRange = true;
+            if (TargetAimedAt(collision.transform, Turret.Id))
             {
                 if (!Turret.AutoShoot)
                 {
-                    Turret.StartAim(hit.transform);
+                    Turret.StartAim(collision.transform);
                 }
             }
-
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!Turret.Active)
-            return;
-
-        if (collision.CompareTag("hero"))
+        if (!string.IsNullOrEmpty(CurrentTarget) && collision.CompareTag(CurrentTarget))
         {
-            if (!Turret.AutoShoot)
-            {
-                Turret.StartSearch();
-            }
+            TargetInRange = false;
         }
+    }
+
+    public bool TargetCentered(Transform origin, string targetTag, int ignoreId = 0)
+    {
+        if (!TargetInRange)
+            return false;
+
+        var collider = Utils.RayCast(origin.position, origin.up, ignore: ignoreId).collider;
+
+        if (collider == null)
+            return false;
+
+        return collider.CompareTag(targetTag);
+    }
+
+    public bool TargetAimedAt(Transform target, int ignoreId = 0)
+    {
+        if (target == null || !TargetInRange)
+            return false;
+
+        var hit = Utils.LineCast(transform.position, target.position, ignoreId, false, target.tag);
+
+        return hit && hit.transform.CompareTag(target.tag);
     }
 }

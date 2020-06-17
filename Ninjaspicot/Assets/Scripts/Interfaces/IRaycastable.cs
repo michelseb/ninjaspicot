@@ -1,4 +1,6 @@
-﻿public interface IRaycastable
+﻿using UnityEngine;
+
+public interface IRaycastable 
 {
     int Id { get; }
 }

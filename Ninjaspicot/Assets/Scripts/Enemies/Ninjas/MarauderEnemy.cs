@@ -2,7 +2,6 @@
 
 public class MarauderEnemy : EnemyNinja
 {
-    [SerializeField] private GameObject _vision;
     private enum MarauderMode
     {
         Searching,
@@ -12,10 +11,17 @@ public class MarauderEnemy : EnemyNinja
     [SerializeField] private float _searchTime;
     [SerializeField] private float _walkTime;
 
+    private FieldOfView _fieldOfView;
     private float _remainingTime;
     private MarauderMode _marauderMode;
     private bool _readyToStop;
     public override PoolableType PoolableType => PoolableType.Marauder;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _fieldOfView = GetComponentInChildren<FieldOfView>();
+    }
 
     protected override void Update()
     {
@@ -37,7 +43,7 @@ public class MarauderEnemy : EnemyNinja
                     Stickiness.NinjaDir = (Dir)1 - (int)Stickiness.NinjaDir;
                     _remainingTime = _walkTime;
                     Stickiness.StartWalking();
-                    _vision.SetActive(false);
+                    _fieldOfView.SetActive(false);
                     _marauderMode = MarauderMode.Moving;
                 }
                 break;
@@ -62,7 +68,7 @@ public class MarauderEnemy : EnemyNinja
         Attacking = false;
         _remainingTime = _searchTime;
         _marauderMode = MarauderMode.Searching;
-        _vision.SetActive(true);
+        _fieldOfView.SetActive(true);
         _readyToStop = false;
     }
 

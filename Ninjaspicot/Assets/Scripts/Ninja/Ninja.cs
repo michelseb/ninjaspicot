@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Ninja : MonoBehaviour, IKillable
+public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 {
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
