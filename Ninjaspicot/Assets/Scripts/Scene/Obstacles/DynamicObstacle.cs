@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class DynamicObstacle : Obstacle, IDynamic
 {
@@ -13,6 +14,18 @@ public class DynamicObstacle : Obstacle, IDynamic
 
     public virtual void Awake()
     {
+        DynamicActive = true;
+    }
+
+    public void LaunchQuickDeactivate()
+    {
+        StartCoroutine(QuickDeactivate());
+    }
+
+    private IEnumerator QuickDeactivate()
+    {
+        DynamicActive = false;
+        yield return new WaitForSeconds(.5f);
         DynamicActive = true;
     }
 }

@@ -36,8 +36,11 @@ public class Hero : Ninja, IRaycastable
         base.Die(killer);
         Renderer.color = ColorUtils.Red;
         _timeManager.StartSlowDownProgressive(.3f);
-        DynamicInteraction.StopInteraction(false);
 
+        if (DynamicInteraction.Interacting)
+        {
+            DynamicInteraction.StopInteraction(false);
+        }
     }
 
     public override IEnumerator Dying()
@@ -46,7 +49,7 @@ public class Hero : Ninja, IRaycastable
 
         SetCapeActivation(false);
         _spawnManager.Respawn();
-        SetAllBehavioursActivation(true);
+        SetAllBehavioursActivation(true, false);
         _cameraBehaviour.SetCenterMode(transform, 1f);
         SetCapeActivation(true);
 
@@ -86,9 +89,9 @@ public class Hero : Ninja, IRaycastable
         DynamicInteraction.Active = active;
     }
 
-    public override void SetAllBehavioursActivation(bool active)
+    public override void SetAllBehavioursActivation(bool active, bool grounded)
     {
-        base.SetAllBehavioursActivation(active);
+        base.SetAllBehavioursActivation(active, grounded);
         SetInteractionActivation(active);
     }
 

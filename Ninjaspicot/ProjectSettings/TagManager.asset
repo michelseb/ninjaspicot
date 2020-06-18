@@ -33,7 +33,7 @@ TagManager:
   - Enemy
   - DynamicObstacle
   - PoppingObstacle
-  - IgnoreCollisions
+  - 
   - 
   - 
   - 

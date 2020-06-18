@@ -65,8 +65,12 @@ public class Stickiness : MonoBehaviour, IDynamic
     }
 
 
-    public void Attach()
+    public void Attach(Obstacle obstacle)
     {
+        var dynamic = obstacle as DynamicObstacle;
+        if (dynamic != null && !dynamic.DynamicActive)
+            return;
+
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
         WallJoint.anchor = GetContactPosition();
@@ -80,7 +84,10 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public void Detach()
     {
-        CurrentAttachment?.LaunchQuickDeactivate();
+        if (CurrentAttachment != null && CurrentAttachment is DynamicObstacle)
+        {
+            ((DynamicObstacle)CurrentAttachment).LaunchQuickDeactivate();
+        }
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
@@ -102,7 +109,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall"))
         {
             Detach();
-            Attach();
+            Attach(obstacle);
         }
     }
 
@@ -145,7 +152,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
     }
 
-    public void StopWalking()
+    public void StopWalking(bool stayGrounded)
     {
         if (_walkOnWalls != null)
         {
@@ -153,7 +160,14 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
 
         Rigidbody.velocity = Vector2.zero;
+        Rigidbody.angularVelocity = 0;
         WallJoint.useMotor = false;
+
+        if (stayGrounded)
+        {
+            Rigidbody.isKinematic = true;
+        }
+
         _walkOnWalls = null;
     }
 
@@ -162,6 +176,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (_walkOnWalls != null)
             return;
 
+        Rigidbody.isKinematic = false;
         _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
     }
 

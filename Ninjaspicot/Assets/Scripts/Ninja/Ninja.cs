@@ -32,7 +32,7 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
         Dead = true;
         Stickiness.Detach();
         JumpManager.ReinitJump();
-        SetAllBehavioursActivation(false);
+        SetAllBehavioursActivation(false, false);
 
         if (killer != null)
         {
@@ -58,21 +58,21 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
         Stickiness.Active = active;
     }
 
-    public void SetWalkingActivation(bool active)
+    public void SetWalkingActivation(bool active, bool grounded)
     {
         if (!active)
         {
-            Stickiness.StopWalking();
+            Stickiness.StopWalking(grounded);
         }
 
         Stickiness.CanWalk = active;
     }
 
-    public virtual void SetAllBehavioursActivation(bool active)
+    public virtual void SetAllBehavioursActivation(bool active, bool grounded)
     {
         SetJumpingActivation(active);
         SetStickinessActivation(active);
-        SetWalkingActivation(active);
+        SetWalkingActivation(active, grounded);
     }
 
     public virtual bool NeedsToWalk()

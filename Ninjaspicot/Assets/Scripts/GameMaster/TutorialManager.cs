@@ -98,7 +98,7 @@ public class TutorialManager : MonoBehaviour
         {
             _initialDistanceToInstruction = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude);
             _hero.SetJumpingActivation(true);
-            _hero.SetWalkingActivation(true);
+            _hero.SetWalkingActivation(true, false);
             _clickText.SetActive(false);
         }
 
@@ -223,7 +223,7 @@ public class TutorialManager : MonoBehaviour
 
         _containerImage.color = Color.white;
         _hero.SetJumpingActivation(false);
-        _hero.SetWalkingActivation(false);
+        _hero.SetWalkingActivation(false, false);
         _instructionsContainer.SetActive(true);
         _clickText.SetActive(true);
         _actionDuration = _tutorials[tutorialId].Duration;

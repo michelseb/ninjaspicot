@@ -82,7 +82,7 @@ public class TouchManager : MonoBehaviour
 
             if (_jumpManager.ReadyToJump())
             {
-                _stickiness.StopWalking();
+                _stickiness.StopWalking(false);
             }
             else if (!Dragging && _stickiness.Attached && _stickiness.CanWalk)
             {

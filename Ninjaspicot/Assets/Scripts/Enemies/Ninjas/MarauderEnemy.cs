@@ -64,7 +64,7 @@ public class MarauderEnemy : EnemyNinja
         if (!_readyToStop)
             return;
 
-        Stickiness.StopWalking();
+        Stickiness.StopWalking(true);
         Attacking = false;
         _remainingTime = _searchTime;
         _marauderMode = MarauderMode.Searching;

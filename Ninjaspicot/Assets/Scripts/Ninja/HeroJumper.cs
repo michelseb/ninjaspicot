@@ -46,7 +46,7 @@ public class HeroJumper : Jumper
                 }
                 else
                 {
-                    _stickiness.StopWalking();
+                    _stickiness.StopWalking(false);
                     Jump(_touchManager.RawTouchOrigin, _touchManager.TouchDrag, _strength);
                 }
                 _touchManager.ReinitDrag();

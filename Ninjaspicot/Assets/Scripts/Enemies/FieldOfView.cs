@@ -107,13 +107,10 @@ public class FieldOfView : MonoBehaviour
         var uv = new Vector2[vertices.Length];
         var triangles = new int[pointCount * 3];
 
-        var scale = transform.lossyScale;
-        var worldSize = size / scale.magnitude;
-        var worldOffset = transform.TransformPoint(new Vector3(offset.x / scale.x, offset.y / scale.y, offset.z / scale.z));
-
+        offset = transform.TransformPoint(offset);
         float angleStep = angle / pointCount;
 
-        vertices[0] = transform.InverseTransformPoint(worldOffset);
+        vertices[0] = transform.InverseTransformPoint(offset);
 
         var currentAngle = Utils.GetAngleFromVector(transform.InverseTransformDirection(transform.up)) + angle / 2f;
         var vertexIndex = 1;
@@ -122,7 +119,7 @@ public class FieldOfView : MonoBehaviour
         for (int i = 0; i < pointCount; i++)
         {
 
-            vertices[vertexIndex] = Utils.GetVectorFromAngle(currentAngle) * (worldSize + transform.InverseTransformPoint(worldOffset).magnitude);
+            vertices[vertexIndex] = Utils.GetVectorFromAngle(currentAngle) * (size + transform.InverseTransformPoint(offset).magnitude);
 
             if (i > 0)
             {

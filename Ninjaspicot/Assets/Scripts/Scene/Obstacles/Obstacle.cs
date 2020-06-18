@@ -18,17 +18,4 @@ public class Obstacle : MonoBehaviour, IRaycastable
 
         ninja.Stickiness.SetContactPoint(collision.contacts[collision.contacts.Length - 1]);
     }
-
-    public void LaunchQuickDeactivate()
-    {
-        StartCoroutine(QuickDeactivate());
-    }
-
-    private IEnumerator QuickDeactivate()
-    {
-        var layer = gameObject.layer;
-        gameObject.layer = LayerMask.NameToLayer("IgnoreCollisions");
-        yield return new WaitForSecondsRealtime(.1f);
-        gameObject.layer = layer;
-    }
 }
