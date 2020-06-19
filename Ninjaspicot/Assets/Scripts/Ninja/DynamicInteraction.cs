@@ -80,8 +80,8 @@ public class DynamicInteraction : MonoBehaviour
         CloneHeroStickiness.Awake();
         CloneHeroStickiness.Start();
 
-        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic);
         CloneHeroStickiness.SetContactPosition(_hero.Stickiness.GetContactPosition());
+        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic);
 
         _cloneHero.transform.SetParent(_cloneOtherDynamic.transform);
         _previousPosition = _cloneHero.transform.localPosition;

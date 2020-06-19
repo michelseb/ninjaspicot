@@ -10,13 +10,17 @@ public class TouchManager : MonoBehaviour
 {
 
     public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1");
+    public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
     public bool Dragging { get; private set; }
-    public Vector3 TouchOrigin { get; private set; }
-    public Vector3 RawTouchOrigin { get; private set; }
+    public Vector3 Touch1Origin { get; private set; }
+    public Vector3 Touch2Origin { get; private set; }
+    public Vector3 RawTouch1Origin { get; private set; }
+    public Vector3 RawTouch2Origin { get; private set; }
     public Vector3 TouchDrag { get; private set; }
-    public TouchArea TouchArea => RawTouchOrigin.x < Screen.width / 2 ? TouchArea.Left : TouchArea.Right;
+    public TouchArea TouchArea => RawTouch1Origin.x < Screen.width / 2 ? TouchArea.Left : TouchArea.Right;
 
     private bool _touchInitialized;
+    private bool _touch2Initialized;
     private LineRenderer _touchLine;
     private Camera _camera;
     //private Coroutine _drawTouch;
@@ -25,6 +29,7 @@ public class TouchManager : MonoBehaviour
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
 
+    private Hero _hero;
     private Stickiness _stickiness;
     private Jumper _jumpManager;
     private DynamicInteraction _dynamicInteraction;
@@ -45,20 +50,22 @@ public class TouchManager : MonoBehaviour
     {
         _touchLine.positionCount = 0;
         _touchLine.useWorldSpace = true;
-        _stickiness = Hero.Instance?.Stickiness;
-        _jumpManager = Hero.Instance?.JumpManager;
-        _dynamicInteraction = Hero.Instance?.DynamicInteraction;
+        _hero = Hero.Instance;
+        _stickiness = _hero?.Stickiness;
+        _jumpManager = _hero?.JumpManager;
+        _dynamicInteraction = _hero?.DynamicInteraction;
     }
 
     private void Update()
     {
         //Waiting for hero to spawn
-        if (_jumpManager == null)
+        if (_hero == null)
         {
-            _jumpManager = Hero.Instance?.JumpManager;
-            _stickiness = Hero.Instance?.Stickiness;
-            _dynamicInteraction = Hero.Instance?.DynamicInteraction;
-            if (_jumpManager == null)
+            _hero = Hero.Instance;
+            _jumpManager = _hero?.JumpManager;
+            _stickiness = _hero?.Stickiness;
+            _dynamicInteraction = _hero?.DynamicInteraction;
+            if (_hero == null)
                 return;
         }
 
@@ -70,15 +77,26 @@ public class TouchManager : MonoBehaviour
 
             if (!_touchInitialized)
             {
-                RawTouchOrigin = Input.mousePosition;
-                TouchDrag = RawTouchOrigin;
-                TouchOrigin = _camera.ScreenToWorldPoint(RawTouchOrigin);
+                RawTouch1Origin = GetRawTouch(0);
+                TouchDrag = RawTouch1Origin;
+                Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
                 //StartTouchCircle();
                 _touchInitialized = true;
             }
 
             TouchDrag = Input.mousePosition;
 
+            if (DoubleTouching && !_touch2Initialized)
+            {
+                RawTouch2Origin = GetRawTouch(1);
+                Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
+
+                //Hero effects
+                _stickiness.CurrentSpeed *= 2;
+                _hero.StartDisplayGhosts();
+
+                _touch2Initialized = true;
+            }
 
             if (_jumpManager.ReadyToJump())
             {
@@ -95,6 +113,15 @@ public class TouchManager : MonoBehaviour
             {
                 _stickiness.Rigidbody.velocity = new Vector2(0, 0);
             }
+        }
+
+        if (!DoubleTouching && _touch2Initialized)
+        {
+            // Cancel hero effects
+            _stickiness.ReinitSpeed();
+            _hero.StopDisplayGhosts();
+
+            _touch2Initialized = false;
         }
 
         if (!Touching && _touchInitialized)
@@ -117,10 +144,10 @@ public class TouchManager : MonoBehaviour
 
     private bool IsDragging()
     {
-        if (RawTouchOrigin == null || TouchDrag == null)
+        if (RawTouch1Origin == null || TouchDrag == null)
             return false;
 
-        return Vector2.Distance(RawTouchOrigin, TouchDrag) > DRAG_THRESHOLD;
+        return Vector2.Distance(RawTouch1Origin, TouchDrag) > DRAG_THRESHOLD;
     }
 
     //public IEnumerator DrawTouchCircle(Vector3 mousePos)
@@ -149,7 +176,15 @@ public class TouchManager : MonoBehaviour
 
     public void ReinitDrag()
     {
-        TouchDrag = RawTouchOrigin;
+        TouchDrag = RawTouch1Origin;
+    }
+
+    private Vector3 GetRawTouch(int index)
+    {
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+            return Input.mousePosition;
+
+        return Input.GetTouch(index).position;
     }
 
     //public void Erase()

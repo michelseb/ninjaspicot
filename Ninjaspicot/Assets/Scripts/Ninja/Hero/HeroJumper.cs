@@ -2,6 +2,7 @@
 
 public class HeroJumper : Jumper
 {
+    private Hero _hero;
     private DynamicInteraction _dynamicInteraction;
     private TimeManager _timeManager;
     private CameraBehaviour _cameraBehaviour;
@@ -11,6 +12,7 @@ public class HeroJumper : Jumper
     {
         base.Awake();
         _dynamicEntity = GetComponent<IDynamic>();
+        _hero = GetComponent<Hero>();
         _dynamicInteraction = GetComponent<DynamicInteraction>();
         _cameraBehaviour = CameraBehaviour.Instance;
         _timeManager = TimeManager.Instance;
@@ -27,7 +29,8 @@ public class HeroJumper : Jumper
             if (CanJump())
             {
                 _trajectory = GetTrajectory();
-                _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouchOrigin, _strength);
+
+                _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouch1Origin, _strength);
             }
             else if (_trajectory != null)
             {
@@ -41,13 +44,13 @@ public class HeroJumper : Jumper
             {
                 if (_trajectory != null && !_trajectory.IsClear(transform.position, 2))//Add ninja to new layer
                 {
-                    _trajectory.ReinitTrajectory();
+                    _trajectory.StartFading();
                     _timeManager.SetNormalTime();
                 }
                 else
                 {
                     _stickiness.StopWalking(false);
-                    Jump(_touchManager.RawTouchOrigin, _touchManager.TouchDrag, _strength);
+                    Jump(_touchManager.RawTouch1Origin, _touchManager.TouchDrag, _strength);
                 }
                 _touchManager.ReinitDrag();
             }
@@ -68,6 +71,8 @@ public class HeroJumper : Jumper
 
         _cameraBehaviour.DoShake(.3f, .1f);
         base.Jump(origin, drag, strength);
+
+        //_hero.StartDisplayGhosts();
     }
 
     public override bool CanJump()
@@ -75,10 +80,11 @@ public class HeroJumper : Jumper
         if (CompareTag("Dynamic"))
             return Hero.Instance.JumpManager.CanJump();
 
-        var boxCast = Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouchOrigin - _touchManager.TouchDrag, 5f, Hero.Instance.Id/*, display: true*/,
-             layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+        if (GetJumps() <= 0 || _touchManager.DoubleTouching || !_touchManager.Dragging)
+            return false;
 
-        return GetJumps() > 0 && _touchManager.Dragging && !boxCast;
+        return !Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouch1Origin - _touchManager.TouchDrag, 5f, Hero.Instance.Id/*, display: true*/,
+         layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
     }
 
     public override bool ReadyToJump()

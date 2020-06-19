@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 1193571091587483882}
   - component: {fileID: 8159433337840102044}
   - component: {fileID: 7238976684239962830}
-  - component: {fileID: 2737463900074261126}
   - component: {fileID: 5648845789806948836}
   - component: {fileID: 653173607067513560}
   - component: {fileID: -6516791787831878942}
+  - component: {fileID: -6750893077450982621}
   m_Layer: 8
   m_Name: HeroCollider
   m_TagString: Dynamic
@@ -70,19 +70,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxJumps: 4
---- !u!114 &2737463900074261126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196463539983542368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 843b5d485a07ab844b4fa227c2763704, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speed: 1000
 --- !u!60 &5648845789806948836
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -182,3 +169,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolableType: 6
+--- !u!114 &-6750893077450982621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196463539983542368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe6f981edc7dcae438f7f693d520ec4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 700

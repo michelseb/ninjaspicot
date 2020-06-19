@@ -4,7 +4,6 @@ public class Jumper : MonoBehaviour
 {
     [SerializeField] private int _maxJumps;
     public bool Active { get; set; }
-
     protected float _strength;
     protected int _jumps;
 
@@ -51,7 +50,7 @@ public class Jumper : MonoBehaviour
         if (_trajectory == null)
             return;
 
-        _trajectory.ReinitTrajectory();
+        _trajectory.StartFading();
         _trajectory = null;
     }
 
@@ -112,10 +111,7 @@ public class Jumper : MonoBehaviour
 
     public virtual bool CanJump()
     {
-        //var boxCast = Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouchOrigin - _touchManager.TouchDrag, 5f, Hero.Instance.Id/*, display: true*/,
-        //     layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
-
-        return GetJumps() > 0/* && !boxCast*/;
+        return GetJumps() > 0;
     }
 
     public virtual bool ReadyToJump()

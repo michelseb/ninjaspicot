@@ -13,9 +13,11 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
     public Image Image { get; private set; } 
 
     protected CameraBehaviour _cameraBehaviour;
+    protected PoolManager _poolManager;
 
     protected virtual void Awake()
     {
+        _poolManager = PoolManager.Instance;
         JumpManager = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
@@ -34,11 +36,11 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
         JumpManager.ReinitJump();
         SetAllBehavioursActivation(false, false);
 
-        if (killer != null)
-        {
-            Stickiness.Rigidbody.AddForce(killer.position - transform.position, ForceMode2D.Impulse);
-            Stickiness.Rigidbody.AddTorque(20, ForceMode2D.Impulse);
-        }
+        //if (killer != null)
+        //{
+        //    Stickiness.Rigidbody.AddForce((killer.position - transform.position) * 10000, ForceMode2D.Impulse);
+        //    Stickiness.Rigidbody.AddTorque(20000, ForceMode2D.Impulse);
+        //}
 
         StartCoroutine(Dying());
     }

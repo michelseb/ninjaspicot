@@ -7,7 +7,6 @@ public class Trajectory : MonoBehaviour, IPoolable
     private bool _appeared;
 
     private LineRenderer _line;
-    private Coroutine _disappearing;
 
     private TimeManager _timeManager;
 
@@ -30,12 +29,6 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
     {
-        if (_disappearing != null)
-        {
-            StopCoroutine(FadeAway());
-            _disappearing = null;
-        }
-
         Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
         Vector2 pos = startPos;
         Vector2 strength = startClick - click;
@@ -97,10 +90,10 @@ public class Trajectory : MonoBehaviour, IPoolable
         return true;
     }
 
-    public void ReinitTrajectory()
+    public void StartFading()
     {
         _appeared = false;
-        _disappearing = StartCoroutine(FadeAway());
+        StartCoroutine(FadeAway());
     }
 
 
@@ -115,7 +108,6 @@ public class Trajectory : MonoBehaviour, IPoolable
             _line.material.color = col;
             yield return null;
         }
-        _disappearing = null;
         Deactivate();
     }
 

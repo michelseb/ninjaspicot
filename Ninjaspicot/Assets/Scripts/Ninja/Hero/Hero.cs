@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Hero : Ninja, IRaycastable
 {
+    [SerializeField] float _ghostSpacing;
     public bool Triggered { get; private set; }
     public DynamicInteraction DynamicInteraction { get; private set; }
 
@@ -11,7 +12,7 @@ public class Hero : Ninja, IRaycastable
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
     private TouchManager _touchManager;
-
+    private Coroutine _displayGhosts;
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
@@ -25,7 +26,6 @@ public class Hero : Ninja, IRaycastable
         _touchManager = TouchManager.Instance;
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
-
     }
 
     public override void Die(Transform killer)
@@ -34,8 +34,10 @@ public class Hero : Ninja, IRaycastable
             return;
 
         base.Die(killer);
+        StopDisplayGhosts();
         Renderer.color = ColorUtils.Red;
         _timeManager.StartSlowDownProgressive(.3f);
+
 
         if (DynamicInteraction.Interacting)
         {
@@ -98,5 +100,31 @@ public class Hero : Ninja, IRaycastable
     public override bool NeedsToWalk()
     {
         return _touchManager.Touching;
+    }
+
+    public void StartDisplayGhosts()
+    {
+        if (_displayGhosts != null)
+            return;
+
+        _displayGhosts = StartCoroutine(DisplayGhosts(_ghostSpacing));
+    }
+
+    public void StopDisplayGhosts()
+    {
+        if (_displayGhosts == null)
+            return;
+
+        StopCoroutine(_displayGhosts);
+        _displayGhosts = null;
+    }
+
+    private IEnumerator DisplayGhosts(float delay)
+    {
+        while (true)
+        {
+            _poolManager.GetPoolable<HeroGhost>(transform.position, transform.rotation, PoolableType.None);
+            yield return new WaitForSeconds(delay);
+        }
     }
 }

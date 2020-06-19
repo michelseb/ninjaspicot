@@ -9,8 +9,8 @@ public enum Dir
 
 public class Stickiness : MonoBehaviour, IDynamic
 {
-    [SerializeField] private int _speed;
-    private Rigidbody2D _rigidbody;
+    [SerializeField] private float _speed;
+    protected Rigidbody2D _rigidbody;
 
     public HingeJoint2D WallJoint { get; set; }
     public Obstacle CurrentAttachment { get; set; }
@@ -18,6 +18,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Active { get; set; }
     public bool CanWalk { get; set; }
     public Dir NinjaDir { get; set; }
+    public float CurrentSpeed { get; set; }
 
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
 
@@ -25,13 +26,13 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public PoolableType PoolableType => PoolableType.HeroCollider;
 
-    private Ninja _ninja;
-    private Transform _contactPoint;
-    private Vector3 _previousContactPoint;
-    private Coroutine _walkOnWalls;
-    private Jumper _jumpManager;
+    protected Ninja _ninja;
+    protected Transform _contactPoint;
+    protected Vector3 _previousContactPoint;
+    protected Coroutine _walkOnWalls;
+    protected Jumper _jumpManager;
 
-    public void Awake()
+    public virtual void Awake()
     {
         if (Active)
             return;
@@ -46,12 +47,13 @@ public class Stickiness : MonoBehaviour, IDynamic
         _previousContactPoint = _contactPoint.position;
     }
 
-    public void Start()
+    public virtual void Start()
     {
         if (CanWalk)
             return;
 
         CanWalk = true;
+        CurrentSpeed = _speed;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -65,7 +67,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     }
 
 
-    public void Attach(Obstacle obstacle)
+    public virtual void Attach(Obstacle obstacle)
     {
         var dynamic = obstacle as DynamicObstacle;
         if (dynamic != null && !dynamic.DynamicActive)
@@ -82,7 +84,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         Rigidbody.velocity = Vector2.zero;
     }
 
-    public void Detach()
+    public virtual void Detach()
     {
         if (CurrentAttachment != null && CurrentAttachment is DynamicObstacle)
         {
@@ -94,17 +96,12 @@ public class Stickiness : MonoBehaviour, IDynamic
         Attached = false;
     }
 
-    public void ReactToObstacle(Obstacle obstacle)
+    public virtual void ReactToObstacle(Obstacle obstacle)
     {
         if (!Active || obstacle == CurrentAttachment)
             return;
 
         _jumpManager.GainAllJumps();
-
-        if (tag == "Dynamic")
-        {
-            Hero.Instance?.JumpManager.GainAllJumps();
-        }
 
         if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall"))
         {
@@ -152,7 +149,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
     }
 
-    public void StopWalking(bool stayGrounded)
+    public virtual void StopWalking(bool stayGrounded)
     {
         if (_walkOnWalls != null)
         {
@@ -171,34 +168,39 @@ public class Stickiness : MonoBehaviour, IDynamic
         _walkOnWalls = null;
     }
 
-    public void StartWalking()
+    public virtual void StartWalking()
     {
-        if (_walkOnWalls != null)
+        if (_walkOnWalls != null && !Active)
             return;
 
         Rigidbody.isKinematic = false;
         _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
     }
 
-    public IEnumerator WalkOnWalls(HingeJoint2D hinge)
+    protected virtual IEnumerator WalkOnWalls(HingeJoint2D hinge)
     {
         if (hinge == null)
             yield break;
 
         var jointMotor = hinge.motor;
-        WallJoint.useMotor = true;
+        hinge.useMotor = true;
 
         while (_ninja?.NeedsToWalk() ?? Input.GetButton("Fire1"))
         {
-            jointMotor.motorSpeed = NinjaDir == Dir.Left ? -_speed : _speed;
+            jointMotor.motorSpeed = NinjaDir == Dir.Left ? -CurrentSpeed : CurrentSpeed;
             hinge.motor = jointMotor;
             hinge.anchor = GetContactPosition();
 
             yield return null;
         }
 
-        WallJoint.useMotor = false;
+        hinge.useMotor = false;
         _walkOnWalls = null;
+    }
+
+    public void ReinitSpeed()
+    {
+        CurrentSpeed = _speed;
     }
 
 }

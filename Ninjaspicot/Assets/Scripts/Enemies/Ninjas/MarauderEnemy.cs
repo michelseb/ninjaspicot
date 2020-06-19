@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class MarauderEnemy : EnemyNinja
 {
@@ -15,6 +16,7 @@ public class MarauderEnemy : EnemyNinja
     private float _remainingTime;
     private MarauderMode _marauderMode;
     private bool _readyToStop;
+    private Coroutine _slowDown;
     public override PoolableType PoolableType => PoolableType.Marauder;
 
     protected override void Awake()
@@ -38,9 +40,10 @@ public class MarauderEnemy : EnemyNinja
 
                 if (_remainingTime <= 0)
                 {
-                    transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+                    //transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
                     Attacking = true;
-                    Stickiness.NinjaDir = (Dir)1 - (int)Stickiness.NinjaDir;
+                    Stickiness.ReinitSpeed();
+                    //Stickiness.NinjaDir = (Dir)1 - (int)Stickiness.NinjaDir;
                     _remainingTime = _walkTime;
                     Stickiness.StartWalking();
                     _fieldOfView.SetActive(false);
@@ -57,12 +60,42 @@ public class MarauderEnemy : EnemyNinja
                 break;
         }
 
+
+        if (_readyToStop && _slowDown == null)
+        {
+            _slowDown = StartCoroutine(SlowDown());
+        }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if (!_readyToStop)
+    //        return;
+
+    //    Stickiness.StopWalking(true);
+    //    Attacking = false;
+    //    _remainingTime = _searchTime;
+    //    _marauderMode = MarauderMode.Searching;
+    //    _fieldOfView.SetActive(true);
+    //    _readyToStop = false;
+    //}
+
+    public override bool NeedsToWalk()
     {
-        if (!_readyToStop)
-            return;
+        return Attacking;
+    }
+
+    private IEnumerator SlowDown()
+    {
+        var angle = Vector3.Angle(transform.up, Vector3.up);
+
+        while (Stickiness.CurrentSpeed > 50)
+        {
+            var currAngle = Vector3.Angle(transform.up, Vector3.up);
+
+            Stickiness.CurrentSpeed = Mathf.Lerp(Stickiness.CurrentSpeed, 0, (angle - currAngle) / angle * .05f);
+            yield return null;
+        }
 
         Stickiness.StopWalking(true);
         Attacking = false;
@@ -70,10 +103,6 @@ public class MarauderEnemy : EnemyNinja
         _marauderMode = MarauderMode.Searching;
         _fieldOfView.SetActive(true);
         _readyToStop = false;
-    }
-
-    public override bool NeedsToWalk()
-    {
-        return Attacking;
+        _slowDown = null;
     }
 }
