@@ -39,7 +39,7 @@ public class Jumper : MonoBehaviour
 
         _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin), PoolableType.None);
 
-        if (_trajectory != null)
+        if (_trajectory.Used)
         {
             ReinitJump();
         }
@@ -51,16 +51,14 @@ public class Jumper : MonoBehaviour
             return;
 
         _trajectory.StartFading();
-        _trajectory = null;
     }
 
     protected Trajectory GetTrajectory()
     {
-        if (_trajectory == null)
-        {
+        if (_trajectory == null || !_trajectory.Active)
             return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity, PoolableType.None);
-        }
 
+        _trajectory.ReUse(transform.position);
         return _trajectory;
     }
 

@@ -8,7 +8,6 @@ public enum PoolableType
     Bullet,
     CloudCollider,
     RockyPlatformCollider,
-    HeroCollider,
     DirectionRockCollider
 }
 

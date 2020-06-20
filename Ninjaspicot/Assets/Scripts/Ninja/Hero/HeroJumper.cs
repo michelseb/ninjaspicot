@@ -32,7 +32,7 @@ public class HeroJumper : Jumper
 
                 _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouch1Origin, _strength);
             }
-            else if (_trajectory != null)
+            else if (_trajectory != null && _trajectory.Used)
             {
                 ReinitJump();
             }
@@ -42,7 +42,7 @@ public class HeroJumper : Jumper
         {
             if (ReadyToJump())
             {
-                if (_trajectory != null && !_trajectory.IsClear(transform.position, 2))//Add ninja to new layer
+                if (_trajectory.Used && !_trajectory.IsClear(transform.position, 2))//Add ninja to new layer
                 {
                     _trajectory.StartFading();
                     _timeManager.SetNormalTime();
@@ -71,7 +71,7 @@ public class HeroJumper : Jumper
 
         _cameraBehaviour.DoShake(.3f, .1f);
         base.Jump(origin, drag, strength);
-
+        _trajectory = null;
         //_hero.StartDisplayGhosts();
     }
 

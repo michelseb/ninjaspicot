@@ -17,17 +17,15 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Attached { get; private set; }
     public bool Active { get; set; }
     public bool CanWalk { get; set; }
+    public bool Walking => _walkOnWalls != null;
     public Dir NinjaDir { get; set; }
     public float CurrentSpeed { get; set; }
-
+    public Transform ContactPoint { get; private set; }
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
-
     public bool DynamicActive => true;
+    public PoolableType PoolableType => PoolableType.None;
 
-    public PoolableType PoolableType => PoolableType.HeroCollider;
-
-    protected Ninja _ninja;
-    protected Transform _contactPoint;
+    protected INinja _ninjaBehaviour;
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumpManager;
@@ -40,11 +38,11 @@ public class Stickiness : MonoBehaviour, IDynamic
         Active = true;
         WallJoint = GetComponent<HingeJoint2D>();
         _jumpManager = GetComponent<Jumper>();
-        _ninja = GetComponent<Ninja>();
-        _contactPoint = new GameObject("ContactPoint").transform;
-        _contactPoint.position = transform.position;
-        _contactPoint.SetParent(transform);
-        _previousContactPoint = _contactPoint.position;
+        _ninjaBehaviour = GetComponent<INinja>();
+        ContactPoint = new GameObject("ContactPoint").transform;
+        ContactPoint.position = transform.position;
+        ContactPoint.SetParent(transform);
+        _previousContactPoint = ContactPoint.position;
     }
 
     public virtual void Start()
@@ -56,14 +54,22 @@ public class Stickiness : MonoBehaviour, IDynamic
         CurrentSpeed = _speed;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void Update()
     {
-        SetContactPoint(GetContactPoint(collision.contacts, _previousContactPoint));
+        if (Walking && !_ninjaBehaviour.ReadyToWalk)
+        {
+            StopWalking(true);
+        }
     }
+
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint), true);
+    //}
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        SetContactPoint(GetContactPoint(collision.contacts, _previousContactPoint));
+        SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint), false);
     }
 
 
@@ -75,7 +81,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = GetContactPosition();
+        WallJoint.anchor = GetContactPosition(true);
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
@@ -96,21 +102,21 @@ public class Stickiness : MonoBehaviour, IDynamic
         Attached = false;
     }
 
-    public virtual void ReactToObstacle(Obstacle obstacle)
+    public virtual void ReactToObstacle(Obstacle obstacle, Vector3 contactPoint, bool localContact)
     {
         if (!Active || obstacle == CurrentAttachment)
             return;
-
-        _jumpManager.GainAllJumps();
 
         if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall"))
         {
             Detach();
             Attach(obstacle);
+            CurrentAttachment = obstacle;
+            SetContactPosition(contactPoint, localContact);
         }
     }
 
-    private ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
+    private Vector3 GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
     {
         ContactPoint2D resultContact = new ContactPoint2D();
         float dist = 0;
@@ -123,29 +129,24 @@ public class Stickiness : MonoBehaviour, IDynamic
             }
         }
 
-        return resultContact;
+        return resultContact.point;
     }
 
-    public void SetContactPoint(ContactPoint2D contact)
+    public Vector3 GetContactPosition(bool local)
     {
-        _previousContactPoint = _contactPoint.position;
-        _contactPoint.position = contact.point;
+        return local ? transform.InverseTransformPoint(ContactPoint.position) : ContactPoint.position;
     }
 
-    public Vector3 GetContactPosition(bool local = true)
+    public void SetContactPosition(Vector3 position, bool local)
     {
-        return local ? transform.InverseTransformPoint(_contactPoint.position) : _contactPoint.position;
-    }
-
-    public void SetContactPosition(Vector3 position, bool local = true)
-    {
+        _previousContactPoint = ContactPoint.position;
         if (local)
         {
-            _contactPoint.localPosition = position;
+            ContactPoint.localPosition = position;
         }
         else
         {
-            _contactPoint.position = position;
+            ContactPoint.position = position;
         }
     }
 
@@ -170,7 +171,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public virtual void StartWalking()
     {
-        if (_walkOnWalls != null && !Active)
+        if (_walkOnWalls != null || !Active)
             return;
 
         Rigidbody.isKinematic = false;
@@ -185,17 +186,14 @@ public class Stickiness : MonoBehaviour, IDynamic
         var jointMotor = hinge.motor;
         hinge.useMotor = true;
 
-        while (_ninja?.NeedsToWalk() ?? Input.GetButton("Fire1"))
+        while (true)
         {
             jointMotor.motorSpeed = NinjaDir == Dir.Left ? -CurrentSpeed : CurrentSpeed;
             hinge.motor = jointMotor;
-            hinge.anchor = GetContactPosition();
+            hinge.anchor = GetContactPosition(true);
 
             yield return null;
         }
-
-        hinge.useMotor = false;
-        _walkOnWalls = null;
     }
 
     public void ReinitSpeed()

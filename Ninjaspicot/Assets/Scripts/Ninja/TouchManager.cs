@@ -71,6 +71,11 @@ public class TouchManager : MonoBehaviour
 
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
+        if (Input.GetButtonUp("Fire2"))
+        {
+            ReinitDrag();
+        }
+
         if (Touching)
         {
             _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;

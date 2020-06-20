@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Obstacle : MonoBehaviour, IRaycastable
 {
@@ -9,13 +8,10 @@ public class Obstacle : MonoBehaviour, IRaycastable
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
         var ninja = collision.gameObject.GetComponent<Ninja>();
-
+        
         if (ninja == null)
             return;
 
-        ninja.Stickiness.ReactToObstacle(this);
-        ninja.Stickiness.CurrentAttachment = this;
-
-        ninja.Stickiness.SetContactPoint(collision.contacts[collision.contacts.Length - 1]);
+        ninja.Stickiness.ReactToObstacle(this, collision.contacts[collision.contacts.Length - 1].point, false);
     }
 }

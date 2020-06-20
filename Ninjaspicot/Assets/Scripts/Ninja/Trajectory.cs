@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class Trajectory : MonoBehaviour, IPoolable
 {
+    public bool Used { get; private set; }
+    public bool Active { get; private set; }
+
     private int _lineMax;
-    private bool _appeared;
 
     private LineRenderer _line;
 
     private TimeManager _timeManager;
+
 
     private const float TIME_SLOW = .01f;
     private const float FADE_SPEED = .5f;
@@ -27,6 +30,11 @@ public class Trajectory : MonoBehaviour, IPoolable
         _lineMax = MAX_VERTEX;
     }
 
+    private void OnEnable()
+    {
+        Active = true;
+    }
+
     public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
     {
         Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
@@ -34,7 +42,7 @@ public class Trajectory : MonoBehaviour, IPoolable
         Vector2 strength = startClick - click;
         Vector2 vel = strength.normalized * speed;
 
-        if (_lineMax == 0)
+        if (_lineMax <= 2)
         {
             _lineMax = MAX_VERTEX;
         }
@@ -92,7 +100,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public void StartFading()
     {
-        _appeared = false;
+        Used = false;
         StartCoroutine(FadeAway());
     }
 
@@ -108,12 +116,19 @@ public class Trajectory : MonoBehaviour, IPoolable
             _line.material.color = col;
             yield return null;
         }
+        Active = false;
         Deactivate();
+    }
+
+    public void ReUse(Vector3 position)
+    {
+        transform.position = new Vector3(position.x, position.y, -5);
+        Appear();
     }
 
     private void Appear()
     {
-        if (_appeared)
+        if (Used)
             return;
 
         _timeManager.SlowDown(TIME_SLOW);
@@ -122,7 +137,7 @@ public class Trajectory : MonoBehaviour, IPoolable
         Color col = _line.material.color;
         _line.material.color = new Color(col.r, col.g, col.b, 1);
 
-        _appeared = true;
+        Used = true;
     }
 
     public void Pool(Vector3 position, Quaternion rotation)

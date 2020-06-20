@@ -1,33 +1,10 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HeroStickiness : Stickiness
 {
-    private Hero _hero;
-
-    public override void Awake()
+    public override void ReactToObstacle(Obstacle obstacle, Vector3 position, bool localContact)
     {
-        base.Awake();
-
-        _hero = _ninja as Hero;
-    }
-
-
-    public override void Attach(Obstacle obstacle)
-    {
-        //_hero.StopDisplayGhosts();
-        base.Attach(obstacle);
-    }
-
-    public override void StartWalking()
-    {
-        //_hero.StartDisplayGhosts();
-        base.StartWalking();
-    }
-
-    protected override IEnumerator WalkOnWalls(HingeJoint2D hinge)
-    {
-        yield return base.WalkOnWalls(hinge);
-        //_hero.StopDisplayGhosts();
+        base.ReactToObstacle(obstacle, position, localContact);
+        _jumpManager.GainAllJumps();
     }
 }

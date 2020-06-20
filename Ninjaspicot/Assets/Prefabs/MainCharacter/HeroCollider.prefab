@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1193571091587483882}
   - component: {fileID: 8159433337840102044}
-  - component: {fileID: 7238976684239962830}
   - component: {fileID: 5648845789806948836}
   - component: {fileID: 653173607067513560}
-  - component: {fileID: -6516791787831878942}
   - component: {fileID: -6750893077450982621}
+  - component: {fileID: -4857658034899675953}
+  - component: {fileID: -1523208976788610735}
   m_Layer: 8
   m_Name: HeroCollider
   m_TagString: Dynamic
@@ -57,19 +57,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &7238976684239962830
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196463539983542368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb4b19e1e9960294684af6e95360b6de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxJumps: 4
 --- !u!60 &5648845789806948836
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -156,19 +143,6 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: 0
     m_UpperAngle: 359
---- !u!114 &-6516791787831878942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1196463539983542368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecad08fb9e848d84c91843bed1588bef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _poolableType: 6
 --- !u!114 &-6750893077450982621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,3 +156,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 700
+--- !u!114 &-4857658034899675953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196463539983542368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04ef3c0612873c1478ac87219f14cde1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolableType: 0
+--- !u!114 &-1523208976788610735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196463539983542368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 909e62ed13c890c43a02e0f5e4050723, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

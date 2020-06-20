@@ -9,7 +9,8 @@ public class DynamicInteraction : MonoBehaviour
     private IDynamic _tempDynamic;
     private Hero _hero;
 
-    private DynamicCollider _cloneHero;
+    private DynamicNinja _cloneHero;
+    private DynamicNinjaCollider _cloneHeroCollider;
     private DynamicCollider _cloneOtherDynamic;
 
     private Vector3 _previousPosition;
@@ -35,37 +36,17 @@ public class DynamicInteraction : MonoBehaviour
 
         if (_tempDynamic != null)
         {
-            _hero.transform.localPosition += _cloneHero.transform.localPosition - _previousPosition;
-            _hero.transform.rotation = _cloneHero.transform.rotation;
-            _previousPosition = _cloneHero.transform.localPosition;
+            _hero.transform.localPosition += _cloneHeroCollider.transform.localPosition - _previousPosition;
+            _hero.transform.rotation = _cloneHeroCollider.transform.rotation;
+            _previousPosition = _cloneHeroCollider.transform.localPosition;
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (!Active)
-            return;
-
-        if (_tempDynamic != null)
-            return;
-
-        var dynamicEntity = collision.collider.GetComponent<IDynamic>();
-
-        if (dynamicEntity == null || !dynamicEntity.DynamicActive)
-            return;
-
-        var ninja = collision.collider.GetComponent<EnemyNinja>();
-
-        if (ninja != null)
-            return;
-
-        StartInteraction(dynamicEntity);
-    }
-
-    private void StartInteraction(IDynamic otherDynamic)
+    public void StartInteraction(IDynamic otherDynamic)
     {
         Interacting = true;
         _tempDynamic = otherDynamic;
+
         _hero.SetWalkingActivation(false, true);
         _hero.SetStickinessActivation(false);
 
@@ -74,17 +55,21 @@ public class DynamicInteraction : MonoBehaviour
         _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position + _clonePosition, otherCollider.transform.rotation, otherDynamic.PoolableType);
         _cloneOtherDynamic.transform.localScale = otherCollider.transform.localScale;
 
-        _cloneHero = _poolManager.GetPoolable<DynamicCollider>(transform.position + _clonePosition, transform.rotation, PoolableType.HeroCollider);
-        CloneHeroStickiness = _cloneHero.GetComponent<Stickiness>();
+        _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position + _clonePosition, transform.rotation, PoolableType.None);
+        CloneHeroStickiness = _cloneHeroCollider.GetComponent<Stickiness>();
+
+        _cloneHero = _cloneHeroCollider.GetComponent<DynamicNinja>();
+        _cloneHero.SetNinja(_hero);
 
         CloneHeroStickiness.Awake();
         CloneHeroStickiness.Start();
 
-        CloneHeroStickiness.SetContactPosition(_hero.Stickiness.GetContactPosition());
-        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic);
+        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic, _hero.Stickiness.GetContactPosition(true), true);
 
-        _cloneHero.transform.SetParent(_cloneOtherDynamic.transform);
-        _previousPosition = _cloneHero.transform.localPosition;
+        CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.transform);
+
+        _cloneHeroCollider.transform.SetParent(_cloneOtherDynamic.transform);
+        _previousPosition = _cloneHeroCollider.transform.localPosition;
 
         _hero.transform.SetParent(otherCollider.transform);
 
@@ -108,8 +93,8 @@ public class DynamicInteraction : MonoBehaviour
         if (_cloneOtherDynamic != null && _cloneOtherDynamic.Active)
         {
             CloneHeroStickiness = null;
-            _cloneHero.transform.SetParent(null);
-            _cloneHero.Deactivate();
+            _cloneHeroCollider.transform.SetParent(null);
+            _cloneHeroCollider.Deactivate();
             _cloneOtherDynamic.Deactivate();
         }
     }

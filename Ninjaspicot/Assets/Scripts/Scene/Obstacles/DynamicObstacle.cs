@@ -17,6 +17,24 @@ public class DynamicObstacle : Obstacle, IDynamic
         DynamicActive = true;
     }
 
+    protected override void OnCollisionEnter2D(Collision2D collision)
+    {
+        base.OnCollisionEnter2D(collision);
+
+        if (!DynamicActive || !collision.collider.CompareTag("hero"))
+            return;
+
+        var dynamicInteraction = collision.collider.GetComponent<DynamicInteraction>();
+
+        if (!dynamicInteraction.Active || dynamicInteraction.Interacting)
+            return;
+
+        if (GetComponent<EnemyNinja>() != null)
+            return;
+
+        dynamicInteraction.StartInteraction(this);
+    }
+
     public void LaunchQuickDeactivate()
     {
         StartCoroutine(QuickDeactivate());
