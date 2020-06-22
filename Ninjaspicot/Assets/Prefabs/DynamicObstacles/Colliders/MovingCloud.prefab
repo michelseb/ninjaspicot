@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 5657859422830991544}
   - component: {fileID: 5638550595466794352}
   - component: {fileID: 5661096556356551439}
-  m_Layer: 14
+  - component: {fileID: 2364536695701519907}
+  m_Layer: 16
   m_Name: MovingCloud
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -105,3 +106,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolableType: 4
+--- !u!50 &2364536695701519907
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5661096556356551438}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

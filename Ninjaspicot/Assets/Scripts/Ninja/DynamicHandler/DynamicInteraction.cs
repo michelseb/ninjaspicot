@@ -14,7 +14,6 @@ public class DynamicInteraction : MonoBehaviour
     private DynamicCollider _cloneOtherDynamic;
 
     private Vector3 _previousPosition;
-    private Vector3 _clonePosition = new Vector3(10000, 10000);
 
     private PoolManager _poolManager;
 
@@ -52,10 +51,10 @@ public class DynamicInteraction : MonoBehaviour
 
         var otherCollider = ((MonoBehaviour)otherDynamic).GetComponent<Collider2D>();
 
-        _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position + _clonePosition, otherCollider.transform.rotation, otherDynamic.PoolableType);
+        _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position, otherCollider.transform.rotation, otherDynamic.PoolableType);
         _cloneOtherDynamic.transform.localScale = otherCollider.transform.localScale;
 
-        _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position + _clonePosition, transform.rotation, PoolableType.None);
+        _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position, transform.rotation, PoolableType.None);
         CloneHeroStickiness = _cloneHeroCollider.GetComponent<Stickiness>();
 
         _cloneHero = _cloneHeroCollider.GetComponent<DynamicNinja>();
@@ -63,8 +62,6 @@ public class DynamicInteraction : MonoBehaviour
 
         CloneHeroStickiness.Awake();
         CloneHeroStickiness.Start();
-
-        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic, _hero.Stickiness.GetContactPosition(true), true);
 
         CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.transform);
 
@@ -75,6 +72,8 @@ public class DynamicInteraction : MonoBehaviour
 
         _hero.Stickiness.Rigidbody.angularVelocity = 0;
         _hero.Stickiness.Rigidbody.velocity = Vector2.zero;
+
+        CloneHeroStickiness.ReactToObstacle(_cloneOtherDynamic, _hero.Stickiness.GetContactPosition());
     }
 
     public void StopInteraction(bool reinit)

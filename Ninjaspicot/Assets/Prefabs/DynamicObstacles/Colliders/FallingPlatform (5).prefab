@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6114769373379795258}
   - component: {fileID: 6109280370310267523}
   - component: {fileID: 6109280370310267522}
-  m_Layer: 14
+  - component: {fileID: -6958367108120856169}
+  m_Layer: 16
   m_Name: FallingPlatform (5)
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -79,3 +80,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _poolableType: 5
+--- !u!50 &-6958367108120856169
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6109280370310267532}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

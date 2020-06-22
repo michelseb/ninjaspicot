@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -6750893077450982621}
   - component: {fileID: -4857658034899675953}
   - component: {fileID: -1523208976788610735}
-  m_Layer: 8
+  m_Layer: 16
   m_Name: HeroCollider
   m_TagString: Dynamic
   m_Icon: {fileID: 0}

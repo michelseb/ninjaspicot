@@ -72,12 +72,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: fe93b3f007a154542b74e111401dd4cb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7d8b7f779c677234782aac28154c2ae8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.62, y: 5.9}
+  m_Size: {x: 0.76, y: 8.24}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -100,28 +100,24 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.62, y: 5.9}
-    newSize: {x: 0.62, y: 5.9}
+    oldSize: {x: 0.76, y: 8.24}
+    newSize: {x: 0.76, y: 8.24}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.14, y: -1.29}
-      - {x: 0.19999999, y: 2.73}
-      - {x: 0.10150554, y: 2.8486762}
-      - {x: 0.0032226564, y: 2.876492}
-      - {x: -0.15689291, y: 2.8445218}
-      - {x: -0.24292196, y: 2.7543385}
-      - {x: -0.2700928, y: 2.5842464}
-      - {x: -0.21294354, y: 1.3313895}
-      - {x: -0.099999994, y: -2.11}
-      - {x: -0.0633667, y: -2.767624}
-      - {x: -0.040987145, y: -2.8828707}
-      - {x: -0.008117676, y: -2.9523764}
-      - {x: 0.061883546, y: -2.9404943}
-      - {x: 0.099999994, y: -2.69}
+    - - {x: 0.2837031, y: 3.7752957}
+      - {x: 0.20500049, y: 3.909512}
+      - {x: 0.02982063, y: 3.9714465}
+      - {x: -0.1805215, y: 3.9347847}
+      - {x: -0.28138876, y: 3.8225248}
+      - {x: 0.03951741, y: -3.930506}
+      - {x: 0.084739156, y: -3.980215}
+      - {x: 0.14225464, y: -3.9966376}
+      - {x: 0.1933358, y: -3.993291}
+      - {x: 0.22964309, y: -3.948851}
 --- !u!114 &8459621883884508214
 MonoBehaviour:
   m_ObjectHideFlags: 0

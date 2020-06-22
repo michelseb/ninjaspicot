@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 3146863854814608036}
   - component: {fileID: 3146863854814608038}
   - component: {fileID: 3146863854814608042}
-  m_Layer: 15
+  - component: {fileID: -6300053387544559531}
+  m_Layer: 16
   m_Name: DynamicRock
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -97,4 +98,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecad08fb9e848d84c91843bed1588bef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _poolableType: 7
+  _poolableType: 6
+--- !u!50 &-6300053387544559531
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3146863854814608041}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

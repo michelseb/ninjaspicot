@@ -24,6 +24,13 @@ public class DynamicObstacle : Obstacle, IDynamic
         if (!DynamicActive || !collision.collider.CompareTag("hero"))
             return;
 
+        var stickiness = collision.collider.GetComponent<Stickiness>();
+
+        if (stickiness == null)
+            return;
+
+        stickiness.SetContactPosition(collision.contacts[collision.contacts.Length - 1].point);
+
         var dynamicInteraction = collision.collider.GetComponent<DynamicInteraction>();
 
         if (!dynamicInteraction.Active || dynamicInteraction.Interacting)

@@ -2,6 +2,8 @@
 
 public class ParallaxObject : MonoBehaviour
 {
+    [SerializeField] private Color _beginColor;
+    [SerializeField] private Color _endColor;
     [SerializeField] private int _depth;
     [SerializeField] private bool _randomDepth;
     [SerializeField] private bool _initSettings;
@@ -28,7 +30,7 @@ public class ParallaxObject : MonoBehaviour
         {
             var scaleFactor = ParallaxManager.SCALE_AMPLITUDE - (ParallaxManager.SCALE_AMPLITUDE * ((float)Depth / ParallaxManager.MAX_DEPTH));
             ParallaxFactor = (float)Depth / ParallaxManager.MAX_DEPTH;
-            _renderer.color = new Color(_renderer.color.r * scaleFactor, _renderer.color.g * scaleFactor, _renderer.color.b * scaleFactor, scaleFactor);
+            _renderer.color = Color.Lerp(_beginColor, _endColor, 1 - scaleFactor);
 
             var factor = 2 * Mathf.Log(Depth + 1);
             transform.Translate(0, factor * factor, 0, Space.World);

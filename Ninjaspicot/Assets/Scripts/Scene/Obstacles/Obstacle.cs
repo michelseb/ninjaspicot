@@ -12,6 +12,6 @@ public class Obstacle : MonoBehaviour, IRaycastable
         if (ninja == null)
             return;
 
-        ninja.Stickiness.ReactToObstacle(this, collision.contacts[collision.contacts.Length - 1].point, false);
+        ninja.Stickiness.ReactToObstacle(this, collision.contacts[collision.contacts.Length - 1].point);
     }
 }

@@ -193,13 +193,20 @@ public class TutorialManager : MonoBehaviour
         }
         else if (index == 9) // FallingCloud
         {
-            _itemIndex = 8;
-            if (_hero.Stickiness.CurrentAttachment?.transform == _itemsToAppear[_itemIndex - 1].transform)
+            _itemIndex = 10;
+            if (_hero.Stickiness.CurrentAttachment?.transform == _itemsToAppear[_itemIndex - 2].transform)
             {
                 duration = 0;
             }
         }
-
+        else if (index == 10) // FallingCloud
+        {
+            _itemIndex = 11;
+            if (_hero.Triggered && _hero.Stickiness.CurrentAttachment?.transform == _itemsToAppear[_itemIndex - 2].transform)
+            {
+                duration = 0;
+            }
+        }
         return false;
     }
 

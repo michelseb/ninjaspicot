@@ -69,7 +69,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint), false);
+        SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint));
     }
 
 
@@ -81,7 +81,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = GetContactPosition(true);
+        WallJoint.anchor = transform.InverseTransformPoint(GetContactPosition());
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
@@ -102,21 +102,21 @@ public class Stickiness : MonoBehaviour, IDynamic
         Attached = false;
     }
 
-    public virtual void ReactToObstacle(Obstacle obstacle, Vector3 contactPoint, bool localContact)
+    public virtual void ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
     {
         if (!Active || obstacle == CurrentAttachment)
             return;
 
-        if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall"))
+        if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall") || obstacle.CompareTag("TutorialWall"))
         {
             Detach();
             Attach(obstacle);
             CurrentAttachment = obstacle;
-            SetContactPosition(contactPoint, localContact);
+            SetContactPosition(contactPoint);
         }
     }
 
-    private Vector3 GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
+    public Vector3 GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
     {
         ContactPoint2D resultContact = new ContactPoint2D();
         float dist = 0;
@@ -132,26 +132,22 @@ public class Stickiness : MonoBehaviour, IDynamic
         return resultContact.point;
     }
 
-    public Vector3 GetContactPosition(bool local)
+    public Vector3 GetContactPosition()
     {
-        return local ? transform.InverseTransformPoint(ContactPoint.position) : ContactPoint.position;
+        return ContactPoint.position;
     }
 
-    public void SetContactPosition(Vector3 position, bool local)
+    public void SetContactPosition(Vector3 position)
     {
         _previousContactPoint = ContactPoint.position;
-        if (local)
-        {
-            ContactPoint.localPosition = position;
-        }
-        else
-        {
-            ContactPoint.position = position;
-        }
+        ContactPoint.position = position;
     }
 
     public virtual void StopWalking(bool stayGrounded)
     {
+        if (!Attached)
+            return;
+
         if (_walkOnWalls != null)
         {
             StopCoroutine(_walkOnWalls);
@@ -190,7 +186,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         {
             jointMotor.motorSpeed = NinjaDir == Dir.Left ? -CurrentSpeed : CurrentSpeed;
             hinge.motor = jointMotor;
-            hinge.anchor = GetContactPosition(true);
+            hinge.anchor = transform.InverseTransformPoint(GetContactPosition());
 
             yield return null;
         }

@@ -47,7 +47,7 @@ public class Jumper : MonoBehaviour
 
     public void ReinitJump()
     {
-        if (_trajectory == null)
+        if (_trajectory == null || !_trajectory.Active)
             return;
 
         _trajectory.StartFading();

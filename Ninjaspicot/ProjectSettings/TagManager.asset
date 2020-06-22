@@ -16,6 +16,7 @@ TagManager:
   - Spawn
   - Dynamic
   - DynamicWall
+  - TutorialWall
   layers:
   - Default
   - TransparentFX
@@ -33,7 +34,7 @@ TagManager:
   - Enemy
   - DynamicObstacle
   - PoppingObstacle
-  - 
+  - DynamicCollider
   - 
   - 
   - 
