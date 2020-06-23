@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public enum TouchArea
 {
@@ -8,23 +9,29 @@ public enum TouchArea
 
 public class TouchManager : MonoBehaviour
 {
-
     public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1");
     public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
-    public bool Dragging { get; private set; }
+    public bool Dragging => Dragging1 || Dragging2;
+    public bool Dragging1 { get; private set; }
+    public bool Dragging2 { get; private set; }
     public Vector3 Touch1Origin { get; private set; }
     public Vector3 Touch2Origin { get; private set; }
     public Vector3 RawTouch1Origin { get; private set; }
     public Vector3 RawTouch2Origin { get; private set; }
-    public Vector3 TouchDrag { get; private set; }
+    public Vector3 Touch1Drag { get; private set; }
+    public Vector3 Touch2Drag { get; private set; }
+    public bool TouchLifted => FingerLifted();
     public TouchArea TouchArea => RawTouch1Origin.x < Screen.width / 2 ? TouchArea.Left : TouchArea.Right;
 
+    private int _touchCount;
     private bool _touchInitialized;
     private bool _touch2Initialized;
+    private TouchIndicator _touch1Indicator;
+    private TouchIndicator _touch2Indicator;
     private LineRenderer _touchLine;
     private Camera _camera;
-    //private Coroutine _drawTouch;
     private CameraBehaviour _cameraBehaviour;
+    private PoolManager _poolManager;
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
@@ -34,16 +41,14 @@ public class TouchManager : MonoBehaviour
     private Jumper _jumpManager;
     private DynamicInteraction _dynamicInteraction;
 
-    private const float DRAG_THRESHOLD = 50;
-    //private const int SEGMENTS = 12;
-    //private const float RADIUS_X = 10;
-    //private const float RADIUS_Y = 10;
+    private const float DRAG_THRESHOLD = 150;
 
     private void Awake()
     {
         _cameraBehaviour = CameraBehaviour.Instance;
         _camera = _cameraBehaviour.Camera;
         _touchLine = GetComponent<LineRenderer>();
+        _poolManager = PoolManager.Instance;
     }
 
     private void Start()
@@ -69,39 +74,41 @@ public class TouchManager : MonoBehaviour
                 return;
         }
 
-        _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
+        Dragging1 = IsDragging1();
+        Dragging2 = IsDragging2();
 
-        if (Input.GetButtonUp("Fire2"))
-        {
-            ReinitDrag();
-        }
+        _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
         if (Touching)
         {
             _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
+            Touch1Drag = GetRawTouch(0);
+
+            if (DoubleTouching)
+            {
+                Touch2Drag = GetRawTouch(1);
+            }
 
             if (!_touchInitialized)
             {
-                RawTouch1Origin = GetRawTouch(0);
-                TouchDrag = RawTouch1Origin;
+                RawTouch1Origin = Touch1Drag;
                 Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
-                //StartTouchCircle();
+                _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _camera.transform);
                 _touchInitialized = true;
             }
 
-            TouchDrag = Input.mousePosition;
-
             if (DoubleTouching && !_touch2Initialized)
             {
-                RawTouch2Origin = GetRawTouch(1);
+                RawTouch2Origin = Touch2Drag;
                 Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
 
                 //Hero effects
                 _stickiness.CurrentSpeed *= 2;
                 _hero.StartDisplayGhosts();
-
+                _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _camera.transform);
                 _touch2Initialized = true;
             }
+
 
             if (_jumpManager.ReadyToJump())
             {
@@ -125,63 +132,47 @@ public class TouchManager : MonoBehaviour
             // Cancel hero effects
             _stickiness.ReinitSpeed();
             _hero.StopDisplayGhosts();
+            _touch2Indicator.StartFading();
+
+            //Touch2 becomes touch1
+            if ((Touch1Drag - RawTouch2Origin).magnitude < DRAG_THRESHOLD)
+            {
+                RawTouch1Origin = RawTouch2Origin;
+                Touch1Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
+                _touch1Indicator.transform.position = Touch1Origin;
+            }
 
             _touch2Initialized = false;
         }
 
         if (!Touching && _touchInitialized)
         {
+            _touch1Indicator.StartFading();
             _touchInitialized = false;
         }
-
-        Dragging = IsDragging();
     }
 
-
-    //public void StartTouchCircle()
-    //{
-    //    if (_drawTouch != null)
-    //        return;
-
-    //    _drawTouch = StartCoroutine(DrawTouchCircle(TouchOrigin));
-    //}
-
-
-    private bool IsDragging()
+    private bool IsDragging1()
     {
-        if (RawTouch1Origin == null || TouchDrag == null)
+        return Vector2.Distance(RawTouch1Origin, Touch1Drag) > DRAG_THRESHOLD;
+    }
+
+    private bool IsDragging2()
+    {
+        if (!_touch2Initialized)
             return false;
 
-        return Vector2.Distance(RawTouch1Origin, TouchDrag) > DRAG_THRESHOLD;
+        return Vector2.Distance(RawTouch2Origin, Touch2Drag) > DRAG_THRESHOLD;
     }
 
-    //public IEnumerator DrawTouchCircle(Vector3 mousePos)
-    //{
-    //    Vector3 pos = new Vector3(mousePos.x, mousePos.y, 0);
-    //    //pos -= _cameraBehaviour.Transform.position;
-    //    float x;
-    //    float y;
-    //    float z = -5f;
-    //    float angle = 20f;
-
-    //    for (int i = 0; i < (SEGMENTS + 1); i++)
-    //    {
-    //        _touchLine.positionCount = i + 1;
-    //        x = pos.x + Mathf.Sin(Mathf.Deg2Rad * angle) * RADIUS_X;
-    //        y = pos.y + Mathf.Cos(Mathf.Deg2Rad * angle) * RADIUS_Y;
-
-    //        _touchLine.SetPosition(i, new Vector3(x, y, z));
-
-    //        angle += (360f / SEGMENTS);
-    //        yield return new WaitForSeconds(.001f);
-    //    }
-
-    //    _drawTouch = null;
-    //}
-
-    public void ReinitDrag()
+    public void ReinitDrag1()
     {
-        TouchDrag = RawTouch1Origin;
+        Touch1Drag = RawTouch1Origin;
+    }
+
+    public void ReinitDrag2()
+    {
+        Touch2Drag = RawTouch2Origin;
     }
 
     private Vector3 GetRawTouch(int index)
@@ -189,16 +180,26 @@ public class TouchManager : MonoBehaviour
         if (Application.platform == RuntimePlatform.WindowsEditor)
             return Input.mousePosition;
 
-        return Input.GetTouch(index).position;
+        var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
+
+        if (touch.phase == TouchPhase.Ended)
+            return index == 0 ? Touch1Drag : Touch2Drag;
+
+        return touch.position;
     }
 
-    //public void Erase()
-    //{
-    //    if (_drawTouch != null)
-    //    {
-    //        StopCoroutine(_drawTouch);
-    //    }
+    private bool FingerLifted()
+    {
+        bool fingerLifted = false;
+        var touchCount = Input.touchCount;
 
-    //    //_touchLine.positionCount = 0;
-    //}
+        if (touchCount < _touchCount)
+        {
+            fingerLifted = true;
+        }
+
+        _touchCount = touchCount;
+
+        return fingerLifted;
+    }
 }

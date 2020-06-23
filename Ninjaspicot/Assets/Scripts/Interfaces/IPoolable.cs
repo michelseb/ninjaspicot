@@ -6,9 +6,8 @@ public enum PoolableType
     EnemyNinja,
     Marauder,
     Bullet,
-    CloudCollider,
-    RockyPlatformCollider,
-    DirectionRockCollider
+    Touch1,
+    Touch2
 }
 
 public interface IPoolable

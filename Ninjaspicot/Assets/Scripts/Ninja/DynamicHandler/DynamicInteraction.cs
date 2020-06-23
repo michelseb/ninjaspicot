@@ -54,7 +54,7 @@ public class DynamicInteraction : MonoBehaviour
         _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position, otherCollider.transform.rotation, otherDynamic.PoolableType);
         _cloneOtherDynamic.transform.localScale = otherCollider.transform.localScale;
 
-        _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position, transform.rotation, PoolableType.None);
+        _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position, transform.rotation);
         CloneHeroStickiness = _cloneHeroCollider.GetComponent<Stickiness>();
 
         _cloneHero = _cloneHeroCollider.GetComponent<DynamicNinja>();

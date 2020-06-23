@@ -2,7 +2,6 @@
 
 public class HeroJumper : Jumper
 {
-    private Hero _hero;
     private DynamicInteraction _dynamicInteraction;
     private TimeManager _timeManager;
     private CameraBehaviour _cameraBehaviour;
@@ -12,7 +11,6 @@ public class HeroJumper : Jumper
     {
         base.Awake();
         _dynamicEntity = GetComponent<IDynamic>();
-        _hero = GetComponent<Hero>();
         _dynamicInteraction = GetComponent<DynamicInteraction>();
         _cameraBehaviour = CameraBehaviour.Instance;
         _timeManager = TimeManager.Instance;
@@ -30,7 +28,14 @@ public class HeroJumper : Jumper
             {
                 _trajectory = GetTrajectory();
 
-                _trajectory.DrawTrajectory(transform.position, _touchManager.TouchDrag, _touchManager.RawTouch1Origin, _strength);
+                if (_touchManager.Dragging1)
+                {
+                    _trajectory.DrawTrajectory(transform.position, _touchManager.Touch1Drag, _touchManager.RawTouch1Origin, _strength);
+                }
+                else if (_touchManager.Dragging2)
+                {
+                    _trajectory.DrawTrajectory(transform.position, _touchManager.Touch2Drag, _touchManager.RawTouch2Origin, _strength);
+                }
             }
             else if (_trajectory != null && _trajectory.Used)
             {
@@ -38,7 +43,7 @@ public class HeroJumper : Jumper
             }
         }
 
-        if (Input.GetButtonUp("Fire1"))
+        if (Input.GetButtonUp("Fire1") || _touchManager.TouchLifted)
         {
             if (ReadyToJump())
             {
@@ -50,9 +55,18 @@ public class HeroJumper : Jumper
                 else
                 {
                     _stickiness.StopWalking(false);
-                    Jump(_touchManager.RawTouch1Origin, _touchManager.TouchDrag, _strength);
+
+                    if (_touchManager.Dragging1)
+                    {
+                        Jump(_touchManager.RawTouch1Origin, _touchManager.Touch1Drag, _strength);
+                        _touchManager.ReinitDrag1();
+                    }
+                    else if (_touchManager.Dragging2)
+                    {
+                        Jump(_touchManager.RawTouch2Origin, _touchManager.Touch2Drag, _strength);
+                        _touchManager.ReinitDrag2();
+                    }
                 }
-                _touchManager.ReinitDrag();
             }
         }
     }
@@ -72,7 +86,6 @@ public class HeroJumper : Jumper
         _cameraBehaviour.DoShake(.3f, .1f);
         base.Jump(origin, drag, strength);
         _trajectory = null;
-        //_hero.StartDisplayGhosts();
     }
 
     public override bool CanJump()
@@ -80,11 +93,21 @@ public class HeroJumper : Jumper
         if (CompareTag("Dynamic"))
             return Hero.Instance.JumpManager.CanJump();
 
-        if (GetJumps() <= 0 || _touchManager.DoubleTouching || !_touchManager.Dragging)
+        if (GetJumps() <= 0 || !_touchManager.Dragging)
             return false;
 
-        return !Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouch1Origin - _touchManager.TouchDrag, 5f, Hero.Instance.Id/*, display: true*/,
-         layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+        if (_touchManager.Dragging1)
+        {
+            return !Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouch1Origin - _touchManager.Touch1Drag, 5f, Hero.Instance.Id,
+            layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+        }
+        else if (_touchManager.Dragging2)
+        {
+            return !Utils.BoxCast(transform.position, Vector2.one, 0f, _touchManager.RawTouch2Origin - _touchManager.Touch2Drag, 5f, Hero.Instance.Id,
+            layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+        }
+
+        return false;
     }
 
     public override bool ReadyToJump()

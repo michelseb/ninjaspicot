@@ -123,7 +123,7 @@ public class Hero : Ninja, IRaycastable
     {
         while (true)
         {
-            _poolManager.GetPoolable<HeroGhost>(transform.position, transform.rotation, PoolableType.None);
+            _poolManager.GetPoolable<HeroGhost>(transform.position, transform.rotation);
             yield return new WaitForSeconds(delay);
         }
     }
