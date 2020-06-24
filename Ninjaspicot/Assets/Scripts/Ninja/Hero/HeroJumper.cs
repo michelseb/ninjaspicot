@@ -42,7 +42,10 @@ public class HeroJumper : Jumper
                 ReinitJump();
             }
         }
+    }
 
+    private void LateUpdate()
+    {
         if (Input.GetButtonUp("Fire1") || _touchManager.TouchLifted)
         {
             if (ReadyToJump())
