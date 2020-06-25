@@ -47,6 +47,7 @@ public class SpawnManager : MonoBehaviour
 
         hero.Stickiness.Rigidbody.velocity = Vector2.zero;
         hero.Stickiness.Rigidbody.rotation = 0;
+        hero.Stickiness.Rigidbody.isKinematic = false;
         hero.Stickiness.CurrentAttachment = null;
         hero.Dead = false;
         hero.Renderer.color = Color.white;

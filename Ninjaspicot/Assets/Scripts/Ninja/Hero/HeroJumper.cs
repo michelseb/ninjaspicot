@@ -96,7 +96,7 @@ public class HeroJumper : Jumper
         if (CompareTag("Dynamic"))
             return Hero.Instance.JumpManager.CanJump();
 
-        if (GetJumps() <= 0 || !_touchManager.Dragging)
+        if (!Active || GetJumps() <= 0 || !_touchManager.Dragging)
             return false;
 
         if (_touchManager.Dragging1)
