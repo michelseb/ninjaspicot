@@ -4,13 +4,14 @@ public class Jumper : MonoBehaviour
 {
     [SerializeField] private int _maxJumps;
     public bool Active { get; set; }
+    public Trajectory Trajectory { get; protected set; }
+
     protected float _strength;
     protected int _jumps;
 
     protected IDynamic _dynamicEntity;
     protected Stickiness _stickiness;
     protected PoolManager _poolManager;
-    protected Trajectory _trajectory;
 
     protected virtual void Awake()
     {
@@ -27,7 +28,7 @@ public class Jumper : MonoBehaviour
         GainAllJumps();
     }
 
-    public virtual void Jump(Vector2 origin, Vector2 drag, float strength)
+    public virtual void Jump(Vector2 origin, Vector2 drag)
     {
         _stickiness.Detach();
 
@@ -35,11 +36,11 @@ public class Jumper : MonoBehaviour
         LoseJump();
         _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
 
-        _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * strength, ForceMode2D.Impulse);
+        _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * _strength, ForceMode2D.Impulse);
 
         _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
 
-        if (_trajectory.Used)
+        if (Trajectory.Used)
         {
             ReinitJump();
         }
@@ -47,19 +48,19 @@ public class Jumper : MonoBehaviour
 
     public void ReinitJump()
     {
-        if (_trajectory == null || !_trajectory.Active)
+        if (Trajectory == null || !Trajectory.Active)
             return;
 
-        _trajectory.StartFading();
+        Trajectory.StartFading();
     }
 
     protected Trajectory GetTrajectory()
     {
-        if (_trajectory == null || !_trajectory.Active)
+        if (Trajectory == null || !Trajectory.Active)
             return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity);
 
-        _trajectory.ReUse(transform.position);
-        return _trajectory;
+        Trajectory.ReUse(transform.position);
+        return Trajectory;
     }
 
     public void LoseJump()
@@ -114,6 +115,20 @@ public class Jumper : MonoBehaviour
 
     public virtual bool ReadyToJump()
     {
-        return CanJump() && _trajectory != null;
+        return CanJump() && Trajectory != null;
+    }
+
+    public void SetTrajectory()
+    {
+        if (TrajectoryInUse())
+            return;
+
+        Trajectory = GetTrajectory();
+        Trajectory.Strength = _strength;
+    }
+
+    public bool TrajectoryInUse()
+    {
+        return Trajectory != null && Trajectory.Used;
     }
 }

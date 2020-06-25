@@ -5,13 +5,13 @@ public class Trajectory : MonoBehaviour, IPoolable
 {
     public bool Used { get; private set; }
     public bool Active { get; private set; }
+    public float Strength { get; set; }
 
     private int _lineMax;
 
     private LineRenderer _line;
 
     private TimeManager _timeManager;
-
 
     private const float TIME_SLOW = .01f;
     private const float FADE_SPEED = .5f;
@@ -35,12 +35,12 @@ public class Trajectory : MonoBehaviour, IPoolable
         Active = true;
     }
 
-    public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick, float speed)
+    public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick)
     {
         Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
         Vector2 pos = startPos;
         Vector2 strength = startClick - click;
-        Vector2 vel = strength.normalized * speed;
+        Vector2 vel = strength.normalized * Strength;
 
         if (_lineMax <= 2)
         {

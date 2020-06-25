@@ -26,6 +26,7 @@ public class TouchManager : MonoBehaviour
 
     private int _index0, _index1; // Touch indexes;
     private int _touchCount;
+    private bool _needsJump;
     private bool _touchInitialized;
     private bool _touch2Initialized;
     private TouchIndicator _touch1Indicator;
@@ -34,13 +35,14 @@ public class TouchManager : MonoBehaviour
     private Camera _camera;
     private CameraBehaviour _cameraBehaviour;
     private PoolManager _poolManager;
+    private TimeManager _timeManager;
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
 
     private Hero _hero;
     private Stickiness _stickiness;
-    private Jumper _jumpManager;
+    private HeroJumper _jumpManager;
     private DynamicInteraction _dynamicInteraction;
 
     private TextMeshProUGUI _debugText;
@@ -52,6 +54,7 @@ public class TouchManager : MonoBehaviour
         _camera = _cameraBehaviour.Camera;
         _touchLine = GetComponent<LineRenderer>();
         _poolManager = PoolManager.Instance;
+        _timeManager = TimeManager.Instance;
         _debugText = _cameraBehaviour.GetComponentInChildren<TextMeshProUGUI>();
     }
 
@@ -61,7 +64,7 @@ public class TouchManager : MonoBehaviour
         _touchLine.useWorldSpace = true;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
-        _jumpManager = _hero?.JumpManager;
+        _jumpManager = _hero?.JumpManager as HeroJumper;
         _dynamicInteraction = _hero?.DynamicInteraction;
         InitTouchIndexes();
     }
@@ -72,7 +75,7 @@ public class TouchManager : MonoBehaviour
         if (_hero == null)
         {
             _hero = Hero.Instance;
-            _jumpManager = _hero?.JumpManager;
+            _jumpManager = _hero?.JumpManager as HeroJumper;
             _stickiness = _hero?.Stickiness;
             _dynamicInteraction = _hero?.DynamicInteraction;
             if (_hero == null)
@@ -92,6 +95,8 @@ public class TouchManager : MonoBehaviour
                 _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _camera.transform);
                 _touchInitialized = true;
             }
+
+            Dragging1 = IsDragging1();
         }
 
         if (DoubleTouching)
@@ -110,6 +115,8 @@ public class TouchManager : MonoBehaviour
                 _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _camera.transform);
                 _touch2Initialized = true;
             }
+
+            Dragging2 = IsDragging2();
         }
 
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
@@ -118,6 +125,25 @@ public class TouchManager : MonoBehaviour
         {
             _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
 
+            if (_jumpManager.CanJump())
+            {
+                _jumpManager.SetTrajectory();
+
+                if (Dragging1)
+                {
+                    _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
+                    _jumpManager.Trajectory.DrawTrajectory(_hero.transform.position, Touch1Drag, RawTouch1Origin);
+                }
+                else if (Dragging2)
+                {
+                    _jumpManager.SetJumpPositions(RawTouch2Origin, Touch2Drag);
+                    _jumpManager.Trajectory.DrawTrajectory(_hero.transform.position, Touch2Drag, RawTouch2Origin);
+                }
+            }
+            else if (_jumpManager.TrajectoryInUse())
+            {
+                _jumpManager.ReinitJump();
+            }
 
             if (_jumpManager.ReadyToJump())
             {
@@ -151,40 +177,62 @@ public class TouchManager : MonoBehaviour
                 {
                     SwitchTouchIndexes();
                     RawTouch1Origin = GetRawTouch(_index0);
+                    ReinitDrag1();
 
-                    if (!Dragging)
-                    {
-                        ReinitDrags();
-                    }
                     Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
                     _touch1Indicator.transform.position = Touch1Origin;
                 }
             }
 
+            Dragging2 = false;
             _touch2Initialized = false;
         }
 
         if (!Touching && _touchInitialized)
         {
             _touch1Indicator.StartFading();
+            Dragging1 = false;
             _touchInitialized = false;
         }
+    }
 
-        Dragging1 = IsDragging1();
-        Dragging2 = IsDragging2();
+
+    private void LateUpdate()
+    {
+        if (Input.GetButtonUp("Fire1") || TouchLifted)
+        {
+            if (_jumpManager.ReadyToJump())
+            {
+                if (_jumpManager.TrajectoryInUse() && !_jumpManager.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
+                {
+                    _jumpManager.Trajectory.StartFading();
+                    _timeManager.SetNormalTime();
+                }
+                else
+                {
+                    _stickiness.StopWalking(false);
+
+                    _jumpManager.Jump(_jumpManager.TrajectoryOrigin, _jumpManager.TrajectoryDestination);
+                    ReinitDrags();
+                }
+            }
+        }
     }
 
     private bool IsDragging1()
     {
-        return Vector2.Distance(RawTouch1Origin, Touch1Drag) > DRAG_THRESHOLD;
+        var dragging = Touching && Vector2.Distance(RawTouch1Origin, Touch1Drag) > DRAG_THRESHOLD;
+        _jumpManager.NeedsJump1 = dragging;
+
+        return dragging;
     }
 
     private bool IsDragging2()
     {
-        if (!_touch2Initialized)
-            return false;
+        var dragging = DoubleTouching && Vector2.Distance(RawTouch2Origin, Touch2Drag) > DRAG_THRESHOLD;
+        _jumpManager.NeedsJump2 = dragging;
 
-        return Vector2.Distance(RawTouch2Origin, Touch2Drag) > DRAG_THRESHOLD;
+        return dragging;
     }
 
     public void ReinitDrag1()
