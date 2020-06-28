@@ -10,6 +10,8 @@ public enum TouchArea
 
 public class TouchManager : MonoBehaviour
 {
+    [SerializeField] private bool _mobileTouch;
+
     public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1");
     public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
     public bool Dragging => Dragging1 || Dragging2;
@@ -91,8 +93,11 @@ public class TouchManager : MonoBehaviour
         {
             if (!_touchInitialized)
             {
+                Debug.Log("Init");
                 InitTouchIndexes();
+
                 RawTouch1Origin = GetRawTouch(_index0);
+
                 ReinitDrag1();
                 Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
                 _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _camera.transform);
@@ -100,8 +105,10 @@ public class TouchManager : MonoBehaviour
             }
             else
             {
-                Touch1Drag = GetRawTouch(_index0);
+                var drag = GetDrag(_index0);
+                Touch2Drag = drag ?? Touch1Drag;
                 Dragging1 = IsDragging1(true);
+                Debug.Log("origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
                 if (Dragging1)
                 {
                     _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
@@ -115,6 +122,7 @@ public class TouchManager : MonoBehaviour
             if (!_touch2Initialized)
             {
                 RawTouch2Origin = GetRawTouch(_index1);
+
                 ReinitDrag2();
                 Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
                 _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _camera.transform);
@@ -127,7 +135,8 @@ public class TouchManager : MonoBehaviour
             }
             else
             {
-                Touch2Drag = GetRawTouch(_index1);
+                var drag = GetDrag(_index1);
+                Touch2Drag = drag ?? Touch2Drag;
                 Dragging2 = IsDragging2(true);
                 if (Dragging2)
                 {
@@ -150,17 +159,28 @@ public class TouchManager : MonoBehaviour
                 var touch = Input.touches.FirstOrDefault(t => t.fingerId == _index0);
                 if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
                 {
-                    SwitchTouchIndexes();
-                    RawTouch1Origin = RawTouch2Origin;
-                    Touch1Drag = Touch2Drag;
-                    Dragging1 = IsDragging1(false);
-
-                    _jumpManager.NeedsJump1 = _jumpManager.NeedsJump1 || _jumpManager.NeedsJump2;
-
                     if (_jumpManager.NeedsJump1)
                     {
                         _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
                     }
+                    else if (_jumpManager.NeedsJump2)
+                    {
+                        _jumpManager.SetJumpPositions(RawTouch2Origin, Touch2Drag);
+                    }
+                    Debug.Log("Switch");
+                    Debug.Log("origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
+                    SwitchTouchIndexes();
+                    var tempDrag = Touch1Drag;
+                    var tempTouch = RawTouch1Origin;
+                    RawTouch1Origin = RawTouch2Origin;
+                    Touch1Drag = Touch2Drag;
+                    RawTouch2Origin = tempTouch;
+                    Touch2Drag = tempDrag;
+                    Dragging1 = IsDragging1(false);
+                    Debug.Log("new origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
+
+                    _jumpManager.NeedsJump1 = _jumpManager.NeedsJump1 || _jumpManager.NeedsJump2;
+
 
                     Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
                     _touch1Indicator.transform.position = Touch1Origin;
@@ -275,13 +295,26 @@ public class TouchManager : MonoBehaviour
 
     private Vector3 GetRawTouch(int index)
     {
-        if (Application.platform == RuntimePlatform.WindowsEditor)
+        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
             return Input.mousePosition;
 
         var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
 
-        if (touch.phase == TouchPhase.Ended)
-            return index == 0 ? Touch1Drag : Touch2Drag;
+        if (touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
+            return index == 0 ? RawTouch1Origin : RawTouch2Origin;
+
+        return touch.position;
+    }
+
+    private Vector3? GetDrag(int index)
+    {
+        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
+            return Input.mousePosition;
+
+        var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
+
+        if (touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
+            return null;
 
         return touch.position;
     }
