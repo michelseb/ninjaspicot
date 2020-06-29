@@ -453,7 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fdd4ebc2ded14842a3d1d333fbc8c4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mobileTouch: 1
+  _mobileTouch: 0
 --- !u!108 &780037605
 Light:
   m_ObjectHideFlags: 0
@@ -602,6 +602,8 @@ MonoBehaviour:
     ExitId: 110
   - EntranceId: 111
     ExitId: 100
+  - EntranceId: 102
+    ExitId: 120
 --- !u!114 &780851355
 MonoBehaviour:
   m_ObjectHideFlags: 0

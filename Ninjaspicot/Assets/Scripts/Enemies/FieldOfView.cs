@@ -57,14 +57,14 @@ public class FieldOfView : MonoBehaviour
 
         vertices[0] = transform.InverseTransformPoint(offset);
 
-        var currentAngle = Utils.GetAngleFromVector(transform.InverseTransformDirection(transform.up)) + angle / 2f;
+        var currentAngle = Utils.GetAngleFromVector(transform.InverseTransformDirection(transform.up)) + angle / 3f;
         var vertexIndex = 1;
         var triangleIndex = 0;
 
         for (int i = 0; i < pointCount; i++)
         {
             Vector3 vertex;
-            Debug.DrawRay(offset, transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)) * size, Color.yellow);
+            //Debug.DrawRay(offset, transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)) * size, Color.yellow);
             var hits = Physics2D.RaycastAll(offset, transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)), size);
             var hit = hits.FirstOrDefault(x => x && !x.collider.isTrigger && !x.collider.CompareTag("hero"));
             if (hit)

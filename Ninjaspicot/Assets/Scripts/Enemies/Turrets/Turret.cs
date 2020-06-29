@@ -14,13 +14,13 @@ public class Turret : MonoBehaviour, IActivable, IRaycastable
     [SerializeField] private bool _clockWise;
     [SerializeField] private float _strength;
     [SerializeField] private float _loadTime;
+    [SerializeField] private float _initRotation;
 
     public bool Loaded { get; private set; }
     public Mode TurretMode { get; private set; }
     public bool AutoShoot => _autoShoot;
     public bool Active { get; private set; }
 
-    private float _initRotation;
     private float _loadProgress;
 
     private Aim _aim;
@@ -41,7 +41,7 @@ public class Turret : MonoBehaviour, IActivable, IRaycastable
     private void Start()
     {
         TurretMode = Mode.Scan;
-        _initRotation = transform.rotation.z;
+        transform.Rotate(0, 0, _initRotation);
         Loaded = true;
         Active = true;
     }
@@ -102,7 +102,7 @@ public class Turret : MonoBehaviour, IActivable, IRaycastable
 
                 transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
 
-                if (Mathf.Abs(transform.rotation.z - _initRotation) > _viewAngle)
+                if (dir * (transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
                 {
                     _clockWise = !_clockWise;
                 }

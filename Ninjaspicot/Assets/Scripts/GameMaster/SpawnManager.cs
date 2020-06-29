@@ -69,7 +69,9 @@ public class SpawnManager : MonoBehaviour
         var scene = SceneManager.GetActiveScene();
         var sceneObjects = scene.GetRootGameObjects();
 
-        _checkPoints = FindObjectsOfType<CheckPoint>(); //TODO : make checkpoint specific to scene => Add property in class to link to scene
+        _checkPoints = FindObjectsOfType<CheckPoint>()
+            .OrderBy(c => c.Order)
+            .ToArray(); //TODO : make checkpoint specific to scene => Add property in class to link to scene
 
 
         var spawn = sceneObjects.FirstOrDefault(s => s.CompareTag("Spawn"))?.transform.position;

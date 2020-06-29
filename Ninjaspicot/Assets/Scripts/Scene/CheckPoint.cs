@@ -2,14 +2,14 @@
 
 public class CheckPoint : MonoBehaviour
 {
+    [SerializeField] private int _order;
     public bool Attained { get; private set; }
-    private SpawnManager _spawnManager;
+    public int Order => _order;
     private Cloth _cloth;
     private SkinnedMeshRenderer _mesh;
 
     private void Awake()
     {
-        _spawnManager = SpawnManager.Instance;
         _cloth = GetComponentInChildren<Cloth>();
         _mesh = GetComponentInChildren<SkinnedMeshRenderer>();
     }
