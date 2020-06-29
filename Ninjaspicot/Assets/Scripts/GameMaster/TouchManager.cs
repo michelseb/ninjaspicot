@@ -46,7 +46,6 @@ public class TouchManager : MonoBehaviour
     private HeroJumper _jumpManager;
     private DynamicInteraction _dynamicInteraction;
 
-    private TextMeshProUGUI _debugText;
     private const float DRAG_THRESHOLD = 150;
 
     private void Awake()
@@ -56,7 +55,6 @@ public class TouchManager : MonoBehaviour
         _touchLine = GetComponent<LineRenderer>();
         _poolManager = PoolManager.Instance;
         _timeManager = TimeManager.Instance;
-        _debugText = _cameraBehaviour.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     private void Start()
@@ -72,10 +70,6 @@ public class TouchManager : MonoBehaviour
 
     private void Update()
     {
-        var touch1 = Input.touches.FirstOrDefault(x => x.fingerId == _index0);
-        var touch2 = Input.touches.FirstOrDefault(x => x.fingerId == _index1);
-        _debugText.text = "Touch" + _index0 + " : " + touch1.phase + " - Touch" + _index1 + " : " + touch2.phase;
-
         //Waiting for hero to spawn
         if (_hero == null)
         {
@@ -106,7 +100,7 @@ public class TouchManager : MonoBehaviour
             else
             {
                 var drag = GetDrag(_index0);
-                Touch2Drag = drag ?? Touch1Drag;
+                Touch1Drag = drag ?? Touch1Drag;
                 Dragging1 = IsDragging1(true);
                 Debug.Log("origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
                 if (Dragging1)
@@ -298,12 +292,7 @@ public class TouchManager : MonoBehaviour
         if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
             return Input.mousePosition;
 
-        var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
-
-        if (touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
-            return index == 0 ? RawTouch1Origin : RawTouch2Origin;
-
-        return touch.position;
+        return Input.touches.FirstOrDefault(t => t.fingerId == index).position;
     }
 
     private Vector3? GetDrag(int index)
@@ -313,7 +302,7 @@ public class TouchManager : MonoBehaviour
 
         var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
 
-        if (touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
+        if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
             return null;
 
         return touch.position;
