@@ -29,6 +29,7 @@ public class TouchIndicator : MonoBehaviour, IPoolable
         {
             StopCoroutine(_appear);
         }
+        Active = false;
         StartCoroutine(FadeAway());
     }
 
@@ -43,7 +44,6 @@ public class TouchIndicator : MonoBehaviour, IPoolable
             _renderer.color = col;
             yield return null;
         }
-        Active = false;
         Deactivate();
     }
 
@@ -63,6 +63,7 @@ public class TouchIndicator : MonoBehaviour, IPoolable
     public void Pool(Vector3 position, Quaternion rotation)
     {
         gameObject.SetActive(true);
+        Active = true;
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
         _appear = StartCoroutine(Appear());

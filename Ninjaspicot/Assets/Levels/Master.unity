@@ -567,6 +567,10 @@ MonoBehaviour:
     Name: Tutorial
     Img: {fileID: 0}
     Loaded: 0
+  - Index: 12
+    Name: Kitchen
+    Img: {fileID: 0}
+    Loaded: 0
   _startScene: 0
 --- !u!4 &780851353
 Transform:

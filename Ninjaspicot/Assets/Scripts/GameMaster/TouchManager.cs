@@ -87,7 +87,6 @@ public class TouchManager : MonoBehaviour
         {
             if (!_touchInitialized)
             {
-                Debug.Log("Init");
                 InitTouchIndexes();
 
                 RawTouch1Origin = GetRawTouch(_index0);
@@ -102,7 +101,6 @@ public class TouchManager : MonoBehaviour
                 var drag = GetDrag(_index0);
                 Touch1Drag = drag ?? Touch1Drag;
                 Dragging1 = IsDragging1(true);
-                Debug.Log("origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
                 if (Dragging1)
                 {
                     _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
@@ -161,8 +159,6 @@ public class TouchManager : MonoBehaviour
                     {
                         _jumpManager.SetJumpPositions(RawTouch2Origin, Touch2Drag);
                     }
-                    Debug.Log("Switch");
-                    Debug.Log("origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
                     SwitchTouchIndexes();
                     var tempDrag = Touch1Drag;
                     var tempTouch = RawTouch1Origin;
@@ -171,7 +167,6 @@ public class TouchManager : MonoBehaviour
                     RawTouch2Origin = tempTouch;
                     Touch2Drag = tempDrag;
                     Dragging1 = IsDragging1(false);
-                    Debug.Log("new origin : " + RawTouch1Origin + " - drag : " + Touch1Drag);
 
                     _jumpManager.NeedsJump1 = _jumpManager.NeedsJump1 || _jumpManager.NeedsJump2;
 
@@ -285,6 +280,20 @@ public class TouchManager : MonoBehaviour
     {
         ReinitDrag1();
         ReinitDrag2();
+    }
+
+    public void UpdateTouchOrigins()
+    {
+        if (_touch1Indicator != null && _touch1Indicator.Active)
+        {
+            Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
+            _touch1Indicator.transform.position = Touch1Origin;
+        }
+        if (_touch2Indicator != null && _touch2Indicator.Active)
+        {
+            Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
+            _touch2Indicator.transform.position = Touch2Origin;
+        }
     }
 
     private Vector3 GetRawTouch(int index)
