@@ -159,7 +159,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         if (stayGrounded)
         {
-            Rigidbody.isKinematic = true;
+            //Rigidbody.isKinematic = true;
         }
 
         _walkOnWalls = null;

@@ -40,7 +40,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        gameObject.SetActive(true);
+        Activate();
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
         _currentLifeTime = LIFE_TIME;
@@ -49,5 +49,10 @@ public class Bullet : MonoBehaviour, IPoolable
     public void Deactivate()
     {
         gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
     }
 }

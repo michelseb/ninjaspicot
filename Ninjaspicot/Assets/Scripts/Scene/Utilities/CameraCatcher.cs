@@ -1,37 +1,44 @@
 ﻿using UnityEngine;
 
-public class CameraCatcher : MonoBehaviour
+public class CameraCatcher : MonoBehaviour, IActivable
 {
-    [SerializeField] private int _zoomAmount;
-    private bool _activated;
-    private CameraBehaviour _cameraBehaviour;
-    private float _previousZoom;
-    private void Awake()
+    [SerializeField] protected int _zoomAmount;
+    protected CameraBehaviour _cameraBehaviour;
+    public virtual Transform ZoomCenter => transform;
+
+    protected virtual void Awake()
     {
         _cameraBehaviour = CameraBehaviour.Instance;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        _previousZoom = _cameraBehaviour.Camera.orthographicSize;
         if (collision.CompareTag("hero"))
         {
-            if (_cameraBehaviour.CameraMode == CameraMode.Follow)
-            {
-                _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
-                _cameraBehaviour.SetCenterMode(transform, .5f);
-                _activated = true;
-            }
+            Activate();
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    protected virtual void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("hero"))
         {
-            _cameraBehaviour.Zoom(ZoomType.Init);
-            _cameraBehaviour.SetFollowMode(Hero.Instance.transform);
+            Deactivate();
         }
-        _activated = false;
+    }
+
+    public virtual void Activate()
+    {
+        if (_cameraBehaviour.CameraMode == CameraMode.Follow)
+        {
+            _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
+            _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
+        }
+    }
+
+    public virtual void Deactivate()
+    {
+        _cameraBehaviour.Zoom(ZoomType.Init);
+        _cameraBehaviour.SetFollowMode(Hero.Instance.transform);
     }
 }

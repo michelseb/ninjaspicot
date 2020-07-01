@@ -1,20 +1,20 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class DynamicObstacle : Obstacle, IDynamic
+public class DynamicObstacle : Obstacle, IDynamic, IActivable
 {
     [SerializeField] private PoolableType _poolableType;
     [SerializeField] protected float _speed;
 
     private Rigidbody2D _rigidbody;
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>() ?? GetComponentInChildren<Rigidbody2D>() ?? GetComponentInParent<Rigidbody2D>(); return _rigidbody; } }
-    public bool DynamicActive { get; set; }
+    public bool DynamicActive { get; protected set; }
 
     public PoolableType PoolableType => _poolableType;
 
     public virtual void Awake()
     {
-        DynamicActive = true;
+        Activate();
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision)
@@ -49,8 +49,18 @@ public class DynamicObstacle : Obstacle, IDynamic
 
     private IEnumerator QuickDeactivate()
     {
-        DynamicActive = false;
+        Deactivate();
         yield return new WaitForSeconds(.5f);
+        Activate();
+    }
+
+    public void Activate()
+    {
         DynamicActive = true;
+    }
+
+    public void Deactivate()
+    {
+        DynamicActive = false;
     }
 }

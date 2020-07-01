@@ -57,8 +57,9 @@ MonoBehaviour:
   _viewAngle: 180
   _rotationSpeed: 100
   _clockWise: 0
-  _strength: 200
+  _strength: 500
   _loadTime: 0.2
+  _initRotation: 0
 --- !u!120 &105435373814606087
 LineRenderer:
   m_ObjectHideFlags: 0

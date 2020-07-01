@@ -142,7 +142,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        gameObject.SetActive(true);
+        Activate();
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
         Appear();
@@ -151,5 +151,10 @@ public class Trajectory : MonoBehaviour, IPoolable
     public void Deactivate()
     {
         gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
     }
 }

@@ -157,8 +157,13 @@ public class Turret : MonoBehaviour, IActivable, IRaycastable
         }
     }
 
-    public void SetActive(bool active)
+    public void Activate()
     {
-        Active = active;
+        Active = true;
+    }
+
+    public void Deactivate()
+    {
+        Active = false;
     }
 }

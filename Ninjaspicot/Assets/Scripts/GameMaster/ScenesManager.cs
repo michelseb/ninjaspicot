@@ -12,6 +12,7 @@ public class SceneInfos
     public string Name;
     public Sprite Img;
     public bool Loaded;
+    public Color FontColor;
 }
 
 

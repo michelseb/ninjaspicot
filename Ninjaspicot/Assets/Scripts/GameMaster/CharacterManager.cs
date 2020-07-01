@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-
-
 public class CharacterManager : MonoBehaviour
 {
     public int Money { get; private set; }

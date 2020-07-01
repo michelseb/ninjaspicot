@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class TimeManager : MonoBehaviour
+public class TimeManager : MonoBehaviour, IActivable
 {
+    public float TimeScale => Time.timeScale;
 
     private bool _active;
-
-    public float TimeScale => Time.timeScale;
 
     private static TimeManager _instance;
     public static TimeManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TimeManager>(); return _instance; } }
@@ -16,7 +15,7 @@ public class TimeManager : MonoBehaviour
 
     private void Start()
     {
-        _active = true;
+        Activate();
     }
 
     public void SlowDown(float slowValue)
@@ -74,14 +73,19 @@ public class TimeManager : MonoBehaviour
         StartCoroutine(RestoreTime());
     }
 
-    public void SetActive(bool active)
-    {
-        _active = active;
-    }
-
     public void SetNormalTime()
     {
         Time.timeScale = 1;
         Time.fixedDeltaTime = Time.timeScale * .02f;
+    }
+
+    public void Activate()
+    {
+        _active = true;
+    }
+
+    public void Deactivate()
+    {
+        _active = false;
     }
 }

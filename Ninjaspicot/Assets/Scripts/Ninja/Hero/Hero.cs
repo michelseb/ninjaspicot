@@ -88,7 +88,14 @@ public class Hero : Ninja, IRaycastable
 
     public void SetInteractionActivation(bool active)
     {
-        DynamicInteraction.Active = active;
+        if (active)
+        {
+            DynamicInteraction.Activate();
+        }
+        else
+        {
+            DynamicInteraction.Deactivate();
+        }
     }
 
     public override void SetAllBehavioursActivation(bool active, bool grounded)

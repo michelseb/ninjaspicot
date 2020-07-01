@@ -19,7 +19,15 @@ public class ActivationButton : MonoBehaviour
     {
         _activable = _activableObject.GetComponent<IActivable>();
         _renderer.color = _active ? ColorUtils.Red : ColorUtils.Green;
-        _activable.SetActive(_active);
+
+        if (_active)
+        {
+            _activable.Activate();
+        }
+        else
+        {
+            _activable.Deactivate();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -40,6 +48,14 @@ public class ActivationButton : MonoBehaviour
     {
         active = !active;
         _renderer.color = active ? Color.red : Color.green;
-        _activable.SetActive(active);
+
+        if (active)
+        {
+            _activable.Activate();
+        }
+        else
+        {
+            _activable.Deactivate();
+        }
     }
 }

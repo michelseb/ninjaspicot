@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-public class DynamicInteraction : MonoBehaviour
+public class DynamicInteraction : MonoBehaviour, IActivable
 {
-    public bool Active { get; set; }
+    public bool Active { get; private set; }
     public bool Interacting { get; set; }
     public Stickiness CloneHeroStickiness { get; private set; }
 
@@ -25,7 +25,7 @@ public class DynamicInteraction : MonoBehaviour
 
     private void Start()
     {
-        Active = true;
+        Activate();
     }
 
     private void Update()
@@ -98,4 +98,13 @@ public class DynamicInteraction : MonoBehaviour
         }
     }
 
+    public void Activate()
+    {
+        Active = true;
+    }
+
+    public void Deactivate()
+    {
+        Active = false;
+    }
 }

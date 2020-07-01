@@ -6,6 +6,12 @@ public class DynamicNinjaCollider : MonoBehaviour, IPoolable
     public PoolableType PoolableType => _poolableType;
     public bool Active { get; private set; }
 
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+        Active = true;
+    }
+
     public void Deactivate()
     {
         gameObject.SetActive(false);
@@ -14,8 +20,7 @@ public class DynamicNinjaCollider : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        gameObject.SetActive(true);
-        Active = true;
+        Activate();
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
     }

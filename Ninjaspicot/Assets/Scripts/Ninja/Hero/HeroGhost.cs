@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HeroGhost : MonoBehaviour, IPoolable
 {
     [SerializeField] private float _disappearingSpeed;
     [SerializeField] private float _initAlpha;
     [SerializeField] private Color _endColor;
-
-    //private float _startTime;
 
     private SpriteRenderer _renderer;
     public PoolableType PoolableType => PoolableType.None;
@@ -34,9 +31,7 @@ public class HeroGhost : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        gameObject.SetActive(true);
-        var color = Hero.Instance.Renderer.color;
-        _renderer.color = new Color(color.r, color.g, color.b, _initAlpha);
+        Activate();
         transform.position = position;
         transform.rotation = rotation;
     }
@@ -44,5 +39,12 @@ public class HeroGhost : MonoBehaviour, IPoolable
     public void Deactivate()
     {
         gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+        var color = Hero.Instance.Renderer.color;
+        _renderer.color = new Color(color.r, color.g, color.b, _initAlpha);
     }
 }

@@ -10,9 +10,8 @@ public enum PoolableType
     Touch2
 }
 
-public interface IPoolable
+public interface IPoolable : IActivable
 {
     PoolableType PoolableType { get; }
     void Pool(Vector3 position, Quaternion rotation);
-    void Deactivate();
 }

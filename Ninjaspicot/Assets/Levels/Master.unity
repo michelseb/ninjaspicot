@@ -563,14 +563,17 @@ MonoBehaviour:
     Name: Lobby
     Img: {fileID: 0}
     Loaded: 0
+    FontColor: {r: 1, g: 1, b: 1, a: 1}
   - Index: 11
     Name: Tutorial
     Img: {fileID: 0}
     Loaded: 0
+    FontColor: {r: 1, g: 1, b: 1, a: 1}
   - Index: 12
     Name: Kitchen
     Img: {fileID: 0}
     Loaded: 0
+    FontColor: {r: 0.17101282, g: 0.30367535, b: 0.5754717, a: 1}
   _startScene: 0
 --- !u!4 &780851353
 Transform:

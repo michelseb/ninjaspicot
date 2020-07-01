@@ -30,7 +30,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        gameObject.SetActive(true);
+        Activate();
         transform.position = position;
         transform.rotation = rotation;
     }
@@ -82,5 +82,10 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     public void Deactivate()
     {
         gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
     }
 }
