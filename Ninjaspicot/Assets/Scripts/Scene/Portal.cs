@@ -23,6 +23,7 @@ public class Portal : MonoBehaviour
     private Coroutine _connect;
 
     private const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
+    private const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
 
     protected void Awake()
     {
@@ -83,11 +84,11 @@ public class Portal : MonoBehaviour
         Other.Mask.enabled = true;
 
         TeleportedRenderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+
         foreach (var renderer in Hero.GetComponentsInChildren<SpriteRenderer>())
         {
             renderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
         }
-
 
         TeleportedLayer = Hero.gameObject.layer;
         Hero.gameObject.layer = LayerMask.NameToLayer("Teleported");
@@ -128,8 +129,8 @@ public class Portal : MonoBehaviour
 
     private IEnumerator Teleport()
     {
-        var transferredPoint = transform.InverseTransformPoint(Hero.transform.position);
-        var transferredVelocity = -transform.InverseTransformDirection(Hero.Stickiness.Rigidbody.velocity);
+        //var transferredPoint = transform.InverseTransformPoint(Hero.transform.position);
+        //var transferredVelocity = -transform.InverseTransformDirection(Hero.Stickiness.Rigidbody.velocity);
 
         Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
         Hero.Stickiness.Rigidbody.isKinematic = true;
@@ -141,14 +142,16 @@ public class Portal : MonoBehaviour
         yield return new WaitForSeconds(TRANSFER_SPEED);
 
         _cameraBehaviour.SetFollowMode(Hero.transform);
-        Hero.Stickiness.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);
+        //Hero.Stickiness.Rigidbody.position = Other.transform.TransformPoint(transferredPoint);
+        Hero.Stickiness.Rigidbody.position = Other.transform.position - Other.transform.right * 2;
 
         yield return new WaitForSeconds(1);
 
         Reinit(true);
         Other.Reinit(true);
         Hero.Stickiness.Rigidbody.isKinematic = false;
-        Hero.Stickiness.Rigidbody.velocity = Other.transform.TransformDirection(transferredVelocity);
+        //Hero.Stickiness.Rigidbody.velocity = Other.transform.TransformDirection(transferredVelocity);
+        Hero.Stickiness.Rigidbody.velocity = Other.transform.right * EJECT_SPEED;
         Hero.SetCapeActivation(true);
     }
 

@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 37ffc084db139704ab336ae650509b27, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -329,7 +329,7 @@ SkinnedMeshRenderer:
   m_RootBone: {fileID: 0}
   m_AABB:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 1.25, y: 0.40207413, z: 0.35860664}
+    m_Extent: {x: 1.75, y: 0.545672, z: 0.46525183}
   m_DirtyAABB: 0
 --- !u!183 &183676759694283910
 Cloth:
