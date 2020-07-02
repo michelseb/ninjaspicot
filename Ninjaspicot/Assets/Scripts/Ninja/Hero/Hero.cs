@@ -13,9 +13,11 @@ public class Hero : Ninja, IRaycastable
     private SpawnManager _spawnManager;
     private TouchManager _touchManager;
     private Coroutine _displayGhosts;
+    private Coroutine _fade;
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
+    private const float FADE_SPEED = 5f;
 
     protected override void Awake()
     {
@@ -132,6 +134,49 @@ public class Hero : Ninja, IRaycastable
         {
             _poolManager.GetPoolable<HeroGhost>(transform.position, transform.rotation);
             yield return new WaitForSeconds(delay);
+        }
+    }
+
+    public void StartFading()
+    {
+        _fade = StartCoroutine(FadeAway());
+    }
+
+    public void StartAppear()
+    {
+        if (_fade != null)
+        {
+            StopCoroutine(_fade);
+        }
+
+        StartCoroutine(Appear());
+    }
+
+
+    private IEnumerator FadeAway()
+    {
+        Color col = Renderer.color;
+        while (col.a > 0)
+        {
+            col = Renderer.color;
+            col.a -= Time.deltaTime * FADE_SPEED;
+            Renderer.color = col;
+            yield return null;
+        }
+        Stickiness.Rigidbody.velocity = Vector2.zero;
+        Stickiness.Rigidbody.isKinematic = true;
+        _fade = null;
+    }
+
+    private IEnumerator Appear()
+    {
+        Color col = Renderer.color;
+        while (col.a < 1)
+        {
+            col = Renderer.color;
+            col.a += Time.deltaTime * FADE_SPEED;
+            Renderer.color = col;
+            yield return null;
         }
     }
 }

@@ -1,18 +1,21 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Binoculars : CameraCatcher
 {
     [SerializeField] private Transform _zoomCenter;
 
-    private Collider2D _trigger;
+    private TriggerExit _trigger;
+    private SpriteRenderer _renderer;
+    private Color _initialColor;
     public override Transform ZoomCenter => _zoomCenter;
 
     protected override void Awake()
     {
         base.Awake();
-        _trigger = GetComponentsInChildren<Collider2D>().FirstOrDefault(c => c.isTrigger);
+        _trigger = GetComponentInChildren<TriggerExit>();
         _trigger.enabled = false;
+        _renderer = GetComponent<SpriteRenderer>();
+        _initialColor = _renderer.color;
     }
 
     protected void OnCollisionEnter2D(Collision2D collision)
@@ -21,15 +24,21 @@ public class Binoculars : CameraCatcher
             return;
 
         Activate();
-        _trigger.enabled = true;
+        _trigger.SetActive(true);
+    }
+
+    public override void Activate()
+    {
+        base.Activate();
+        _renderer.color = ColorUtils.Blue;
+    }
+
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        _renderer.color = _initialColor;
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision) { }
-
-
-    protected override void OnTriggerExit2D(Collider2D collision)
-    {
-        base.OnTriggerExit2D(collision);
-        _trigger.enabled = false;
-    }
+    protected override void OnTriggerExit2D(Collider2D collision) { }
 }

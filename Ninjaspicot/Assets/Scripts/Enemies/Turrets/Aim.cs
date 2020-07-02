@@ -2,18 +2,18 @@
 
 public class Aim : FieldOfView
 {
-    private Turret _turret;
-    public Turret Turret { get { if (_turret == null) _turret = GetComponentInParent<Turret>() ?? GetComponentInChildren<Turret>(); return _turret; } }
+    protected TurretBase _turret;
+    public TurretBase Turret { get { if (_turret == null) _turret = GetComponentInParent<TurretBase>() ?? GetComponentInChildren<TurretBase>(); return _turret; } }
 
     public string CurrentTarget { get; set; }
     public bool TargetInRange { get; internal set; }
 
-    private void Update()
+    protected virtual void Update()
     {
         Active = Turret.Active;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (!Turret.Active)
             return;
@@ -23,15 +23,15 @@ public class Aim : FieldOfView
             TargetInRange = true;
             if (TargetAimedAt(collision.transform, Turret.Id))
             {
-                if (!Turret.AutoShoot)
-                {
-                    Turret.StartAim(collision.transform);
-                }
+                //if (!Turret.AutoShoot) => Pb : too specific (shooting turret)
+                //{
+                Turret.StartAim(collision.transform);
+                //}
             }
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    protected virtual void OnTriggerExit2D(Collider2D collision)
     {
         if (!string.IsNullOrEmpty(CurrentTarget) && collision.CompareTag(CurrentTarget))
         {

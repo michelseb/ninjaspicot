@@ -2,7 +2,7 @@
 
 public class Perimeter : MonoBehaviour, IRaycastable
 {
-    private Turret _turret;
-    public Turret Turret { get { if (_turret == null) _turret = GetComponentInParent<Turret>() ?? GetComponentInChildren<Turret>(); return _turret; } }
+    private ShootingTurret _turret;
+    public ShootingTurret Turret { get { if (_turret == null) _turret = GetComponentInParent<ShootingTurret>() ?? GetComponentInChildren<ShootingTurret>(); return _turret; } }
     public int Id => Turret.Id;
 }

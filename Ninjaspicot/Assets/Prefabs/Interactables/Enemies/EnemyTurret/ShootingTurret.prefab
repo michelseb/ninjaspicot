@@ -53,13 +53,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fc9cd0b02c2627479c0c889097a8453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _autoShoot: 0
   _viewAngle: 180
   _rotationSpeed: 100
   _clockWise: 0
+  _initRotation: 0
+  _autoShoot: 0
   _strength: 500
   _loadTime: 0.2
-  _initRotation: 0
 --- !u!120 &105435373814606087
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 8692095818253765191}
   - component: {fileID: 5297972683042849010}
   m_Layer: 13
-  m_Name: DeactivableTurret
+  m_Name: ShootingTurret
   m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class FieldOfView : MonoBehaviour
 {
-    [SerializeField] private float _size;
-    [SerializeField] private int _viewAngle;
-    [SerializeField] private int _detailAmount;
-    [SerializeField] private Vector3 _offset;
-    [SerializeField] private float _startAngle;
+    [SerializeField] protected float _size;
+    [SerializeField] protected int _viewAngle;
+    [SerializeField] protected int _detailAmount;
+    [SerializeField] protected Vector3 _offset;
+    [SerializeField] protected float _startAngle;
     public float Size => _size;
     public bool Active { get; protected set; }
     protected Mesh _mesh;
