@@ -46,7 +46,7 @@ public class MarauderEnemy : EnemyNinja
                     //Stickiness.NinjaDir = (Dir)1 - (int)Stickiness.NinjaDir;
                     _remainingTime = _walkTime;
                     Stickiness.StartWalking();
-                    _fieldOfView.SetActive(false);
+                    _fieldOfView.Deactivate();
                     _marauderMode = MarauderMode.Moving;
                 }
                 break;
@@ -101,7 +101,7 @@ public class MarauderEnemy : EnemyNinja
         Attacking = false;
         _remainingTime = _searchTime;
         _marauderMode = MarauderMode.Searching;
-        _fieldOfView.SetActive(true);
+        _fieldOfView.Activate();
         _readyToStop = false;
         _slowDown = null;
     }

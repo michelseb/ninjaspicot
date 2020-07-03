@@ -2,20 +2,24 @@
 using System.Linq;
 using UnityEngine;
 
-public class FieldOfView : MonoBehaviour
+public class FieldOfView : MonoBehaviour, IActivable
 {
     [SerializeField] protected float _size;
-    [SerializeField] protected int _viewAngle;
+    [SerializeField] protected float _viewAngle;
     [SerializeField] protected int _detailAmount;
     [SerializeField] protected Vector3 _offset;
     [SerializeField] protected float _startAngle;
-    public float Size => _size;
+    [SerializeField] protected CustomColor _customColor;
+
     public bool Active { get; protected set; }
     protected Mesh _mesh;
     protected MeshFilter _filter;
     protected IRaycastable _parent;
     protected PolygonCollider2D _collider;
     protected MeshRenderer _renderer;
+    protected Color _color;
+
+    protected const float TRANSPARENCY = .5f;
 
     protected virtual void Awake()
     {
@@ -23,6 +27,12 @@ public class FieldOfView : MonoBehaviour
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
         _parent = transform.parent?.GetComponent<IRaycastable>();
+
+        if (_customColor != CustomColor.None)
+        {
+            _color = ColorUtils.GetColor(_customColor, TRANSPARENCY);
+            SetColor(_color);
+        }
     }
 
     protected virtual void Start()
@@ -42,7 +52,7 @@ public class FieldOfView : MonoBehaviour
         _filter.sharedMesh = _mesh;
     }
 
-    private Mesh GenerateMesh(float size, int angle, int pointCount, Vector3 offset)
+    private Mesh GenerateMesh(float size, float angle, int pointCount, Vector3 offset)
     {
         var mesh = new Mesh();
         pointCount = Mathf.Max(pointCount, 2);
@@ -53,7 +63,7 @@ public class FieldOfView : MonoBehaviour
 
         offset = transform.TransformPoint(offset);
 
-        float angleStep = angle / pointCount;
+        float angleStep = (float)angle / pointCount;
 
         vertices[0] = transform.InverseTransformPoint(offset);
 
@@ -98,7 +108,7 @@ public class FieldOfView : MonoBehaviour
     }
 
 
-    private Mesh InitMesh(float size, int angle, int pointCount, Vector3 offset)
+    private Mesh InitMesh(float size, float angle, int pointCount, Vector3 offset)
     {
         var mesh = new Mesh();
         pointCount = Mathf.Max(pointCount, 2);
@@ -158,10 +168,23 @@ public class FieldOfView : MonoBehaviour
         _collider.SetPath(0, collPoints);
     }
 
-    public void SetActive(bool active)
+    protected void SetColor(Color color)
     {
-        _renderer.enabled = active;
-        _collider.enabled = active;
-        Active = active;
+        _renderer.material.SetColor("_Color", _color);
+        _renderer.material.SetColor("_EmissionColor", _color);
+    }
+
+    public void Activate()
+    {
+        _renderer.enabled = true;
+        _collider.enabled = true;
+        Active = true;
+    }
+
+    public void Deactivate()
+    {
+        _renderer.enabled = false;
+        _collider.enabled = false;
+        Active = false;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class ShootingTurret : TurretBase
 {
@@ -18,7 +16,7 @@ public class ShootingTurret : TurretBase
 
     protected override void Update()
     {
-        _image.color = Active ? ColorUtils.Red : ColorUtils.White;
+        base.Update();
 
         if (!Active)
             return;
@@ -36,59 +34,36 @@ public class ShootingTurret : TurretBase
                 _loadProgress += Time.deltaTime;
             }
         }
+    }
 
+    protected override void Aim()
+    {
+        base.Aim();
 
-        switch (TurretMode)
+        if (_target != null && _aim.TargetAimedAt(_target, Id))
         {
-            case Mode.Aim:
+            if (Loaded && _aim.TargetCentered(transform, _target.tag, Id))
+            {
+                Shoot();
+            }
+        }
+        else
+        {
+            StartWait();
+        }
+    }
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
-
-                if (_target != null && _aim.TargetAimedAt(_target, Id))
-                {
-                    if (Loaded && _aim.TargetCentered(transform, _target.tag, Id))
-                    {
-                        Shoot();
-                    }
-                }
-                else
-                {
-                    StartWait();
-                }
-                break;
-
-
-            case Mode.Scan:
-
-                if (_autoShoot)
-                {
-                    if (Loaded)
-                    {
-                        Shoot();
-                    }
-                }
-
-                var dir = _clockWise ? 1 : -1;
-
-                transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
-
-                if (dir * (transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
-                {
-                    _clockWise = !_clockWise;
-                }
-
-                break;
-
-
-            case Mode.Wait:
-
-                if (_target != null && _aim.TargetAimedAt(_target, Id))
-                {
-                    StartAim(_target);
-                }
-                break;
+    protected override void Scan()
+    {
+        if (_autoShoot)
+        {
+            if (Loaded)
+            {
+                Shoot();
+            }
         }
 
+        base.Scan();
     }
 
     private void Shoot()

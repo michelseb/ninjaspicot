@@ -6,7 +6,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 {
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-    public enum Mode { Scan, Aim, Wait };
+    public enum Mode { Scan, Aim, Wonder };
 
     [SerializeField] protected float _viewAngle;
     [SerializeField] protected float _rotationSpeed;
@@ -20,7 +20,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected Aim _aim;
     protected Image _image;
     protected Transform _target;
-    protected Coroutine _search;
+    protected Coroutine _wait;
 
     protected virtual void Awake()
     {
@@ -44,61 +44,65 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
         if (!Active)
             return;
 
-
         switch (TurretMode)
         {
             case Mode.Aim:
-
-                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
-
-                if (_target == null || _aim.TargetAimedAt(_target, Id))
-                {
-                    StartWait();
-                }
+                Aim();
                 break;
 
             case Mode.Scan:
-
-                var dir = _clockWise ? 1 : -1;
-
-                transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
-
-                if (dir * (transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
-                {
-                    _clockWise = !_clockWise;
-                }
-
+                Scan();
                 break;
 
 
-            case Mode.Wait:
-
-                if (_target != null && _aim.TargetAimedAt(_target, Id))
-                {
-                    StartAim(_target);
-                }
+            case Mode.Wonder:
+                Wonder();
                 break;
         }
 
     }
 
+    protected virtual void Aim()
+    {
+        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
+    }
+
+    protected virtual void Scan()
+    {
+        var dir = _clockWise ? 1 : -1;
+
+        transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+
+        if (dir * (transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
+        {
+            _clockWise = !_clockWise;
+        }
+    }
+
+    protected virtual void Wonder()
+    {
+        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        {
+            StartAim(_target);
+        }
+    }
 
     public void StartAim(Transform target)
     {
         _target = target;
         TurretMode = Mode.Aim;
 
-        if (_search != null)
+        if (_wait != null)
         {
-            StopCoroutine(_search);
-            _search = null;
+            StopCoroutine(_wait);
+            _wait = null;
         }
     }
 
     public void StartWait()
     {
-        TurretMode = Mode.Wait;
-        _search = StartCoroutine(Wait());
+        TurretMode = Mode.Wonder;
+        _wait = StartCoroutine(Wait());
     }
 
     protected virtual IEnumerator Wait()
@@ -114,10 +118,12 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     public void Activate()
     {
         Active = true;
+        _aim.Activate();
     }
 
     public void Deactivate()
     {
         Active = false;
+        _aim.Deactivate();
     }
 }

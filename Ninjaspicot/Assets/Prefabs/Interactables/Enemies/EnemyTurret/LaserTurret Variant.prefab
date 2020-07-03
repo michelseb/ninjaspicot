@@ -28,11 +28,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 190f81bc8cf0b204ba414e7fec0a1a50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 0
-  _viewAngle: 0
-  _detailAmount: 0
-  _offset: {x: 0, y: 0, z: 0}
-  _startAngle: 0
+  _size: 100
+  _viewAngle: 45
+  _detailAmount: 30
+  _offset: {x: 0, y: 10, z: 0}
+  _startAngle: 90
+  _customColor: 3
 --- !u!1001 &7881880677219954683
 PrefabInstance:
   m_ObjectHideFlags: 0

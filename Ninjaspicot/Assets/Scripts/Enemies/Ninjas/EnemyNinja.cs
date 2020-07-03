@@ -76,7 +76,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
             }
         }
         Deactivate();
-        yield return base.Dying();
+        yield return StartCoroutine(base.Dying());
     }
 
     public void Deactivate()

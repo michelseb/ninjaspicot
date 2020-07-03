@@ -97,6 +97,8 @@ MonoBehaviour:
   _viewAngle: 45
   _detailAmount: 20
   _offset: {x: 0, y: 0, z: 0}
+  _startAngle: 0
+  _customColor: 2
 --- !u!60 &5767600494403769527
 PolygonCollider2D:
   m_ObjectHideFlags: 0
