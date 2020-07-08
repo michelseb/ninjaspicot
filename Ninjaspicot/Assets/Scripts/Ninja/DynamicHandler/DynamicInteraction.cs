@@ -63,12 +63,12 @@ public class DynamicInteraction : MonoBehaviour, IActivable
         CloneHeroStickiness.Awake();
         CloneHeroStickiness.Start();
 
-        CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.transform);
+        CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.transform, true);
 
-        _cloneHeroCollider.transform.SetParent(_cloneOtherDynamic.transform);
+        _cloneHeroCollider.transform.SetParent(_cloneOtherDynamic.transform, true);
         _previousPosition = _cloneHeroCollider.transform.localPosition;
 
-        _hero.transform.SetParent(otherCollider.transform);
+        _hero.transform.SetParent(otherCollider.transform, true);
 
         _hero.Stickiness.Rigidbody.angularVelocity = 0;
         _hero.Stickiness.Rigidbody.velocity = Vector2.zero;

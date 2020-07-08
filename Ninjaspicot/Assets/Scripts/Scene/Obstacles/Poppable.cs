@@ -18,7 +18,7 @@ public class Poppable : DynamicObstacle
         if (!_active)
             return;
 
-        _currentSpeed += _speed * Time.deltaTime;
+        _currentSpeed += _customSpeed * Time.deltaTime;
         _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _maxSpeed);
 
         Rigidbody.MovePosition(Rigidbody.position + new Vector2(0, -_currentSpeed));

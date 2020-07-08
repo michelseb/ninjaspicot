@@ -112,13 +112,13 @@ namespace DigitalRuby.LightningBolt
 
             if (distX < distY)
             {
-                _collider.size = new Vector2(2, distY);
+                _collider.size = new Vector2(10, distY);
                 
                 _collider.offset = StartObject.transform.localPosition + new Vector3(0, distY / 2);
             }
             else
             {
-                _collider.size = new Vector2(distX, 2);
+                _collider.size = new Vector2(distX, 10);
                 _collider.offset = StartObject.transform.localPosition + new Vector3(distX / 2, 0);
             }
         }

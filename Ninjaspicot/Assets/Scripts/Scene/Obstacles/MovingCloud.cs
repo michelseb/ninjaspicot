@@ -22,8 +22,8 @@ public class MovingCloud : DynamicObstacle
 
     private void FixedUpdate()
     {
-        var xMove = _xAmplitude > 0 ? _speed * _xDir : 0;
-        var yMove = _yAmplitude > 0 ? _speed * _yDir : 0;
+        var xMove = _xAmplitude > 0 ? _customSpeed * _xDir : 0;
+        var yMove = _yAmplitude > 0 ? _customSpeed * _yDir : 0;
 
         Rigidbody.MovePosition(Rigidbody.position + new Vector2(xMove, yMove) * Time.deltaTime);
 
