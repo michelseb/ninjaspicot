@@ -36,7 +36,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.08310108, y: 5.856}
+  m_AnchoredPosition: {x: 0.12, y: 5.9}
   m_SizeDelta: {x: 20, y: 9.512}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &7740466649977184543
@@ -143,7 +143,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278190080
   m_fontSize: 80
-  m_fontSizeBase: 2
+  m_fontSizeBase: 80
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 9.608555, y: 2.3883426, z: 9.678759, w: 2.4879282}
+  m_margin: {x: -14.753628, y: 2.3883426, z: -3.2930431, w: 2.4879282}
   m_textInfo:
     textComponent: {fileID: 7740466649977184540}
     characterCount: 8
@@ -188,7 +188,7 @@ MonoBehaviour:
     spaceCount: 0
     wordCount: 1
     linkCount: 0
-    lineCount: 8
+    lineCount: 1
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -255,7 +255,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 37ffc084db139704ab336ae650509b27, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -275,8 +275,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: f812d6974d80682458c7ead4dc32b901, type: 3}
+  m_SortingOrder: 1
+  m_Sprite: {fileID: 3286163911610860551, guid: 87e484f7852e592478eb4098197aadae,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -334,7 +335,7 @@ PolygonCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 1
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -1.31, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -346,18 +347,30 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 13.753418, y: 18.610533}
-      - {x: 13.316467, y: 9.228261}
-      - {x: -26.269043, y: 10.101226}
-      - {x: -26.352661, y: -2.1293678}
-      - {x: -6.9003296, y: -1.7120743}
-      - {x: -5.680237, y: -16.142756}
+    - - {x: 29.197695, y: 5.883627}
+      - {x: 15.872805, y: 17.448704}
+      - {x: 14.069643, y: 18.187315}
+      - {x: 12.965029, y: 17.743269}
+      - {x: 13.06946, y: 10.817586}
+      - {x: 12.260012, y: 10.146634}
+      - {x: 11.030031, y: 9.937839}
+      - {x: -24.917662, y: 10.53165}
+      - {x: -26.742064, y: 8.524384}
+      - {x: -26.391356, y: -1.3376503}
+      - {x: -24.145079, y: -2.681263}
+      - {x: -8.329954, y: -2.4268494}
+      - {x: -7.215696, y: -3.6042862}
+      - {x: -5.8379493, y: -16.142756}
+      - {x: -5.2078223, y: -17.756079}
       - {x: -2.0202637, y: -17.875105}
-      - {x: 1.8726196, y: -14.9319935}
-      - {x: 2.0883179, y: -0.0075206757}
-      - {x: 13.27417, y: 0.73921204}
-      - {x: 13.501221, y: -5.777315}
-      - {x: 30.110107, y: 5.123884}
+      - {x: 1.1380029, y: -16.55416}
+      - {x: 2.1879907, y: -13.276308}
+      - {x: 2.4824853, y: -0.40172958}
+      - {x: 12.012697, y: -0.28573418}
+      - {x: 13.866274, y: -5.0925274}
+      - {x: 14.920412, y: -4.9888935}
+      - {x: 29.213503, y: 3.7355232}
+      - {x: 29.321718, y: 4.8085155}
 --- !u!114 &5579698436013381761
 MonoBehaviour:
   m_ObjectHideFlags: 0

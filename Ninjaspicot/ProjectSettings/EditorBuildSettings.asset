@@ -11,28 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Levels/Lobby.unity
     guid: e687421e15379e94f9ad685937285870
-  - enabled: 0
-    path: Assets/Levels/level0.unity
-    guid: 08f881609c278ec48b00a24e248c04d1
-  - enabled: 0
-    path: Assets/Levels/level1.unity
-    guid: 210e15bfd637126458f848cabeb80588
-  - enabled: 0
-    path: Assets/Levels/level2.unity
-    guid: d7bd2f0e2b4ed5545866543d1ac904c8
-  - enabled: 0
-    path: Assets/Levels/level3.unity
-    guid: 854e0be68d1f69a429f38a405f5bb944
-  - enabled: 0
-    path: Assets/Levels/level4.unity
-    guid: 9888df4a7e755934ebbb6f91473d8c6b
-  - enabled: 0
-    path: Assets/Levels/level5.unity
-    guid: 251225f939ea3ac429a53b06dc8df7c3
-  - enabled: 0
-    path: Assets/Levels/level6.unity
-    guid: bc39a41950884d847a242f4aa2d16eab
   - enabled: 1
     path: Assets/Levels/Tutorial.unity
     guid: ac795909a1162d94cb98fd04af12f38a
+  - enabled: 1
+    path: Assets/Levels/Kitchen.unity
+    guid: a28ea13fafeafc24dbd5be3c5844fe77
   m_configObjects: {}

@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+
+public class ShootingTurret : TurretBase
+{
+    [SerializeField] private bool _autoShoot;
+    [SerializeField] private float _strength;
+    [SerializeField] private float _loadTime;
+
+    public bool AutoShoot => _autoShoot;
+
+    private float _loadProgress;
+
+    private PoolManager _poolManager;
+
+
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (!Active)
+            return;
+
+        //Loading weapon
+        if (!Loaded)
+        {
+            if (_loadProgress >= _loadTime)
+            {
+                Loaded = true;
+                _loadProgress = 0;
+            }
+            else
+            {
+                _loadProgress += Time.deltaTime;
+            }
+        }
+    }
+
+    protected override void Aim()
+    {
+        base.Aim();
+
+        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        {
+            if (Loaded && _aim.TargetCentered(transform, _target.tag, Id))
+            {
+                Shoot();
+            }
+        }
+        else
+        {
+            StartWait();
+        }
+    }
+
+    protected override void Scan()
+    {
+        if (_autoShoot)
+        {
+            if (Loaded)
+            {
+                Shoot();
+            }
+        }
+
+        base.Scan();
+    }
+
+    private void Shoot()
+    {
+        var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation, PoolableType.Bullet);
+        bullet.Speed = _strength;
+        Loaded = false;
+    }
+}

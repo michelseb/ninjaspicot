@@ -21,7 +21,6 @@ public class ScenesManager : MonoBehaviour
     [SerializeField] private SceneInfos[] _scenes;
     [SerializeField] private int _startScene;
 
-    private AsyncOperation _operation;
     private SpawnManager _spawnManager;
     public Coroutine SceneLoad { get; private set; }
 
@@ -53,12 +52,11 @@ public class ScenesManager : MonoBehaviour
 
         var operation = SceneManager.LoadSceneAsync(scene.Name, LoadSceneMode.Additive);
         operation.allowSceneActivation = false;
-        _operation = operation;
 
         while (operation.progress < .9f)
             yield return null;
 
-        _operation.allowSceneActivation = true;
+        operation.allowSceneActivation = true;
 
         while (!operation.isDone)
             yield return null;

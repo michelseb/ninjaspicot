@@ -7,7 +7,12 @@ public enum PoolableType
     Marauder,
     Bullet,
     Touch1,
-    Touch2
+    Touch2,
+    Cloud,
+    Platform,
+    Shelf,
+    Rice,
+    IndicationRock
 }
 
 public interface IPoolable : IActivable

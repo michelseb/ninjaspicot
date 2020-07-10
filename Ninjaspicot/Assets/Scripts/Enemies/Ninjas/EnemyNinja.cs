@@ -30,7 +30,6 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        Activate();
         transform.position = position;
         transform.rotation = rotation;
     }
@@ -76,7 +75,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
             }
         }
         Deactivate();
-        yield return base.Dying();
+        yield return StartCoroutine(base.Dying());
     }
 
     public void Deactivate()

@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 780037604}
   - component: {fileID: 780037605}
   - component: {fileID: 780037607}
+  - component: {fileID: 780037606}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -243,7 +244,7 @@ LineRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -515,6 +516,37 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &780037606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780037596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
 --- !u!222 &780037607
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -673,6 +705,8 @@ MonoBehaviour:
   - {fileID: 4191711070170336480, guid: 9c10d8ab8aad1824e8545044bbd0f3bc, type: 3}
   - {fileID: 1312505499617283950, guid: 61908617a2b10424dac256a34bbffbe4, type: 3}
   - {fileID: 4196596280736877105, guid: ddb6aa3426798b04f9edbbafb53cb41f, type: 3}
+  - {fileID: 9040868208357890174, guid: a9aea617b3047a14c8a9c61a5aa7d9f1, type: 3}
+  - {fileID: 4221473169236583224, guid: 0fe0b81b9d9cb2646acf3da182cfb365, type: 3}
   _poolableParent: {fileID: 117308930}
 --- !u!114 &780851359
 MonoBehaviour:
@@ -918,5 +952,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1000000
       objectReference: {fileID: 0}
+    - target: {fileID: 212945898605512338, guid: e9251095c848a6747a493e69692928df,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9251095c848a6747a493e69692928df, type: 3}
