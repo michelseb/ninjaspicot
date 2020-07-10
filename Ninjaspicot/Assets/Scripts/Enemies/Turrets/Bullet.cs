@@ -40,7 +40,6 @@ public class Bullet : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        Activate();
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
         _currentLifeTime = LIFE_TIME;

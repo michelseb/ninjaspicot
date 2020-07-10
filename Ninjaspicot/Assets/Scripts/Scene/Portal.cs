@@ -53,10 +53,6 @@ public class Portal : MonoBehaviour
 
         Hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
 
-        //var velocity = Hero.Stickiness.Rigidbody.velocity;
-        //Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
-        //Hero.Stickiness.Rigidbody.isKinematic = true;
-
         if (_connect == null)
         {
             Hero.StartFading();

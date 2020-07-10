@@ -11,6 +11,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 {
     [SerializeField] private float _speed;
     protected Rigidbody2D _rigidbody;
+    protected Collider2D _collider;
 
     public HingeJoint2D WallJoint { get; set; }
     public Obstacle CurrentAttachment { get; set; }
@@ -22,6 +23,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     public float CurrentSpeed { get; set; }
     public Transform ContactPoint { get; private set; }
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
+    public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
     public bool DynamicActive => true;
     public PoolableType PoolableType => PoolableType.None;
 
@@ -38,6 +40,8 @@ public class Stickiness : MonoBehaviour, IDynamic
         Active = true;
         WallJoint = GetComponent<HingeJoint2D>();
         _jumpManager = GetComponent<Jumper>();
+        _rigidbody = _rigidbody ?? GetComponent<Rigidbody2D>();
+        _collider = _collider ?? GetComponent<Collider2D>();
         _ninjaBehaviour = GetComponent<INinja>();
         ContactPoint = new GameObject("ContactPoint").transform;
         ContactPoint.position = transform.position;
@@ -92,10 +96,6 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public virtual void Detach()
     {
-        if (CurrentAttachment != null && CurrentAttachment is DynamicObstacle)
-        {
-            ((DynamicObstacle)CurrentAttachment).LaunchQuickDeactivate();
-        }
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
@@ -159,7 +159,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         if (stayGrounded)
         {
-            //Rigidbody.isKinematic = true;
+            Rigidbody.isKinematic = true;
         }
 
         _walkOnWalls = null;
@@ -197,4 +197,8 @@ public class Stickiness : MonoBehaviour, IDynamic
         CurrentSpeed = _speed;
     }
 
+    public void LaunchQuickDeactivate()
+    {
+        Detach();
+    }
 }

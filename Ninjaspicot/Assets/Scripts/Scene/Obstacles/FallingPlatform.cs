@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class FallingPlatform : DynamicObstacle
 {
@@ -7,6 +8,9 @@ public class FallingPlatform : DynamicObstacle
     private Vector3 _initialPosition;
     private bool _active;
 
+    private Coroutine _wait;
+
+    private const float FALL_DELAY = .5f;
     private const float FALL_TIME = 10f;
     private const float MAX_SPEED = 20f;
     private const float DEFAULT_SPEED = 1f;
@@ -39,9 +43,9 @@ public class FallingPlatform : DynamicObstacle
     protected override void OnCollisionEnter2D(Collision2D collision)
     {
         base.OnCollisionEnter2D(collision);
-        if (collision.collider.CompareTag("hero"))
+        if (collision.collider.CompareTag("hero") && _wait == null)
         {
-            _active = true;
+            _wait = StartCoroutine(WaitBeforeFall(FALL_DELAY));
         }
     }
 
@@ -51,5 +55,12 @@ public class FallingPlatform : DynamicObstacle
         _currentSpeed = 0;
         _remainingTime = FALL_TIME;
         transform.position = _initialPosition;
+    }
+
+    private IEnumerator WaitBeforeFall(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        _active = true;
+        _wait = null;
     }
 }

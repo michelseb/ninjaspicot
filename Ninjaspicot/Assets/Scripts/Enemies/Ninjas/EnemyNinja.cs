@@ -30,7 +30,6 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        Activate();
         transform.position = position;
         transform.rotation = rotation;
     }

@@ -12,8 +12,9 @@ public class DynamicObstacle : Obstacle, IDynamic, IActivable
 
     public PoolableType PoolableType => _poolableType;
 
-    public virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         Activate();
     }
 
@@ -57,10 +58,20 @@ public class DynamicObstacle : Obstacle, IDynamic, IActivable
     public void Activate()
     {
         DynamicActive = true;
+        var heroCollider = Hero.Instance?.Stickiness?.Collider;
+        if (heroCollider != null)
+        {
+            Physics2D.IgnoreCollision(_collider, heroCollider, false);
+        }
     }
 
     public void Deactivate()
     {
         DynamicActive = false;
+        var heroCollider = Hero.Instance?.Stickiness?.Collider;
+        if (heroCollider != null)
+        {
+            Physics2D.IgnoreCollision(_collider, heroCollider);
+        }
     }
 }
