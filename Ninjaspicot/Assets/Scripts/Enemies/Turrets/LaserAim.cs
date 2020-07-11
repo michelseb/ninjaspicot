@@ -58,7 +58,7 @@ public class LaserAim : Aim
             StopCoroutine(_unlaserize);
         }
 
-        _laserize = StartCoroutine(Laserize(LASERIZE_DURATION));
+        //_laserize = StartCoroutine(Laserize(LASERIZE_DURATION));
     }
 
     public void StopLaserize()
@@ -71,7 +71,7 @@ public class LaserAim : Aim
             StopCoroutine(_laserize);
         }
         Charged = false;
-        _unlaserize = StartCoroutine(Unlaserize(UNLASERIZE_DURATION));
+        //_unlaserize = StartCoroutine(Unlaserize(UNLASERIZE_DURATION));
     }
 
     private IEnumerator Laserize(float duration)

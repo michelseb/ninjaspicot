@@ -722,6 +722,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _size: 100
   _viewAngle: 45
-  _detailAmount: 30
+  _detailAmount: 10
   _offset: {x: 0, y: 10, z: 0}
   _startAngle: 90
+  _customColor: 0

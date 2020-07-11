@@ -18,6 +18,7 @@ public class FieldOfView : MonoBehaviour, IActivable
     protected PolygonCollider2D _collider;
     protected MeshRenderer _renderer;
     protected Color _color;
+    private Vector3[] _vertices;
 
     protected const float TRANSPARENCY = .5f;
 
@@ -48,79 +49,54 @@ public class FieldOfView : MonoBehaviour, IActivable
         if (!Active)
             return;
 
-        _mesh = GenerateMesh(_size, _viewAngle, _detailAmount, _offset);
+        var newVertices = GetNewVertices(_size, _viewAngle, _detailAmount, _offset);
+
+        foreach (KeyValuePair<int, Vector3> vertex in newVertices)
+        {
+            _vertices[vertex.Key] = vertex.Value;
+        }
+        _mesh.vertices = _vertices;
         _filter.sharedMesh = _mesh;
     }
 
-    private Mesh GenerateMesh(float size, float angle, int pointCount, Vector3 offset)
+    private Dictionary<int, Vector3> GetNewVertices(float size, float angle, int pointCount, Vector3 offset)
     {
-        var mesh = new Mesh();
-        pointCount = Mathf.Max(pointCount, 2);
-
-        var vertices = new Vector3[pointCount + 2];
-        var uv = new Vector2[vertices.Length];
-        var triangles = new int[pointCount * 3];
+        var modifiedVertices = new Dictionary<int, Vector3>();
 
         offset = transform.TransformPoint(offset);
 
         float angleStep = (float)angle / pointCount;
 
-        vertices[0] = transform.InverseTransformPoint(offset);
-
         var currentAngle = Utils.GetAngleFromVector(transform.InverseTransformDirection(transform.up)) + angle / 3f;
-        var vertexIndex = 1;
-        var triangleIndex = 0;
 
         for (int i = 0; i < pointCount; i++)
         {
-            Vector3 vertex;
-            //Debug.DrawRay(offset, transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)) * size, Color.yellow);
             var hits = Physics2D.RaycastAll(offset, transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)), size);
             var hit = hits.FirstOrDefault(x => x && !x.collider.isTrigger && !x.collider.CompareTag("hero"));
             if (hit)
             {
-                vertex = transform.InverseTransformPoint(hit.point);
-            }
-            else
-            {
-                vertex = Utils.GetVectorFromAngle(currentAngle) * (size + transform.InverseTransformPoint(offset).magnitude);
+                modifiedVertices.Add(i + 1, transform.InverseTransformPoint(hit.point));
             }
 
-            vertices[vertexIndex] = vertex;
-
-            if (i > 0)
-            {
-                triangles[triangleIndex] = 0;
-                triangles[triangleIndex + 1] = vertexIndex - 1;
-                triangles[triangleIndex + 2] = vertexIndex;
-                triangleIndex += 3;
-            }
-
-            vertexIndex++;
             currentAngle -= angleStep;
         }
 
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.uv = uv;
-
-        return mesh;
+        return modifiedVertices;
     }
 
 
     private Mesh InitMesh(float size, float angle, int pointCount, Vector3 offset)
     {
         var mesh = new Mesh();
-        pointCount = Mathf.Max(pointCount, 2);
 
-        var vertices = new Vector3[pointCount + 2];
-        var uv = new Vector2[vertices.Length];
+        _vertices = new Vector3[pointCount + 2];
+        var uvs = new Vector2[_vertices.Length];
         var triangles = new int[pointCount * 3];
 
         offset = transform.TransformPoint(offset);
         float angleStep = angle / pointCount;
 
-        vertices[0] = transform.InverseTransformPoint(offset);
+        _vertices[0] = transform.InverseTransformPoint(offset);
 
         var currentAngle = Utils.GetAngleFromVector(transform.InverseTransformDirection(transform.up)) + angle / 2f;
         var vertexIndex = 1;
@@ -129,7 +105,7 @@ public class FieldOfView : MonoBehaviour, IActivable
         for (int i = 0; i < pointCount; i++)
         {
 
-            vertices[vertexIndex] = Utils.GetVectorFromAngle(currentAngle) * (size + transform.InverseTransformPoint(offset).magnitude);
+            _vertices[vertexIndex] = Utils.GetVectorFromAngle(currentAngle) * (size + transform.InverseTransformPoint(offset).magnitude);
 
             if (i > 0)
             {
@@ -143,9 +119,9 @@ public class FieldOfView : MonoBehaviour, IActivable
             currentAngle -= angleStep;
         }
 
-        mesh.vertices = vertices;
+        mesh.vertices = _vertices;
         mesh.triangles = triangles;
-        mesh.uv = uv;
+        mesh.uv = uvs;
 
         return mesh;
     }
