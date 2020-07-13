@@ -23,10 +23,7 @@ public class Aim : FieldOfView
             TargetInRange = true;
             if (TargetAimedAt(collision.transform, Turret.Id))
             {
-                //if (!Turret.AutoShoot) => Pb : too specific (shooting turret)
-                //{
                 Turret.StartAim(collision.transform);
-                //}
             }
         }
     }
@@ -57,7 +54,7 @@ public class Aim : FieldOfView
         if (target == null || !TargetInRange)
             return false;
 
-        var hit = Utils.LineCast(transform.position, target.position, ignoreId, false, target.tag);
+        var hit = Utils.LineCast(_transform.position, target.position, ignoreId, false, target.tag);
 
         return hit && hit.transform.CompareTag(target.tag);
     }

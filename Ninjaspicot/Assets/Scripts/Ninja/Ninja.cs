@@ -16,6 +16,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
 
     protected CameraBehaviour _cameraBehaviour;
     protected PoolManager _poolManager;
+    protected Transform _transform;
 
     protected virtual void Awake()
     {
@@ -25,6 +26,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
         Image = GetComponent<Image>();
+        _transform = transform;
     }
 
 

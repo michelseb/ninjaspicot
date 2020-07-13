@@ -21,18 +21,20 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected Image _image;
     protected Transform _target;
     protected Coroutine _wait;
+    protected Transform _transform;
 
     protected virtual void Awake()
     {
         _aim = GetComponentInChildren<Aim>();
         _aim.CurrentTarget = "hero";
         _image = GetComponent<Image>();
+        _transform = transform; //Caching transform for enhanced performance
     }
 
     protected virtual void Start()
     {
         TurretMode = Mode.Scan;
-        transform.Rotate(0, 0, _initRotation);
+        _transform.Rotate(0, 0, _initRotation);
         Loaded = true;
         Active = true;
     }
@@ -64,16 +66,16 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual void Aim()
     {
-        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.transform.position - transform.position), .05f);
+        _transform.rotation = Quaternion.Lerp(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.position - _transform.position), .05f);
     }
 
     protected virtual void Scan()
     {
         var dir = _clockWise ? 1 : -1;
 
-        transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+        _transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
 
-        if (dir * (transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
+        if (dir * (_transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
         {
             _clockWise = !_clockWise;
         }
@@ -107,7 +109,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual IEnumerator Wait()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(4);
 
         if (TurretMode != Mode.Aim)
         {

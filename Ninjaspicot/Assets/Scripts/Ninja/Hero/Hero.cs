@@ -54,12 +54,12 @@ public class Hero : Ninja, IRaycastable
         SetCapeActivation(false);
         _spawnManager.Respawn();
         SetAllBehavioursActivation(true, false);
-        _cameraBehaviour.SetCenterMode(transform, 1f);
+        _cameraBehaviour.SetCenterMode(_transform, 1f);
         SetCapeActivation(true);
 
         yield return new WaitForSeconds(1f);
 
-        _cameraBehaviour.SetFollowMode(transform);
+        _cameraBehaviour.SetFollowMode(_transform);
     }
 
     public void SetCapeActivation(bool active)
@@ -132,7 +132,7 @@ public class Hero : Ninja, IRaycastable
     {
         while (true)
         {
-            _poolManager.GetPoolable<HeroGhost>(transform.position, transform.rotation);
+            _poolManager.GetPoolable<HeroGhost>(_transform.position, _transform.rotation);
             yield return new WaitForSeconds(delay);
         }
     }

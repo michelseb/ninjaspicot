@@ -31,6 +31,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumpManager;
+    protected Transform _transform;
 
     public virtual void Awake()
     {
@@ -38,14 +39,15 @@ public class Stickiness : MonoBehaviour, IDynamic
             return;
 
         Active = true;
+        _transform = transform;
         WallJoint = GetComponent<HingeJoint2D>();
         _jumpManager = GetComponent<Jumper>();
         _rigidbody = _rigidbody ?? GetComponent<Rigidbody2D>();
         _collider = _collider ?? GetComponent<Collider2D>();
         _ninjaBehaviour = GetComponent<INinja>();
         ContactPoint = new GameObject("ContactPoint").transform;
-        ContactPoint.position = transform.position;
-        ContactPoint.SetParent(transform);
+        ContactPoint.position = _transform.position;
+        ContactPoint.SetParent(_transform);
         _previousContactPoint = ContactPoint.position;
     }
 
@@ -85,7 +87,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = transform.InverseTransformPoint(GetContactPosition());
+        WallJoint.anchor = _transform.InverseTransformPoint(GetContactPosition());
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
@@ -186,7 +188,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         {
             jointMotor.motorSpeed = NinjaDir == Dir.Left ? -CurrentSpeed : CurrentSpeed;
             hinge.motor = jointMotor;
-            hinge.anchor = transform.InverseTransformPoint(GetContactPosition());
+            hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
 
             yield return null;
         }

@@ -41,7 +41,7 @@ public class CameraBehaviour : MonoBehaviour
     private float _screenRatio;
     private float INITIAL_CAMERA_SIZE;
     private const float ZOOM_SPEED = 2f;
-    private const float FOLLOW_SPEED = .01f;
+    private const float FOLLOW_SPEED = 2f;
     private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
@@ -106,7 +106,7 @@ public class CameraBehaviour : MonoBehaviour
     }
     private void Follow(Transform tracker, float speed)
     {
-        Transform.position = Vector3.Lerp(Transform.position, new Vector3(tracker.position.x, tracker.position.y, Transform.position.z), speed);
+        Transform.position = Vector3.Lerp(Transform.position, new Vector3(tracker.position.x, tracker.position.y, Transform.position.z), speed * Time.deltaTime);
     }
 
     private void Center(Vector3 origin, Vector3 destination, float duration)

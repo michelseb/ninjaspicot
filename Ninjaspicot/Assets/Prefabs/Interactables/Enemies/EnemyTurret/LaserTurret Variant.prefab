@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _viewAngle: 180
-  _rotationSpeed: 100
+  _rotationSpeed: 50
   _clockWise: 0
   _initRotation: 180
 --- !u!114 &1969653065
@@ -30,7 +30,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _size: 100
   _viewAngle: 45
-  _detailAmount: 10
+  _detailAmount: 20
   _offset: {x: 0, y: 10, z: 0}
   _startAngle: 90
   _customColor: 3

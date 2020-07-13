@@ -9,9 +9,14 @@ public class ShootingTurret : TurretBase
     public bool AutoShoot => _autoShoot;
 
     private float _loadProgress;
-
+    
     private PoolManager _poolManager;
 
+    protected override void Start()
+    {
+        base.Start();
+        _poolManager = PoolManager.Instance;
+    }
 
 
     protected override void Update()
@@ -42,7 +47,7 @@ public class ShootingTurret : TurretBase
 
         if (_target != null && _aim.TargetAimedAt(_target, Id))
         {
-            if (Loaded && _aim.TargetCentered(transform, _target.tag, Id))
+            if (Loaded && _aim.TargetCentered(_transform, _target.tag, Id))
             {
                 Shoot();
             }
@@ -68,7 +73,7 @@ public class ShootingTurret : TurretBase
 
     private void Shoot()
     {
-        var bullet = _poolManager.GetPoolable<Bullet>(transform.position, transform.rotation, PoolableType.Bullet);
+        var bullet = _poolManager.GetPoolable<Bullet>(_transform.position, _transform.rotation, PoolableType.Bullet);
         bullet.Speed = _strength;
         Loaded = false;
     }

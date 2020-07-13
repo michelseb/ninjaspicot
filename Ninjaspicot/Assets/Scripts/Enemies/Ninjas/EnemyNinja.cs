@@ -8,9 +8,13 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     public bool Attacking { get; protected set; }
     public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
 
+    private Canvas _canvas;
+
     protected virtual void Start()
     {
         Stickiness.NinjaDir = _direction;
+        _canvas = GetComponent<Canvas>();
+        _canvas.worldCamera = _cameraBehaviour.Camera;
     }
 
     protected virtual void Update()
@@ -30,8 +34,8 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        transform.position = position;
-        transform.rotation = rotation;
+        _transform.position = position;
+        _transform.rotation = rotation;
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -51,7 +55,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
             }
             else
             {
-                hero.Die(transform);
+                hero.Die(_transform);
             }
         }
     }

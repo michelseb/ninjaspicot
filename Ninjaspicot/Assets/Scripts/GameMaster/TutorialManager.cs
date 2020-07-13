@@ -34,6 +34,7 @@ public class TutorialManager : MonoBehaviour
     private CameraBehaviour _cameraBehaviour;
 
     private bool _started;
+    private Canvas _canvas;
 
     private void Awake()
     {
@@ -41,6 +42,8 @@ public class TutorialManager : MonoBehaviour
         _touchManager = TouchManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
         _containerImage = _instructionsContainer.GetComponent<Image>();
+        _canvas = GetComponent<Canvas>();
+        _canvas.worldCamera = _cameraBehaviour.Camera;
     }
 
     private void Update()

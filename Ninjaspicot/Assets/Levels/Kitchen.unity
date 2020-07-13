@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2600,7 +2600,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4251258184184596, guid: e0dab5ee2d7a27b40a04c2fabd739a89, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4251258184184596, guid: e0dab5ee2d7a27b40a04c2fabd739a89, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2818,7 +2818,7 @@ PrefabInstance:
     - target: {fileID: 4853604387833599686, guid: 51dfefdfdbfc3be498a20deed70b290d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -363.4
+      value: -338.1
       objectReference: {fileID: 0}
     - target: {fileID: 4853604387833599686, guid: 51dfefdfdbfc3be498a20deed70b290d,
         type: 3}
@@ -40711,6 +40711,21 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 27.6
       objectReference: {fileID: 0}
+    - target: {fileID: 3071860023769854555, guid: 3b59b650aff8310499dd90fa340c407f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 3071860023967268696, guid: 3b59b650aff8310499dd90fa340c407f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 3071860024408339764, guid: 3b59b650aff8310499dd90fa340c407f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 3071860024529552288, guid: 3b59b650aff8310499dd90fa340c407f,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -40780,6 +40795,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _zoomAmount
       value: -500
+      objectReference: {fileID: 0}
+    - target: {fileID: 5263745567708363648, guid: 3b59b650aff8310499dd90fa340c407f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3b59b650aff8310499dd90fa340c407f, type: 3}
@@ -43628,7 +43648,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 795343048, guid: 17f58a22b319ff64aabfd7edd199b910, type: 3}
       propertyPath: _rotationSpeed
-      value: 150
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 1969653065, guid: 17f58a22b319ff64aabfd7edd199b910, type: 3}
       propertyPath: _laserizeSpeed
