@@ -12,7 +12,8 @@ public enum PoolableType
     Platform,
     Shelf,
     Rice,
-    IndicationRock
+    IndicationRock,
+    Plate
 }
 
 public interface IPoolable : IActivable

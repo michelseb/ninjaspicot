@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 557423402012665333, guid: 30a64afa9021e674d82708a2e6bcfc62,
         type: 3}
       propertyPath: m_Name
-      value: plate_side_green
+      value: plate_side_green Variant
       objectReference: {fileID: 0}
     - target: {fileID: 557423402012665334, guid: 30a64afa9021e674d82708a2e6bcfc62,
         type: 3}
@@ -18,6 +18,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: e4d8aed72ff1e1545be388da2f652536,
         type: 3}
+    - target: {fileID: 557423402012665334, guid: 30a64afa9021e674d82708a2e6bcfc62,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 557423402012665335, guid: 30a64afa9021e674d82708a2e6bcfc62,
         type: 3}
       propertyPath: m_LocalPosition.x

@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3958402980913166440
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3958402980913166442}
+  - component: {fileID: 3958402980913166484}
+  - component: {fileID: 3958402980913166444}
+  - component: {fileID: 3958402980913166443}
+  m_Layer: 16
+  m_Name: FallingPlateCollider
+  m_TagString: Wall
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3958402980913166442
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3958402980913166440}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 149.4, y: 419.6, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!60 &3958402980913166484
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3958402980913166440}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 1
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 10.67, y: 1.44}
+    newSize: {x: 10.67, y: 1.44}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 3.1203308, y: -0.53718567}
+      - {x: 3.2421174, y: -0.41496584}
+      - {x: 4.1079164, y: -0.20051269}
+      - {x: 4.6248536, y: 0.017626954}
+      - {x: 5.1342683, y: 0.39711305}
+      - {x: 5.222336, y: 0.49489138}
+      - {x: 5.1956973, y: 0.59970707}
+      - {x: 5.0958314, y: 0.59758914}
+      - {x: 4.234015, y: 0.021380616}
+      - {x: 3.1435945, y: -0.28193972}
+      - {x: -3.3088531, y: -0.24995728}
+      - {x: -4.143599, y: -0.025790406}
+      - {x: -4.707944, y: 0.26137695}
+      - {x: -5.028137, y: 0.60162354}
+      - {x: -5.2062697, y: 0.5995392}
+      - {x: -5.206444, y: 0.5399994}
+      - {x: -4.9124084, y: 0.24007264}
+      - {x: -4.3312807, y: -0.116824344}
+      - {x: -3.517517, y: -0.3498566}
+      - {x: -3.2421906, y: -0.41000062}
+      - {x: -3.1602554, y: -0.5246704}
+      - {x: -2.2224808, y: -0.5798554}
+      - {x: 1.6875213, y: -0.60489196}
+--- !u!50 &3958402980913166444
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3958402980913166440}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &3958402980913166443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3958402980913166440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecad08fb9e848d84c91843bed1588bef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolableType: 11

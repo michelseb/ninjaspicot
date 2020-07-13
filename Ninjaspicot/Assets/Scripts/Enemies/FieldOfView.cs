@@ -30,11 +30,11 @@ public class FieldOfView : MonoBehaviour, IActivable
 
     protected virtual void Awake()
     {
+        _transform = transform;
         _renderer = GetComponent<MeshRenderer>();
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
-        _parent = transform.parent?.GetComponent<IRaycastable>();
-        _transform = transform;
+        _parent = _transform.parent?.GetComponent<IRaycastable>();
 
         if (_customColor != CustomColor.None)
         {
@@ -58,6 +58,12 @@ public class FieldOfView : MonoBehaviour, IActivable
             layerMask = 1 << LayerMask.NameToLayer("Obstacle") | 1 << LayerMask.NameToLayer("DynamicObstacle") | 1 << LayerMask.NameToLayer("Enemy"),
             useTriggers = false
         };
+
+        if (UpdateVertices(_size, _viewAngle, _detailAmount, _offset))
+        {
+            _mesh.vertices = _vertices.Select(x => x.ModifiedPos).ToArray();
+            _filter.sharedMesh = _mesh;
+        }
     }
 
     protected virtual void OnTriggerStay2D(Collider2D collider)
@@ -76,17 +82,17 @@ public class FieldOfView : MonoBehaviour, IActivable
     {
         var updated = false;
 
-        offset = _transform.TransformPoint(offset);
+        float angleStep = angle / pointCount;
 
-        float angleStep = (float)angle / pointCount;
+        var currentAngle = Utils.GetAngleFromVector(_transform.InverseTransformDirection(_transform.up)) + angle / 2f;
 
-        var currentAngle = Utils.GetAngleFromVector(_transform.InverseTransformDirection(transform.up)) + angle / 2f;
+        RaycastHit2D[] results = new RaycastHit2D[1];
 
-        for (int i = 1; i < pointCount; i++)
+        for (int i = 1; i <= pointCount; i++)
         {
-            RaycastHit2D[] results = new RaycastHit2D[1];
-            Physics2D.Raycast(offset, _transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)), _contactFilter, results, size);
-            if (results[0])
+            Debug.DrawRay(_transform.TransformPoint(offset), transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)) * size, Color.yellow);
+            var hits = Physics2D.Raycast(_transform.TransformPoint(offset), _transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)), _contactFilter, results, size);
+            if (hits > 0)
             {
                 _vertices[i].Modified = true;
                 _vertices[i].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
@@ -113,16 +119,15 @@ public class FieldOfView : MonoBehaviour, IActivable
         var uvs = new Vector2[_vertices.Length];
         var triangles = new int[pointCount * 3];
 
-        offset = _transform.TransformPoint(offset);
         float angleStep = angle / pointCount;
 
-        _vertices[0] = new Vertex(_transform.InverseTransformPoint(offset));
+        _vertices[0] = new Vertex(offset);
         var currentAngle = Utils.GetAngleFromVector(_transform.InverseTransformDirection(_transform.up)) + angle / 2f;
         var triangleIndex = 0;
 
-        for (int i = 1; i < pointCount; i++)
+        for (int i = 1; i <= pointCount; i++)
         {
-            _vertices[i] = new Vertex(Utils.GetVectorFromAngle(currentAngle) * (size + _transform.InverseTransformPoint(offset).magnitude));
+            _vertices[i] = new Vertex(Utils.GetVectorFromAngle(currentAngle) * (size + offset.magnitude));
 
             if (i > 0)
             {
@@ -147,11 +152,11 @@ public class FieldOfView : MonoBehaviour, IActivable
     {
         var points = new List<Vector2>();
         points.Add(vertices[0]);
-        for (int i = 1; i < vertices.Length - 3; i += 6)
+        for (int i = 1; i < vertices.Length - 1; i += 6)
         {
             points.Add(vertices[i]);
         }
-        points.Add(vertices[vertices.Length - 2]);
+        points.Add(vertices[vertices.Length - 1]);
         points.Add(vertices[0]);
 
         var collPoints = points.ToArray();

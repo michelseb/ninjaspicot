@@ -12,12 +12,13 @@ public class Jumper : MonoBehaviour
     protected IDynamic _dynamicEntity;
     protected Stickiness _stickiness;
     protected PoolManager _poolManager;
-
+    protected Transform _transform;
     protected virtual void Awake()
     {
         _dynamicEntity = GetComponent<IDynamic>();
         _stickiness = GetComponent<Stickiness>();
         _poolManager = PoolManager.Instance;
+        _transform = transform;
     }
 
     protected virtual void Start()
@@ -38,7 +39,7 @@ public class Jumper : MonoBehaviour
 
         _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * _strength, ForceMode2D.Impulse);
 
-        _poolManager.GetPoolable<Dash>(transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
+        _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, drag - origin));
 
         if (Trajectory.Used)
         {
@@ -59,7 +60,7 @@ public class Jumper : MonoBehaviour
         if (Trajectory == null || !Trajectory.Active)
             return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity);
 
-        Trajectory.ReUse(transform.position);
+        Trajectory.ReUse(_transform.position);
         return Trajectory;
     }
 

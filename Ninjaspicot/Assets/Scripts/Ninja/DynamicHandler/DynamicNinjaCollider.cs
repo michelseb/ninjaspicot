@@ -5,6 +5,12 @@ public class DynamicNinjaCollider : MonoBehaviour, IPoolable
     [SerializeField] private PoolableType _poolableType;
     public PoolableType PoolableType => _poolableType;
     public bool Active { get; private set; }
+    public Transform Transform { get; private set; }
+
+    private void Awake()
+    {
+        Transform = transform;
+    }
 
     public void Activate()
     {

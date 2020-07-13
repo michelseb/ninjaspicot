@@ -34,8 +34,8 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        _transform.position = position;
-        _transform.rotation = rotation;
+        Transform.position = position;
+        Transform.rotation = rotation;
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -55,7 +55,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
             }
             else
             {
-                hero.Die(_transform);
+                hero.Die(Transform);
             }
         }
     }

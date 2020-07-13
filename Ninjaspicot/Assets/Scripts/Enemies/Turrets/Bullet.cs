@@ -8,6 +8,12 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private float _currentLifeTime;
     private const float LIFE_TIME = 5;
+    private Transform _transform;
+
+    private void Awake()
+    {
+        _transform = transform;
+    }
 
     private void Start()
     {
@@ -16,7 +22,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void Update()
     {
-        transform.Translate(0, Speed * Time.deltaTime, 0);
+        _transform.Translate(0, Speed * Time.deltaTime, 0);
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {
@@ -32,7 +38,7 @@ public class Bullet : MonoBehaviour, IPoolable
         }
         if (collision.CompareTag("hero"))
         {
-            collision.GetComponent<Hero>().Die(transform);
+            collision.GetComponent<Hero>().Die(_transform);
             Deactivate();
         }
 
@@ -40,8 +46,8 @@ public class Bullet : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        transform.position = new Vector3(position.x, position.y, -5);
-        transform.rotation = rotation;
+        _transform.position = new Vector3(position.x, position.y, -5);
+        _transform.rotation = rotation;
         _currentLifeTime = LIFE_TIME;
     }
 

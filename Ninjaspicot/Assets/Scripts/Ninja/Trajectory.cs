@@ -10,10 +10,9 @@ public class Trajectory : MonoBehaviour, IPoolable
     private int _lineMax;
 
     private LineRenderer _line;
-
+    private Transform _transform;
     private TimeManager _timeManager;
 
-    private const float TIME_SLOW = .01f;
     private const float FADE_SPEED = .5f;
     private const int MAX_VERTEX = 50;
 
@@ -21,6 +20,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     private void Awake()
     {
+        _transform = transform;
         _timeManager = TimeManager.Instance;
         _line = GetComponent<LineRenderer>();
     }
@@ -122,7 +122,7 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public void ReUse(Vector3 position)
     {
-        transform.position = new Vector3(position.x, position.y, -5);
+        _transform.position = new Vector3(position.x, position.y, -5);
         Appear();
     }
 
@@ -131,7 +131,7 @@ public class Trajectory : MonoBehaviour, IPoolable
         if (Used)
             return;
 
-        _timeManager.SlowDown(TIME_SLOW);
+        _timeManager.SlowDown();
         _timeManager.StartTimeRestore();
 
         Color col = _line.material.color;
@@ -142,8 +142,8 @@ public class Trajectory : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        transform.position = new Vector3(position.x, position.y, -5);
-        transform.rotation = rotation;
+        _transform.position = new Vector3(position.x, position.y, -5);
+        _transform.rotation = rotation;
         Appear();
     }
 

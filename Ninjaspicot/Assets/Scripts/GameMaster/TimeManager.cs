@@ -12,41 +12,30 @@ public class TimeManager : MonoBehaviour, IActivable
 
     private const float INCREASE_INTERPOLATION = .5f;
     private const float DECREASE_INTERPOLATION = .8f;
+    private const float TIME_SLOW = .05f;
 
     private void Start()
     {
         Activate();
     }
 
-    public void SlowDown(float slowValue)
+    public void SlowDown(float slowValue = TIME_SLOW)
     {
-        if (!_active)
+        if (!_active || Time.timeScale <= slowValue)
             return;
 
-        if (Time.timeScale > slowValue)
-        {
-            Time.timeScale = slowValue;
-        }
-
-        Time.fixedDeltaTime = Time.timeScale * .02f;
+        SetTimeScale(slowValue);
     }
 
     private IEnumerator SlowDownProgressive(float slowValue)
     {
         while (Time.timeScale > slowValue)
         {
-            Time.timeScale -= DECREASE_INTERPOLATION * Time.unscaledDeltaTime;
-            Time.fixedDeltaTime = Time.timeScale * .02f;
+            SetTimeScale(Time.timeScale - DECREASE_INTERPOLATION * Time.unscaledDeltaTime);
             yield return null;
         }
 
         Time.timeScale = slowValue;
-    }
-
-    public void StopTime()
-    {
-        Time.timeScale = 0;
-        Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 
     private IEnumerator RestoreTime()
@@ -55,8 +44,7 @@ public class TimeManager : MonoBehaviour, IActivable
 
         while (Time.timeScale < 1)
         {
-            Time.timeScale += INCREASE_INTERPOLATION * Time.unscaledDeltaTime;
-            Time.fixedDeltaTime = Time.timeScale * .02f;
+            SetTimeScale(Time.timeScale + INCREASE_INTERPOLATION * Time.unscaledDeltaTime);
             yield return null;
         }
 
@@ -75,8 +63,12 @@ public class TimeManager : MonoBehaviour, IActivable
 
     public void SetNormalTime()
     {
-        Time.timeScale = 1;
-        Time.fixedDeltaTime = Time.timeScale * .02f;
+        SetTimeScale(1);
+    }
+
+    public void StopTime()
+    {
+        SetTimeScale(0);
     }
 
     public void Activate()
@@ -87,5 +79,11 @@ public class TimeManager : MonoBehaviour, IActivable
     public void Deactivate()
     {
         _active = false;
+    }
+
+    private void SetTimeScale(float scale)
+    {
+        Time.timeScale = scale;
+        Time.fixedDeltaTime = Time.timeScale * .02f;
     }
 }

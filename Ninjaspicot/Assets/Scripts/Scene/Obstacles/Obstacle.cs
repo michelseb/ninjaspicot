@@ -6,9 +6,11 @@ public class Obstacle : MonoBehaviour, IRaycastable
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected Collider2D _collider;
+    public Transform Transform { get; private set; }
 
     protected virtual void Awake()
     {
+        Transform = transform;
         _collider = GetComponent<Collider2D>() ?? GetComponentInChildren<Collider2D>() ?? GetComponentInParent<Collider2D>();
     }
 

@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 5604203284770356697, guid: 68a3ca0adb22bb649aa2be7f2d1d37ce,
         type: 3}
       propertyPath: m_Name
-      value: plate_side_red
+      value: plate_side_red Variant
       objectReference: {fileID: 0}
     - target: {fileID: 5604203284770356698, guid: 68a3ca0adb22bb649aa2be7f2d1d37ce,
         type: 3}

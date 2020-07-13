@@ -93,7 +93,7 @@ public class TouchManager : MonoBehaviour
 
                 ReinitDrag1();
                 Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
-                _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _camera.transform, false);
+                _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _cameraBehaviour.Transform, false);
                 _touchInitialized = true;
             }
             else
@@ -117,7 +117,7 @@ public class TouchManager : MonoBehaviour
 
                 ReinitDrag2();
                 Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
-                _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _camera.transform, false);
+                _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _cameraBehaviour.Transform, false);
 
                 //Hero effects
                 _stickiness.CurrentSpeed *= 2;

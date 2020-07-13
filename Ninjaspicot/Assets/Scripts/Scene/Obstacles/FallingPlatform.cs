@@ -11,7 +11,7 @@ public class FallingPlatform : DynamicObstacle
     private Coroutine _wait;
 
     private const float FALL_DELAY = .5f;
-    private const float FALL_TIME = 10f;
+    private const float FALL_TIME = 6f;
     private const float MAX_SPEED = 20f;
     private const float DEFAULT_SPEED = 1f;
 

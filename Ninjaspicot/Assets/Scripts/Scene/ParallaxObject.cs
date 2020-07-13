@@ -8,7 +8,8 @@ public class ParallaxObject : MonoBehaviour
     [SerializeField] private bool _randomDepth;
     [SerializeField] private bool _initSettings;
     public int Depth => _depth > 0 ? _depth : ParallaxManager.MIN_DEPTH;
-    public float ParallaxFactor { get; internal set; }
+    public float ParallaxFactor { get; private set; }
+    public Transform Transform { get; private set; }
 
     private SpriteRenderer _renderer;
     private ParallaxManager _parallaxManager;
@@ -17,6 +18,7 @@ public class ParallaxObject : MonoBehaviour
     {
         _renderer = GetComponent<SpriteRenderer>();
         _parallaxManager = ParallaxManager.Instance;
+        Transform = transform;
     }
 
     private void Start()
@@ -33,8 +35,8 @@ public class ParallaxObject : MonoBehaviour
             _renderer.color = Color.Lerp(_beginColor, _endColor, 1 - scaleFactor);
 
             var factor = 2 * Mathf.Log(Depth + 1);
-            transform.Translate(0, factor * factor, 0, Space.World);
-            transform.localScale = transform.localScale * scaleFactor;
+            Transform.Translate(0, factor * factor, 0, Space.World);
+            Transform.localScale = Transform.localScale * scaleFactor;
         }
 
         _renderer.sortingOrder = ParallaxManager.MAX_DEPTH - Depth;

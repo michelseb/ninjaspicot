@@ -66,7 +66,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual void Aim()
     {
-        _transform.rotation = Quaternion.Lerp(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.position - _transform.position), .05f);
+        _transform.rotation = Quaternion.Lerp(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.position - _transform.position), .5f);
     }
 
     protected virtual void Scan()

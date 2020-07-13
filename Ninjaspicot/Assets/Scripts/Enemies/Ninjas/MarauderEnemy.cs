@@ -87,11 +87,11 @@ public class MarauderEnemy : EnemyNinja
 
     private IEnumerator SlowDown()
     {
-        var angle = Vector3.Angle(_transform.up, Vector3.up);
+        var angle = Vector3.Angle(Transform.up, Vector3.up);
 
         while (Stickiness.CurrentSpeed > 50)
         {
-            var currAngle = Vector3.Angle(_transform.up, Vector3.up);
+            var currAngle = Vector3.Angle(Transform.up, Vector3.up);
 
             Stickiness.CurrentSpeed = Mathf.Lerp(Stickiness.CurrentSpeed, 0, (angle - currAngle) / angle * .05f);
             yield return null;

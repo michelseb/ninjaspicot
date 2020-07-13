@@ -35,9 +35,9 @@ public class DynamicInteraction : MonoBehaviour, IActivable
 
         if (_tempDynamic != null)
         {
-            _hero.transform.localPosition += _cloneHeroCollider.transform.localPosition - _previousPosition;
-            _hero.transform.rotation = _cloneHeroCollider.transform.rotation;
-            _previousPosition = _cloneHeroCollider.transform.localPosition;
+            _hero.Transform.localPosition += _cloneHeroCollider.Transform.localPosition - _previousPosition;
+            _hero.Transform.rotation = _cloneHeroCollider.Transform.rotation;
+            _previousPosition = _cloneHeroCollider.Transform.localPosition;
         }
     }
 
@@ -73,12 +73,12 @@ public class DynamicInteraction : MonoBehaviour, IActivable
         CloneHeroStickiness.Awake();
         CloneHeroStickiness.Start();
 
-        CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.transform, true);
+        CloneHeroStickiness.ContactPoint.SetParent(_cloneOtherDynamic.Transform, true);
 
-        _cloneHeroCollider.transform.SetParent(_cloneOtherDynamic.transform, true);
-        _previousPosition = _cloneHeroCollider.transform.localPosition;
+        _cloneHeroCollider.Transform.SetParent(_cloneOtherDynamic.Transform, true);
+        _previousPosition = _cloneHeroCollider.Transform.localPosition;
 
-        _hero.transform.SetParent(otherCollider.transform, true);
+        _hero.Transform.SetParent(otherCollider.transform, true);
 
         _hero.Stickiness.Collider.isTrigger = true;
         _hero.Stickiness.Rigidbody.angularVelocity = 0;
@@ -89,7 +89,7 @@ public class DynamicInteraction : MonoBehaviour, IActivable
 
     public void StopInteraction(bool reinit)
     {
-        _hero.transform.SetParent(null);
+        _hero.Transform.SetParent(null);
 
         if (reinit)
         {
@@ -105,7 +105,7 @@ public class DynamicInteraction : MonoBehaviour, IActivable
         if (_cloneOtherDynamic != null && _cloneOtherDynamic.Active)
         {
             CloneHeroStickiness = null;
-            _cloneHeroCollider.transform.SetParent(null);
+            _cloneHeroCollider.Transform.SetParent(null);
             _cloneHeroCollider.Deactivate();
             _cloneOtherDynamic.Deactivate();
         }

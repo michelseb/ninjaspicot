@@ -44,13 +44,13 @@ namespace DigitalRuby.LightningBolt
     public class LightningBoltScript : MonoBehaviour
     {
         [Tooltip("The game object where the lightning will emit from. If null, StartPosition is used.")]
-        public GameObject StartObject;
+        public Transform StartObject;
 
         [Tooltip("The start position where the lightning will emit from. This is in world space if StartObject is null, otherwise this is offset from StartObject position.")]
         public Vector3 StartPosition;
 
         [Tooltip("The game object where the lightning will end at. If null, EndPosition is used.")]
-        public GameObject EndObject;
+        public Transform EndObject;
 
         [Tooltip("The end position where the lightning will end at. This is in world space if EndObject is null, otherwise this is offset from EndObject position.")]
         public Vector3 EndPosition;
@@ -98,28 +98,30 @@ namespace DigitalRuby.LightningBolt
         private int _animationOffsetIndex;
         private int _animationPingPongDirection = 1;
         private bool _orthographic;
+        private Transform _transform;
 
         private void Awake()
         {
+            _transform = transform;
             _orthographic = (Camera.main != null && Camera.main.orthographic);
             _lineRenderer = GetComponent<LineRenderer>();
             _collider = GetComponent<BoxCollider2D>();
             _lineRenderer.positionCount = 0;
             UpdateFromMaterialChange();
 
-            float distX = Mathf.Abs(StartObject.transform.position.x - EndObject.transform.position.x);
-            float distY = Mathf.Abs(StartObject.transform.position.y - EndObject.transform.position.y);
+            float distX = Mathf.Abs(StartObject.position.x - EndObject.position.x);
+            float distY = Mathf.Abs(StartObject.position.y - EndObject.position.y);
 
             if (distX < distY)
             {
-                _collider.size = new Vector2(10, distY);
+                _collider.size = new Vector2(5, distY);
                 
-                _collider.offset = StartObject.transform.localPosition + new Vector3(0, distY / 2);
+                _collider.offset = StartObject.localPosition + new Vector3(0, distY / 2);
             }
             else
             {
-                _collider.size = new Vector2(distX, 10);
-                _collider.offset = StartObject.transform.localPosition + new Vector3(distX / 2, 0);
+                _collider.size = new Vector2(distX, 5);
+                _collider.offset = StartObject.localPosition + new Vector3(distX / 2, 0);
             }
         }
 
@@ -145,7 +147,7 @@ namespace DigitalRuby.LightningBolt
         {
             if (collision.CompareTag("hero"))
             {
-                Hero.Instance.Die(transform);
+                Hero.Instance.Die(_transform);
             }
         }
 
@@ -349,7 +351,7 @@ namespace DigitalRuby.LightningBolt
             }
             else
             {
-                start = StartObject.transform.position + StartPosition;
+                start = StartObject.position + StartPosition;
             }
             if (EndObject == null)
             {
@@ -357,7 +359,7 @@ namespace DigitalRuby.LightningBolt
             }
             else
             {
-                end = EndObject.transform.position + EndPosition;
+                end = EndObject.position + EndPosition;
             }
             _startIndex = 0;
             GenerateLightningBolt(start, end, Generations, Generations, 0.0f);

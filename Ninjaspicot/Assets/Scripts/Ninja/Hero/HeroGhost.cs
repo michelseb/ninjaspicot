@@ -7,10 +7,12 @@ public class HeroGhost : MonoBehaviour, IPoolable
     [SerializeField] private Color _endColor;
 
     private SpriteRenderer _renderer;
+    private Transform _transform;
     public PoolableType PoolableType => PoolableType.None;
 
     private void Awake()
     {
+        _transform = transform;
         _renderer = GetComponent<SpriteRenderer>();
     }
 
@@ -31,8 +33,8 @@ public class HeroGhost : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation)
     {
-        transform.position = position;
-        transform.rotation = rotation;
+        _transform.position = position;
+        _transform.rotation = rotation;
     }
 
     public void Deactivate()
