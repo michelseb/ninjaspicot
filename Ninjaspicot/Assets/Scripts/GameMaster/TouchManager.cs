@@ -14,6 +14,7 @@ public class TouchManager : MonoBehaviour
 
     public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1");
     public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
+    public bool Moving => GetMoving();
     public bool Dragging => Dragging1 || Dragging2;
     public bool Dragging1 { get; private set; }
     public bool Dragging2 { get; private set; }
@@ -188,8 +189,7 @@ public class TouchManager : MonoBehaviour
         }
     }
 
-
-    private void LateUpdate()
+    private void FixedUpdate()
     {
         if (Touching)
         {
@@ -197,8 +197,11 @@ public class TouchManager : MonoBehaviour
 
             if (_jumpManager.CanJump())
             {
-                _jumpManager.SetTrajectory();
-                _jumpManager.Trajectory.DrawTrajectory(_hero.transform.position, _jumpManager.TrajectoryDestination, _jumpManager.TrajectoryOrigin);
+                if (Moving)
+                {
+                    _jumpManager.SetTrajectory();
+                    _jumpManager.Trajectory.DrawTrajectory(_hero.transform.position, _jumpManager.TrajectoryDestination, _jumpManager.TrajectoryOrigin);
+                }
             }
             else if (_jumpManager.TrajectoryInUse())
             {
@@ -221,7 +224,11 @@ public class TouchManager : MonoBehaviour
                 _stickiness.Rigidbody.velocity = new Vector2(0, 0);
             }
         }
+    }
 
+
+    private void LateUpdate()
+    {
         if (Input.GetButtonUp("Fire1") || TouchLifted)
         {
             if (_jumpManager.ReadyToJump())
@@ -315,6 +322,14 @@ public class TouchManager : MonoBehaviour
             return null;
 
         return touch.position;
+    }
+
+    private bool GetMoving()
+    {
+        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
+            return Dragging;
+
+        return Input.touches.Any(touch => touch.phase == TouchPhase.Moved);
     }
 
     private bool FingerLifted()

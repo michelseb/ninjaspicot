@@ -7,14 +7,13 @@ public class Trajectory : MonoBehaviour, IPoolable
     public bool Active { get; private set; }
     public float Strength { get; set; }
 
-    private int _lineMax;
-
     private LineRenderer _line;
     private Transform _transform;
     private TimeManager _timeManager;
 
     private const float FADE_SPEED = .5f;
     private const int MAX_VERTEX = 50;
+    private const float LENGTH = .01f;
 
     public PoolableType PoolableType => PoolableType.None;
 
@@ -25,38 +24,24 @@ public class Trajectory : MonoBehaviour, IPoolable
         _line = GetComponent<LineRenderer>();
     }
 
-    private void Start()
-    {
-        _lineMax = MAX_VERTEX;
-    }
-
     private void OnEnable()
     {
         Active = true;
     }
 
-    public void DrawTrajectory(Vector2 startPos, Vector2 click, Vector2 startClick)
+    public void DrawTrajectory(Vector2 linePosition, Vector2 click, Vector2 startClick)
     {
-        Vector2 grav = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 pos = startPos;
-        Vector2 strength = startClick - click;
-        Vector2 vel = strength.normalized * Strength;
+        Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+        Vector2 direction = (startClick - click).normalized;
+        Vector2 velocity = direction * Strength;
 
-        if (_lineMax <= 2)
-        {
-            _lineMax = MAX_VERTEX;
-        }
-
-        if (_line.positionCount < _lineMax)
-        {
-            _line.positionCount = _lineMax;
-        }
+        _line.positionCount = MAX_VERTEX;
 
         for (var i = 0; i < _line.positionCount; i++)
         {
-            vel = vel + grav * Time.fixedUnscaledDeltaTime;
-            pos = pos + vel * Time.fixedUnscaledDeltaTime;
-            _line.SetPosition(i, new Vector3(pos.x, pos.y, 0));
+            velocity = velocity + gravity * LENGTH;
+            linePosition = linePosition + velocity * LENGTH;
+            _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y, 0));
 
             if (i > 1)
             {
@@ -67,16 +52,10 @@ public class Trajectory : MonoBehaviour, IPoolable
                 {
                     if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
                     {
-                        _lineMax = i;
                         _line.positionCount = i;
                         break;
                     }
                 }
-                else
-                {
-                    _lineMax = MAX_VERTEX;
-                }
-
             }
         }
     }
