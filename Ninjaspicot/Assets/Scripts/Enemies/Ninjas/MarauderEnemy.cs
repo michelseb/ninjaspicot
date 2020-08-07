@@ -25,10 +25,8 @@ public class MarauderEnemy : EnemyNinja
         _fieldOfView = GetComponentInChildren<FieldOfView>();
     }
 
-    protected override void Update()
+    protected virtual void Update()
     {
-        base.Update();
-
         if (Dead)
             return;
 
@@ -40,10 +38,8 @@ public class MarauderEnemy : EnemyNinja
 
                 if (_remainingTime <= 0)
                 {
-                    //transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-                    Attacking = true;
+                    SetAttacking(true);
                     Stickiness.ReinitSpeed();
-                    //Stickiness.NinjaDir = (Dir)1 - (int)Stickiness.NinjaDir;
                     _remainingTime = _walkTime;
                     Stickiness.StartWalking();
                     _fieldOfView.Deactivate();
@@ -93,12 +89,12 @@ public class MarauderEnemy : EnemyNinja
         {
             var currAngle = Vector3.Angle(Transform.up, Vector3.up);
 
-            Stickiness.CurrentSpeed = Mathf.Lerp(Stickiness.CurrentSpeed, 0, (angle - currAngle) / angle * .05f);
+            Stickiness.CurrentSpeed = Mathf.Lerp(Stickiness.CurrentSpeed, 0, Mathf.Clamp(angle - currAngle, 0, angle) / angle);
             yield return null;
         }
 
         Stickiness.StopWalking(true);
-        Attacking = false;
+        SetAttacking(false);
         _remainingTime = _searchTime;
         _marauderMode = MarauderMode.Searching;
         _fieldOfView.Activate();

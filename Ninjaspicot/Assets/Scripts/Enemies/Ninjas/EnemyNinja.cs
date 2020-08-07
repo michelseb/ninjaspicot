@@ -17,21 +17,6 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
         _canvas.worldCamera = _cameraBehaviour.Camera;
     }
 
-    protected virtual void Update()
-    {
-        if (Dead)
-            return;
-
-        if (Renderer != null)
-        {
-            Renderer.color = Attacking ? ColorUtils.Red : ColorUtils.White;
-        }
-        if (Image != null)
-        {
-            Image.color = Attacking ? ColorUtils.Red : ColorUtils.White;
-        }
-    }
-
     public void Pool(Vector3 position, Quaternion rotation)
     {
         Transform.position = position;
@@ -81,6 +66,21 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
         Deactivate();
         yield return StartCoroutine(base.Dying());
     }
+
+    protected void SetAttacking(bool attacking)
+    {
+        Attacking = attacking;
+
+        if (Renderer != null)
+        {
+            Renderer.color = Attacking ? ColorUtils.Red : ColorUtils.White;
+        }
+        if (Image != null)
+        {
+            Image.color = Attacking ? ColorUtils.Red : ColorUtils.White;
+        }
+    }
+
 
     public void Deactivate()
     {

@@ -7,7 +7,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool Dead { get; set; }
-    public Jumper JumpManager { get; private set; }
+    public Jumper Jumper { get; private set; }
     public Stickiness Stickiness { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
     public Image Image { get; private set; }
@@ -21,7 +21,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
     protected virtual void Awake()
     {
         _poolManager = PoolManager.Instance;
-        JumpManager = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
+        Jumper = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Renderer = GetComponent<SpriteRenderer>();
@@ -37,7 +37,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
 
         Dead = true;
         Stickiness.Detach();
-        JumpManager.ReinitJump();
+        Jumper.ReinitJump();
         SetAllBehavioursActivation(false, false);
 
         //if (killer != null)
@@ -56,7 +56,7 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
 
     public void SetJumpingActivation(bool active)
     {
-        JumpManager.Active = active;
+        Jumper.Active = active;
     }
 
     public void SetStickinessActivation(bool active)

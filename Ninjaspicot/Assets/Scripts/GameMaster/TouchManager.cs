@@ -12,7 +12,7 @@ public class TouchManager : MonoBehaviour
 {
     [SerializeField] private bool _mobileTouch;
 
-    public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1");
+    public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1") || Input.GetButton("Fire2");
     public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
     public bool Moving => GetMoving();
     public bool Dragging => Dragging1 || Dragging2;
@@ -44,7 +44,7 @@ public class TouchManager : MonoBehaviour
 
     private Hero _hero;
     private Stickiness _stickiness;
-    private HeroJumper _jumpManager;
+    private HeroJumper _jumper;
     private DynamicInteraction _dynamicInteraction;
 
     private const float DRAG_THRESHOLD = 150;
@@ -64,23 +64,15 @@ public class TouchManager : MonoBehaviour
         _touchLine.useWorldSpace = true;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
-        _jumpManager = _hero?.JumpManager as HeroJumper;
+        _jumper = _hero?.Jumper as HeroJumper;
         _dynamicInteraction = _hero?.DynamicInteraction;
         InitTouchIndexes();
     }
 
     private void Update()
     {
-        //Waiting for hero to spawn
-        if (_hero == null)
-        {
-            _hero = Hero.Instance;
-            _jumpManager = _hero?.JumpManager as HeroJumper;
-            _stickiness = _hero?.Stickiness;
-            _dynamicInteraction = _hero?.DynamicInteraction;
-            if (_hero == null)
-                return;
-        }
+        if (!HeroSpawned())
+            return;
 
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
@@ -104,7 +96,7 @@ public class TouchManager : MonoBehaviour
                 Dragging1 = IsDragging1(true);
                 if (Dragging1)
                 {
-                    _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
+                    _jumper.SetJumpPositions(RawTouch1Origin, Touch1Drag);
                 }
             }
 
@@ -133,7 +125,7 @@ public class TouchManager : MonoBehaviour
                 Dragging2 = IsDragging2(true);
                 if (Dragging2)
                 {
-                    _jumpManager.SetJumpPositions(RawTouch2Origin, Touch2Drag);
+                    _jumper.SetJumpPositions(RawTouch2Origin, Touch2Drag);
                 }
             }
 
@@ -152,13 +144,13 @@ public class TouchManager : MonoBehaviour
                 var touch = Input.touches.FirstOrDefault(t => t.fingerId == _index0);
                 if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
                 {
-                    if (_jumpManager.NeedsJump1)
+                    if (_jumper.NeedsJump1)
                     {
-                        _jumpManager.SetJumpPositions(RawTouch1Origin, Touch1Drag);
+                        _jumper.SetJumpPositions(RawTouch1Origin, Touch1Drag);
                     }
-                    else if (_jumpManager.NeedsJump2)
+                    else if (_jumper.NeedsJump2)
                     {
-                        _jumpManager.SetJumpPositions(RawTouch2Origin, Touch2Drag);
+                        _jumper.SetJumpPositions(RawTouch2Origin, Touch2Drag);
                     }
                     SwitchTouchIndexes();
                     var tempDrag = Touch1Drag;
@@ -169,7 +161,7 @@ public class TouchManager : MonoBehaviour
                     Touch2Drag = tempDrag;
                     Dragging1 = IsDragging1(false);
 
-                    _jumpManager.NeedsJump1 = _jumpManager.NeedsJump1 || _jumpManager.NeedsJump2;
+                    _jumper.NeedsJump1 = _jumper.NeedsJump1 || _jumper.NeedsJump2;
 
 
                     Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
@@ -191,24 +183,38 @@ public class TouchManager : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!HeroSpawned())
+            return;
+
         if (Touching)
         {
             _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
 
-            if (_jumpManager.CanJump())
+            if (_jumper.CanJump())
             {
                 if (Moving)
                 {
-                    _jumpManager.SetTrajectory();
-                    _jumpManager.Trajectory.DrawTrajectory(_hero.transform.position, _jumpManager.TrajectoryDestination, _jumpManager.TrajectoryOrigin);
+                    if (DoubleTouching)
+                    {
+                        var trajectory = _jumper.SetTrajectory<ChargeTrajectory>();
+                        trajectory.SetJumper(_jumper);
+                        _jumper.JumpMode = JumpMode.Charge;
+                    }
+                    else
+                    {
+                        _jumper.SetTrajectory<ClassicTrajectory>();
+                        _jumper.JumpMode = JumpMode.Classic;
+                    }
+
+                    _jumper.Trajectory.DrawTrajectory(_hero.transform.position, _jumper.TrajectoryDestination, _jumper.TrajectoryOrigin);
                 }
             }
-            else if (_jumpManager.TrajectoryInUse())
+            else if (_jumper.TrajectoryInUse())
             {
-                _jumpManager.ReinitJump();
+                _jumper.ReinitJump();
             }
 
-            if (_jumpManager.ReadyToJump())
+            if (_jumper.ReadyToJump())
             {
                 _stickiness.StopWalking(false);
             }
@@ -229,20 +235,29 @@ public class TouchManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (Input.GetButtonUp("Fire1") || TouchLifted)
+        if (TouchLifted || Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2"))
         {
-            if (_jumpManager.ReadyToJump())
+            if (_jumper.ReadyToJump())
             {
-                if (_jumpManager.TrajectoryInUse() && !_jumpManager.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
+                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
                 {
-                    _jumpManager.Trajectory.StartFading();
+                    _jumper.Trajectory.StartFading();
                     _timeManager.SetNormalTime();
                 }
                 else
                 {
                     _stickiness.StopWalking(false);
 
-                    _jumpManager.Jump(_jumpManager.TrajectoryOrigin, _jumpManager.TrajectoryDestination);
+                    switch (_jumper.JumpMode)
+                    {
+                        case JumpMode.Classic:
+                            _jumper.Jump();
+                            break;
+                        case JumpMode.Charge:
+                            _jumper.Charge();
+                            break;
+                    }
+
                     ReinitDrags();
                 }
             }
@@ -254,7 +269,7 @@ public class TouchManager : MonoBehaviour
         var dragging = Touching && Vector2.Distance(RawTouch1Origin, Touch1Drag) > DRAG_THRESHOLD;
         if (setJump)
         {
-            _jumpManager.NeedsJump1 = dragging;
+            _jumper.NeedsJump1 = dragging;
         }
 
         return dragging;
@@ -265,7 +280,7 @@ public class TouchManager : MonoBehaviour
         var dragging = DoubleTouching && Vector2.Distance(RawTouch2Origin, Touch2Drag) > DRAG_THRESHOLD;
         if (setJump)
         {
-            _jumpManager.NeedsJump2 = dragging;
+            _jumper.NeedsJump2 = dragging;
         }
 
         return dragging;
@@ -356,5 +371,21 @@ public class TouchManager : MonoBehaviour
     {
         _index0 = 1 - _index0;
         _index1 = 1 - _index0;
+    }
+
+    private bool HeroSpawned()
+    {
+        //Waiting for hero to spawn
+        if (_hero == null)
+        {
+            _hero = Hero.Instance;
+            _jumper = _hero?.Jumper as HeroJumper;
+            _stickiness = _hero?.Stickiness;
+            _dynamicInteraction = _hero?.DynamicInteraction;
+            if (_hero == null)
+                return false;
+        }
+
+        return true;
     }
 }

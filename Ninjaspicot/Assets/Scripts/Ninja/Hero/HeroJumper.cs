@@ -5,12 +5,9 @@ public class HeroJumper : Jumper
     public bool NeedsJump => NeedsJump1 || NeedsJump2;
     public bool NeedsJump1 { get; set; }
     public bool NeedsJump2 { get; set; }
-    public Vector3 TrajectoryOrigin { get; set; }
-    public Vector3 TrajectoryDestination { get; set; }
-    private DynamicInteraction _dynamicInteraction;
-    private TimeManager _timeManager;
-    private CameraBehaviour _cameraBehaviour;
-    private TouchManager _touchManager;
+    protected DynamicInteraction _dynamicInteraction;
+    protected TimeManager _timeManager;
+    protected CameraBehaviour _cameraBehaviour;
 
     protected override void Awake()
     {
@@ -19,10 +16,9 @@ public class HeroJumper : Jumper
         _dynamicInteraction = GetComponent<DynamicInteraction>();
         _cameraBehaviour = CameraBehaviour.Instance;
         _timeManager = TimeManager.Instance;
-        _touchManager = TouchManager.Instance;
     }
 
-    public override void Jump(Vector2 origin, Vector2 drag)
+    public override void Jump()
     {
         if (_dynamicInteraction.Interacting)
         {
@@ -35,7 +31,7 @@ public class HeroJumper : Jumper
         }
 
         _cameraBehaviour.DoShake(.3f, .1f);
-        base.Jump(origin, drag);
+        base.Jump();
         Trajectory = null;
         NeedsJump1 = false;
         NeedsJump2 = false;
@@ -44,7 +40,7 @@ public class HeroJumper : Jumper
     public override bool CanJump()
     {
         if (CompareTag("Dynamic"))
-            return Hero.Instance.JumpManager.CanJump();
+            return Hero.Instance.Jumper.CanJump();
 
         if (!Active || GetJumps() <= 0 || !NeedsJump)
             return false;
@@ -56,7 +52,7 @@ public class HeroJumper : Jumper
     public override bool ReadyToJump()
     {
         if (CompareTag("Dynamic"))
-            return Hero.Instance.JumpManager.ReadyToJump();
+            return Hero.Instance.Jumper.ReadyToJump();
 
         return CanJump() && Trajectory != null;
     }

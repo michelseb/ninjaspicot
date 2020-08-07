@@ -3,7 +3,7 @@
     protected override void Start()
     {
         base.Start();
-        Attacking = true;
+        SetAttacking(true);
         Stickiness.StartWalking();
     }
 

@@ -21,9 +21,11 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Walking => _walkOnWalls != null;
     public Dir NinjaDir { get; set; }
     public float CurrentSpeed { get; set; }
+    public Transform Transform => _transform;
     public Transform ContactPoint { get; private set; }
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
     public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
+    public Vector3 CollisionNormal { get; private set; }
     public bool DynamicActive => true;
     public PoolableType PoolableType => PoolableType.None;
 
@@ -75,7 +77,9 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint));
+        var contact = GetContactPoint(collision.contacts, _previousContactPoint);
+        SetContactPosition(contact.point);
+        CollisionNormal = contact.normal;
     }
 
 
@@ -118,7 +122,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
     }
 
-    public Vector3 GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
+    public ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
     {
         ContactPoint2D resultContact = new ContactPoint2D();
         float dist = 0;
@@ -131,7 +135,7 @@ public class Stickiness : MonoBehaviour, IDynamic
             }
         }
 
-        return resultContact.point;
+        return resultContact;
     }
 
     public Vector3 GetContactPosition()

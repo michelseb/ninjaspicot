@@ -1,66 +1,43 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Trajectory : MonoBehaviour, IPoolable
+public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 {
     public bool Used { get; private set; }
     public bool Active { get; private set; }
     public float Strength { get; set; }
 
-    private LineRenderer _line;
-    private Transform _transform;
-    private TimeManager _timeManager;
+    protected LineRenderer _line;
+    protected Transform _transform;
+    protected TimeManager _timeManager;
 
-    private const float FADE_SPEED = .5f;
-    private const int MAX_VERTEX = 50;
-    private const float LENGTH = .01f;
+    protected const float FADE_SPEED = .5f;
+    protected const int MAX_VERTEX = 50;
+    protected const float LENGTH = .01f;
 
     public PoolableType PoolableType => PoolableType.None;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _transform = transform;
         _timeManager = TimeManager.Instance;
         _line = GetComponent<LineRenderer>();
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         Active = true;
     }
 
-    public void DrawTrajectory(Vector2 linePosition, Vector2 click, Vector2 startClick)
+    public abstract void DrawTrajectory(Vector2 linePosition, Vector2 click, Vector2 startClick);
+
+    protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {
-        Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 direction = (startClick - click).normalized;
-        Vector2 velocity = direction * Strength;
-
-        _line.positionCount = MAX_VERTEX;
-
-        for (var i = 0; i < _line.positionCount; i++)
-        {
-            velocity = velocity + gravity * LENGTH;
-            linePosition = linePosition + velocity * LENGTH;
-            _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y, 0));
-
-            if (i > 1)
-            {
-                RaycastHit2D hit = Physics2D.CircleCast(_line.GetPosition(i - 1), 1, _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f,
+        return Physics2D.CircleCast(origin, 1, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
-
-                if (hit)
-                {
-                    if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
-                    {
-                        _line.positionCount = i;
-                        break;
-                    }
-                }
-            }
-        }
     }
 
-    public bool IsClear(Vector3 origin, int lineIndex, int layer = 0)
+    public virtual bool IsClear(Vector3 origin, int lineIndex, int layer = 0)
     {
         if (_line.positionCount < 1)
             return false;
@@ -84,7 +61,7 @@ public class Trajectory : MonoBehaviour, IPoolable
     }
 
 
-    private IEnumerator FadeAway()
+    protected virtual IEnumerator FadeAway()
     {
         _timeManager.SetNormalTime();
         Color col = _line.material.color;
@@ -99,13 +76,13 @@ public class Trajectory : MonoBehaviour, IPoolable
         Deactivate();
     }
 
-    public void ReUse(Vector3 position)
+    public virtual void ReUse(Vector3 position)
     {
         _transform.position = new Vector3(position.x, position.y, -5);
         Appear();
     }
 
-    private void Appear()
+    protected virtual void Appear()
     {
         if (Used)
             return;

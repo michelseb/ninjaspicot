@@ -22,7 +22,7 @@ public class DynamicStickiness : Stickiness
         if (!Active || obstacle == CurrentAttachment)
             return;
 
-        _hero.JumpManager.GainAllJumps();
+        _hero.Jumper.GainAllJumps();
 
         base.ReactToObstacle(obstacle, contactPoint);
     }

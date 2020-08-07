@@ -25,9 +25,11 @@ public class CameraBehaviour : MonoBehaviour
     public Camera Camera { get; private set; }
     public CameraMode CameraMode { get; private set; }
     private Hero _hero;
+    private Stickiness _stickiness;
     private float _colorInterpolation;
     private Color _targetColor;
     private Transform _tracker;
+    private Transform _transform;
     private Vector3 _movementOrigin;
     private Vector3 _movementDestination;
 
@@ -50,6 +52,7 @@ public class CameraBehaviour : MonoBehaviour
     private void Awake()
     {
         Camera = GetComponent<Camera>();
+        _transform = transform;
         _timeManager = TimeManager.Instance;
         _touchManager = TouchManager.Instance;
         Transform = transform.parent.transform;
@@ -63,6 +66,7 @@ public class CameraBehaviour : MonoBehaviour
     private void Start()
     {
         _hero = Hero.Instance;
+        _stickiness = _hero?.Stickiness;
         _tracker = _hero?.transform;
         InstantZoom(_beginZoom);
         Zoom(ZoomType.Intro);
@@ -74,6 +78,7 @@ public class CameraBehaviour : MonoBehaviour
         {
             _hero = Hero.Instance;
             _tracker = _hero?.transform;
+            _stickiness = _hero?.Stickiness;
         }
 
         switch (CameraMode)
@@ -89,7 +94,7 @@ public class CameraBehaviour : MonoBehaviour
                 break;
         }
 
-
+        //_transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.Euler(0, 0, Utils.GetAngleFromVector(_stickiness.CollisionNormal) - 90), 100 * Time.deltaTime);
 
         var newCol = Color.white * _timeManager.TimeScale;
         _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
@@ -175,7 +180,7 @@ public class CameraBehaviour : MonoBehaviour
             yield return null;
         }
         SetFollowMode(_hero.transform);
-        _hero.JumpManager.Active = true;
+        _hero.Jumper.Active = true;
     }
 
     private void InstantZoom(int zoom)
