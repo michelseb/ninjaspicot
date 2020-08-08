@@ -151,7 +151,6 @@ public class CameraBehaviour : MonoBehaviour
         while (Mathf.Abs(Camera.orthographicSize - _initSize) < Mathf.Abs(zoom * _screenRatio))
         {
             Camera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED * _screenRatio;
-            _touchManager.UpdateTouchOrigins();
             yield return null;
         }
     }
@@ -163,7 +162,6 @@ public class CameraBehaviour : MonoBehaviour
         while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - Camera.orthographicSize) > 0)
         {
             Camera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED * _screenRatio;
-            _touchManager.UpdateTouchOrigins();
             yield return null;
         }
         Camera.orthographicSize = INITIAL_CAMERA_SIZE;
@@ -176,7 +174,6 @@ public class CameraBehaviour : MonoBehaviour
         while (Camera.orthographicSize > INITIAL_CAMERA_SIZE)
         {
             Camera.orthographicSize -= speed;
-            _touchManager.UpdateTouchOrigins();
             yield return null;
         }
         SetFollowMode(_hero.transform);

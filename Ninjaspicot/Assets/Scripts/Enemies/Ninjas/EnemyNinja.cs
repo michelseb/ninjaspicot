@@ -1,6 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+public enum Dir
+{
+    Left,
+    Right
+}
+
 public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 {
     [SerializeField] protected Dir _direction;
@@ -12,7 +18,6 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     protected virtual void Start()
     {
-        Stickiness.NinjaDir = _direction;
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.Camera;
     }

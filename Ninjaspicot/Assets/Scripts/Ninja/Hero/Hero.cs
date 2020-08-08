@@ -108,7 +108,7 @@ public class Hero : Ninja, IRaycastable
 
     public override bool NeedsToWalk()
     {
-        return _touchManager.Touching;
+        return _touchManager.WalkDragging;
     }
 
     public void StartDisplayGhosts()

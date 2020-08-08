@@ -1,12 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public enum Dir
-{
-    Left,
-    Right
-}
-
 public class Stickiness : MonoBehaviour, IDynamic
 {
     [SerializeField] private float _speed;
@@ -19,7 +13,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Active { get; set; }
     public bool CanWalk { get; set; }
     public bool Walking => _walkOnWalls != null;
-    public Dir NinjaDir { get; set; }
     public float CurrentSpeed { get; set; }
     public Transform Transform => _transform;
     public Transform ContactPoint { get; private set; }
@@ -79,7 +72,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     {
         var contact = GetContactPoint(collision.contacts, _previousContactPoint);
         SetContactPosition(contact.point);
-        CollisionNormal = contact.normal;
+        CollisionNormal = Quaternion.Euler(0, 0, -90) * contact.normal;
     }
 
 
@@ -190,7 +183,7 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         while (true)
         {
-            jointMotor.motorSpeed = NinjaDir == Dir.Left ? -CurrentSpeed : CurrentSpeed;
+            jointMotor.motorSpeed = CurrentSpeed;
             hinge.motor = jointMotor;
             hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
 

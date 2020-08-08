@@ -122,19 +122,19 @@ public class TutorialManager : MonoBehaviour
 
         if (index == 0) // Déplacement
         {
-            if (_touchManager.Touching)
+            if (_touchManager.WalkTouching)
             {
                 duration -= Time.deltaTime;
             }
         }
         else if (index == 1) // Saut
         {
-            if (_touchManager.Dragging && duration > 1)
+            if (_touchManager.JumpDragging && duration > 1)
             {
                 duration = 1;
             }
 
-            if (!_touchManager.Touching && duration == 1)
+            if (!_touchManager.JumpTouching && duration == 1)
             {
                 duration = 0;
             }

@@ -29,7 +29,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         Active = true;
     }
 
-    public abstract void DrawTrajectory(Vector2 linePosition, Vector2 click, Vector2 startClick);
+    public abstract void DrawTrajectory(Vector2 linePosition, Vector2 direction);
 
     protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {

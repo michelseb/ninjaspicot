@@ -2,10 +2,10 @@
 
 public class ClassicTrajectory : TrajectoryBase
 {
-    public override void DrawTrajectory(Vector2 linePosition, Vector2 click, Vector2 startClick)
+    public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
     {
         Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 direction = (startClick - click).normalized;
+        direction = -direction.normalized;
         Vector2 velocity = direction * Strength;
 
         _line.positionCount = MAX_VERTEX;

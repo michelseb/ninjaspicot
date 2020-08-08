@@ -7,7 +7,8 @@ public enum CustomColor
     Red,
     Green,
     White,
-    Blue
+    Blue,
+    Yellow
 }
 
 public static class ColorUtils
@@ -16,6 +17,7 @@ public static class ColorUtils
     public static Color Green => new Color(0, 1, 0.5f, 1);
     public static Color White => new Color(1, 1, 1, 1);
     public static Color Blue => new Color(0, 128, 255);
+    public static Color Yellow => new Color(255, 200, 0);
 
     public static Dictionary<CustomColor, Color> CustomColors = new Dictionary<CustomColor, Color> 
     {
@@ -23,6 +25,7 @@ public static class ColorUtils
         { CustomColor.Green, Green },
         { CustomColor.Red, Red },
         { CustomColor.Blue, Blue },
+        { CustomColor.Yellow, Yellow },
     };
 
     public static Color GetColor(CustomColor color, float alpha = 1)

@@ -2,9 +2,6 @@
 
 public class HeroJumper : Jumper
 {
-    public bool NeedsJump => NeedsJump1 || NeedsJump2;
-    public bool NeedsJump1 { get; set; }
-    public bool NeedsJump2 { get; set; }
     protected DynamicInteraction _dynamicInteraction;
     protected TimeManager _timeManager;
     protected CameraBehaviour _cameraBehaviour;
@@ -18,7 +15,7 @@ public class HeroJumper : Jumper
         _timeManager = TimeManager.Instance;
     }
 
-    public override void Jump()
+    public override void Jump(Vector2 direction)
     {
         if (_dynamicInteraction.Interacting)
         {
@@ -31,10 +28,8 @@ public class HeroJumper : Jumper
         }
 
         _cameraBehaviour.DoShake(.3f, .1f);
-        base.Jump();
+        base.Jump(direction);
         Trajectory = null;
-        NeedsJump1 = false;
-        NeedsJump2 = false;
     }
 
     public override bool CanJump()
@@ -42,7 +37,7 @@ public class HeroJumper : Jumper
         if (CompareTag("Dynamic"))
             return Hero.Instance.Jumper.CanJump();
 
-        if (!Active || GetJumps() <= 0 || !NeedsJump)
+        if (!Active || GetJumps() <= 0)
             return false;
 
         return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 5f, Hero.Instance.Id,

@@ -38,15 +38,15 @@ public class Jumper : MonoBehaviour
         GainAllJumps();
     }
 
-    public virtual void Jump()
+    public virtual void Jump(Vector2 direction)
     {
         _stickiness.Detach();
 
-        Vector2 forceToApply = TrajectoryOrigin - TrajectoryDestination;
         LoseJump();
+        _dynamicEntity.Rigidbody.isKinematic = false;
         _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
 
-        _dynamicEntity.Rigidbody.AddForce(forceToApply.normalized * _strength, ForceMode2D.Impulse);
+        _dynamicEntity.Rigidbody.AddForce(-direction.normalized * _strength, ForceMode2D.Impulse);
 
         _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, TrajectoryDestination - TrajectoryOrigin));
 
@@ -56,7 +56,7 @@ public class Jumper : MonoBehaviour
         }
     }
 
-    public virtual void Charge()
+    public virtual void Charge(Vector3 jumpDirection)
     {
         Vector3 initialPos = _dynamicEntity.Rigidbody.position;
         var pos = initialPos;
@@ -70,7 +70,7 @@ public class Jumper : MonoBehaviour
         }
 
         _dynamicEntity.Rigidbody.position = ChargeDestination;
-        Jump();
+        Jump(jumpDirection);
     }
 
     public virtual void ReinitJump()
