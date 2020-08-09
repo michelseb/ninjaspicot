@@ -53,8 +53,8 @@ public class CameraBehaviour : MonoBehaviour
         MainCamera = GetComponent<Camera>();
         _timeManager = TimeManager.Instance;
         Transform = transform.parent.transform;
-        UiCamera = Transform.Find("UICamera").GetComponent<Camera>();
-        Canvas = UiCamera.GetComponentInChildren<Canvas>();
+        Canvas = Transform.GetComponentInChildren<Canvas>();
+        UiCamera = Canvas.GetComponentInChildren<Camera>();
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 

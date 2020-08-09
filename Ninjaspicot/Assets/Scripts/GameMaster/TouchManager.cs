@@ -27,7 +27,7 @@ public class TouchManager : MonoBehaviour
     private TimeManager _timeManager;
     private PoolManager _poolManager;
     private CameraBehaviour _cameraBehaviour;
-    private Camera _camera;
+    private Camera _uiCamera;
     private Transform _canvasTransform;
     private bool _walkInitialized;
     private bool _jumpInitialized;
@@ -37,12 +37,12 @@ public class TouchManager : MonoBehaviour
         _timeManager = TimeManager.Instance;
         _poolManager = PoolManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
-        _camera = _cameraBehaviour.MainCamera;
         _canvasTransform = _cameraBehaviour.Canvas.transform;
     }
 
     private void Start()
     {
+        _uiCamera = _cameraBehaviour.UiCamera;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
         _jumper = _hero?.Jumper as HeroJumper;
@@ -51,6 +51,7 @@ public class TouchManager : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(_joystick1?.Direction);
         if (!HeroSpawned())
             return;
 
@@ -58,20 +59,32 @@ public class TouchManager : MonoBehaviour
 
         if (!_walkInitialized && LeftTouching)
         {
-            var touchPos = _camera.ScreenToWorldPoint(LeftTouch.Value.position);
+            var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value.position);
             _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false) ;
             _walkInitialized = true;
         }
 
         if (!_jumpInitialized && RightTouching)
         {
-            var touchPos = _camera.ScreenToWorldPoint(RightTouch.Value.position);
+            var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value.position);
             _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
             _jumpInitialized = true;
         }
+
+        if (_walkInitialized && !LeftTouching)
+        {
+            _joystick1.StartFading();
+            _walkInitialized = false;
+        }
+
+        if (_jumpInitialized && !RightTouching)
+        {
+            _joystick2.StartFading();
+            _jumpInitialized = false;
+        }
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         if (!HeroSpawned())
             return;
