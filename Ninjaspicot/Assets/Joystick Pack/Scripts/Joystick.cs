@@ -1,14 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler, IPoolable
 {
+    public bool Active { get; private set; }
     public float Horizontal { get { return (snapX) ? SnapFloat(input.x, AxisOptions.Horizontal) : input.x; } }
     public float Vertical { get { return (snapY) ? SnapFloat(input.y, AxisOptions.Vertical) : input.y; } }
     public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
 
     private TouchManager _touchManager;
+    private Transform _transform;
 
     public float HandleRange
     {
@@ -26,6 +29,9 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     public bool SnapX { get { return snapX; } set { snapX = value; } }
     public bool SnapY { get { return snapY; } set { snapY = value; } }
 
+    public PoolableType PoolableType => _poolableType;
+
+    [SerializeField] private PoolableType _poolableType;
     [SerializeField] private float handleRange = 1;
     [SerializeField] private float deadZone = 0;
     [SerializeField] private AxisOptions axisOptions = AxisOptions.Both;
@@ -42,8 +48,12 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Canvas canvas;
     private Camera cam;
     private Color _initColor;
+    private Coroutine _appear;
 
     private Vector2 input = Vector2.zero;
+
+    private const float APPEAR_SPEED = 4f;
+    private const float FADE_SPEED = 1.5f;
 
     protected virtual void Awake()
     {
@@ -52,6 +62,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         _touchManager = TouchManager.Instance;
         _initColor = _image.color;
         _alpha = _image.color.a;
+        _transform = transform;
     }
 
     protected virtual void Start()
@@ -153,21 +164,71 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         SetColor(_initColor);
     }
 
-    protected Vector2 ScreenPointToAnchoredPosition(Vector2 screenPosition)
-    {
-        Vector2 localPoint = Vector2.zero;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(baseRect, screenPosition, cam, out localPoint))
-        {
-            Vector2 pivotOffset = baseRect.pivot * baseRect.sizeDelta;
-            return localPoint - (background.anchorMax * baseRect.sizeDelta) + pivotOffset;
-        }
-        return Vector2.zero;
-    }
-
     protected void SetColor(Color color)
     {
         _image.color = color;
         _handleImage.color = color;
+    }
+
+    private void OnEnable()
+    {
+        var col = _image.color;
+        _image.color = new Color(col.r, col.g, col.b, 0);
+    }
+
+    public void StartFading()
+    {
+        if (_appear != null)
+        {
+            StopCoroutine(_appear);
+        }
+        StartCoroutine(FadeAway());
+    }
+
+
+    private IEnumerator FadeAway()
+    {
+        Color col = _image.color;
+        while (col.a > 0)
+        {
+            col = _image.color;
+            col.a -= Time.deltaTime * FADE_SPEED;
+            _image.color = col;
+            yield return null;
+        }
+        Deactivate();
+    }
+
+    private IEnumerator Appear()
+    {
+        Color col = _image.color;
+        while (col.a < 1)
+        {
+            col = _image.color;
+            col.a += Time.deltaTime * APPEAR_SPEED;
+            _image.color = col;
+            yield return null;
+        }
+        _appear = null;
+    }
+
+    public void Pool(Vector3 position, Quaternion rotation)
+    {
+        _transform.position = new Vector3(position.x, position.y, -5);
+        _transform.rotation = rotation;
+        _appear = StartCoroutine(Appear());
+    }
+
+    public void Deactivate()
+    {
+        Active = false;
+        gameObject.SetActive(false);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+        Active = true;
     }
 }
 

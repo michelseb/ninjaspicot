@@ -19,7 +19,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     protected virtual void Start()
     {
         _canvas = GetComponent<Canvas>();
-        _canvas.worldCamera = _cameraBehaviour.Camera;
+        _canvas.worldCamera = _cameraBehaviour.MainCamera;
     }
 
     public void Pool(Vector3 position, Quaternion rotation)

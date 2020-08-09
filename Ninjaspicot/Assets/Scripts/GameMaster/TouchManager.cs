@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 public class TouchManager : MonoBehaviour
 {
@@ -8,12 +9,13 @@ public class TouchManager : MonoBehaviour
 
     public bool WalkTouching { get; private set; }
     public bool JumpTouching { get; private set; }
-    private TimeManager _timeManager;
-
-    public bool WalkDragging => _joystick1.Direction.magnitude > .5f;
-    public bool JumpDragging => _joystick2.Direction.magnitude > .5f;
-
+    public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .5f;
+    public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .5f;
     public bool DoubleTouching { get; private set; }
+    private Touch? LeftTouch => GetLeftTouch();
+    private Touch? RightTouch => GetRightTouch();
+    public bool LeftTouching => LeftTouch != null;
+    public bool RightTouching => RightTouch != null;
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
@@ -22,10 +24,21 @@ public class TouchManager : MonoBehaviour
     private Stickiness _stickiness;
     private HeroJumper _jumper;
     private DynamicInteraction _dynamicInteraction;
+    private TimeManager _timeManager;
+    private PoolManager _poolManager;
+    private CameraBehaviour _cameraBehaviour;
+    private Camera _camera;
+    private Transform _canvasTransform;
+    private bool _walkInitialized;
+    private bool _jumpInitialized;
 
     private void Awake()
     {
         _timeManager = TimeManager.Instance;
+        _poolManager = PoolManager.Instance;
+        _cameraBehaviour = CameraBehaviour.Instance;
+        _camera = _cameraBehaviour.MainCamera;
+        _canvasTransform = _cameraBehaviour.Canvas.transform;
     }
 
     private void Start()
@@ -42,6 +55,20 @@ public class TouchManager : MonoBehaviour
             return;
 
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
+
+        if (!_walkInitialized && LeftTouching)
+        {
+            var touchPos = _camera.ScreenToWorldPoint(LeftTouch.Value.position);
+            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false) ;
+            _walkInitialized = true;
+        }
+
+        if (!_jumpInitialized && RightTouching)
+        {
+            var touchPos = _camera.ScreenToWorldPoint(RightTouch.Value.position);
+            _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
+            _jumpInitialized = true;
+        }
     }
 
     private void FixedUpdate()
@@ -58,7 +85,7 @@ public class TouchManager : MonoBehaviour
 
             if (_jumper.CanJump())
             {
-                if (WalkTouching)
+                if (WalkTouching && !WalkDragging)
                 {
                     var trajectory = _jumper.SetTrajectory<ChargeTrajectory>();
                     trajectory.SetJumper(_jumper);
@@ -177,5 +204,41 @@ public class TouchManager : MonoBehaviour
     public Vector3 GetJumpDirection()
     {
         return _joystick2.Direction;
+    }
+
+    private Touch? GetLeftTouch()
+    {
+        var touches = Input.touches;
+        if (touches.Count() == 0)
+            return null;
+
+        foreach (var touch in touches)
+        {
+            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
+                continue;
+
+            if (touch.position.x <= Screen.width / 2)
+                return touch;
+        }
+
+        return null;
+    }
+
+    private Touch? GetRightTouch()
+    {
+        var touches = Input.touches;
+        if (touches.Count() == 0)
+            return null;
+
+        foreach (var touch in touches)
+        {
+            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
+                continue;
+
+            if (touch.position.x > Screen.width / 2)
+                return touch;
+        }
+
+        return null;
     }
 }

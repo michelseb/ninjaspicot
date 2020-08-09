@@ -22,14 +22,14 @@ public class CameraBehaviour : MonoBehaviour
     [SerializeField]
     private int _beginZoom;
     public Transform Transform { get; private set; }
-    public Camera Camera { get; private set; }
+    public Camera MainCamera { get; private set; }
+    public Camera UiCamera { get; private set; }
+    public Canvas Canvas { get; private set; }
     public CameraMode CameraMode { get; private set; }
     private Hero _hero;
-    private Stickiness _stickiness;
     private float _colorInterpolation;
     private Color _targetColor;
     private Transform _tracker;
-    private Transform _transform;
     private Vector3 _movementOrigin;
     private Vector3 _movementDestination;
 
@@ -38,7 +38,6 @@ public class CameraBehaviour : MonoBehaviour
     private float _centerDuration;
 
     private TimeManager _timeManager;
-    private TouchManager _touchManager;
 
     private float _screenRatio;
     private float INITIAL_CAMERA_SIZE;
@@ -51,11 +50,11 @@ public class CameraBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        Camera = GetComponent<Camera>();
-        _transform = transform;
+        MainCamera = GetComponent<Camera>();
         _timeManager = TimeManager.Instance;
-        _touchManager = TouchManager.Instance;
         Transform = transform.parent.transform;
+        UiCamera = Transform.Find("UICamera").GetComponent<Camera>();
+        Canvas = UiCamera.GetComponentInChildren<Canvas>();
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
@@ -66,7 +65,6 @@ public class CameraBehaviour : MonoBehaviour
     private void Start()
     {
         _hero = Hero.Instance;
-        _stickiness = _hero?.Stickiness;
         _tracker = _hero?.transform;
         InstantZoom(_beginZoom);
         Zoom(ZoomType.Intro);
@@ -78,7 +76,6 @@ public class CameraBehaviour : MonoBehaviour
         {
             _hero = Hero.Instance;
             _tracker = _hero?.transform;
-            _stickiness = _hero?.Stickiness;
         }
 
         switch (CameraMode)
@@ -99,7 +96,7 @@ public class CameraBehaviour : MonoBehaviour
         var newCol = Color.white * _timeManager.TimeScale;
         _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
 
-        if (Mathf.Abs(Camera.backgroundColor.grayscale - _targetColor.grayscale) > COLOR_THRESHOLD && _colorInterpolation >= 1)
+        if (Mathf.Abs(MainCamera.backgroundColor.grayscale - _targetColor.grayscale) > COLOR_THRESHOLD && _colorInterpolation >= 1)
         {
             _colorInterpolation = 0;
         }
@@ -141,39 +138,39 @@ public class CameraBehaviour : MonoBehaviour
     private void Colorize(Color color)
     {
         _colorInterpolation += Time.deltaTime * 10;
-        Camera.backgroundColor = Color.Lerp(Camera.backgroundColor, color, _colorInterpolation);
+        MainCamera.backgroundColor = Color.Lerp(MainCamera.backgroundColor, color, _colorInterpolation);
     }
 
     private IEnumerator ZoomProgressive(int zoom)
     {
-        float _initSize = Camera.orthographicSize;
+        float _initSize = MainCamera.orthographicSize;
 
-        while (Mathf.Abs(Camera.orthographicSize - _initSize) < Mathf.Abs(zoom * _screenRatio))
+        while (Mathf.Abs(MainCamera.orthographicSize - _initSize) < Mathf.Abs(zoom * _screenRatio))
         {
-            Camera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED * _screenRatio;
+            MainCamera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
     }
 
     private IEnumerator ReinitZoom()
     {
-        var delta = INITIAL_CAMERA_SIZE - Camera.orthographicSize;
+        var delta = INITIAL_CAMERA_SIZE - MainCamera.orthographicSize;
 
-        while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - Camera.orthographicSize) > 0)
+        while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - MainCamera.orthographicSize) > 0)
         {
-            Camera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED * _screenRatio;
+            MainCamera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
-        Camera.orthographicSize = INITIAL_CAMERA_SIZE;
+        MainCamera.orthographicSize = INITIAL_CAMERA_SIZE;
     }
 
     private IEnumerator ZoomIntro(float speed)
     {
         yield return new WaitForSecondsRealtime(2);
 
-        while (Camera.orthographicSize > INITIAL_CAMERA_SIZE)
+        while (MainCamera.orthographicSize > INITIAL_CAMERA_SIZE)
         {
-            Camera.orthographicSize -= speed;
+            MainCamera.orthographicSize -= speed;
             yield return null;
         }
         SetFollowMode(_hero.transform);
@@ -182,7 +179,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private void InstantZoom(int zoom)
     {
-        Camera.orthographicSize = INITIAL_CAMERA_SIZE + zoom * _screenRatio;
+        MainCamera.orthographicSize = INITIAL_CAMERA_SIZE + zoom * _screenRatio;
     }
 
     public void Zoom(ZoomType type, int zoomAmount = 0)
@@ -225,13 +222,13 @@ public class CameraBehaviour : MonoBehaviour
             float x = Random.Range(-1f, 1f) * strength;
             float y = Random.Range(-1f, 1f) * strength;
 
-            transform.localPosition = new Vector3(x, y, pos.z);
+            Transform.localPosition = new Vector3(x, y, pos.z);
 
             ellapsed += Time.deltaTime;
             yield return null;
         }
 
-        transform.localPosition = pos;
+        Transform.localPosition = pos;
     }
 
 }

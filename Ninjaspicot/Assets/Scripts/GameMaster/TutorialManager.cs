@@ -43,7 +43,7 @@ public class TutorialManager : MonoBehaviour
         _cameraBehaviour = CameraBehaviour.Instance;
         _containerImage = _instructionsContainer.GetComponent<Image>();
         _canvas = GetComponent<Canvas>();
-        _canvas.worldCamera = _cameraBehaviour.Camera;
+        _canvas.worldCamera = _cameraBehaviour.MainCamera;
     }
 
     private void Update()

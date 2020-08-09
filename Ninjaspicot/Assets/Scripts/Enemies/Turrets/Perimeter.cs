@@ -13,6 +13,6 @@ public class Perimeter : MonoBehaviour, IRaycastable
     {
         _cameraBehaviour = CameraBehaviour.Instance;
         _canvas = GetComponent<Canvas>();
-        _canvas.worldCamera = _cameraBehaviour.Camera;
+        _canvas.worldCamera = _cameraBehaviour.MainCamera;
     }
 }
