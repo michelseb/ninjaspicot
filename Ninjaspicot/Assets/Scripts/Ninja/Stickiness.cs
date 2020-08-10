@@ -55,19 +55,6 @@ public class Stickiness : MonoBehaviour, IDynamic
         CurrentSpeed = _speed;
     }
 
-    protected virtual void Update()
-    {
-        if (Walking && !_ninjaBehaviour.ReadyToWalk)
-        {
-            StopWalking(true);
-        }
-    }
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    SetContactPosition(GetContactPoint(collision.contacts, _previousContactPoint), true);
-    //}
-
     private void OnCollisionStay2D(Collision2D collision)
     {
         var contact = GetContactPoint(collision.contacts, _previousContactPoint);

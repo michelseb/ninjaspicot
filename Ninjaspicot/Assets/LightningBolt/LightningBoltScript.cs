@@ -68,9 +68,6 @@ namespace DigitalRuby.LightningBolt
         [Tooltip("How chaotic should the lightning be? (0-1)")]
         public float ChaosFactor = 0.15f;
 
-        [Tooltip("In manual mode, the trigger method must be called to create a bolt")]
-        public bool ManualMode;
-
         [Range(1, 64)]
         [Tooltip("The number of rows in the texture. Used for animation.")]
         public int Rows = 1;
@@ -97,13 +94,11 @@ namespace DigitalRuby.LightningBolt
         private Vector2[] _offsets;
         private int _animationOffsetIndex;
         private int _animationPingPongDirection = 1;
-        private bool _orthographic;
         private Transform _transform;
 
         private void Awake()
         {
             _transform = transform;
-            _orthographic = (Camera.main != null && Camera.main.orthographic);
             _lineRenderer = GetComponent<LineRenderer>();
             _collider = GetComponent<BoxCollider2D>();
             _lineRenderer.positionCount = 0;
@@ -115,7 +110,7 @@ namespace DigitalRuby.LightningBolt
             if (distX < distY)
             {
                 _collider.size = new Vector2(5, distY);
-                
+
                 _collider.offset = StartObject.localPosition + new Vector3(0, distY / 2);
             }
             else
@@ -127,18 +122,9 @@ namespace DigitalRuby.LightningBolt
 
         private void Update()
         {
-            _orthographic = (Camera.main != null && Camera.main.orthographic);
             if (timer <= 0.0f)
             {
-                if (ManualMode)
-                {
-                    timer = Duration;
-                    _lineRenderer.positionCount = 0;
-                }
-                else
-                {
-                    Trigger();
-                }
+                Trigger();
             }
             timer -= Time.deltaTime;
         }
@@ -196,13 +182,9 @@ namespace DigitalRuby.LightningBolt
         private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, int totalGenerations, float offsetAmount)
         {
             if (generation < 0 || generation > 8)
-            {
                 return;
-            }
-            else if (_orthographic)
-            {
-                start.z = end.z = Mathf.Min(start.z, end.z);
-            }
+
+            start.z = end.z = Mathf.Min(start.z, end.z);
 
             _segments.Add(new KeyValuePair<Vector3, Vector3>(start, end));
             if (generation == 0)
@@ -244,28 +226,10 @@ namespace DigitalRuby.LightningBolt
 
         public void RandomVector(ref Vector3 start, ref Vector3 end, float offsetAmount, out Vector3 result)
         {
-            if (_orthographic)
-            {
-                Vector3 directionNormalized = (end - start).normalized;
-                Vector3 side = new Vector3(-directionNormalized.y, directionNormalized.x, directionNormalized.z);
-                float distance = ((float)RandomGenerator.NextDouble() * offsetAmount * 2.0f) - offsetAmount;
-                result = side * distance;
-            }
-            else
-            {
-                Vector3 directionNormalized = (end - start).normalized;
-                Vector3 side;
-                GetPerpendicularVector(ref directionNormalized, out side);
-
-                // generate random distance
-                float distance = (((float)RandomGenerator.NextDouble() + 0.1f) * offsetAmount);
-
-                // get random rotation angle to rotate around the current direction
-                float rotationAngle = ((float)RandomGenerator.NextDouble() * 360.0f);
-
-                // rotate around the direction and then offset by the perpendicular vector
-                result = Quaternion.AngleAxis(rotationAngle, directionNormalized) * side * distance;
-            }
+            Vector3 directionNormalized = (end - start).normalized;
+            Vector3 side = new Vector3(-directionNormalized.y, directionNormalized.x, directionNormalized.z);
+            float distance = ((float)RandomGenerator.NextDouble() * offsetAmount * 2.0f) - offsetAmount;
+            result = side * distance;
         }
 
         private void SelectOffsetFromAnimationMode()

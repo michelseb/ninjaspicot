@@ -84,14 +84,15 @@ public class FieldOfView : MonoBehaviour, IActivable
 
         float angleStep = angle / pointCount;
 
-        var currentAngle = Utils.GetAngleFromVector(_transform.InverseTransformDirection(_transform.up)) + angle / 2f;
+        offset = _transform.TransformPoint(offset);
+        var direction = _transform.TransformDirection(Quaternion.AngleAxis(angle / 2f, Vector3.forward) * _transform.InverseTransformDirection(_transform.up));
 
         RaycastHit2D[] results = new RaycastHit2D[1];
 
         for (int i = 1; i <= pointCount; i++)
         {
-            Debug.DrawRay(_transform.TransformPoint(offset), transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)) * size, Color.yellow);
-            var hits = Physics2D.Raycast(_transform.TransformPoint(offset), _transform.TransformDirection(Utils.GetVectorFromAngle(currentAngle)), _contactFilter, results, size);
+            //Debug.DrawRay(offset, direction * size, Color.yellow); //=> gourmand
+            var hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
             if (hits > 0)
             {
                 _vertices[i].Modified = true;
@@ -104,8 +105,7 @@ public class FieldOfView : MonoBehaviour, IActivable
                 _vertices[i].Modified = false;
                 updated = true;
             }
-
-            currentAngle -= angleStep;
+            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
         }
         return updated;
     }

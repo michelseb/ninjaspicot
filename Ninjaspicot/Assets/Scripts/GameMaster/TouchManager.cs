@@ -9,8 +9,8 @@ public class TouchManager : MonoBehaviour
 
     public bool WalkTouching { get; private set; }
     public bool JumpTouching { get; private set; }
-    public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .5f;
-    public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .5f;
+    public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .2f;
+    public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
     public bool DoubleTouching { get; private set; }
     private Touch? LeftTouch => GetLeftTouch();
     private Touch? RightTouch => GetRightTouch();

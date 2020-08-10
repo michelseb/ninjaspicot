@@ -30,8 +30,10 @@ public class CameraBehaviour : MonoBehaviour
     private float _colorInterpolation;
     private Color _targetColor;
     private Transform _tracker;
+    private Transform _transform;
     private Vector3 _movementOrigin;
     private Vector3 _movementDestination;
+    private Vector3 _velocity;
 
     //Center mode
     private float _centerStart;
@@ -42,7 +44,7 @@ public class CameraBehaviour : MonoBehaviour
     private float _screenRatio;
     private float INITIAL_CAMERA_SIZE;
     private const float ZOOM_SPEED = 2f;
-    private const float FOLLOW_SPEED = 2f;
+    private const float FOLLOW_SPEED = 1f;
     private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
@@ -52,7 +54,8 @@ public class CameraBehaviour : MonoBehaviour
     {
         MainCamera = GetComponent<Camera>();
         _timeManager = TimeManager.Instance;
-        Transform = transform.parent.transform;
+        _transform = transform;
+        Transform = _transform.parent.transform;
         Canvas = Transform.GetComponentInChildren<Canvas>();
         UiCamera = Canvas.GetComponentInChildren<Camera>();
 
@@ -66,6 +69,7 @@ public class CameraBehaviour : MonoBehaviour
     {
         _hero = Hero.Instance;
         _tracker = _hero?.transform;
+        _velocity = Vector3.zero;
         InstantZoom(_beginZoom);
         Zoom(ZoomType.Intro);
     }
@@ -91,8 +95,6 @@ public class CameraBehaviour : MonoBehaviour
                 break;
         }
 
-        //_transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.Euler(0, 0, Utils.GetAngleFromVector(_stickiness.CollisionNormal) - 90), 100 * Time.deltaTime);
-
         var newCol = Color.white * _timeManager.TimeScale;
         _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
 
@@ -108,7 +110,7 @@ public class CameraBehaviour : MonoBehaviour
     }
     private void Follow(Transform tracker, float speed)
     {
-        Transform.position = Vector3.Lerp(Transform.position, new Vector3(tracker.position.x, tracker.position.y, Transform.position.z), speed * Time.deltaTime);
+        Transform.position = Vector3.SmoothDamp(Transform.position, tracker.position, ref _velocity, speed);
     }
 
     private void Center(Vector3 origin, Vector3 destination, float duration)
@@ -122,7 +124,8 @@ public class CameraBehaviour : MonoBehaviour
         CameraMode = CameraMode.Follow;
         _tracker = tracker;
         _movementOrigin = Transform.position;
-        _movementDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
+        _tracker.position = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
+        _movementDestination = _tracker.position;
     }
 
     public void SetCenterMode(Transform tracker, float duration)
@@ -213,7 +216,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private IEnumerator Shake(float duration, float strength)
     {
-        var pos = transform.localPosition;
+        var pos = _transform.localPosition;
 
         float ellapsed = 0;
 
@@ -222,13 +225,13 @@ public class CameraBehaviour : MonoBehaviour
             float x = Random.Range(-1f, 1f) * strength;
             float y = Random.Range(-1f, 1f) * strength;
 
-            transform.localPosition = new Vector3(x, y, pos.z);
+            _transform.localPosition = new Vector3(x, y, pos.z);
 
             ellapsed += Time.deltaTime;
             yield return null;
         }
 
-        transform.localPosition = pos;
+        _transform.localPosition = pos;
     }
 
 }
