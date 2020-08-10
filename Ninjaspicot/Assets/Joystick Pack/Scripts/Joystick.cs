@@ -3,11 +3,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler, IPoolable
+public class Joystick : MonoBehaviour, IPoolable
 {
     public bool Active { get; private set; }
-    public float Horizontal { get { return (snapX) ? SnapFloat(input.x, AxisOptions.Horizontal) : input.x; } }
-    public float Vertical { get { return (snapY) ? SnapFloat(input.y, AxisOptions.Vertical) : input.y; } }
+    public float Horizontal { get { return (_snapX) ? SnapFloat(_input.x, AxisOptions.Horizontal) : _input.x; } }
+    public float Vertical { get { return (_snapY) ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; } }
     public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
 
     private TouchManager _touchManager;
@@ -15,42 +15,42 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     public float HandleRange
     {
-        get { return handleRange; }
-        set { handleRange = Mathf.Abs(value); }
+        get { return _handleRange; }
+        set { _handleRange = Mathf.Abs(value); }
     }
 
     public float DeadZone
     {
-        get { return deadZone; }
-        set { deadZone = Mathf.Abs(value); }
+        get { return _deadZone; }
+        set { _deadZone = Mathf.Abs(value); }
     }
 
-    public AxisOptions AxisOptions { get { return AxisOptions; } set { axisOptions = value; } }
-    public bool SnapX { get { return snapX; } set { snapX = value; } }
-    public bool SnapY { get { return snapY; } set { snapY = value; } }
+    public AxisOptions AxisOptions { get { return AxisOptions; } set { _axisOptions = value; } }
+    public bool SnapX { get { return _snapX; } set { _snapX = value; } }
+    public bool SnapY { get { return _snapY; } set { _snapY = value; } }
 
     public PoolableType PoolableType => _poolableType;
 
     [SerializeField] private PoolableType _poolableType;
-    [SerializeField] private float handleRange = 1;
-    [SerializeField] private float deadZone = 0;
-    [SerializeField] private AxisOptions axisOptions = AxisOptions.Both;
-    [SerializeField] private bool snapX = false;
-    [SerializeField] private bool snapY = false;
-    [SerializeField] private CustomColor customColor;
-    [SerializeField] protected RectTransform background = null;
-    [SerializeField] private RectTransform handle = null;
-    private RectTransform baseRect = null;
+    [SerializeField] private float _handleRange = 1;
+    [SerializeField] private float _deadZone = 0;
+    [SerializeField] private AxisOptions _axisOptions = AxisOptions.Both;
+    [SerializeField] private bool _snapX = false;
+    [SerializeField] private bool _snapY = false;
+    [SerializeField] private CustomColor _customColor;
+    [SerializeField] protected RectTransform _background = null;
+    [SerializeField] private RectTransform _handle = null;
+
     private Image _image;
     private Image _handleImage;
     private float _alpha;
 
-    private Canvas canvas;
-    private Camera cam;
+    private Canvas _canvas;
+    private Camera _cam;
     private Color _initColor;
     private Coroutine _appear;
 
-    private Vector2 input = Vector2.zero;
+    private Vector2 _input = Vector2.zero;
 
     private const float APPEAR_SPEED = 4f;
     private const float FADE_SPEED = 1.5f;
@@ -58,7 +58,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     protected virtual void Awake()
     {
         _image = GetComponent<Image>();
-        _handleImage = handle.GetComponent<Image>();
+        _handleImage = _handle.GetComponent<Image>();
         _touchManager = TouchManager.Instance;
         _initColor = _image.color;
         _alpha = _image.color.a;
@@ -67,59 +67,60 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
     protected virtual void Start()
     {
-        HandleRange = handleRange;
-        DeadZone = deadZone;
-        baseRect = GetComponent<RectTransform>();
-        canvas = GetComponentInParent<Canvas>();
-        if (canvas == null)
+        HandleRange = _handleRange;
+        DeadZone = _deadZone;
+        
+        _canvas = GetComponentInParent<Canvas>();
+        if (_canvas == null)
+        { 
             Debug.LogError("The Joystick is not placed inside a canvas");
+        }
+
+        _cam = null;
+        if (_canvas?.renderMode == RenderMode.ScreenSpaceCamera)
+        {
+            _cam = _canvas.worldCamera;
+        }
 
         Vector2 center = new Vector2(0.5f, 0.5f);
-        background.pivot = center;
-        handle.anchorMin = center;
-        handle.anchorMax = center;
-        handle.pivot = center;
-        handle.anchoredPosition = Vector2.zero;
+        _background.pivot = center;
+        _handle.anchorMin = center;
+        _handle.anchorMax = center;
+        _handle.pivot = center;
+        _handle.anchoredPosition = Vector2.zero;
+        SetColor(ColorUtils.GetColor(_customColor, _alpha));
     }
 
-    public virtual void OnPointerDown(PointerEventData eventData)
+    public void Drag(Vector2 touchPosition)
     {
-        _touchManager.GetTouchDown(this);
-        SetColor(ColorUtils.GetColor(customColor, _alpha));
-        OnDrag(eventData);
-    }
+        if (_cam == null)
+            return;
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        cam = null;
-        if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
-            cam = canvas.worldCamera;
-
-        Vector2 position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
-        Vector2 radius = background.sizeDelta / 2;
-        input = (eventData.position - position) / (radius * canvas.scaleFactor);
+        Vector2 position = RectTransformUtility.WorldToScreenPoint(_cam, _background.position);
+        Vector2 radius = _background.sizeDelta / 2;
+        _input = (touchPosition - position) / (radius * _canvas.scaleFactor);
         FormatInput();
-        HandleInput(input.magnitude, input.normalized, radius, cam);
-        handle.anchoredPosition = input * radius * handleRange;
+        HandleInput(_input.magnitude, _input.normalized, radius, _cam);
+        _handle.anchoredPosition = _input * radius * _handleRange;
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
     {
-        if (magnitude > deadZone)
+        if (magnitude > _deadZone)
         {
             if (magnitude > 1)
-                input = normalised;
+                _input = normalised;
         }
         else
-            input = Vector2.zero;
+            _input = Vector2.zero;
     }
 
     private void FormatInput()
     {
-        if (axisOptions == AxisOptions.Horizontal)
-            input = new Vector2(input.x, 0f);
-        else if (axisOptions == AxisOptions.Vertical)
-            input = new Vector2(0f, input.y);
+        if (_axisOptions == AxisOptions.Horizontal)
+            _input = new Vector2(_input.x, 0f);
+        else if (_axisOptions == AxisOptions.Vertical)
+            _input = new Vector2(0f, _input.y);
     }
 
     private float SnapFloat(float value, AxisOptions snapAxis)
@@ -127,9 +128,9 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (value == 0)
             return value;
 
-        if (axisOptions == AxisOptions.Both)
+        if (_axisOptions == AxisOptions.Both)
         {
-            float angle = Vector2.Angle(input, Vector2.up);
+            float angle = Vector2.Angle(_input, Vector2.up);
             if (snapAxis == AxisOptions.Horizontal)
             {
                 if (angle < 22.5f || angle > 157.5f)
@@ -156,11 +157,15 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         return 0;
     }
 
-    public virtual void OnPointerUp(PointerEventData eventData)
+    public virtual void OnPointerDown()
     {
-        _touchManager.GetTouchUp(this);
-        input = Vector2.zero;
-        handle.anchoredPosition = Vector2.zero;
+        SetColor(ColorUtils.GetColor(_customColor, _alpha));
+    }
+
+    public virtual void OnPointerUp()
+    {
+        _input = Vector2.zero;
+        _handle.anchoredPosition = Vector2.zero;
         SetColor(_initColor);
     }
 

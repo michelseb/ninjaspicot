@@ -88,14 +88,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9fca4100a7477741b3973b4ff2c405f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handleRange: 1
-  deadZone: 0
-  axisOptions: 0
-  snapX: 0
-  snapY: 0
-  customColor: 0
-  background: {fileID: 2929252283123773938}
-  handle: {fileID: 2929252285020697096}
+  _poolableType: 0
+  _handleRange: 1
+  _deadZone: 0
+  _axisOptions: 0
+  _snapX: 0
+  _snapY: 0
+  _customColor: 0
+  _background: {fileID: 2929252283123773938}
+  _handle: {fileID: 2929252285020697096}
 --- !u!1 &2929252285020697097
 GameObject:
   m_ObjectHideFlags: 0

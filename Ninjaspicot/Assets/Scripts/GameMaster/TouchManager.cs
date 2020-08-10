@@ -51,16 +51,18 @@ public class TouchManager : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(_joystick1?.Direction);
         if (!HeroSpawned())
             return;
 
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
+
         if (!_walkInitialized && LeftTouching)
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value.position);
-            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false) ;
+            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false);
+            _joystick1.OnPointerDown();
+            WalkTouching = true;
             _walkInitialized = true;
         }
 
@@ -68,18 +70,61 @@ public class TouchManager : MonoBehaviour
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value.position);
             _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
+            _joystick2.OnPointerDown();
+            JumpTouching = true;
             _jumpInitialized = true;
         }
 
         if (_walkInitialized && !LeftTouching)
         {
             _joystick1.StartFading();
+            _joystick1.OnPointerUp();
+            WalkTouching = false;
+            DoubleTouching = false;
             _walkInitialized = false;
+        }
+
+        if (_walkInitialized && LeftTouching)
+        {
+            _joystick1.Drag(LeftTouch.Value.position);
+        }
+
+        if (_jumpInitialized && RightTouching)
+        {
+            _joystick2.Drag(RightTouch.Value.position);
         }
 
         if (_jumpInitialized && !RightTouching)
         {
             _joystick2.StartFading();
+            if (_jumper.ReadyToJump())
+            {
+                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
+                {
+                    _jumper.Trajectory.StartFading();
+                    _timeManager.SetNormalTime();
+                }
+                else
+                {
+                    _stickiness.StopWalking(false);
+
+                    switch (_jumper.JumpMode)
+                    {
+                        case JumpMode.Classic:
+                            _jumper.Jump(_joystick2.Direction);
+                            break;
+                        case JumpMode.Charge:
+                            _jumper.Charge(_joystick2.Direction);
+                            break;
+                    }
+                }
+            }
+            JumpTouching = false;
+            _stickiness.ReinitSpeed();
+            _hero.StopDisplayGhosts();
+            DoubleTouching = false;
+            _joystick2.OnPointerUp();
+
             _jumpInitialized = false;
         }
     }
@@ -157,56 +202,6 @@ public class TouchManager : MonoBehaviour
         }
 
         return true;
-    }
-
-    public void GetTouchDown(Joystick joystick)
-    {
-        if (joystick == _joystick1)
-        {
-            WalkTouching = true;
-        }
-        else if (joystick == _joystick2)
-        {
-            JumpTouching = true;
-        }
-    }
-
-    public void GetTouchUp(Joystick joystick)
-    {
-        if (joystick == _joystick1)
-        {
-            WalkTouching = false;
-        }
-        else if (joystick == _joystick2)
-        {
-
-            if (_jumper.ReadyToJump())
-            {
-                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
-                {
-                    _jumper.Trajectory.StartFading();
-                    _timeManager.SetNormalTime();
-                }
-                else
-                {
-                    _stickiness.StopWalking(false);
-
-                    switch (_jumper.JumpMode)
-                    {
-                        case JumpMode.Classic:
-                            _jumper.Jump(_joystick2.Direction);
-                            break;
-                        case JumpMode.Charge:
-                            _jumper.Charge(_joystick2.Direction);
-                            break;
-                    }
-                }
-            }
-            JumpTouching = false;
-        }
-        _stickiness.ReinitSpeed();
-        _hero.StopDisplayGhosts();
-        DoubleTouching = false;
     }
 
     public Vector3 GetWalkDirection()

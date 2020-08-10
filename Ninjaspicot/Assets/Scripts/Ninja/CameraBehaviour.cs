@@ -222,13 +222,13 @@ public class CameraBehaviour : MonoBehaviour
             float x = Random.Range(-1f, 1f) * strength;
             float y = Random.Range(-1f, 1f) * strength;
 
-            Transform.localPosition = new Vector3(x, y, pos.z);
+            transform.localPosition = new Vector3(x, y, pos.z);
 
             ellapsed += Time.deltaTime;
             yield return null;
         }
 
-        Transform.localPosition = pos;
+        transform.localPosition = pos;
     }
 
 }
