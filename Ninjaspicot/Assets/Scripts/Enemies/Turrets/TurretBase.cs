@@ -16,11 +16,11 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
     public bool Active { get; protected set; }
-
     protected Aim _aim;
     protected Image _image;
     protected Transform _target;
     protected Coroutine _wait;
+    protected Coroutine _getReady;
     protected Transform _transform;
 
     protected virtual void Awake()
@@ -34,9 +34,9 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected virtual void Start()
     {
         TurretMode = Mode.Scan;
-        _transform.Rotate(0, 0, _initRotation);
         Loaded = true;
-        Active = true;
+        Activate();
+        _transform.Rotate(0, 0, _initRotation);
     }
 
     protected virtual void Update()
@@ -72,7 +72,6 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected virtual void Scan()
     {
         var dir = _clockWise ? 1 : -1;
-
         _transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
 
         if (dir * (_transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)

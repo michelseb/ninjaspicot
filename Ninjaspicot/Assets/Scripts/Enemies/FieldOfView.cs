@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -22,7 +21,9 @@ public class FieldOfView : MonoBehaviour, IActivable
     protected Transform _transform;
     private Vertex[] _vertices;
     private ContactFilter2D _contactFilter;
-    private bool _calculateModifications;
+    private bool _isVisible;
+    private bool _isColliding;
+    private int _collidingAmount;
     private int _colorPropertyId;
     private int _emissionPropertyId;
 
@@ -44,14 +45,10 @@ public class FieldOfView : MonoBehaviour, IActivable
 
         _colorPropertyId = Shader.PropertyToID("_Color");
         _emissionPropertyId = Shader.PropertyToID("_EmissionColor");
-    }
 
-    protected virtual void Start()
-    {
         Active = true;
         _mesh = InitMesh(_size, _viewAngle, _detailAmount, _offset);
         _filter.sharedMesh = _mesh;
-        SetCollider(_mesh.vertices);
         _contactFilter = new ContactFilter2D
         {
             useLayerMask = true,
@@ -59,6 +56,10 @@ public class FieldOfView : MonoBehaviour, IActivable
             useTriggers = false
         };
 
+    }
+
+    protected virtual void Start()
+    {
         if (UpdateVertices(_size, _viewAngle, _detailAmount, _offset))
         {
             _mesh.vertices = _vertices.Select(x => x.ModifiedPos).ToArray();
@@ -66,9 +67,23 @@ public class FieldOfView : MonoBehaviour, IActivable
         }
     }
 
-    protected virtual void OnTriggerStay2D(Collider2D collider)
+    protected virtual void OnTriggerEnter2D(Collider2D collider)
     {
-        if (!Active || !_calculateModifications)
+        _collidingAmount++;
+        _isColliding = true;
+    }
+
+    protected virtual void OnTriggerExit2D(Collider2D collider)
+    {
+        if (_collidingAmount-- == 0)
+        {
+            _isColliding = false;
+        }
+    }
+
+    protected virtual void LateUpdate()
+    {
+        if (!Active || !_isColliding || !_isVisible)
             return;
 
         if (UpdateVertices(_size, _viewAngle, _detailAmount, _offset))
@@ -89,14 +104,31 @@ public class FieldOfView : MonoBehaviour, IActivable
 
         RaycastHit2D[] results = new RaycastHit2D[1];
 
-        for (int i = 1; i <= pointCount; i++)
+        //Debug.DrawRay(offset, direction * size, Color.yellow); //=> gourmand
+        var hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
+        if (hits > 0)
         {
+            _vertices[1].Modified = true;
+            _vertices[1].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
+            updated = true;
+        }
+        else if (_vertices[1].Modified)
+        {
+            _vertices[1].ModifiedPos = _vertices[1].DefaultPos;
+            _vertices[1].Modified = false;
+            updated = true;
+        }
+
+
+        for (int i = 2; i <= pointCount; i++)
+        {
+            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
             //Debug.DrawRay(offset, direction * size, Color.yellow); //=> gourmand
-            var hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
+            hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
             if (hits > 0)
             {
-                _vertices[i].Modified = true;
-                _vertices[i].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
+                _vertices[i - 1].Modified = true;
+                _vertices[i - 1].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
                 updated = true;
             }
             else if (_vertices[i].Modified)
@@ -105,7 +137,6 @@ public class FieldOfView : MonoBehaviour, IActivable
                 _vertices[i].Modified = false;
                 updated = true;
             }
-            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
         }
         return updated;
     }
@@ -118,51 +149,46 @@ public class FieldOfView : MonoBehaviour, IActivable
         _vertices = new Vertex[pointCount + 1];
         var uvs = new Vector2[_vertices.Length];
         var triangles = new int[pointCount * 3];
+        var points = new List<Vector2>();
+        points.Add(offset);
 
         float angleStep = angle / pointCount;
 
         _vertices[0] = new Vertex(offset);
-        var currentAngle = Utils.GetAngleFromVector(_transform.InverseTransformDirection(_transform.up)) + angle / 2f;
+
+        var direction = _transform.TransformDirection(Quaternion.AngleAxis(angle / 2f, Vector3.forward) * _transform.InverseTransformDirection(_transform.up));
+
         var triangleIndex = 0;
+        var colliderInterval = 3;
 
-        for (int i = 1; i <= pointCount; i++)
+        for (int i = 1; i < pointCount - 1; i++)
         {
-            _vertices[i] = new Vertex(Utils.GetVectorFromAngle(currentAngle) * (size + offset.magnitude));
-
-            if (i > 0)
+            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
+            _vertices[i] = new Vertex(direction * (size + offset.magnitude));
+            if (i % colliderInterval == 1)
             {
-                triangles[triangleIndex] = 0;
-                triangles[triangleIndex + 1] = i - 1;
-                triangles[triangleIndex + 2] = i;
-                triangleIndex += 3;
+                points.Add(direction * (size + offset.magnitude));
             }
 
-            currentAngle -= angleStep;
+            triangles[triangleIndex] = 0;
+            triangles[triangleIndex + 1] = i - 1;
+            triangles[triangleIndex + 2] = i;
+            triangleIndex += 3;
         }
+        points.Add(direction * (size + offset.magnitude));
+        points.Add(offset);
 
         mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();
         mesh.triangles = triangles;
         mesh.uv = uvs;
 
-        return mesh;
-    }
-
-
-    private void SetCollider(Vector3[] vertices)
-    {
-        var points = new List<Vector2>();
-        points.Add(vertices[0]);
-        for (int i = 1; i < vertices.Length - 1; i += 6)
-        {
-            points.Add(vertices[i]);
-        }
-        points.Add(vertices[vertices.Length - 1]);
-        points.Add(vertices[0]);
 
         var collPoints = points.ToArray();
         _collider.points = collPoints;
         _collider.pathCount = 1;
         _collider.SetPath(0, collPoints);
+
+        return mesh;
     }
 
     protected void SetColor(Color color)
@@ -187,12 +213,12 @@ public class FieldOfView : MonoBehaviour, IActivable
 
     private void OnBecameVisible()
     {
-        _calculateModifications = true;
+        _isVisible = true;
     }
 
     private void OnBecameInvisible()
     {
-        _calculateModifications = false;
+        _isVisible = false;
     }
 
     internal struct Vertex

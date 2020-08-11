@@ -5,7 +5,6 @@ public class LaserAim : Aim
 {
 
     private float _initAngle;
-    //private float _initSize;
     private Color _initColor;
     private Coroutine _laserize;
     private Coroutine _unlaserize;
@@ -13,7 +12,6 @@ public class LaserAim : Aim
     public bool Charged { get; private set; }
 
     private const int LASER_WIDTH = 2;
-    private const float GROWTH_FACTOR = 1.6f;
     private const float LASERIZE_DURATION = .4f;
     private const float UNLASERIZE_DURATION = .2f;
 
@@ -31,14 +29,12 @@ public class LaserAim : Aim
         if (TargetInRange)
         {
             var dist = (Hero.Instance.transform.position - (_transform.position + _offset)).sqrMagnitude;
-            TargetInRange = dist < _size * _size * GROWTH_FACTOR;
+            TargetInRange = dist < _size * _size;
         }
     }
 
-    protected override void OnTriggerStay2D(Collider2D collision)
-    {
-        base.OnTriggerStay2D(collision);
-
+    protected virtual void OnTriggerStay2D(Collider2D collision)
+    { 
         if (!collision.CompareTag("hero"))
             return;
 
@@ -47,8 +43,6 @@ public class LaserAim : Aim
             Hero.Instance.Die(_transform);
         }
     }
-
-    protected override void OnTriggerExit2D(Collider2D collision) { }
 
     public void StartLaserize()
     {

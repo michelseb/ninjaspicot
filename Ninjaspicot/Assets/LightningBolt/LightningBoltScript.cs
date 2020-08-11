@@ -46,14 +46,8 @@ namespace DigitalRuby.LightningBolt
         [Tooltip("The game object where the lightning will emit from. If null, StartPosition is used.")]
         public Transform StartObject;
 
-        [Tooltip("The start position where the lightning will emit from. This is in world space if StartObject is null, otherwise this is offset from StartObject position.")]
-        public Vector3 StartPosition;
-
         [Tooltip("The game object where the lightning will end at. If null, EndPosition is used.")]
         public Transform EndObject;
-
-        [Tooltip("The end position where the lightning will end at. This is in world space if EndObject is null, otherwise this is offset from EndObject position.")]
-        public Vector3 EndPosition;
 
         [Range(0, 8)]
         [Tooltip("How manu generations? Higher numbers create more line segments.")]
@@ -137,60 +131,15 @@ namespace DigitalRuby.LightningBolt
             }
         }
 
-        private void GetPerpendicularVector(ref Vector3 directionNormalized, out Vector3 side)
-        {
-            if (directionNormalized == Vector3.zero)
-            {
-                side = Vector3.right;
-            }
-            else
-            {
-                // use cross product to find any perpendicular vector around directionNormalized:
-                // 0 = x * px + y * py + z * pz
-                // => pz = -(x * px + y * py) / z
-                // for computational stability use the component farthest from 0 to divide by
-                float x = directionNormalized.x;
-                float y = directionNormalized.y;
-                float z = directionNormalized.z;
-                float px, py, pz;
-                float ax = Mathf.Abs(x), ay = Mathf.Abs(y), az = Mathf.Abs(z);
-                if (ax >= ay && ay >= az)
-                {
-                    // x is the max, so we can pick (py, pz) arbitrarily at (1, 1):
-                    py = 1.0f;
-                    pz = 1.0f;
-                    px = -(y * py + z * pz) / x;
-                }
-                else if (ay >= az)
-                {
-                    // y is the max, so we can pick (px, pz) arbitrarily at (1, 1):
-                    px = 1.0f;
-                    pz = 1.0f;
-                    py = -(x * px + z * pz) / y;
-                }
-                else
-                {
-                    // z is the max, so we can pick (px, py) arbitrarily at (1, 1):
-                    px = 1.0f;
-                    py = 1.0f;
-                    pz = -(x * px + y * py) / z;
-                }
-                side = new Vector3(px, py, pz).normalized;
-            }
-        }
-
-        private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, int totalGenerations, float offsetAmount)
+        private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, float offsetAmount)
         {
             if (generation < 0 || generation > 8)
                 return;
 
-            start.z = end.z = Mathf.Min(start.z, end.z);
-
             _segments.Add(new KeyValuePair<Vector3, Vector3>(start, end));
+
             if (generation == 0)
-            {
                 return;
-            }
 
             Vector3 randomVector;
             if (offsetAmount <= 0.0f)
@@ -307,26 +256,10 @@ namespace DigitalRuby.LightningBolt
         /// </summary>
         public void Trigger()
         {
-            Vector3 start, end;
             timer = Duration + Mathf.Min(0.0f, timer);
-            if (StartObject == null)
-            {
-                start = StartPosition;
-            }
-            else
-            {
-                start = StartObject.position + StartPosition;
-            }
-            if (EndObject == null)
-            {
-                end = EndPosition;
-            }
-            else
-            {
-                end = EndObject.position + EndPosition;
-            }
+
             _startIndex = 0;
-            GenerateLightningBolt(start, end, Generations, Generations, 0.0f);
+            GenerateLightningBolt(StartObject.position, EndObject.position, Generations, 0.0f);
             UpdateLineRenderer();
         }
 

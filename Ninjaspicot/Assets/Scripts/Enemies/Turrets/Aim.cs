@@ -13,8 +13,9 @@ public class Aim : FieldOfView
         Active = Turret.Active;
     }
 
-    protected virtual void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnTriggerEnter2D(Collider2D collision)
     {
+        base.OnTriggerEnter2D(collision);
         if (!Turret.Active)
             return;
 
@@ -28,8 +29,9 @@ public class Aim : FieldOfView
         }
     }
 
-    protected virtual void OnTriggerExit2D(Collider2D collision)
+    protected override void OnTriggerExit2D(Collider2D collision)
     {
+        base.OnTriggerExit2D(collision);
         if (!string.IsNullOrEmpty(CurrentTarget) && collision.CompareTag(CurrentTarget))
         {
             TargetInRange = false;

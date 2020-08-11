@@ -79,19 +79,10 @@ public class TouchManager : MonoBehaviour
         {
             _joystick1.StartFading();
             _joystick1.OnPointerUp();
+            _stickiness.StopWalking(true);
             WalkTouching = false;
             DoubleTouching = false;
             _walkInitialized = false;
-        }
-
-        if (_walkInitialized && LeftTouching)
-        {
-            _joystick1.Drag(LeftTouch.Value.position);
-        }
-
-        if (_jumpInitialized && RightTouching)
-        {
-            _joystick2.Drag(RightTouch.Value.position);
         }
 
         if (_jumpInitialized && !RightTouching)
@@ -126,6 +117,16 @@ public class TouchManager : MonoBehaviour
             _joystick2.OnPointerUp();
 
             _jumpInitialized = false;
+        }
+
+        if (_walkInitialized && LeftTouching)
+        {
+            _joystick1.Drag(LeftTouch.Value.position);
+        }
+
+        if (_jumpInitialized && RightTouching)
+        {
+            _joystick2.Drag(RightTouch.Value.position);
         }
     }
 

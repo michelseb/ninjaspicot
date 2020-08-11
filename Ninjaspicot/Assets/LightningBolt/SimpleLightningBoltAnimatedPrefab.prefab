@@ -136,13 +136,13 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 3
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.20000076
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -150,8 +150,17 @@ LineRenderer:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 1
+        time: 0.4971503
         value: 1
+        inSlope: 0.000011444092
+        outSlope: 0.000011444092
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.20000839
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -211,13 +220,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartObject: {fileID: 156244}
-  StartPosition: {x: 0, y: 0, z: 0}
   EndObject: {fileID: 103226}
-  EndPosition: {x: 0, y: 0, z: 0}
-  Generations: 3
-  Duration: 0.03
-  ChaosFactor: 0.15
-  ManualMode: 0
+  Generations: 4
+  Duration: 0.02
+  ChaosFactor: 0.014
   Rows: 8
   Columns: 1
-  AnimationMode: 3
+  AnimationMode: 2

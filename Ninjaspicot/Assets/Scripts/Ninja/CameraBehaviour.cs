@@ -13,7 +13,8 @@ public enum CameraMode
 {
     None = 0,
     Follow = 1,
-    Center = 2
+    Center = 2,
+    Stick = 3
 }
 
 
@@ -28,6 +29,7 @@ public class CameraBehaviour : MonoBehaviour
     public CameraMode CameraMode { get; private set; }
     private Hero _hero;
     private float _colorInterpolation;
+    private Color _baseColor;
     private Color _targetColor;
     private Transform _tracker;
     private Transform _transform;
@@ -44,7 +46,7 @@ public class CameraBehaviour : MonoBehaviour
     private float _screenRatio;
     private float INITIAL_CAMERA_SIZE;
     private const float ZOOM_SPEED = 2f;
-    private const float FOLLOW_SPEED = 1f;
+    private const float FOLLOW_DELAY = .6f;
     private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
@@ -63,6 +65,7 @@ public class CameraBehaviour : MonoBehaviour
 
         _screenRatio = (float)Screen.height / Screen.width * .5f;
         INITIAL_CAMERA_SIZE = 200f * _screenRatio;
+        SetBaseColor(Color.black);//ColorUtils.GetColor(CustomColor.Blue, .6f));
     }
 
     private void Start()
@@ -85,17 +88,19 @@ public class CameraBehaviour : MonoBehaviour
         switch (CameraMode)
         {
             case CameraMode.Follow:
-
-                Follow(_tracker, FOLLOW_SPEED);
+                Follow(_tracker, FOLLOW_DELAY);
                 break;
 
             case CameraMode.Center:
-
                 Center(_movementOrigin, _movementDestination, _centerDuration);
+                break;
+
+            case CameraMode.Stick:
+                Stick(_tracker.position);
                 break;
         }
 
-        var newCol = Color.white * _timeManager.TimeScale;
+        var newCol = _baseColor * _timeManager.TimeScale;
         _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
 
         if (Mathf.Abs(MainCamera.backgroundColor.grayscale - _targetColor.grayscale) > COLOR_THRESHOLD && _colorInterpolation >= 1)
@@ -119,13 +124,23 @@ public class CameraBehaviour : MonoBehaviour
         Transform.position = Vector3.Lerp(origin, destination, interpolation);
     }
 
+    public void Stick(Vector3 tracker)
+    {
+        Transform.position = tracker;
+    }
+
     public void SetFollowMode(Transform tracker)
     {
         CameraMode = CameraMode.Follow;
         _tracker = tracker;
-        _movementOrigin = Transform.position;
         _tracker.position = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
-        _movementDestination = _tracker.position;
+    }
+
+    public void SetStickMode(Transform tracker)
+    {
+        CameraMode = CameraMode.Stick;
+        _tracker = tracker;
+        _tracker.position = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
     }
 
     public void SetCenterMode(Transform tracker, float duration)
@@ -232,6 +247,11 @@ public class CameraBehaviour : MonoBehaviour
         }
 
         _transform.localPosition = pos;
+    }
+
+    public void SetBaseColor(Color color)
+    {
+        _baseColor = color;
     }
 
 }

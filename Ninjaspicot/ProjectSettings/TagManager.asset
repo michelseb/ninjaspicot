@@ -35,7 +35,7 @@ TagManager:
   - DynamicObstacle
   - PoppingObstacle
   - DynamicCollider
-  - 
+  - WorldUI
   - 
   - 
   - 

@@ -28,6 +28,11 @@ public class HeroStickiness : Stickiness
         while (true)
         {
             var speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CollisionNormal, CurrentSpeed);
+            if (speedFactor == 0)
+            {
+                Rigidbody.velocity = Vector2.zero;
+            }
+
             jointMotor.motorSpeed = speedFactor;
             hinge.motor = jointMotor;
             hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
@@ -39,15 +44,10 @@ public class HeroStickiness : Stickiness
     private float GetHeroSpeed(Vector3 direction, Vector3 platformNormal, float speed)
     {
         var dir = Vector3.Dot(direction, platformNormal);
-        
-        if (dir > .1f) 
-        {
-            return speed;
-        }
-        else if (dir < -.1f)
-        {
-            return -speed;
-        }
+        var sign = Mathf.Sign(dir);
+
+        if (sign * dir > .1f)
+            return sign * speed;
 
         return 0;
     }
