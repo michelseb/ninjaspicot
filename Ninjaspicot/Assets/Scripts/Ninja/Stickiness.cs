@@ -22,7 +22,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool DynamicActive => true;
     public PoolableType PoolableType => PoolableType.None;
 
-    protected INinja _ninjaBehaviour;
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumpManager;
@@ -39,7 +38,6 @@ public class Stickiness : MonoBehaviour, IDynamic
         _jumpManager = GetComponent<Jumper>();
         _rigidbody = _rigidbody ?? GetComponent<Rigidbody2D>();
         _collider = _collider ?? GetComponent<Collider2D>();
-        _ninjaBehaviour = GetComponent<INinja>();
         ContactPoint = new GameObject("ContactPoint").transform;
         ContactPoint.position = _transform.position;
         ContactPoint.SetParent(_transform);

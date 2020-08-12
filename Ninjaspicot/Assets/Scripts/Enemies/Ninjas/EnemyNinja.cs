@@ -1,15 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public enum Dir
-{
-    Left,
-    Right
-}
-
 public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 {
-    [SerializeField] protected Dir _direction;
     [SerializeField] protected Collider2D _bottom;
     public bool Attacking { get; protected set; }
     public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
@@ -28,14 +21,14 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
         Transform.rotation = rotation;
     }
 
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (Dead)
             return;
 
-        if (collision.collider.CompareTag("hero"))
+        if (collision.CompareTag("hero"))
         {
-            var hero = collision.collider.GetComponent<Hero>();
+            var hero = collision.GetComponent<Hero>();
             if (hero == null)
                 return;
 

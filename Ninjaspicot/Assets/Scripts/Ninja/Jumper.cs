@@ -45,7 +45,7 @@ public class Jumper : MonoBehaviour
         LoseJump();
         _dynamicEntity.Rigidbody.isKinematic = false;
         _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
-
+        Debug.Log("At jump" + _dynamicEntity.Rigidbody.isKinematic);
         _dynamicEntity.Rigidbody.AddForce(-direction.normalized * _strength, ForceMode2D.Impulse);
 
         _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, TrajectoryDestination - TrajectoryOrigin));

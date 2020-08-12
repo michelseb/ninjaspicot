@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 
-public class DynamicNinja : MonoBehaviour, INinja
+public class DynamicNinja : MonoBehaviour
 {
     private Ninja _linkedNinja;
     public Jumper JumpManager { get; private set; }
     public DynamicStickiness Stickiness { get; private set; }
-    public bool ReadyToWalk => NeedsToWalk();
 
     protected virtual void Awake()
     {

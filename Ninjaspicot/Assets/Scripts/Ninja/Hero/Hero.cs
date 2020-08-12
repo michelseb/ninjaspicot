@@ -1,19 +1,20 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Hero : Ninja, IRaycastable
+public class Hero : Ninja, IRaycastable, ITriggerable
 {
     [SerializeField] float _ghostSpacing;
     public bool Triggered { get; private set; }
     public DynamicInteraction DynamicInteraction { get; private set; }
+    public int LastTrigger { get; private set; }
 
-    private int _lastTrigger;
     private Cloth _cape;
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
     private TouchManager _touchManager;
     private Coroutine _displayGhosts;
     private Coroutine _fade;
+    private Coroutine _trigger;
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
@@ -71,7 +72,7 @@ public class Hero : Ninja, IRaycastable
     public IEnumerator Trigger(EventTrigger trigger)
     {
         Triggered = true;
-        _lastTrigger = trigger.Id;
+        LastTrigger = trigger.Id;
         
         yield return new WaitForSeconds(3);
         
@@ -81,11 +82,12 @@ public class Hero : Ninja, IRaycastable
         {
             Destroy(trigger.gameObject);
         }
+        _trigger = null;
     }
 
     public bool IsTriggeredBy(int id)
     {
-        return _lastTrigger == id;
+        return LastTrigger == id;
     }
 
     public void SetInteractionActivation(bool active)
@@ -177,6 +179,14 @@ public class Hero : Ninja, IRaycastable
             col.a += Time.deltaTime * FADE_SPEED;
             Renderer.color = col;
             yield return null;
+        }
+    }
+
+    public void StartTrigger(EventTrigger trigger)
+    {
+        if (_trigger == null)
+        {
+            _trigger = StartCoroutine(Trigger(trigger));
         }
     }
 }

@@ -20,6 +20,7 @@ public class ScenesManager : MonoBehaviour
 {
     [SerializeField] private SceneInfos[] _scenes;
     [SerializeField] private int _startScene;
+    [SerializeField] private int _startCheckPoint;
 
     private SpawnManager _spawnManager;
     public Coroutine SceneLoad { get; private set; }
@@ -32,7 +33,15 @@ public class ScenesManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         _spawnManager = SpawnManager.Instance;
-        LoadLobby();
+        if (_startScene < 2)
+        {
+            LoadLobby();
+        }
+        else
+        {
+            LoadSceneById(_startScene);
+        }
+        _spawnManager.InitActiveSceneSpawns(_startCheckPoint - 1);
     }
 
     public void LoadLobby()
@@ -40,6 +49,11 @@ public class ScenesManager : MonoBehaviour
         var lobby = FindSceneByName("Lobby");
         SceneManager.LoadScene(lobby.Name);
         lobby.Loaded = true;
+    }
+
+    public void LoadSceneById(int sceneId)
+    {
+        SceneManager.LoadScene(sceneId);
     }
 
     private IEnumerator LoadAdditionalZone(int portalId)
@@ -81,7 +95,7 @@ public class ScenesManager : MonoBehaviour
     {
         if (SceneLoad != null)
             return;
-        
+
         SceneLoad = StartCoroutine(LoadAdditionalZone(portalId));
     }
 

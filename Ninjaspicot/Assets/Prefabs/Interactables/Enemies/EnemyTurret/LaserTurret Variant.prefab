@@ -33,7 +33,7 @@ MonoBehaviour:
   _detailAmount: 20
   _offset: {x: 0, y: 10, z: 0}
   _startAngle: 90
-  _customColor: 3
+  _customColor: 1
 --- !u!1001 &7881880677219954683
 PrefabInstance:
   m_ObjectHideFlags: 0

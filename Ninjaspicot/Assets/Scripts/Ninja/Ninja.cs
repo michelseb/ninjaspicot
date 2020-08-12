@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
+public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 {
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
@@ -11,7 +11,6 @@ public abstract class Ninja : MonoBehaviour, INinja, IKillable, IRaycastable
     public Stickiness Stickiness { get; private set; }
     public SpriteRenderer Renderer { get; private set; }
     public Image Image { get; private set; }
-    public bool ReadyToWalk => NeedsToWalk();
 
 
     protected CameraBehaviour _cameraBehaviour;

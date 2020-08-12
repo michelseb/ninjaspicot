@@ -15,6 +15,11 @@ public class HeroJumper : Jumper
         _timeManager = TimeManager.Instance;
     }
 
+    public void Update()
+    {
+        Debug.Log(_dynamicEntity.Rigidbody.isKinematic);
+    }
+
     public override void Jump(Vector2 direction)
     {
         if (_dynamicInteraction.Interacting)

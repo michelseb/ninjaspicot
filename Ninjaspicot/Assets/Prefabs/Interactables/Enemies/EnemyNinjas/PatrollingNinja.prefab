@@ -18,7 +18,8 @@ GameObject:
   - component: {fileID: -4447413891503731020}
   - component: {fileID: 4494649555327570752}
   - component: {fileID: 5420039215652656388}
-  m_Layer: 0
+  - component: {fileID: 7121690312425823363}
+  m_Layer: 13
   m_Name: PatrollingNinja
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -35,8 +36,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5.875}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4833536752687542729}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxJumps: 1
+  JumpMode: 0
 --- !u!114 &1483240424057133996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,8 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 945909523558bb14891d5445b7245a89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _direction: 1
-  _bottom: {fileID: 8673443656147902146}
+  _bottom: {fileID: 0}
 --- !u!222 &4494649555327570752
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -232,60 +232,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &4307512251584818471
-GameObject:
+--- !u!70 &7121690312425823363
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4833536752687542729}
-  - component: {fileID: 8673443656147902146}
-  m_Layer: 0
-  m_Name: Bottom
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4833536752687542729
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4307512251584818471}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7581016976920018157}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &8673443656147902146
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4307512251584818471}
+  m_GameObject: {fileID: 2446117497584322890}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.00007449463, y: -0.1594966}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.0650286, y: 0.015008554}
-  m_EdgeRadius: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 4.58, y: 14.81}
+  m_Direction: 0

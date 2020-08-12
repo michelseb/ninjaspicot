@@ -23,7 +23,6 @@ public class SpawnManager : MonoBehaviour
 
     private void Start()
     {
-        InitActiveSceneSpawns();
         if (Hero.Instance == null)
         {
             Instantiate(_spawnEntity, _spawnPosition, Quaternion.identity);
@@ -64,7 +63,7 @@ public class SpawnManager : MonoBehaviour
         hero.transform.position = pos;
     }
 
-    public void InitActiveSceneSpawns()
+    public void InitActiveSceneSpawns(int checkPoint = -1)
     {
         var scene = SceneManager.GetActiveScene();
         var sceneObjects = scene.GetRootGameObjects();
@@ -74,7 +73,9 @@ public class SpawnManager : MonoBehaviour
             .ToArray(); //TODO : make checkpoint specific to scene => Add property in class to link to scene
 
 
-        var spawn = sceneObjects.FirstOrDefault(s => s.CompareTag("Spawn"))?.transform.position;
+        var spawn = checkPoint == -1 ? 
+            sceneObjects.FirstOrDefault(s => s.CompareTag("Spawn"))?.transform.position :
+            _checkPoints.ElementAtOrDefault(checkPoint)?.transform.position;
 
         if (!spawn.HasValue)
             return;

@@ -1,6 +1,12 @@
 ﻿using System.Linq;
 using UnityEngine;
 
+public enum TouchType
+{
+    Left,
+    Right
+}
+
 public class TouchManager : MonoBehaviour
 {
     [SerializeField] private bool _mobileTouch;
@@ -12,10 +18,10 @@ public class TouchManager : MonoBehaviour
     public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .2f;
     public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
     public bool DoubleTouching { get; private set; }
-    private Touch? LeftTouch => GetLeftTouch();
-    private Touch? RightTouch => GetRightTouch();
-    public bool LeftTouching => LeftTouch != null;
-    public bool RightTouching => RightTouch != null;
+    private Vector3? LeftTouch => GetTouch(TouchType.Left);
+    private Vector3? RightTouch => GetTouch(TouchType.Right);
+    public bool LeftTouching => IsTouching(TouchType.Left);
+    public bool RightTouching => IsTouching(TouchType.Right);
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
@@ -59,7 +65,7 @@ public class TouchManager : MonoBehaviour
 
         if (!_walkInitialized && LeftTouching)
         {
-            var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value.position);
+            var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
             _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false);
             _joystick1.OnPointerDown();
             WalkTouching = true;
@@ -68,7 +74,7 @@ public class TouchManager : MonoBehaviour
 
         if (!_jumpInitialized && RightTouching)
         {
-            var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value.position);
+            var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value);
             _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
             _joystick2.OnPointerDown();
             JumpTouching = true;
@@ -79,7 +85,7 @@ public class TouchManager : MonoBehaviour
         {
             _joystick1.StartFading();
             _joystick1.OnPointerUp();
-            _stickiness.StopWalking(true);
+            _stickiness.StopWalking(_jumper.ReadyToJump());
             WalkTouching = false;
             DoubleTouching = false;
             _walkInitialized = false;
@@ -121,12 +127,12 @@ public class TouchManager : MonoBehaviour
 
         if (_walkInitialized && LeftTouching)
         {
-            _joystick1.Drag(LeftTouch.Value.position);
+            _joystick1.Drag(LeftTouch.Value);
         }
 
         if (_jumpInitialized && RightTouching)
         {
-            _joystick2.Drag(RightTouch.Value.position);
+            _joystick2.Drag(RightTouch.Value);
         }
     }
 
@@ -215,26 +221,16 @@ public class TouchManager : MonoBehaviour
         return _joystick2.Direction;
     }
 
-    private Touch? GetLeftTouch()
+    private Vector3? GetTouch(TouchType touchType)
     {
-        var touches = Input.touches;
-        if (touches.Count() == 0)
-            return null;
-
-        foreach (var touch in touches)
+        if (!_mobileTouch && Application.platform == RuntimePlatform.WindowsEditor)
         {
-            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
-                continue;
+            if (IsTouching(touchType))
+                return Input.mousePosition;
 
-            if (touch.position.x <= Screen.width / 2)
-                return touch;
+            return null;
         }
 
-        return null;
-    }
-
-    private Touch? GetRightTouch()
-    {
         var touches = Input.touches;
         if (touches.Count() == 0)
             return null;
@@ -245,9 +241,21 @@ public class TouchManager : MonoBehaviour
                 continue;
 
             if (touch.position.x > Screen.width / 2)
-                return touch;
+                return touch.position;
         }
 
         return null;
+    }
+
+    private bool IsTouching (TouchType touchType)
+    {
+        if (!_mobileTouch && Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            return touchType == TouchType.Left ? Input.GetButton("Fire1") : Input.GetButton("Fire2");
+        }
+        else
+        {
+            return touchType == TouchType.Left ? LeftTouch != null : RightTouch != null;
+        }
     }
 }
