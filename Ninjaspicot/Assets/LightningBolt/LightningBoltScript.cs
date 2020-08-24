@@ -89,6 +89,7 @@ namespace DigitalRuby.LightningBolt
         private int _animationOffsetIndex;
         private int _animationPingPongDirection = 1;
         private Transform _transform;
+        private bool _isVisible;
 
         private void Awake()
         {
@@ -103,20 +104,23 @@ namespace DigitalRuby.LightningBolt
 
             if (distX < distY)
             {
-                _collider.size = new Vector2(5, distY);
+                _collider.size = new Vector2(2, distY);
+                var pos = StartObject.position.y < EndObject.position.y ? StartObject.localPosition : EndObject.localPosition;
 
-                _collider.offset = StartObject.localPosition + new Vector3(0, distY / 2);
+                _collider.offset = pos + new Vector3(0, distY / 2);
             }
             else
             {
-                _collider.size = new Vector2(distX, 5);
-                _collider.offset = StartObject.localPosition + new Vector3(distX / 2, 0);
+                _collider.size = new Vector2(distX, 2);
+                var pos = StartObject.position.x < EndObject.position.x ? StartObject.localPosition : EndObject.localPosition;
+
+                _collider.offset = pos + new Vector3(distX / 2, 0);
             }
         }
 
         private void Update()
         {
-            if (timer <= 0.0f)
+            if (_isVisible && timer <= 0.0f)
             {
                 Trigger();
             }
@@ -278,6 +282,16 @@ namespace DigitalRuby.LightningBolt
                     _offsets[x + (y * Columns)] = new Vector2((float)x / Columns, (float)y / Rows);
                 }
             }
+        }
+
+        private void OnBecameVisible()
+        {
+            _isVisible = true;
+        }
+
+        private void OnBecameInvisible()
+        {
+            _isVisible = false;
         }
     }
 }

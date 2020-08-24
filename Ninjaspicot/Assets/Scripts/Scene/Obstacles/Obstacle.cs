@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
-public class Obstacle : MonoBehaviour, IRaycastable
+public class Obstacle : MonoBehaviour, IRaycastable, IActivable
 {
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
@@ -21,6 +22,38 @@ public class Obstacle : MonoBehaviour, IRaycastable
         if (ninja == null)
             return;
 
-        ninja.Stickiness.ReactToObstacle(this, collision.contacts[collision.contacts.Length - 1].point);
+        var contact = collision.contacts[0];
+
+        ninja.Stickiness.ReactToObstacle(this, contact.point);
+    }
+
+    public virtual void Activate()
+    {
+        var heroCollider = Hero.Instance?.Stickiness?.Collider;
+        if (heroCollider != null)
+        {
+            Physics2D.IgnoreCollision(_collider, heroCollider, false);
+        }
+    }
+
+    public virtual void Deactivate()
+    {
+        var heroCollider = Hero.Instance?.Stickiness?.Collider;
+        if (heroCollider != null)
+        {
+            Physics2D.IgnoreCollision(_collider, heroCollider);
+        }
+    }
+
+    public void LaunchQuickDeactivate()
+    {
+        StartCoroutine(QuickDeactivate());
+    }
+
+    private IEnumerator QuickDeactivate()
+    {
+        Deactivate();
+        yield return new WaitForSeconds(.1f);
+        Activate();
     }
 }

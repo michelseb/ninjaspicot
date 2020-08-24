@@ -13,15 +13,14 @@ public class TouchManager : MonoBehaviour
     [SerializeField] private Joystick _joystick1;
     [SerializeField] private Joystick _joystick2;
 
-    public bool WalkTouching { get; private set; }
-    public bool JumpTouching { get; private set; }
+    public bool WalkTouching => IsTouching(TouchType.Left);
+    public bool JumpTouching => IsTouching(TouchType.Right);
+    public bool Touching => WalkTouching || JumpTouching;
     public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .2f;
     public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
     public bool DoubleTouching { get; private set; }
     private Vector3? LeftTouch => GetTouch(TouchType.Left);
     private Vector3? RightTouch => GetTouch(TouchType.Right);
-    public bool LeftTouching => IsTouching(TouchType.Left);
-    public bool RightTouching => IsTouching(TouchType.Right);
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
@@ -30,9 +29,7 @@ public class TouchManager : MonoBehaviour
     private Stickiness _stickiness;
     private HeroJumper _jumper;
     private DynamicInteraction _dynamicInteraction;
-    private TimeManager _timeManager;
     private PoolManager _poolManager;
-    private CameraBehaviour _cameraBehaviour;
     private Camera _uiCamera;
     private Transform _canvasTransform;
     private bool _walkInitialized;
@@ -40,15 +37,13 @@ public class TouchManager : MonoBehaviour
 
     private void Awake()
     {
-        _timeManager = TimeManager.Instance;
         _poolManager = PoolManager.Instance;
-        _cameraBehaviour = CameraBehaviour.Instance;
-        _canvasTransform = _cameraBehaviour.Canvas.transform;
     }
 
     private void Start()
     {
-        _uiCamera = _cameraBehaviour.UiCamera;
+        _canvasTransform = UICamera.Instance.Canvas.transform;
+        _uiCamera = UICamera.Instance.Camera;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
         _jumper = _hero?.Jumper as HeroJumper;
@@ -63,43 +58,41 @@ public class TouchManager : MonoBehaviour
         _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
 
-        if (!_walkInitialized && LeftTouching)
+        if (!_walkInitialized && WalkTouching)
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
             _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false);
             _joystick1.OnPointerDown();
-            WalkTouching = true;
             _walkInitialized = true;
         }
 
-        if (!_jumpInitialized && RightTouching)
+        if (!_jumpInitialized && JumpTouching)
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value);
             _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
             _joystick2.OnPointerDown();
-            JumpTouching = true;
             _jumpInitialized = true;
         }
 
-        if (_walkInitialized && !LeftTouching)
+        if (_walkInitialized && !WalkTouching)
         {
             _joystick1.StartFading();
+            _stickiness.StopWalking(true);
             _joystick1.OnPointerUp();
-            _stickiness.StopWalking(_jumper.ReadyToJump());
-            WalkTouching = false;
             DoubleTouching = false;
+            _stickiness.ReinitSpeed();
+            _hero.StopDisplayGhosts();
             _walkInitialized = false;
         }
 
-        if (_jumpInitialized && !RightTouching)
+        if (_jumpInitialized && !JumpTouching)
         {
-            _joystick2.StartFading();
             if (_jumper.ReadyToJump())
             {
-                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
+                Debug.DrawLine(_jumper.Trajectory.GetLinePosition(0), _jumper.Trajectory.GetLinePosition(8), Color.red, 5);
+                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(0, 8))//Add ninja to new layer
                 {
-                    _jumper.Trajectory.StartFading();
-                    _timeManager.SetNormalTime();
+                    _jumper.CancelJump();
                 }
                 else
                 {
@@ -116,21 +109,21 @@ public class TouchManager : MonoBehaviour
                     }
                 }
             }
-            JumpTouching = false;
+
+            _joystick2.StartFading();
+            _joystick2.OnPointerUp();
+            DoubleTouching = false;
             _stickiness.ReinitSpeed();
             _hero.StopDisplayGhosts();
-            DoubleTouching = false;
-            _joystick2.OnPointerUp();
-
             _jumpInitialized = false;
         }
 
-        if (_walkInitialized && LeftTouching)
+        if (_walkInitialized && WalkTouching)
         {
             _joystick1.Drag(LeftTouch.Value);
         }
 
-        if (_jumpInitialized && RightTouching)
+        if (_jumpInitialized && JumpTouching)
         {
             _joystick2.Drag(RightTouch.Value);
         }
@@ -158,7 +151,8 @@ public class TouchManager : MonoBehaviour
                 }
                 else
                 {
-                    _jumper.SetTrajectory<ClassicTrajectory>();
+                    var trajectory = _jumper.SetTrajectory<ClassicTrajectory>();
+                    //trajectory.SetJumper(_jumper);
                     _jumper.JumpMode = JumpMode.Classic;
                 }
 
@@ -166,12 +160,7 @@ public class TouchManager : MonoBehaviour
             }
             else if (_jumper.TrajectoryInUse())
             {
-                _jumper.ReinitJump();
-            }
-
-            if (_jumper.ReadyToJump())
-            {
-                _stickiness.StopWalking(false);
+                _jumper.CancelJump();
             }
         }
         else if (WalkDragging && _stickiness.Attached && _stickiness.CanWalk)
@@ -186,12 +175,10 @@ public class TouchManager : MonoBehaviour
 
             _stickiness.StartWalking();
         }
-        else
+
+        if (!JumpDragging && _jumper.TrajectoryInUse())
         {
-            if (_stickiness.Attached)
-            {
-                _stickiness.Rigidbody.velocity = new Vector2(0, 0);
-            }
+            _jumper.CancelJump();
         }
     }
 
@@ -240,14 +227,14 @@ public class TouchManager : MonoBehaviour
             if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
                 continue;
 
-            if (touch.position.x > Screen.width / 2)
+            if (touchType == TouchType.Left && touch.position.x <= Screen.width / 2 || touchType == TouchType.Right && touch.position.x > Screen.width / 2)
                 return touch.position;
         }
 
         return null;
     }
 
-    private bool IsTouching (TouchType touchType)
+    private bool IsTouching(TouchType touchType)
     {
         if (!_mobileTouch && Application.platform == RuntimePlatform.WindowsEditor)
         {

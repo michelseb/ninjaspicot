@@ -16,7 +16,7 @@ public class ActivationButton : MonoBehaviour
 
     protected virtual void Start()
     {
-        _activable = _activableObject.GetComponent<IActivable>();
+        _activable = _activableObject?.GetComponent<IActivable>();
         SetActive(_active);
     }
 
@@ -47,11 +47,11 @@ public class ActivationButton : MonoBehaviour
 
         if (active)
         {
-            _activable.Activate();
+            _activable?.Activate();
         }
         else
         {
-            _activable.Deactivate();
+            _activable?.Deactivate();
         }
     }
 }

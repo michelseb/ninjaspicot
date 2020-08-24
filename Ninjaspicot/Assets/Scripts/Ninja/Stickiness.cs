@@ -50,20 +50,34 @@ public class Stickiness : MonoBehaviour, IDynamic
             return;
 
         CanWalk = true;
-        CurrentSpeed = _speed;
+        ReinitSpeed();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        OnCollisionStay2D(collision);
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
         var contact = GetContactPoint(collision.contacts, _previousContactPoint);
         SetContactPosition(contact.point);
+        SetCollisionNormal(contact);
+    }
+
+    public void SetCollisionNormal(ContactPoint2D contact)
+    {
         CollisionNormal = Quaternion.Euler(0, 0, -90) * contact.normal;
     }
 
 
     public virtual void Attach(Obstacle obstacle)
     {
+        if (Attached)
+            return;
+
         var dynamic = obstacle as DynamicObstacle;
+
         if (dynamic != null && !dynamic.DynamicActive)
             return;
 
@@ -80,16 +94,20 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public virtual void Detach()
     {
+        if (!Attached)
+            return;
+
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
+        CurrentAttachment.LaunchQuickDeactivate();
         CurrentAttachment = null;
         Attached = false;
     }
 
-    public virtual void ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
+    public virtual bool ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
     {
         if (!Active || obstacle == CurrentAttachment)
-            return;
+            return false;
 
         if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall") || obstacle.CompareTag("TutorialWall"))
         {
@@ -97,7 +115,10 @@ public class Stickiness : MonoBehaviour, IDynamic
             Attach(obstacle);
             CurrentAttachment = obstacle;
             SetContactPosition(contactPoint);
+            return true;
         }
+
+        return false;
     }
 
     public ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
@@ -140,11 +161,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         Rigidbody.velocity = Vector2.zero;
         Rigidbody.angularVelocity = 0;
         WallJoint.useMotor = false;
-
-        if (stayGrounded)
-        {
-            Rigidbody.isKinematic = true;
-        }
+        Rigidbody.isKinematic = stayGrounded;
 
         _walkOnWalls = null;
     }

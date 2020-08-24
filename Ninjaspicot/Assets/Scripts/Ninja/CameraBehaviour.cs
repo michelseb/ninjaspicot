@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public enum ZoomType
 {
@@ -22,11 +23,15 @@ public class CameraBehaviour : MonoBehaviour
 {
     [SerializeField]
     private int _beginZoom;
+    [SerializeField]
+    private Light2D _globalLight;
+    [SerializeField]
+    private Light2D _frontLight;
     public Transform Transform { get; private set; }
     public Camera MainCamera { get; private set; }
-    public Camera UiCamera { get; private set; }
-    public Canvas Canvas { get; private set; }
     public CameraMode CameraMode { get; private set; }
+    public Coroutine ColorLerp { get; private set; }
+
     private Hero _hero;
     private float _colorInterpolation;
     private Color _baseColor;
@@ -58,14 +63,13 @@ public class CameraBehaviour : MonoBehaviour
         _timeManager = TimeManager.Instance;
         _transform = transform;
         Transform = _transform.parent.transform;
-        Canvas = Transform.GetComponentInChildren<Canvas>();
-        UiCamera = Canvas.GetComponentInChildren<Camera>();
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
         _screenRatio = (float)Screen.height / Screen.width * .5f;
         INITIAL_CAMERA_SIZE = 200f * _screenRatio;
-        SetBaseColor(Color.black);//ColorUtils.GetColor(CustomColor.Blue, .6f));
+        var color = ColorUtils.GetColor(CustomColor.White);
+        SetBaseColor(color, color, color, 0f);
     }
 
     private void Start()
@@ -101,7 +105,7 @@ public class CameraBehaviour : MonoBehaviour
         }
 
         var newCol = _baseColor * _timeManager.TimeScale;
-        _targetColor = new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
+        _targetColor = newCol;//new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
 
         if (Mathf.Abs(MainCamera.backgroundColor.grayscale - _targetColor.grayscale) > COLOR_THRESHOLD && _colorInterpolation >= 1)
         {
@@ -120,8 +124,13 @@ public class CameraBehaviour : MonoBehaviour
 
     private void Center(Vector3 origin, Vector3 destination, float duration)
     {
-        var interpolation = (Time.time - _centerStart) / duration;
+        var interpolation = (Time.unscaledTime - _centerStart) / duration;
         Transform.position = Vector3.Lerp(origin, destination, interpolation);
+    }
+
+    public void Teleport (Vector3 position)
+    {
+        Transform.position = new Vector3(position.x, position.y, Transform.position.z);
     }
 
     public void Stick(Vector3 tracker)
@@ -150,12 +159,12 @@ public class CameraBehaviour : MonoBehaviour
         _centerDuration = duration;
         _movementOrigin = Transform.position;
         _movementDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
-        _centerStart = Time.time;
+        _centerStart = Time.unscaledTime;
     }
 
     private void Colorize(Color color)
     {
-        _colorInterpolation += Time.deltaTime * 10;
+        _colorInterpolation += Time.unscaledDeltaTime * 10;
         MainCamera.backgroundColor = Color.Lerp(MainCamera.backgroundColor, color, _colorInterpolation);
     }
 
@@ -165,7 +174,7 @@ public class CameraBehaviour : MonoBehaviour
 
         while (Mathf.Abs(MainCamera.orthographicSize - _initSize) < Mathf.Abs(zoom * _screenRatio))
         {
-            MainCamera.orthographicSize -= zoom * Time.deltaTime * ZOOM_SPEED * _screenRatio;
+            MainCamera.orthographicSize -= zoom * Time.unscaledDeltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
     }
@@ -176,7 +185,7 @@ public class CameraBehaviour : MonoBehaviour
 
         while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - MainCamera.orthographicSize) > 0)
         {
-            MainCamera.orthographicSize += delta * Time.deltaTime * ZOOM_SPEED * _screenRatio;
+            MainCamera.orthographicSize += delta * Time.unscaledDeltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
         MainCamera.orthographicSize = INITIAL_CAMERA_SIZE;
@@ -249,9 +258,34 @@ public class CameraBehaviour : MonoBehaviour
         _transform.localPosition = pos;
     }
 
-    public void SetBaseColor(Color color)
+    public void SetBaseColor(Color fontColor, Color globalLightColor, Color frontLightColor, float duration)
     {
-        _baseColor = color;
+        if (ColorLerp != null)
+        {
+            StopCoroutine(ColorLerp);
+            ColorLerp = null;
+        }
+
+        ColorLerp = StartCoroutine(LerpFont(_baseColor, fontColor, globalLightColor, frontLightColor, duration));
     }
 
+    private IEnumerator LerpFont(Color init, Color goal, Color lightGoal, Color frontGoal, float duration)
+    {
+        var currTime = Time.unscaledTime;
+        var interpolation = (Time.unscaledTime - currTime) / duration;
+        var lightColor = _globalLight.color;
+        var frontColor = _frontLight.color;
+
+        while (interpolation < 1)
+        {
+            interpolation = (Time.unscaledTime - currTime) / duration;
+            _baseColor = Color.Lerp(init, goal, interpolation);
+            _globalLight.color = Color.Lerp(lightColor, lightGoal, interpolation);
+            _frontLight.color = Color.Lerp(frontColor, frontGoal, interpolation);
+            yield return null;
+        }
+
+        _baseColor = goal;
+        ColorLerp = null;
+    }
 }

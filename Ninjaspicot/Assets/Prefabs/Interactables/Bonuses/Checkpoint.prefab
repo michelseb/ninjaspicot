@@ -457,7 +457,7 @@ GameObject:
   - component: {fileID: 5021085950395626123}
   m_Layer: 0
   m_Name: Checkpoint
-  m_TagString: hero
+  m_TagString: Spawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

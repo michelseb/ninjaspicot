@@ -13,7 +13,7 @@ public class Jumper : MonoBehaviour
     public TrajectoryBase Trajectory { get; protected set; }
     public Vector3 TrajectoryOrigin { get; set; }
     public Vector3 TrajectoryDestination { get; set; }
-    public Vector3 ChargeDestination { get; set; }
+    public Vector2 ChargeDestination { get; set; }
     protected float _strength;
     protected int _jumps;
     public JumpMode JumpMode;
@@ -42,38 +42,38 @@ public class Jumper : MonoBehaviour
     {
         _stickiness.Detach();
 
-        LoseJump();
-        _dynamicEntity.Rigidbody.isKinematic = false;
-        _dynamicEntity.Rigidbody.velocity = new Vector2(0, 0);
-        Debug.Log("At jump" + _dynamicEntity.Rigidbody.isKinematic);
-        _dynamicEntity.Rigidbody.AddForce(-direction.normalized * _strength, ForceMode2D.Impulse);
+        direction = direction.normalized;
 
-        _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, TrajectoryDestination - TrajectoryOrigin));
+        LoseJump();
+        _dynamicEntity.Rigidbody.velocity = Vector2.zero;
+        _dynamicEntity.Rigidbody.AddForce(-direction * _strength, ForceMode2D.Impulse);
+
+        _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
         if (Trajectory.Used)
         {
-            ReinitJump();
+            CommitJump();
         }
     }
 
-    public virtual void Charge(Vector3 jumpDirection)
+    public virtual void Charge(Vector2 direction)
     {
-        Vector3 initialPos = _dynamicEntity.Rigidbody.position;
+        var initialPos = _dynamicEntity.Rigidbody.position;
         var pos = initialPos;
-        var direction = (ChargeDestination - pos).normalized;
-        pos += direction;
+        var dir = (ChargeDestination - pos).normalized;
+        pos += dir;
 
         while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
         {
             _poolManager.GetPoolable<HeroGhost>(pos, _dynamicEntity.Transform.rotation);
-            pos += direction * 10;
+            pos += dir * 10;
         }
 
         _dynamicEntity.Rigidbody.position = ChargeDestination;
-        Jump(jumpDirection);
+        Jump(direction);
     }
 
-    public virtual void ReinitJump()
+    public virtual void CommitJump()
     {
         if (Trajectory == null || !Trajectory.Active)
             return;
@@ -86,6 +86,14 @@ public class Jumper : MonoBehaviour
                 charge.Target.Die(_transform);
             }
         }
+
+        Trajectory.StartFading();
+    }
+
+    public virtual void CancelJump()
+    {
+        if (Trajectory == null || !Trajectory.Active)
+            return;
 
         Trajectory.StartFading();
     }
@@ -151,7 +159,7 @@ public class Jumper : MonoBehaviour
 
     public virtual bool ReadyToJump()
     {
-        return CanJump() && Trajectory != null;
+        return CanJump() && TrajectoryInUse();
     }
 
     public T SetTrajectory<T>() where T : TrajectoryBase

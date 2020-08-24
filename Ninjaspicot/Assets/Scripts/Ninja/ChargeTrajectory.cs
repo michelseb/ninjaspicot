@@ -4,7 +4,7 @@ public class ChargeTrajectory : TrajectoryBase
 {
     public EnemyNinja Target { get; private set; }
     private Jumper _jumper;
-    private const float CHARGE_LENGTH = 50f;
+    private const float CHARGE_LENGTH = 30f;
 
     public void SetJumper(Jumper jumper)
     {

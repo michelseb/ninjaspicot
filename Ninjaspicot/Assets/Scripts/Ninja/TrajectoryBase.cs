@@ -37,19 +37,18 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
     }
 
-    public virtual bool IsClear(Vector3 origin, int lineIndex, int layer = 0)
+    public virtual bool IsClear(int originIndex, int lineIndex, int layer = 0)
     {
-        if (_line.positionCount < 1)
+        if (_line.positionCount < 10)
             return false;
 
-        for (int i = 0; i < lineIndex; i++)
-        {
-            var pos = _line.GetPosition(i);
-            RaycastHit2D hit = Physics2D.Linecast(origin, pos, layer != 0 ? layer : LayerMask.GetMask("Default"));
+        var origin = _line.GetPosition(0);
+        var pos = _line.GetPosition(originIndex);
+        var layerIndex = (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle"));
+        RaycastHit2D hit = Physics2D.Linecast(origin, pos, layer != 0 ? layer : layerIndex);
 
-            if (hit && !hit.collider.CompareTag("hero") && !hit.collider.isTrigger)
-                return false;
-        }
+        if (hit && !hit.collider.CompareTag("hero") && !hit.collider.isTrigger)
+            return false;
 
         return true;
     }
@@ -58,6 +57,12 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     {
         Used = false;
         StartCoroutine(FadeAway());
+    }
+
+    public Vector3 GetLinePosition(int index)
+    {
+        index = Mathf.Min(index, _line.positionCount - 1);
+        return _line.GetPosition(index);
     }
 
 

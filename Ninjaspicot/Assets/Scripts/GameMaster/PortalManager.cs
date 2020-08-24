@@ -19,11 +19,16 @@ public class PortalManager : MonoBehaviour
 
     public bool Connecting { get; private set; }
     public Coroutine Connection { get; private set; }
+    public List<Portal> Portals { get { if (_portals == null) _portals = new List<Portal>(); return _portals; } }
 
 
     private List<Portal> _portals;
     private ScenesManager _scenesManager;
-    public List<Portal> Portals { get { if (_portals == null) _portals = new List<Portal>(); return _portals; } }
+    private CameraBehaviour _cameraBehaviour;
+    private UICamera _uiCamera;
+
+    public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
+    public const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
 
     private static PortalManager _instance;
     public static PortalManager Instance { get { if (_instance == null) _instance = FindObjectOfType<PortalManager>(); return _instance; } }
@@ -32,6 +37,8 @@ public class PortalManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         _scenesManager = ScenesManager.Instance;
+        _cameraBehaviour = CameraBehaviour.Instance;
+        _uiCamera = UICamera.Instance;
     }
 
     private int? GetExitIndexByEntranceId(int entranceId)
@@ -44,23 +51,16 @@ public class PortalManager : MonoBehaviour
         return Portals.FirstOrDefault(t => t.Id == portalId);
     }
 
-    private IEnumerator CreateConnection(Portal entrance)
+    private IEnumerator CreateConnection(Portal entrance, int exitId)
     {
         Connecting = true;
-        var otherId = GetExitIndexByEntranceId(entrance.Id);
 
-        if (otherId == null)
-        {
-            TerminateConnection();
-            yield break;
-        }
-
-        _scenesManager.LaunchZoneLoad((int)otherId);
+        _scenesManager.LaunchZoneLoad(exitId);
 
         while (_scenesManager.SceneLoad != null)
             yield return null;
 
-        var exit = GetPortalById((int)otherId);
+        var exit = GetPortalById(exitId);
 
         if (exit == null)
         {
@@ -81,7 +81,13 @@ public class PortalManager : MonoBehaviour
         if (Connection != null)
             return;
 
-        Connection = StartCoroutine(CreateConnection(entrance));
+        var otherId = GetExitIndexByEntranceId(entrance.Id);
+
+        if (otherId == null)
+            return;
+
+        _scenesManager.InitColorChange(otherId.Value);
+        Connection = StartCoroutine(CreateConnection(entrance, otherId.Value));
     }
 
     public void ClosePreviousZone(int entranceId)
@@ -90,7 +96,6 @@ public class PortalManager : MonoBehaviour
 
         RemoveZonePortalsFromList(zoneId);
         _scenesManager.UnloadZone(zoneId);
-        TerminateConnection();
     }
 
     public void TerminateConnection()
@@ -109,5 +114,24 @@ public class PortalManager : MonoBehaviour
     private void RemoveZonePortalsFromList(int zoneId)
     {
         Portals.Where(p => p.Id.ToString().Substring(0, 2) == zoneId.ToString()).ToList().ForEach(x => Portals.Remove(x));
+    }
+
+    public IEnumerator Teleport(Portal entrance, Portal exit)
+    {
+        var rb = Hero.Instance.Stickiness.Rigidbody;
+        rb.position = exit.transform.position - exit.transform.right * 4;
+        _cameraBehaviour.Teleport(Hero.Instance.Stickiness.Rigidbody.position);
+        _uiCamera.CameraAppear();
+        entrance.Reinit();
+        exit.Reinit();
+        ClosePreviousZone(entrance.Id);
+
+        yield return new WaitForSecondsRealtime(2);
+
+        Hero.Instance.StartAppear();
+        rb.isKinematic = false;
+        rb.velocity = exit.transform.right * EJECT_SPEED;
+        Hero.Instance.SetCapeActivation(true);
+        TerminateConnection();
     }
 }

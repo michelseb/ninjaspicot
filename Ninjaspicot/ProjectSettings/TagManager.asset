@@ -36,8 +36,8 @@ TagManager:
   - PoppingObstacle
   - DynamicCollider
   - WorldUI
-  - 
-  - 
+  - EnemyTrigger
+  - Light
   - 
   - 
   - 
@@ -59,4 +59,7 @@ TagManager:
     locked: 0
   - name: Foreground
     uniqueID: 3656796725
+    locked: 0
+  - name: OutOfFlow
+    uniqueID: 50198309
     locked: 0

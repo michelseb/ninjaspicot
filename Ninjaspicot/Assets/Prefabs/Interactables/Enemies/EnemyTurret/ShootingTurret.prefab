@@ -324,7 +324,7 @@ GameObject:
   - component: {fileID: 4162547055235508428}
   - component: {fileID: 8692095818253765191}
   - component: {fileID: 5297972683042849010}
-  m_Layer: 13
+  m_Layer: 9
   m_Name: ShootingTurret
   m_TagString: Wall
   m_Icon: {fileID: 0}

@@ -165,7 +165,9 @@ public class Hero : Ninja, IRaycastable, ITriggerable
             Renderer.color = col;
             yield return null;
         }
+        Debug.Log("Vector0");
         Stickiness.Rigidbody.velocity = Vector2.zero;
+        Debug.Log("Kinematic");
         Stickiness.Rigidbody.isKinematic = true;
         _fade = null;
     }

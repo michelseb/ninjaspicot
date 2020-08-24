@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class DynamicObstacle : Obstacle, IDynamic, IActivable
+public class DynamicObstacle : Obstacle, IDynamic
 {
     [SerializeField] private PoolableType _poolableType;
     [SerializeField] protected float _customSpeed;
@@ -43,35 +43,15 @@ public class DynamicObstacle : Obstacle, IDynamic, IActivable
         dynamicInteraction.StartInteraction(this);
     }
 
-    public void LaunchQuickDeactivate()
-    {
-        StartCoroutine(QuickDeactivate());
-    }
-
-    private IEnumerator QuickDeactivate()
-    {
-        Deactivate();
-        yield return new WaitForSeconds(.5f);
-        Activate();
-    }
-
-    public void Activate()
+    public override void Activate()
     {
         DynamicActive = true;
-        var heroCollider = Hero.Instance?.Stickiness?.Collider;
-        if (heroCollider != null)
-        {
-            Physics2D.IgnoreCollision(_collider, heroCollider, false);
-        }
+        base.Activate();
     }
 
-    public void Deactivate()
+    public override void Deactivate()
     {
         DynamicActive = false;
-        var heroCollider = Hero.Instance?.Stickiness?.Collider;
-        if (heroCollider != null)
-        {
-            Physics2D.IgnoreCollision(_collider, heroCollider);
-        }
+        base.Deactivate();
     }
 }

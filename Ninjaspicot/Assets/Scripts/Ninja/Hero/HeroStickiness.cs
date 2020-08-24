@@ -11,10 +11,15 @@ public class HeroStickiness : Stickiness
         _touchManager = TouchManager.Instance;
     }
 
-    public override void ReactToObstacle(Obstacle obstacle, Vector3 position)
+    public override bool ReactToObstacle(Obstacle obstacle, Vector3 position)
     {
-        base.ReactToObstacle(obstacle, position);
-        _jumpManager.GainAllJumps();
+        if (base.ReactToObstacle(obstacle, position))
+        {
+            _jumpManager.GainAllJumps();
+            return true;
+        }
+
+        return false;
     }
 
     protected override IEnumerator WalkOnWalls(HingeJoint2D hinge)
@@ -32,7 +37,7 @@ public class HeroStickiness : Stickiness
             {
                 Rigidbody.velocity = Vector2.zero;
             }
-
+            Debug.Log("Dir : " + _touchManager.GetWalkDirection() + " Normal : " + CollisionNormal + " Speed : " + CurrentSpeed);
             jointMotor.motorSpeed = speedFactor;
             hinge.motor = jointMotor;
             hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
@@ -41,12 +46,23 @@ public class HeroStickiness : Stickiness
         }
     }
 
+    public override void Attach(Obstacle obstacle)
+    {
+        base.Attach(obstacle);
+        if (!_touchManager.Touching)
+        {
+            Rigidbody.velocity = Vector2.zero;
+            Rigidbody.angularVelocity = 0;
+            Rigidbody.isKinematic = true;
+        }
+    }
+
     private float GetHeroSpeed(Vector3 direction, Vector3 platformNormal, float speed)
     {
         var dir = Vector3.Dot(direction, platformNormal);
         var sign = Mathf.Sign(dir);
 
-        if (sign * dir > .1f)
+        if (sign * dir > .5f)
             return sign * speed;
 
         return 0;

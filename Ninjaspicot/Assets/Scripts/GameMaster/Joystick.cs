@@ -207,7 +207,7 @@ public class Joystick : MonoBehaviour, IPoolable
     private IEnumerator Appear()
     {
         Color col = _image.color;
-        while (col.a < 1)
+        while (col.a < _alpha)
         {
             col = _image.color;
             col.a += Time.deltaTime * APPEAR_SPEED;

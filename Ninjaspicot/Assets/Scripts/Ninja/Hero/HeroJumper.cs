@@ -15,11 +15,6 @@ public class HeroJumper : Jumper
         _timeManager = TimeManager.Instance;
     }
 
-    public void Update()
-    {
-        Debug.Log(_dynamicEntity.Rigidbody.isKinematic);
-    }
-
     public override void Jump(Vector2 direction)
     {
         if (_dynamicInteraction.Interacting)
@@ -31,7 +26,6 @@ public class HeroJumper : Jumper
         {
             _timeManager.SetNormalTime();
         }
-
         _cameraBehaviour.DoShake(.3f, .1f);
         base.Jump(direction);
         Trajectory = null;
@@ -54,7 +48,13 @@ public class HeroJumper : Jumper
         if (CompareTag("Dynamic"))
             return Hero.Instance.Jumper.ReadyToJump();
 
-        return CanJump() && Trajectory != null;
+        return base.ReadyToJump();
+    }
+
+    public override void CancelJump()
+    {
+        base.CancelJump();
+        _timeManager.SetNormalTime();
     }
 
     public void SetJumpPositions(Vector3 origin, Vector3 destination)

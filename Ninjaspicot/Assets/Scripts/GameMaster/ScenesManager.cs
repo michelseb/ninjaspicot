@@ -12,7 +12,9 @@ public class SceneInfos
     public string Name;
     public Sprite Img;
     public bool Loaded;
-    public Color FontColor;
+    public CustomColor FontColor;
+    public CustomColor GlobalLightColor;
+    public CustomColor FrontLightColor;
 }
 
 
@@ -22,8 +24,12 @@ public class ScenesManager : MonoBehaviour
     [SerializeField] private int _startScene;
     [SerializeField] private int _startCheckPoint;
 
-    private SpawnManager _spawnManager;
     public Coroutine SceneLoad { get; private set; }
+    public SceneInfos CurrentScene { get; private set; }
+
+    private CameraBehaviour _cameraBehaviour;
+    private SpawnManager _spawnManager;
+    private LightManager _lightManager;
 
     private static ScenesManager _instance;
     public static ScenesManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ScenesManager>(); return _instance; } }
@@ -32,7 +38,10 @@ public class ScenesManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
+        _cameraBehaviour = CameraBehaviour.Instance;
         _spawnManager = SpawnManager.Instance;
+        _lightManager = LightManager.Instance;
+
         if (_startScene < 2)
         {
             LoadLobby();
@@ -41,6 +50,10 @@ public class ScenesManager : MonoBehaviour
         {
             LoadSceneById(_startScene);
         }
+    }
+
+    private void Start()
+    {
         _spawnManager.InitActiveSceneSpawns(_startCheckPoint - 1);
     }
 
@@ -58,8 +71,7 @@ public class ScenesManager : MonoBehaviour
 
     private IEnumerator LoadAdditionalZone(int portalId)
     {
-        var id = int.Parse(portalId.ToString().Substring(0, 2));
-        var scene = FindSceneById(id);
+        var scene = GetSceneByPortalId(portalId);
 
         if (scene == null || scene.Loaded)
             yield break;
@@ -76,7 +88,6 @@ public class ScenesManager : MonoBehaviour
             yield return null;
 
         EnableScene(scene);
-        scene.Loaded = true;
         SceneLoad = null;
     }
 
@@ -88,6 +99,8 @@ public class ScenesManager : MonoBehaviour
             SceneManager.MoveGameObjectToScene(Hero.Instance.gameObject, sceneToLoad);
             SceneManager.SetActiveScene(sceneToLoad);
             _spawnManager.InitActiveSceneSpawns();
+            CurrentScene = sceneInfos;
+            sceneInfos.Loaded = true;
         }
     }
 
@@ -124,6 +137,22 @@ public class ScenesManager : MonoBehaviour
     public void MoveObjectToCurrentScene(GameObject obj)
     {
         SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
+    }
+
+    private SceneInfos GetSceneByPortalId(int portalId)
+    {
+        var id = int.Parse(portalId.ToString().Substring(0, 2));
+        return FindSceneById(id);
+    }
+
+    public void InitColorChange(int exitId)
+    {
+        var scene = GetSceneByPortalId(exitId);
+
+        _cameraBehaviour.SetBaseColor(ColorUtils.GetColor(scene.FontColor), 
+            ColorUtils.GetColor(scene.GlobalLightColor), 
+            ColorUtils.GetColor(scene.FontColor),
+            PortalManager.TRANSFER_SPEED);
     }
 
 }

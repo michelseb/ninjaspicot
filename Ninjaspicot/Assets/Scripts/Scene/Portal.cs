@@ -18,15 +18,14 @@ public class Portal : MonoBehaviour
     public SpriteMaskInteraction SpriteMaskInteraction;
     private Coroutine _portalMovement;
     private CameraBehaviour _cameraBehaviour;
+    private UICamera _uiCamera;
     private PortalManager _portalManager;
     private Coroutine _connect;
-
-    private const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
-    private const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
 
     protected void Awake()
     {
         _cameraBehaviour = CameraBehaviour.Instance;
+        _uiCamera = UICamera.Instance;
         _portalManager = PortalManager.Instance;
     }
 
@@ -53,8 +52,12 @@ public class Portal : MonoBehaviour
 
         Hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
 
+        Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
+        Hero.Stickiness.Rigidbody.isKinematic = true;
+
         if (_connect == null)
         {
+            _uiCamera.CameraFade();
             Hero.StartFading();
             _connect = StartCoroutine(Connect());
         }
@@ -62,6 +65,8 @@ public class Portal : MonoBehaviour
 
     private IEnumerator Connect()
     {
+        yield return new WaitForSecondsRealtime(2);
+
         _portalManager.LaunchConnection(this);
 
         while (_portalManager.Connection != null)
@@ -69,14 +74,9 @@ public class Portal : MonoBehaviour
 
         if (Other == null || Exit)
         {
-            Hero.StartAppear();
-            //Hero.Stickiness.Rigidbody.velocity = heroVelocity;
-            //Hero.Stickiness.Rigidbody.isKinematic = false;
-            Reinit(false);
+            Reinit();
             yield break;
         }
-
-        
 
         Other.Hero = Hero;
         TeleportedRenderer = Hero.GetComponent<SpriteRenderer>();
@@ -95,19 +95,20 @@ public class Portal : MonoBehaviour
         Hero.gameObject.layer = LayerMask.NameToLayer("Teleported");
         Hero.SetCapeActivation(false);
 
-        StartCoroutine(Teleport());
+        _portalManager.StartCoroutine(_portalManager.Teleport(this, Other));
         _connect = null;
     }
 
 
-    public void Reinit(bool success)
+
+
+    public void Reinit()
     {
         if (_portalMovement != null) StopCoroutine(_portalMovement);
         _portalMovement = StartCoroutine(StopPortal());
 
-        if (success && Entrance)
+        if (Entrance)
         {
-            _portalManager.ClosePreviousZone(Id);
             Entrance = false;
             return;
         }
@@ -125,26 +126,21 @@ public class Portal : MonoBehaviour
         Exit = false;
     }
 
-    private IEnumerator Teleport()
-    {
-        yield return new WaitForSeconds(1);
+    //private IEnumerator Teleport()
+    //{
+    //    Hero.Stickiness.Rigidbody.position = Other.transform.position - Other.transform.right * 4;
+    //    _cameraBehaviour.Teleport(Hero.Stickiness.Rigidbody.position);
+    //    _uiCamera.CameraAppear();
 
-        _cameraBehaviour.SetCenterMode(Other.transform, TRANSFER_SPEED);
+    //    yield return new WaitForSeconds(1);
 
-        yield return new WaitForSeconds(TRANSFER_SPEED);
-
-        _cameraBehaviour.SetFollowMode(Hero.transform);
-        Hero.Stickiness.Rigidbody.position = Other.transform.position - Other.transform.right * 4;
-
-        yield return new WaitForSeconds(1);
-
-        Reinit(true);
-        Other.Reinit(true);
-        Hero.StartAppear();
-        Hero.Stickiness.Rigidbody.isKinematic = false;
-        Hero.Stickiness.Rigidbody.velocity = Other.transform.right * EJECT_SPEED;
-        Hero.SetCapeActivation(true);
-    }
+    //    Reinit();
+    //    Other.Reinit();
+    //    Hero.Stickiness.Rigidbody.isKinematic = false;
+    //    Hero.Stickiness.Rigidbody.velocity = Other.transform.right * PortalManager.EJECT_SPEED;
+    //    Hero.SetCapeActivation(true);
+    //    _portalManager.TerminateConnection();
+    //}
 
     private IEnumerator StartPortal()
     {

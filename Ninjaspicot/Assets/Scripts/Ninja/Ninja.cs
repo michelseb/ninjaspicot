@@ -36,7 +36,7 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 
         Dead = true;
         Stickiness.Detach();
-        Jumper.ReinitJump();
+        Jumper.CancelJump();
         SetAllBehavioursActivation(false, false);
 
         //if (killer != null)

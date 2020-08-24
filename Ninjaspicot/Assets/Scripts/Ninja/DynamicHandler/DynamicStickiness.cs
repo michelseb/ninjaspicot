@@ -17,13 +17,13 @@ public class DynamicStickiness : Stickiness
     }
 
 
-    public override void ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
+    public override bool ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
     {
         if (!Active || obstacle == CurrentAttachment)
-            return;
+            return false;
 
         _hero.Jumper.GainAllJumps();
 
-        base.ReactToObstacle(obstacle, contactPoint);
+        return base.ReactToObstacle(obstacle, contactPoint);
     }
 }
