@@ -101,10 +101,10 @@ public class TouchManager : MonoBehaviour
                     switch (_jumper.JumpMode)
                     {
                         case JumpMode.Classic:
-                            _jumper.Jump(_joystick2.Direction);
+                            _jumper.Jump(-_joystick2.Direction);
                             break;
                         case JumpMode.Charge:
-                            _jumper.Charge(_joystick2.Direction);
+                            _jumper.Charge(-_joystick2.Direction);
                             break;
                     }
                 }

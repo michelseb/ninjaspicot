@@ -46,11 +46,11 @@ public class Jumper : MonoBehaviour
 
         LoseJump();
         _dynamicEntity.Rigidbody.velocity = Vector2.zero;
-        _dynamicEntity.Rigidbody.AddForce(-direction * _strength, ForceMode2D.Impulse);
+        _dynamicEntity.Rigidbody.AddForce(direction * _strength, ForceMode2D.Impulse);
 
         _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
-        if (Trajectory.Used)
+        if (TrajectoryInUse())
         {
             CommitJump();
         }

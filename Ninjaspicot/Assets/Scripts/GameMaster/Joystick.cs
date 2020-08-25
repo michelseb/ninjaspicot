@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Joystick : MonoBehaviour, IPoolable
@@ -10,7 +9,6 @@ public class Joystick : MonoBehaviour, IPoolable
     public float Vertical { get { return (_snapY) ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; } }
     public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
 
-    private TouchManager _touchManager;
     private Transform _transform;
 
     public float HandleRange
@@ -59,7 +57,6 @@ public class Joystick : MonoBehaviour, IPoolable
     {
         _image = GetComponent<Image>();
         _handleImage = _handle.GetComponent<Image>();
-        _touchManager = TouchManager.Instance;
         _initColor = _image.color;
         _alpha = _image.color.a;
         _transform = transform;
@@ -71,10 +68,6 @@ public class Joystick : MonoBehaviour, IPoolable
         DeadZone = _deadZone;
         
         _canvas = GetComponentInParent<Canvas>();
-        if (_canvas == null)
-        { 
-            Debug.LogError("The Joystick is not placed inside a canvas");
-        }
 
         _cam = null;
         if (_canvas?.renderMode == RenderMode.ScreenSpaceCamera)
