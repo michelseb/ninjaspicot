@@ -44,7 +44,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     }
 
-    public void Pool(Vector3 position, Quaternion rotation)
+    public void Pool(Vector3 position, Quaternion rotation, float size)
     {
         _transform.position = new Vector3(position.x, position.y, -5);
         _transform.rotation = rotation;

@@ -26,6 +26,11 @@ public class PortalManager : MonoBehaviour
     private ScenesManager _scenesManager;
     private CameraBehaviour _cameraBehaviour;
     private UICamera _uiCamera;
+    private AudioSource _audioSource;
+    private AudioManager _audioManager;
+    private AudioClip _enterClip;
+    private AudioClip _exitClip;
+
 
     public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
     public const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
@@ -39,6 +44,14 @@ public class PortalManager : MonoBehaviour
         _scenesManager = ScenesManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
         _uiCamera = UICamera.Instance;
+        _audioSource = GetComponent<AudioSource>();
+        _audioManager = AudioManager.Instance;
+    }
+
+    private void Start()
+    {
+        _enterClip = _audioManager.FindByName("EnterPortal");
+        _exitClip = _audioManager.FindByName("ExitPortal");
     }
 
     private int? GetExitIndexByEntranceId(int entranceId)
@@ -118,6 +131,7 @@ public class PortalManager : MonoBehaviour
 
     public IEnumerator Teleport(Portal entrance, Portal exit)
     {
+        _audioSource.PlayOneShot(_exitClip, .3f);
         var rb = Hero.Instance.Stickiness.Rigidbody;
         rb.position = exit.transform.position - exit.transform.right * 4;
         _cameraBehaviour.Teleport(Hero.Instance.Stickiness.Rigidbody.position);
@@ -133,5 +147,10 @@ public class PortalManager : MonoBehaviour
         rb.velocity = exit.transform.right * EJECT_SPEED;
         Hero.Instance.SetCapeActivation(true);
         TerminateConnection();
+    }
+
+    public void StartPortalSound()
+    {
+        _audioSource.PlayOneShot(_enterClip, .3f);
     }
 }

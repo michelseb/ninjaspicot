@@ -12,15 +12,17 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     [SerializeField] protected float _rotationSpeed;
     [SerializeField] protected bool _clockWise;
     [SerializeField] protected float _initRotation;
+    [SerializeField] protected float _aimSpeed;
 
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
     public bool Active { get; protected set; }
+    public Aim AimField => _aim;
+
     protected Aim _aim;
     protected Image _image;
-    protected Transform _target;
+    protected IKillable _target;
     protected Coroutine _wait;
-    protected Coroutine _getReady;
     protected Transform _transform;
 
     protected virtual void Awake()
@@ -29,6 +31,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
         _aim.CurrentTarget = "hero";
         _image = GetComponent<Image>();
         _transform = transform; //Caching transform for enhanced performance
+        _aimSpeed = .5f;
     }
 
     protected virtual void Start()
@@ -37,6 +40,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
         Loaded = true;
         Activate();
         _transform.Rotate(0, 0, _initRotation);
+        
     }
 
     protected virtual void Update()
@@ -66,7 +70,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual void Aim()
     {
-        _transform.rotation = Quaternion.Lerp(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.position - _transform.position), .5f);
+        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.Transform.position - _transform.position), _aimSpeed);
     }
 
     protected virtual void Scan()
@@ -82,13 +86,13 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual void Wonder()
     {
-        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        if (_target != null && _aim.TargetVisible(_target, Id))
         {
             StartAim(_target);
         }
     }
 
-    public void StartAim(Transform target)
+    public void StartAim(IKillable target)
     {
         _target = target;
         TurretMode = Mode.Aim;

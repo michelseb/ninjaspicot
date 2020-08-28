@@ -19,5 +19,5 @@ public enum PoolableType
 public interface IPoolable : IActivable
 {
     PoolableType PoolableType { get; }
-    void Pool(Vector3 position, Quaternion rotation);
+    void Pool(Vector3 position, Quaternion rotation, float size = 1);
 }

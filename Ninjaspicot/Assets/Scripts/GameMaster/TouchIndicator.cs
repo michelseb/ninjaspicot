@@ -61,7 +61,7 @@ public class TouchIndicator : MonoBehaviour, IPoolable
         _appear = null;
     }
 
-    public void Pool(Vector3 position, Quaternion rotation)
+    public void Pool(Vector3 position, Quaternion rotation, float size)
     {
         _transform.position = new Vector3(position.x, position.y, -5);
         _transform.rotation = rotation;

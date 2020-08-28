@@ -1,12 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class Cannon : MonoBehaviour, IRaycastable
+public class Cannon : TurretWall
 {
-    private TurretBase _turret;
-    public TurretBase Turret { get { if (_turret == null) _turret = GetComponentInParent<TurretBase>() ?? GetComponentInChildren<TurretBase>(); return _turret; } }
-    public int Id => Turret.Id;
-
     private Image _image;
 
     private void Awake()

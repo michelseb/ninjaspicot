@@ -54,7 +54,7 @@ public class ScenesManager : MonoBehaviour
 
     private void Start()
     {
-        _spawnManager.InitActiveSceneSpawns(_startCheckPoint - 1);
+        _spawnManager.InitActiveSceneSpawns(_startCheckPoint);
     }
 
     public void LoadLobby()

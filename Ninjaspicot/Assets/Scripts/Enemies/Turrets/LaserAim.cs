@@ -23,25 +23,16 @@ public class LaserAim : Aim
         _initColor = _color;
     }
 
-    protected override void Update()
+    protected override void OnTriggerStay2D(Collider2D collision)
     {
-        base.Update();
-        if (TargetInRange)
-        {
-            var dist = (Hero.Instance.transform.position - (_transform.position + _offset)).sqrMagnitude;
-            TargetInRange = dist < _size * _size;
-        }
-    }
-
-    protected virtual void OnTriggerStay2D(Collider2D collision)
-    { 
         if (!collision.CompareTag("hero"))
             return;
 
-        if (Charged && TargetAimedAt(collision.transform, Turret.Id) && TargetCentered(_transform, CurrentTarget, Turret.Id))
-        {
-            Hero.Instance.Die(_transform);
-        }
+        base.OnTriggerStay2D(collision);
+        //if (Charged && TargetAimedAt(collision.transform, Turret.Id) && TargetCentered(_transform, CurrentTarget, Turret.Id))
+        //{
+        //    Hero.Instance.Die(_transform);
+        //}
     }
 
     public void StartLaserize()

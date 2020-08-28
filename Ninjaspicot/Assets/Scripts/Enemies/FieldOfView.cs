@@ -12,6 +12,8 @@ public class FieldOfView : MonoBehaviour, IActivable
     [SerializeField] protected CustomColor _customColor;
 
     public bool Active { get; protected set; }
+    public float Size => _size;
+    public Vector3 Offset => _offset;
     protected Mesh _mesh;
     protected MeshFilter _filter;
     protected IRaycastable _parent;

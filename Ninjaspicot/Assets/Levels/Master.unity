@@ -5547,6 +5547,8 @@ GameObject:
   - component: {fileID: 780851362}
   - component: {fileID: 780851363}
   - component: {fileID: 780851364}
+  - component: {fileID: 780851365}
+  - component: {fileID: 780851366}
   m_Layer: 0
   m_Name: GameMaster
   m_TagString: Untagged
@@ -5589,7 +5591,7 @@ MonoBehaviour:
     GlobalLightColor: 7
     FrontLightColor: 8
   _startScene: 0
-  _startCheckPoint: 0
+  _startCheckPoint: -1
 --- !u!4 &780851353
 Transform:
   m_ObjectHideFlags: 0
@@ -5697,6 +5699,8 @@ MonoBehaviour:
   - {fileID: 4221473169236583224, guid: 0fe0b81b9d9cb2646acf3da182cfb365, type: 3}
   - {fileID: 3958402980913166440, guid: cd48a3f4a131ecc41980f3357a8383d5, type: 3}
   - {fileID: 4971978839858147142, guid: 1a7e7bb8342113848920998acba938d9, type: 3}
+  - {fileID: 5300732467323034326, guid: b38285446aa231b4bbeebe4d755707c8, type: 3}
+  - {fileID: 2843356803364272668, guid: c8377d01e5500cf4c9c6d450c4eba3e4, type: 3}
   _poolableParent: {fileID: 117308930}
 --- !u!114 &780851359
 MonoBehaviour:
@@ -5780,6 +5784,147 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9bf17a58a531764d91a351e92301ca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &780851365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780851351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4d1bda4c3695ad46898dd02b58d2266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _audios:
+  - Name: Tap
+    Clip: {fileID: 8300000, guid: 378a1b82691a8054e94fa02622a815e4, type: 3}
+  - Name: Aspire
+    Clip: {fileID: 8300000, guid: 6ecd2a3e511797d42bf59061933c7e8f, type: 3}
+  - Name: Tu
+    Clip: {fileID: 8300000, guid: d50c364f08cd84343867810df1478f11, type: 3}
+  - Name: Glissement
+    Clip: {fileID: 8300000, guid: a690443ce184a664e8d9eebb7039466a, type: 3}
+  - Name: Whoosh1
+    Clip: {fileID: 8300000, guid: fc0c690f932e3304589287415165ab15, type: 3}
+  - Name: Whoosh2
+    Clip: {fileID: 8300000, guid: 67aee502972068842a728e157f5e2917, type: 3}
+  - Name: Whoosh3
+    Clip: {fileID: 8300000, guid: 03b7c2691eb51d14c948dd8b15762b9c, type: 3}
+  - Name: Blob
+    Clip: {fileID: 8300000, guid: 5b82a3e8b874f5044a7c4d5781ff1045, type: 3}
+  - Name: Tou
+    Clip: {fileID: 8300000, guid: decec4a99030e2c41a10f0db61d250a0, type: 3}
+  - Name: Tap3
+    Clip: {fileID: 8300000, guid: 22a198ae6a5123b4ba85ab6f0cdf1558, type: 3}
+  - Name: Tap4
+    Clip: {fileID: 8300000, guid: b796963f1dece8a46b37c9b7dfef5be9, type: 3}
+  - Name: Jump
+    Clip: {fileID: 8300000, guid: bce92ea7d13928447b689895405f92b1, type: 3}
+  - Name: Slash
+    Clip: {fileID: 8300000, guid: 733c6f7c2b8bb884592476d6d19813e3, type: 3}
+  - Name: EnterPortal
+    Clip: {fileID: 8300000, guid: df3136c68175c374195c8cadcff8cb62, type: 3}
+  - Name: ExitPortal
+    Clip: {fileID: 8300000, guid: f96eec596896d4247b1bd8b420db0778, type: 3}
+  - Name: Gun
+    Clip: {fileID: 8300000, guid: dc1218d53a75aad46809a368ce4652e2, type: 3}
+--- !u!82 &780851366
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780851351}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: d2746596d8b9f934389c7fab2639d82a, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.352
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 185
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &804126932
 GameObject:
   m_ObjectHideFlags: 0

@@ -94,9 +94,9 @@ public static class Utils
         return actualHits;
     }
 
-    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, Type ignoreType = null)
     {
-        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
+        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers, ignoreType);
 
         RaycastHit2D hit = new RaycastHit2D();
         if (hits.Length > 0)
@@ -116,9 +116,9 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "")
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "", Type ignoreType = null)
     {
-        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers);
+        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers, ignoreType);
 
         if (!string.IsNullOrEmpty(target))
         {
@@ -146,7 +146,7 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, Type ignoreType = null)
     {
         RaycastHit2D[] hits;
 
@@ -163,7 +163,24 @@ public static class Utils
 
         foreach (var hit in hits)
         {
-            var raycastable = hit.collider.GetComponent<IRaycastable>();
+            IRaycastable raycastable;
+
+            if (ignoreType != null)
+            {
+                var raycasts = hit.collider.GetComponents<IRaycastable>();
+                if (raycasts.Length > 1)
+                {
+                    raycastable = raycasts.FirstOrDefault(r => r.GetType() == ignoreType);
+                }
+                else
+                {
+                    raycastable = hit.collider.GetComponent<IRaycastable>();
+                }
+            }
+            else
+            {
+                raycastable = hit.collider.GetComponent<IRaycastable>();
+            }
 
             if (raycastable == null ||
                 raycastable.Id == ignore ||
@@ -176,7 +193,7 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, Type ignoreType = null)
     {
         RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination);
 
@@ -184,7 +201,25 @@ public static class Utils
 
         foreach (var hit in hits)
         {
-            var raycastable = hit.collider.GetComponent<IRaycastable>();
+            IRaycastable raycastable;
+
+            if (ignoreType != null)
+            {
+                var raycasts = hit.collider.GetComponents<IRaycastable>();
+                if (raycasts.Length > 1)
+                {
+                    raycastable = raycasts.FirstOrDefault(r => r.GetType() == ignoreType) ?? raycasts.FirstOrDefault();
+                }
+                else
+                {
+                    raycastable = hit.collider.GetComponent<IRaycastable>();
+                }
+            }
+            else
+            {
+                raycastable = hit.collider.GetComponent<IRaycastable>();
+            }
+
 
             if (raycastable == null ||
                 raycastable.Id == ignore ||

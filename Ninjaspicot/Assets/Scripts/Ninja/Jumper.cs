@@ -21,13 +21,21 @@ public class Jumper : MonoBehaviour
     protected IDynamic _dynamicEntity;
     protected Stickiness _stickiness;
     protected PoolManager _poolManager;
+    protected AudioSource _audioSource;
+    protected AudioManager _audioManager;
+    protected AudioClip _normalJumpSound;
+    protected AudioClip _chargeJumpSound;
     protected Transform _transform;
+
     protected virtual void Awake()
     {
         _dynamicEntity = GetComponent<IDynamic>();
         _stickiness = GetComponent<Stickiness>();
         _poolManager = PoolManager.Instance;
+        _audioSource = GetComponent<AudioSource>();
+        _audioManager = AudioManager.Instance;
         _transform = transform;
+        
     }
 
     protected virtual void Start()
@@ -36,9 +44,28 @@ public class Jumper : MonoBehaviour
         _jumps = _maxJumps;
         SetMaxJumps(_maxJumps);
         GainAllJumps();
+
+        _audioManager = AudioManager.Instance;
+        _normalJumpSound = _audioManager.FindByName("Jump");
+        _chargeJumpSound = _audioManager.FindByName("Tap4");
     }
 
-    public virtual void Jump(Vector2 direction)
+    public virtual void CalculatedJump(Vector2 velocity)
+    {
+        _stickiness.Detach();
+        _stickiness.StopWalking(false);
+        LoseJump();
+        _dynamicEntity.Rigidbody.velocity = velocity;
+
+        _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
+
+        if (TrajectoryInUse())
+        {
+            CommitJump();
+        }
+    }
+
+    public virtual void NormalJump(Vector2 direction)
     {
         _stickiness.Detach();
 
@@ -70,7 +97,7 @@ public class Jumper : MonoBehaviour
         }
 
         _dynamicEntity.Rigidbody.position = ChargeDestination;
-        Jump(direction);
+        NormalJump(direction);
     }
 
     public virtual void CommitJump()
@@ -80,11 +107,16 @@ public class Jumper : MonoBehaviour
 
         if (Trajectory is ChargeTrajectory)
         {
+            _audioSource.PlayOneShot(_chargeJumpSound);
             var charge = Trajectory as ChargeTrajectory;
             if (charge.Target != null)
             {
                 charge.Target.Die(_transform);
             }
+        }
+        else
+        {
+            _audioSource.PlayOneShot(_normalJumpSound);
         }
 
         Trajectory.StartFading();

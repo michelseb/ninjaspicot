@@ -7,6 +7,8 @@ public class Hero : Ninja, IRaycastable, ITriggerable
     public bool Triggered { get; private set; }
     public DynamicInteraction DynamicInteraction { get; private set; }
     public int LastTrigger { get; private set; }
+    public bool Detected { get; private set; }
+    public bool Visible { get; private set; }
 
     private Cloth _cape;
     private TimeManager _timeManager;
@@ -18,6 +20,7 @@ public class Hero : Ninja, IRaycastable, ITriggerable
     private static Hero _instance;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
+    private const int GHOST_SOUND_FREQUENCY = 3;
     private const float FADE_SPEED = 5f;
 
     protected override void Awake()
@@ -73,9 +76,9 @@ public class Hero : Ninja, IRaycastable, ITriggerable
     {
         Triggered = true;
         LastTrigger = trigger.Id;
-        
+
         yield return new WaitForSeconds(3);
-        
+
         Triggered = false;
 
         if (trigger.SingleTime)
@@ -132,9 +135,15 @@ public class Hero : Ninja, IRaycastable, ITriggerable
 
     private IEnumerator DisplayGhosts(float delay)
     {
+        int iteration = 0;
         while (true)
         {
             _poolManager.GetPoolable<HeroGhost>(Transform.position, Transform.rotation);
+            if (iteration % GHOST_SOUND_FREQUENCY == 0)
+            {
+                _poolManager.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
+            }
+            iteration++;
             yield return new WaitForSeconds(delay);
         }
     }
@@ -165,9 +174,7 @@ public class Hero : Ninja, IRaycastable, ITriggerable
             Renderer.color = col;
             yield return null;
         }
-        Debug.Log("Vector0");
         Stickiness.Rigidbody.velocity = Vector2.zero;
-        Debug.Log("Kinematic");
         Stickiness.Rigidbody.isKinematic = true;
         _fade = null;
     }

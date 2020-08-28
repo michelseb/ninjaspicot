@@ -61,7 +61,7 @@ public class DynamicInteraction : MonoBehaviour, IActivable
 
         var otherCollider = ((MonoBehaviour)otherDynamic).GetComponent<Collider2D>();
 
-        _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position, otherCollider.transform.rotation, otherDynamic.PoolableType, defaultParent: false);
+        _cloneOtherDynamic = _poolManager.GetPoolable<DynamicCollider>(otherCollider.transform.position, otherCollider.transform.rotation, 1, otherDynamic.PoolableType, defaultParent: false);
         _cloneOtherDynamic.transform.localScale = otherCollider.transform.localScale;
 
         _cloneHeroCollider = _poolManager.GetPoolable<DynamicNinjaCollider>(transform.position, transform.rotation, defaultParent: false);

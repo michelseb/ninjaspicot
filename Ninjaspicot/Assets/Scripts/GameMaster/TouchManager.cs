@@ -61,7 +61,7 @@ public class TouchManager : MonoBehaviour
         if (!_walkInitialized && WalkTouching)
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
-            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch1, _canvasTransform, false);
+            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch1, _canvasTransform, false);
             _joystick1.OnPointerDown();
             _walkInitialized = true;
         }
@@ -69,7 +69,7 @@ public class TouchManager : MonoBehaviour
         if (!_jumpInitialized && JumpTouching)
         {
             var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value);
-            _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, PoolableType.Touch2, _canvasTransform, false);
+            _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch2, _canvasTransform, false);
             _joystick2.OnPointerDown();
             _jumpInitialized = true;
         }
@@ -101,7 +101,7 @@ public class TouchManager : MonoBehaviour
                     switch (_jumper.JumpMode)
                     {
                         case JumpMode.Classic:
-                            _jumper.Jump(-_joystick2.Direction);
+                            _jumper.NormalJump(-_joystick2.Direction);
                             break;
                         case JumpMode.Charge:
                             _jumper.Charge(-_joystick2.Direction);
@@ -167,7 +167,7 @@ public class TouchManager : MonoBehaviour
         {
             if (JumpTouching && !DoubleTouching)
             {
-                _stickiness.CurrentSpeed *= 2;
+                _stickiness.StartRunning();
                 _hero.StartDisplayGhosts();
 
                 DoubleTouching = true;

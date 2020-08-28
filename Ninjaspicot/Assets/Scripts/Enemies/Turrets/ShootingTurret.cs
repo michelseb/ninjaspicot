@@ -47,12 +47,12 @@ public class ShootingTurret : TurretBase
 
         if (_target != null && _aim.TargetAimedAt(_target, Id))
         {
-            if (Loaded && _aim.TargetCentered(_transform, _target.tag, Id))
+            if (Loaded && _aim.TargetCentered(_transform, _target.Transform.tag, Id))
             {
                 Shoot();
             }
         }
-        else
+        else if (_target == null || !_aim.TargetInRange)
         {
             StartWait();
         }
@@ -73,7 +73,7 @@ public class ShootingTurret : TurretBase
 
     private void Shoot()
     {
-        var bullet = _poolManager.GetPoolable<Bullet>(_transform.position, _transform.rotation, PoolableType.Bullet);
+        var bullet = _poolManager.GetPoolable<Bullet>(_transform.position, _transform.rotation, 1, PoolableType.Bullet);
         bullet.Speed = _strength;
         Loaded = false;
     }

@@ -65,6 +65,8 @@ public class Portal : MonoBehaviour
 
     private IEnumerator Connect()
     {
+        _portalManager.StartPortalSound();
+
         yield return new WaitForSecondsRealtime(2);
 
         _portalManager.LaunchConnection(this);
@@ -125,22 +127,6 @@ public class Portal : MonoBehaviour
         Hero.gameObject.layer = TeleportedLayer;
         Exit = false;
     }
-
-    //private IEnumerator Teleport()
-    //{
-    //    Hero.Stickiness.Rigidbody.position = Other.transform.position - Other.transform.right * 4;
-    //    _cameraBehaviour.Teleport(Hero.Stickiness.Rigidbody.position);
-    //    _uiCamera.CameraAppear();
-
-    //    yield return new WaitForSeconds(1);
-
-    //    Reinit();
-    //    Other.Reinit();
-    //    Hero.Stickiness.Rigidbody.isKinematic = false;
-    //    Hero.Stickiness.Rigidbody.velocity = Other.transform.right * PortalManager.EJECT_SPEED;
-    //    Hero.SetCapeActivation(true);
-    //    _portalManager.TerminateConnection();
-    //}
 
     private IEnumerator StartPortal()
     {

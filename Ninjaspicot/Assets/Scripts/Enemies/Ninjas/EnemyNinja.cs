@@ -7,15 +7,17 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     public bool Attacking { get; protected set; }
     public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
 
+    protected AudioClip _slash;
     private Canvas _canvas;
 
     protected virtual void Start()
     {
+        _slash = _audioManager.FindByName("Slash");
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.MainCamera;
     }
 
-    public void Pool(Vector3 position, Quaternion rotation)
+    public void Pool(Vector3 position, Quaternion rotation, float size)
     {
         Transform.position = position;
         Transform.rotation = rotation;
@@ -23,7 +25,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (Dead)
+        if (Dead || Hero.Instance.Dead)
             return;
 
         if (collision.CompareTag("hero"))
@@ -38,6 +40,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
             }
             else
             {
+                _audioSource.PlayOneShot(_slash, .3f);
                 hero.Die(Transform);
             }
         }

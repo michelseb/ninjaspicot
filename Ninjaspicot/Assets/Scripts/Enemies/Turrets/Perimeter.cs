@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 
-public class Perimeter : MonoBehaviour, IRaycastable
+public class Perimeter : MonoBehaviour
 {
-    private TurretBase _turret;
-    public TurretBase Turret { get { if (_turret == null) _turret = GetComponentInParent<TurretBase>() ?? GetComponentInChildren<TurretBase>(); return _turret; } }
-    public int Id => Turret.Id;
+    [SerializeField] private float _size;
+    public float Size => _size;
 
-    private Canvas _canvas;
-    private CameraBehaviour _cameraBehaviour;
+    private Transform _transform;
+
+    private void Awake()
+    {
+        _transform = transform;
+    }
 
     private void Start()
     {
-        _cameraBehaviour = CameraBehaviour.Instance;
-        _canvas = GetComponent<Canvas>();
-        _canvas.worldCamera = _cameraBehaviour.MainCamera;
+        _transform.localScale = Vector3.one * Size;
     }
 }

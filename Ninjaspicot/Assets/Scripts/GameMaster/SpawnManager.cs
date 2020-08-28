@@ -44,6 +44,7 @@ public class SpawnManager : MonoBehaviour
         if (hero == null)
             return;
 
+        hero.Stickiness.StopWalking(false);
         hero.Stickiness.Rigidbody.velocity = Vector2.zero;
         hero.Stickiness.Rigidbody.rotation = 0;
         hero.Stickiness.Rigidbody.isKinematic = false;

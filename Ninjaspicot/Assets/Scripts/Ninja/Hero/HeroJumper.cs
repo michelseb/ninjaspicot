@@ -15,7 +15,7 @@ public class HeroJumper : Jumper
         _timeManager = TimeManager.Instance;
     }
 
-    public override void Jump(Vector2 direction)
+    public override void NormalJump(Vector2 direction)
     {
         if (_dynamicInteraction.Interacting)
         {
@@ -27,7 +27,7 @@ public class HeroJumper : Jumper
             _timeManager.SetNormalTime();
         }
         _cameraBehaviour.DoShake(.3f, .1f);
-        base.Jump(direction);
+        base.NormalJump(direction);
         Trajectory = null;
     }
 

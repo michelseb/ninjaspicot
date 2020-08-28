@@ -31,7 +31,7 @@ public class HeroGhost : MonoBehaviour, IPoolable
     }
 
 
-    public void Pool(Vector3 position, Quaternion rotation)
+    public void Pool(Vector3 position, Quaternion rotation, float size)
     {
         _transform.position = position;
         _transform.rotation = rotation;

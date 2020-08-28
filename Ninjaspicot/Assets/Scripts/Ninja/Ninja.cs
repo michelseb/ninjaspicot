@@ -15,10 +15,14 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 
     protected CameraBehaviour _cameraBehaviour;
     protected PoolManager _poolManager;
+    protected AudioSource _audioSource;
+    protected AudioManager _audioManager;
     public Transform Transform { get; private set; }
 
     protected virtual void Awake()
     {
+        _audioSource = GetComponent<AudioSource>();
+        _audioManager = AudioManager.Instance;
         _poolManager = PoolManager.Instance;
         Jumper = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();

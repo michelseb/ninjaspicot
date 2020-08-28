@@ -19,13 +19,16 @@ public class Stickiness : MonoBehaviour, IDynamic
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
     public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
     public Vector3 CollisionNormal { get; private set; }
+    public float ImpactVelocity { get; private set; }
     public bool DynamicActive => true;
+    public bool Running { get; protected set; }
     public PoolableType PoolableType => PoolableType.None;
 
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumpManager;
     protected Transform _transform;
+    private float _velocityBeforePhysicsUpdate;
 
     public virtual void Awake()
     {
@@ -53,8 +56,14 @@ public class Stickiness : MonoBehaviour, IDynamic
         ReinitSpeed();
     }
 
+    private void FixedUpdate()
+    {
+        _velocityBeforePhysicsUpdate = Rigidbody.velocity.magnitude;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        ImpactVelocity = _velocityBeforePhysicsUpdate;
         OnCollisionStay2D(collision);
     }
 
@@ -99,7 +108,6 @@ public class Stickiness : MonoBehaviour, IDynamic
 
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
-        CurrentAttachment.LaunchQuickDeactivate();
         CurrentAttachment = null;
         Attached = false;
     }
@@ -150,20 +158,20 @@ public class Stickiness : MonoBehaviour, IDynamic
 
     public virtual void StopWalking(bool stayGrounded)
     {
-        if (!Attached)
-            return;
-
         if (_walkOnWalls != null)
         {
             StopCoroutine(_walkOnWalls);
+            _walkOnWalls = null;
         }
+
+        if (!Attached)
+            return;
 
         Rigidbody.velocity = Vector2.zero;
         Rigidbody.angularVelocity = 0;
         WallJoint.useMotor = false;
         Rigidbody.isKinematic = stayGrounded;
 
-        _walkOnWalls = null;
     }
 
     public virtual void StartWalking()
@@ -193,8 +201,15 @@ public class Stickiness : MonoBehaviour, IDynamic
         }
     }
 
+    public void StartRunning()
+    {
+        Running = true;
+        CurrentSpeed *= 2;
+    }
+
     public void ReinitSpeed()
     {
+        Running = false;
         CurrentSpeed = _speed;
     }
 
