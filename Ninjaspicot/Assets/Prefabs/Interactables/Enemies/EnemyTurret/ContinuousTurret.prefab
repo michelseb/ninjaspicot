@@ -52,6 +52,7 @@ MonoBehaviour:
   _detailAmount: 30
   _offset: {x: 0, y: 10, z: 0}
   _startAngle: 90
+  _customColor: 0
 --- !u!222 &3736005685020107487
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -105,6 +106,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -129,6 +131,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &4900672009013223663
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -188,6 +191,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -248,7 +252,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1095147419921557760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3e2e85315998e14b8251afe2cc5fb39, type: 3}
+  m_Script: {fileID: 11500000, guid: 12a3ecf5f53dd924990d82a62cee9d28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1053931592243593170
@@ -384,6 +388,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.20392159, b: 0.20392159, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -452,10 +457,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fc9cd0b02c2627479c0c889097a8453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _autoShoot: 0
   _viewAngle: 360
   _rotationSpeed: 20
   _clockWise: 0
+  _initRotation: 0
+  _aimSpeed: 0
+  _wonderTime: 0
+  _autoShoot: 0
   _strength: 200
   _loadTime: 0.2
 --- !u!120 &1052710078079956834
@@ -473,6 +481,7 @@ LineRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -599,6 +608,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 0.20392159, b: 0.20392159, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

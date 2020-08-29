@@ -2,17 +2,18 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
+public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, IListener
 {
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-    public enum Mode { Scan, Aim, Wonder };
+    public enum Mode { Scan, LookFor, Aim, Wonder };
 
     [SerializeField] protected float _viewAngle;
     [SerializeField] protected float _rotationSpeed;
     [SerializeField] protected bool _clockWise;
     [SerializeField] protected float _initRotation;
     [SerializeField] protected float _aimSpeed;
+    [SerializeField] protected float _wonderTime;
 
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
@@ -22,6 +23,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected Aim _aim;
     protected Image _image;
     protected IKillable _target;
+    protected Vector3 _targetLocation;
     protected Coroutine _wait;
     protected Transform _transform;
 
@@ -60,6 +62,10 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
                 Scan();
                 break;
 
+            case Mode.LookFor:
+                LookFor();
+                break;
+
 
             case Mode.Wonder:
                 Wonder();
@@ -71,6 +77,11 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     protected virtual void Aim()
     {
         _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.Transform.position - _transform.position), _aimSpeed);
+    }
+
+    protected virtual void LookFor()
+    {
+        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _transform.position), _aimSpeed);
     }
 
     protected virtual void Scan()
@@ -112,7 +123,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
 
     protected virtual IEnumerator Wait()
     {
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(_wonderTime);
 
         if (TurretMode != Mode.Aim)
         {
@@ -130,5 +141,14 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable
     {
         Active = false;
         _aim.Deactivate();
+    }
+
+    public void Hear(Vector3 source)
+    {
+        if (TurretMode == Mode.Aim)
+            return;
+
+        _targetLocation = source;
+        TurretMode = Mode.LookFor;
     }
 }
