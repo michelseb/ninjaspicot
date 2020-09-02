@@ -13,8 +13,8 @@ public class Aim : FieldOfView
     {
         Active = Turret.Active;
 
-        var dist = (Hero.Instance.transform.position - (_transform.position + _offset)).sqrMagnitude;
-        TargetInRange = dist < _size * _size;
+        var dist = Vector3.Distance(Hero.Instance.transform.position, _transform.position - _offset);
+        TargetInRange = dist < _size;
         if (!TargetInRange && TargetInView)
         {
             TargetInView = false;
@@ -33,7 +33,9 @@ public class Aim : FieldOfView
             if (target == null)
                 return;
 
+            Turret.Target = target;
             TargetInView = true;
+
             if (TargetAimedAt(target, Turret.Id))
             {
                 Turret.StartAim(target);
@@ -43,9 +45,13 @@ public class Aim : FieldOfView
 
     protected virtual void OnTriggerStay2D(Collider2D collider)
     {
-        if (!collider.CompareTag("hero"))
+        if (!collider.CompareTag("hero") || Turret.Target == null)
             return;
 
+        if (TargetAimedAt(Turret.Target, Turret.Id))
+        {
+            Turret.StartAim(Turret.Target);
+        }
         TargetInView = true;
     }
 

@@ -45,14 +45,14 @@ public class ShootingTurret : TurretBase
     {
         base.Aim();
 
-        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        if (Target != null && _aim.TargetAimedAt(Target, Id))
         {
-            if (Loaded && _aim.TargetCentered(_transform, _target.Transform.tag, Id))
+            if (Loaded && _aim.TargetCentered(_transform, Target.Transform.tag, Id))
             {
                 Shoot();
             }
         }
-        else if (_target == null || !_aim.TargetInRange)
+        else if (Target == null || !_aim.TargetInRange)
         {
             StartWait();
         }

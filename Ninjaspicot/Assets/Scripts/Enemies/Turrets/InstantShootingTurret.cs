@@ -43,18 +43,29 @@ public class InstantShootingTurret : TurretBase
         }
     }
 
+    protected override void LookFor()
+    {
+        base.LookFor();
+        var dir = Vector3.Dot(_transform.up, (Target.Transform.position - _transform.position).normalized);
+        if (dir > .98f)
+        {
+            StartWait();
+        }
+    }
+
+
     protected override void Aim()
     {
         base.Aim();
 
-        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        if (Target != null && _aim.TargetAimedAt(Target, Id))
         {
             if (Loaded)
             {
                 StartShooting();
             }
         }
-        else if (_target == null || !_aim.TargetInRange)
+        else if (Target == null || !_aim.TargetInRange)
         {
             StartWait();
         }
@@ -66,9 +77,9 @@ public class InstantShootingTurret : TurretBase
         StartCoroutine(Shoot(SHOOTING_TIME));
         _audioManager.PlaySound(_audioSource, "Gun");
 
-        if (_aim.TargetCentered(_transform, _target.Transform.tag, Id))
+        if (_aim.TargetCentered(_transform, Target.Transform.tag, Id))
         {
-            _target.Die(_transform);
+            Target.Die(_transform);
         }
     }
 

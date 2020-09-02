@@ -101,7 +101,7 @@ public class HeroStickiness : Stickiness
         var dir = Vector3.Dot(direction, platformNormal);
         var sign = Mathf.Sign(dir);
 
-        if (sign * dir > .5f)
+        if (sign * dir > .3f)
             return sign * speed;
 
         return 0;

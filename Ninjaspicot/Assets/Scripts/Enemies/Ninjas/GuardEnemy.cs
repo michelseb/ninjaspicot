@@ -14,6 +14,8 @@ public class GuardEnemy : EnemyNinja, IListener
     private GuardMode _guardMode;
     private Vector3 _target;
 
+    public float Range => 100f;
+
     protected override void Awake()
     {
         base.Awake();

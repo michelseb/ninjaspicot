@@ -2331,6 +2331,20 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51dfefdfdbfc3be498a20deed70b290d, type: 3}
+--- !u!1 &1008859137 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2361894896252291542, guid: 17f58a22b319ff64aabfd7edd199b910,
+    type: 3}
+  m_PrefabInstance: {fileID: 943496723}
+  m_PrefabAsset: {fileID: 0}
+--- !u!222 &1008859139
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008859137}
+  m_CullTransparentMesh: 0
 --- !u!850595691 &1176245167
 LightingSettings:
   m_ObjectHideFlags: 0

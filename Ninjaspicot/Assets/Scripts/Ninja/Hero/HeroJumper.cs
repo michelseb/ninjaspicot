@@ -39,7 +39,7 @@ public class HeroJumper : Jumper
         if (!Active || GetJumps() <= 0)
             return false;
 
-        return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 5f, Hero.Instance.Id,
+        return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Hero.Instance.Id,
         layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
     }
 

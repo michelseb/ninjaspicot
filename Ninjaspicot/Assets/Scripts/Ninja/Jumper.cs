@@ -9,12 +9,14 @@ public enum JumpMode
 public class Jumper : MonoBehaviour
 {
     [SerializeField] private int _maxJumps;
+    [SerializeField] protected float _strength;
+
     public bool Active { get; set; }
     public TrajectoryBase Trajectory { get; protected set; }
     public Vector3 TrajectoryOrigin { get; set; }
     public Vector3 TrajectoryDestination { get; set; }
     public Vector2 ChargeDestination { get; set; }
-    protected float _strength;
+
     protected int _jumps;
     public JumpMode JumpMode;
 
@@ -40,7 +42,6 @@ public class Jumper : MonoBehaviour
 
     protected virtual void Start()
     {
-        _strength = 100;
         _jumps = _maxJumps;
         SetMaxJumps(_maxJumps);
         GainAllJumps();

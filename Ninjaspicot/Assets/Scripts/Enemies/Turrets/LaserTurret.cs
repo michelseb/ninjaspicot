@@ -14,7 +14,7 @@ public class LaserTurret : TurretBase
     {
         base.Aim();
 
-        if (_target != null && _aim.TargetAimedAt(_target, Id))
+        if (Target != null && _aim.TargetAimedAt(Target, Id))
         {
             _laserAim.StartLaserize();
         }

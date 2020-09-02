@@ -237,6 +237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxJumps: 2
+  _strength: 85
   JumpMode: 0
 --- !u!114 &9131827216875105256
 MonoBehaviour:

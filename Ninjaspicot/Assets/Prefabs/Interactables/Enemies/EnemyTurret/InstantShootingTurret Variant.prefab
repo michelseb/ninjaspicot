@@ -16,8 +16,9 @@ MonoBehaviour:
   _rotationSpeed: 100
   _clockWise: 0
   _initRotation: 0
-  _aimSpeed: 0
-  _wonderTime: 0
+  _aimSpeed: 0.5
+  _searchSpeed: 2
+  _wonderTime: 3
   _loadTime: 0.2
 --- !u!1001 &6341155298802420213
 PrefabInstance:

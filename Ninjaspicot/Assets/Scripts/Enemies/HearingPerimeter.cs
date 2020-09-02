@@ -2,7 +2,7 @@
 
 public abstract class HearingPerimeter : MonoBehaviour
 {
-    public virtual float Size => 1f;
+    public virtual float Size => _listener?.Range ?? 1f;
 
     protected Transform _transform;
     protected IListener _listener;

@@ -13,16 +13,19 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
     [SerializeField] protected bool _clockWise;
     [SerializeField] protected float _initRotation;
     [SerializeField] protected float _aimSpeed;
+    [SerializeField] protected float _searchSpeed;
     [SerializeField] protected float _wonderTime;
 
+    public IKillable Target { get; set; }
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
     public bool Active { get; protected set; }
     public Aim AimField => _aim;
 
+    public float Range => 50f;
+
     protected Aim _aim;
     protected Image _image;
-    protected IKillable _target;
     protected Vector3 _targetLocation;
     protected Coroutine _wait;
     protected Transform _transform;
@@ -42,7 +45,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
         Loaded = true;
         Activate();
         _transform.Rotate(0, 0, _initRotation);
-        
+
     }
 
     protected virtual void Update()
@@ -76,12 +79,13 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
 
     protected virtual void Aim()
     {
-        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _target.Transform.position - _transform.position), _aimSpeed);
+        var speed = _aim.TargetInView ? _aimSpeed : _searchSpeed;
+        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, Target.Transform.position - _transform.position), speed);
     }
 
     protected virtual void LookFor()
     {
-        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _transform.position), _aimSpeed);
+        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _transform.position), _searchSpeed);
     }
 
     protected virtual void Scan()
@@ -97,15 +101,15 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
 
     protected virtual void Wonder()
     {
-        if (_target != null && _aim.TargetVisible(_target, Id))
+        if (Target != null && _aim.TargetVisible(Target, Id))
         {
-            StartAim(_target);
+            StartAim(Target);
         }
     }
 
     public void StartAim(IKillable target)
     {
-        _target = target;
+        Target = target;
         TurretMode = Mode.Aim;
 
         if (_wait != null)
@@ -148,6 +152,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
         if (TurretMode == Mode.Aim)
             return;
 
+        StopAllCoroutines();
         _targetLocation = source;
         TurretMode = Mode.LookFor;
     }
