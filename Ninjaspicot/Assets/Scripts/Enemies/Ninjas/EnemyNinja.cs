@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
+public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
 {
     [SerializeField] protected Collider2D _bottom;
     public bool Attacking { get; protected set; }
@@ -91,5 +91,15 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable
     public void Activate()
     {
         gameObject.SetActive(true);
+    }
+
+    public void Sleep()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void Wake()
+    {
+        throw new System.NotImplementedException();
     }
 }

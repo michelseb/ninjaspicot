@@ -59,6 +59,7 @@ MonoBehaviour:
   _clockWise: 0
   _initRotation: 0
   _aimSpeed: 0.5
+  _searchSpeed: 0
   _wonderTime: 2
   _autoShoot: 0
   _strength: 500
@@ -755,6 +756,14 @@ PrefabInstance:
       propertyPath: _activableObject
       value: 
       objectReference: {fileID: 61189714498512773}
+    - target: {fileID: 1479735692, guid: 3d95986bdab75114e8966b9c68d3dfa5, type: 3}
+      propertyPath: _desactivationButton
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1479735692, guid: 3d95986bdab75114e8966b9c68d3dfa5, type: 3}
+      propertyPath: _triggerOnStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3879711635600512184, guid: 3d95986bdab75114e8966b9c68d3dfa5,
         type: 3}
       propertyPath: m_Name

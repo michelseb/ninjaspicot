@@ -10,7 +10,12 @@ PrefabInstance:
     - target: {fileID: 804269362246695967, guid: 9c8691685395aa0499c07ba72074bf8f,
         type: 3}
       propertyPath: m_Name
-      value: Rice group
+      value: Rice group Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 804269362246695967, guid: 9c8691685395aa0499c07ba72074bf8f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 804269362246695968, guid: 9c8691685395aa0499c07ba72074bf8f,
         type: 3}

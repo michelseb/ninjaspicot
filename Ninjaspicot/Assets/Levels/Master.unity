@@ -5829,6 +5829,10 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: f96eec596896d4247b1bd8b420db0778, type: 3}
   - Name: Gun
     Clip: {fileID: 8300000, guid: dc1218d53a75aad46809a368ce4652e2, type: 3}
+  - Name: Coin
+    Clip: {fileID: 8300000, guid: 1f4855e1d0d07b74bb5e95b1214dcd69, type: 3}
+  - Name: Bip
+    Clip: {fileID: 8300000, guid: 6035734add1596745b007bfe3ad9548b, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

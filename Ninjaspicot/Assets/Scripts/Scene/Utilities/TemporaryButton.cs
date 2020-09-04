@@ -12,9 +12,9 @@ public class TemporaryButton : ActivationButton
         {
             _remainingTime -= Time.deltaTime;
         }
-        else if (!_active)
+        else if (_active)
         {
-            SetActive(true);
+            SetActive(false);
         }
     }
 
@@ -23,7 +23,8 @@ public class TemporaryButton : ActivationButton
         if (collision.CompareTag("hero") && !Pressing)
         {
             _remainingTime = _activeTime;
-            SetActive(false);
+            _audioManager.PlaySound(_audioSource, "Bip", .3f);
+            SetActive(true);
             Pressing = true;
         }
     }

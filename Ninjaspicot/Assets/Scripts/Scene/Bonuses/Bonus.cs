@@ -35,7 +35,8 @@ public abstract class Bonus : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            SetActive(false);
+            Destroy(gameObject, 1f);
         }
     }
 

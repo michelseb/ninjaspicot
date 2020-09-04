@@ -58,16 +58,23 @@ public class InstantShootingTurret : TurretBase
     {
         base.Aim();
 
-        if (Target != null && _aim.TargetAimedAt(Target, Id))
-        {
-            if (Loaded)
-            {
-                StartShooting();
-            }
-        }
-        else if (Target == null || !_aim.TargetInRange)
+        if (!_aim.TargetInRange)
         {
             StartWait();
+        }
+        else
+        {
+            if (Target != null && _aim.TargetAimedAt(Target, Id))
+            {
+                if (Loaded)
+                {
+                    StartShooting();
+                }
+            }
+            else
+            {
+                StartWait();
+            }
         }
     }
 

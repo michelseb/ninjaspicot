@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, IListener
+public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, IListener, IWakeable
 {
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
@@ -155,5 +155,15 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
         StopAllCoroutines();
         _targetLocation = source;
         TurretMode = Mode.LookFor;
+    }
+
+    public void Sleep()
+    {
+        Deactivate();
+    }
+
+    public void Wake()
+    {
+        Activate();
     }
 }
