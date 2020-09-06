@@ -78,16 +78,16 @@ public class Zone : MonoBehaviour
 
     private void SetItemsActivation(bool active)
     {
-        foreach (var activable in _activables)
-        {
-            if (active)
-            {
-                activable.Activate();
-            }
-            else
-            {
-                activable.Deactivate();
-            }
-        }
+        //foreach (var activable in _activables)
+        //{
+        //    if (active)
+        //    {
+        //        activable.Activate();
+        //    }
+        //    else
+        //    {
+        //        activable.Deactivate();
+        //    }
+        //}
     }
 }

@@ -21,6 +21,10 @@ public class ActivationButton : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _light = GetComponent<Light2D>();
         _renderer = GetComponent<SpriteRenderer>();
+        if (!_renderer) 
+        {
+            _renderer = GetComponentInChildren<SpriteRenderer>();
+        }
     }
 
     protected virtual void Start()

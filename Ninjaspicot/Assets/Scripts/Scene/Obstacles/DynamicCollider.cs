@@ -6,17 +6,17 @@ public class DynamicCollider : Obstacle, IPoolable
     public PoolableType PoolableType => _poolableType;
     public bool Active { get; private set; }
 
-    //public void Activate()
-    //{
-    //    gameObject.SetActive(true);
-    //    Active = true;
-    //}
+    public override void Activate()
+    {
+        Active = true;
+        gameObject.SetActive(true);
+    }
 
-    //public void Deactivate()
-    //{
-    //    gameObject.SetActive(false);
-    //    Active = false;
-    //}
+    public override void Deactivate()
+    {
+        Active = false;
+        gameObject.SetActive(false);
+    }
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {

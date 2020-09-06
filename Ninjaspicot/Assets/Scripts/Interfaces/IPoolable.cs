@@ -13,7 +13,8 @@ public enum PoolableType
     Shelf,
     Rice,
     IndicationRock,
-    Plate
+    Plate,
+    Shovel
 }
 
 public interface IPoolable : IActivable
