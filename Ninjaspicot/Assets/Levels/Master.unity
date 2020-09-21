@@ -376,7 +376,6 @@ GameObject:
   - component: {fileID: 780037607}
   - component: {fileID: 780037606}
   - component: {fileID: 780037608}
-  - component: {fileID: 780037605}
   - component: {fileID: 780037610}
   - component: {fileID: 780037609}
   m_Layer: 0
@@ -631,47 +630,6 @@ MonoBehaviour:
   _mobileTouch: 0
   _joystick1: {fileID: 0}
   _joystick2: {fileID: 0}
---- !u!114 &780037605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 780037596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_LightType: 3
-  m_BlendStyleIndex: 2
-  m_FalloffIntensity: 0.7
-  m_Color: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
-  m_Intensity: 1
-  m_LightVolumeOpacity: 0
-  m_ApplyToSortingLayers: 00000000354af6d9
-  m_LightCookieSprite: {fileID: 0}
-  m_UseNormalMap: 0
-  m_LightOrder: 0
-  m_AlphaBlendOnOverlap: 1
-  m_ShadowIntensity: 0
-  m_ShadowVolumeIntensity: 0
-  m_PointLightInnerAngle: 360
-  m_PointLightOuterAngle: 360
-  m_PointLightInnerRadius: 10
-  m_PointLightOuterRadius: 50
-  m_PointLightDistance: 3
-  m_PointLightQuality: 1
-  m_ShapeLightParametricSides: 5
-  m_ShapeLightParametricAngleOffset: 0
-  m_ShapeLightParametricRadius: 1
-  m_ShapeLightFalloffSize: 0.5
-  m_ShapeLightFalloffOffset: {x: 0, y: 0}
-  m_ShapePath:
-  - {x: -0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: 0.5, z: 0}
-  - {x: -0.5, y: 0.5, z: 0}
 --- !u!114 &780037606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5702,6 +5660,7 @@ MonoBehaviour:
   - {fileID: 5300732467323034326, guid: b38285446aa231b4bbeebe4d755707c8, type: 3}
   - {fileID: 2843356803364272668, guid: c8377d01e5500cf4c9c6d450c4eba3e4, type: 3}
   - {fileID: 5257107163935485547, guid: fe0c7f692c0de134d92b9c0d35af9284, type: 3}
+  - {fileID: 3443929097045683637, guid: 1c625cc13688e8444bc2b84a06504ebe, type: 3}
   _poolableParent: {fileID: 117308930}
 --- !u!114 &780851359
 MonoBehaviour:

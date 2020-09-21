@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
 {
+    [SerializeField] private CustomColor _lightColor;
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool Dead { get; set; }
@@ -12,7 +13,7 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
     public SpriteRenderer Renderer { get; private set; }
     public Image Image { get; private set; }
 
-
+    private CharacterLight _characterLight;
     protected CameraBehaviour _cameraBehaviour;
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
@@ -23,7 +24,6 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
     {
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
-        _poolManager = PoolManager.Instance;
         Jumper = GetComponent<Jumper>() ?? GetComponentInChildren<Jumper>();
         Stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>();
         _cameraBehaviour = CameraBehaviour.Instance;
@@ -32,6 +32,17 @@ public abstract class Ninja : MonoBehaviour, IKillable, IRaycastable
         Transform = transform;
     }
 
+    protected virtual void Start()
+    {
+        _poolManager = PoolManager.Instance;
+        _characterLight = _poolManager.GetPoolable<CharacterLight>(transform.position, Quaternion.identity);
+        _characterLight.SetColor(ColorUtils.GetColor(_lightColor));
+    }
+
+    protected virtual void Update()
+    {
+        _characterLight.transform.position = transform.position;
+    }
 
     public virtual void Die(Transform killer)
     {

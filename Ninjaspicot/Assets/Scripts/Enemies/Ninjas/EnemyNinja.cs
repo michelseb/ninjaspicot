@@ -10,8 +10,9 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
     protected AudioClip _slash;
     private Canvas _canvas;
 
-    protected virtual void Start()
+    protected override void Start()
     {
+        base.Start();
         _slash = _audioManager.FindByName("Slash");
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.MainCamera;
@@ -31,7 +32,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
         if (collision.CompareTag("hero"))
         {
             var hero = collision.GetComponent<Hero>();
-            if (hero == null)
+            if (Utils.IsNull(hero))
                 return;
 
             if (!Attacking)

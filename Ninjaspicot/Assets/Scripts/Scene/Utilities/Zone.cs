@@ -1,12 +1,12 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
 public class Zone : MonoBehaviour
 {
-    [SerializeField] private GameObject[] _activableObjects;
-    private IActivable[] _activables;
+    private List<IActivable> _activables;
     private Light2D _ambiantLight;
     private ZoneManager _zoneManager;
     private float _lightIntensity;
@@ -14,7 +14,7 @@ public class Zone : MonoBehaviour
     private void Awake()
     {
         _ambiantLight = GetComponent<Light2D>();
-        _activables = _activableObjects.Select(activable => activable.GetComponent<IActivable>()).ToArray();
+        _activables = GetComponentsInChildren<IActivable>().ToList();
         _lightIntensity = _ambiantLight.intensity;
         Close();
     }
@@ -78,16 +78,22 @@ public class Zone : MonoBehaviour
 
     private void SetItemsActivation(bool active)
     {
-        //foreach (var activable in _activables)
-        //{
-        //    if (active)
-        //    {
-        //        activable.Activate();
-        //    }
-        //    else
-        //    {
-        //        activable.Deactivate();
-        //    }
-        //}
+        for (int i = 0; i < _activables.Count; i++)
+        {
+            if (Utils.IsNull(_activables[i]))
+            {
+                _activables.RemoveAt(i);
+                continue;
+            }
+
+            if (active)
+            {
+                _activables[i].Activate();
+            }
+            else
+            {
+                _activables[i].Deactivate();
+            }
+        }
     }
 }

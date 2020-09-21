@@ -47,6 +47,7 @@ public class DynamicInteraction : MonoBehaviour, IActivable
             return;
 
         StopInteraction(true);
+        //_hero.Stickiness.OnCollisionStay2D(collision);
         _hero.Stickiness.Detach();
         _hero.Stickiness.Rigidbody.isKinematic = false;
     }

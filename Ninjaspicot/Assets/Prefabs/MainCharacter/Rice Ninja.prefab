@@ -211,6 +211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a763fbff267f4b49942549397d2e883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lightColor: 3
   _ghostSpacing: 0.1
 --- !u!114 &6793037721863660851
 MonoBehaviour:

@@ -55,7 +55,7 @@ public class TouchManager : MonoBehaviour
         if (!HeroSpawned())
             return;
 
-        _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
+        _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
 
         if (!_walkInitialized && WalkTouching)

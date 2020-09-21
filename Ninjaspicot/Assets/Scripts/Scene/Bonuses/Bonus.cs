@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Bonus : MonoBehaviour
+public abstract class Bonus : MonoBehaviour, IActivable
 {
     [SerializeField] protected bool _respawn;
     [SerializeField] protected float _respawnTime;
@@ -60,5 +60,15 @@ public abstract class Bonus : MonoBehaviour
         {
             renderer.enabled = active;
         }
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 }

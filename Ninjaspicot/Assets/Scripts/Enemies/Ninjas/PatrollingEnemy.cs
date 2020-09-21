@@ -8,11 +8,6 @@ public class PatrollingEnemy : EnemyNinja, ITriggerable
     public bool Triggered { get; private set; }
     public int LastTrigger { get; private set; }
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
     protected override void Start()
     {
         base.Start();

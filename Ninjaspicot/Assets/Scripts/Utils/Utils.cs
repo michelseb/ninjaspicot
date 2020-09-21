@@ -295,4 +295,9 @@ public static class Utils
 
         return angle;
     }
+
+    public static bool IsNull(object obj)
+    {
+        return obj == null || obj.Equals(null);
+    }
 }

@@ -67,7 +67,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         OnCollisionStay2D(collision);
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
+    public void OnCollisionStay2D(Collision2D collision)
     {
         var contact = GetContactPoint(collision.contacts, _previousContactPoint);
         SetContactPosition(contact.point);
