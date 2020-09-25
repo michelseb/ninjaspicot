@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class ActivationButton : MonoBehaviour
+public class ActivationButton : MonoBehaviour, IWakeable
 {
     [SerializeField] protected bool _active;
     [SerializeField] protected GameObject _activableObject;
@@ -14,6 +14,9 @@ public class ActivationButton : MonoBehaviour
     protected IActivable _activable;
     protected SpriteRenderer _renderer;
     protected Light2D _light;
+
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     protected virtual void Awake()
     {
@@ -86,5 +89,15 @@ public class ActivationButton : MonoBehaviour
     {
         _renderer.color = active ? ColorUtils.Green : ColorUtils.Red;
         _light.color = active ? ColorUtils.Green : ColorUtils.Red;
+    }
+
+    public void Sleep()
+    {
+        _light.enabled = false;
+    }
+
+    public void Wake()
+    {
+        _light.enabled = true;
     }
 }

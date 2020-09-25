@@ -24,6 +24,9 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
 
     public float Range => 50f;
 
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
     protected Aim _aim;
     protected Image _image;
     protected Vector3 _targetLocation;
@@ -149,7 +152,7 @@ public abstract class TurretBase : MonoBehaviour, IActivable, IRaycastable, ILis
 
     public void Hear(Vector3 source)
     {
-        if (TurretMode == Mode.Aim)
+        if (TurretMode == Mode.Aim || !Active)
             return;
 
         StopAllCoroutines();

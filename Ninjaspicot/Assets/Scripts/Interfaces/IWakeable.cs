@@ -3,4 +3,5 @@ public interface IWakeable
 {
     void Sleep();
     void Wake();
+    Zone Zone { get; }
 }

@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 
-public class CharacterLight : Lamp, IPoolable
+public class CharacterLight : Lamp
 {
     private Transform _transform;
-
-    public PoolableType PoolableType => PoolableType.None;
 
     protected override void Awake()
     {
@@ -12,13 +10,13 @@ public class CharacterLight : Lamp, IPoolable
         _transform = transform;
     }
 
-    public void Pool(Vector3 position, Quaternion rotation, float size)
+    protected virtual void LateUpdate()
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
+        _transform.rotation = Quaternion.identity;
     }
 
     public void SetColor(Color color)
     {
-        _light.color = color;
+        Light.color = color;
     }
 }

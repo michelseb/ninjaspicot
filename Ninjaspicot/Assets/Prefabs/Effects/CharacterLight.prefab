@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3443929097045683639}
   - component: {fileID: 3443929097045683638}
-  - component: {fileID: 8519402627058105032}
+  - component: {fileID: 8035355707681769032}
+  - component: {fileID: 4934004409367222515}
   m_Layer: 0
   m_Name: CharacterLight
   m_TagString: Untagged
@@ -73,7 +74,26 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &8519402627058105032
+--- !u!95 &8035355707681769032
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3443929097045683637}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 604e4b09e965c174d93d5978bdc96350, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &4934004409367222515
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

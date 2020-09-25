@@ -25,12 +25,10 @@ public class MarauderEnemy : EnemyNinja
         _fieldOfView = GetComponentInChildren<FieldOfView>();
     }
 
-    protected override void Update()
+    protected virtual void Update()
     {
         if (Dead)
             return;
-
-        base.Update();
 
         _remainingTime -= Time.deltaTime;
 

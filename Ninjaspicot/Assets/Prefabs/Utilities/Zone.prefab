@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4739108600423055949}
   - component: {fileID: 1200745892862816798}
   - component: {fileID: 9018844176174550652}
+  - component: {fileID: 887435021595696852}
   m_Layer: 19
   m_Name: Zone
   m_TagString: Untagged
@@ -120,4 +121,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 795981f1ef71bc14ab865521c14cf17a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _activableObjects: []
+--- !u!95 &887435021595696852
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2852095192136819214}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 19fd055aade79504ea2b33df58fad82f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

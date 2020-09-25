@@ -6,93 +6,119 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class Zone : MonoBehaviour
 {
-    private List<IActivable> _activables;
+    private List<IWakeable> _wakeables;
     private Light2D _ambiantLight;
     private ZoneManager _zoneManager;
     private float _lightIntensity;
+    private Animator _animator;
+
+    private long _id;
+    public long Id { get { if (_id == 0) _id = GetInstanceID(); return _id; } }
+
+    public bool Exited { get; private set; }
 
     private void Awake()
     {
         _ambiantLight = GetComponent<Light2D>();
-        _activables = GetComponentsInChildren<IActivable>().ToList();
         _lightIntensity = _ambiantLight.intensity;
-        Close();
+        _animator = GetComponent<Animator>();
     }
 
     private void Start()
     {
+        _wakeables = GetComponentsInChildren<IWakeable>().ToList();
+        Close();
         _zoneManager = ZoneManager.Instance;
         _zoneManager.AddZone(this);
+        Exited = true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
+    {
+        OnTriggerStay2D(collision);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("hero"))
+            return;
+
+        Exited = true;
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (!collision.CompareTag("hero"))
             return;
 
         _zoneManager.SetZone(this);
+        Exited = false;
     }
 
-    public void StartOpen()
+    public void Open()
     {
         SetItemsActivation(true);
-        StopAllCoroutines();
-        StartCoroutine(OpenZone());
+
+        _animator.SetTrigger("Open");
+        //StopAllCoroutines();
+        //StartCoroutine(OpenZone());
     }
 
-    public void StartClose()
+    public void Close()
     {
         SetItemsActivation(false);
-        StopAllCoroutines();
-        StartCoroutine(CloseZone());
+
+        _animator.SetTrigger("Close");
+        //StopAllCoroutines();
+        //StartCoroutine(CloseZone());
     }
 
-    private IEnumerator OpenZone()
-    {
-        _ambiantLight.intensity = 0;
-        _ambiantLight.enabled = true;
-        while (_ambiantLight.intensity < _lightIntensity)
-        {
-            _ambiantLight.intensity += Time.deltaTime;
-            yield return null;
-        }
+    //private IEnumerator OpenZone()
+    //{
+    //    _ambiantLight.intensity = 0;
+    //    _ambiantLight.enabled = true;
+    //    while (_ambiantLight.intensity < _lightIntensity)
+    //    {
+    //        _ambiantLight.intensity += Time.deltaTime;
+    //        yield return null;
+    //    }
 
-        _ambiantLight.intensity = _lightIntensity;
-    }
+    //    _ambiantLight.intensity = _lightIntensity;
+    //}
 
-    private IEnumerator CloseZone()
-    {
-        while(_ambiantLight.intensity > 0)
-        {
-            _ambiantLight.intensity -= Time.deltaTime;
-            yield return null;
-        }
+    //private IEnumerator CloseZone()
+    //{
+    //    while(_ambiantLight.intensity > 0)
+    //    {
+    //        _ambiantLight.intensity -= Time.deltaTime;
+    //        yield return null;
+    //    }
 
-        Close();
-    }
+    //    Close();
+    //}
 
-    private void Close()
-    {
-        _ambiantLight.enabled = false;
-    }
+    //private void Close()
+    //{
+    //    _ambiantLight.enabled = false;
+    //}
 
     private void SetItemsActivation(bool active)
     {
-        for (int i = 0; i < _activables.Count; i++)
+        for (int i = 0; i < _wakeables.Count; i++)
         {
-            if (Utils.IsNull(_activables[i]))
+            if (Utils.IsNull(_wakeables[i]))
             {
-                _activables.RemoveAt(i);
+                _wakeables.RemoveAt(i);
                 continue;
             }
 
             if (active)
             {
-                _activables[i].Activate();
+                _wakeables[i].Wake();
             }
             else
             {
-                _activables[i].Deactivate();
+                _wakeables[i].Sleep();
             }
         }
     }

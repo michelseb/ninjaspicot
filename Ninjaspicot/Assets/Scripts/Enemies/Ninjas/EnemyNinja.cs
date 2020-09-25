@@ -7,12 +7,16 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
     public bool Attacking { get; protected set; }
     public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
 
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
     protected AudioClip _slash;
     private Canvas _canvas;
 
     protected override void Start()
     {
         base.Start();
+
         _slash = _audioManager.FindByName("Slash");
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.MainCamera;
@@ -77,7 +81,7 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
         {
             Renderer.color = Attacking ? ColorUtils.Red : ColorUtils.White;
         }
-        if (Image != null)
+        else if (Image != null)
         {
             Image.color = Attacking ? ColorUtils.Red : ColorUtils.White;
         }
@@ -96,11 +100,25 @@ public abstract class EnemyNinja : Ninja, IRaycastable, IPoolable, IWakeable
 
     public void Sleep()
     {
-        throw new System.NotImplementedException();
+        if (Renderer != null)
+        {
+            Renderer.enabled = false;
+        }
+        else if (Image != null)
+        {
+            Image.enabled = false;
+        }
     }
 
     public void Wake()
     {
-        throw new System.NotImplementedException();
+        if (Renderer != null)
+        {
+            Renderer.enabled = true;
+        }
+        else if (Image != null)
+        {
+            Image.enabled = true;
+        }
     }
 }

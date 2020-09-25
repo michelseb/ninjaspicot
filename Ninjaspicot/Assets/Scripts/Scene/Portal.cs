@@ -16,17 +16,16 @@ public class Portal : MonoBehaviour
     public LayerMask TeleportedLayer;
     public SpriteRenderer TeleportedRenderer;
     public SpriteMaskInteraction SpriteMaskInteraction;
-    private Coroutine _portalMovement;
-    private CameraBehaviour _cameraBehaviour;
     private UICamera _uiCamera;
     private PortalManager _portalManager;
     private Coroutine _connect;
+    private Animator _animator;
 
     protected void Awake()
     {
-        _cameraBehaviour = CameraBehaviour.Instance;
         _uiCamera = UICamera.Instance;
         _portalManager = PortalManager.Instance;
+        _animator = GetComponent<Animator>();
     }
 
     protected void Start()
@@ -44,8 +43,7 @@ public class Portal : MonoBehaviour
         if (!collision.CompareTag("hero"))
             return;
 
-        if (_portalMovement != null) StopCoroutine(_portalMovement);
-        _portalMovement = StartCoroutine(StartPortal());
+        _animator.SetTrigger("Wake");
 
         if (_portalManager.Connecting)
             return;
@@ -106,8 +104,7 @@ public class Portal : MonoBehaviour
 
     public void Reinit()
     {
-        if (_portalMovement != null) StopCoroutine(_portalMovement);
-        _portalMovement = StartCoroutine(StopPortal());
+        _animator.SetTrigger("Sleep");
 
         if (Entrance)
         {
@@ -126,26 +123,6 @@ public class Portal : MonoBehaviour
 
         Hero.gameObject.layer = TeleportedLayer;
         Exit = false;
-    }
-
-    private IEnumerator StartPortal()
-    {
-        while (_rotationSpeed < 10)
-        {
-            _rotationSpeed += 100 * Time.deltaTime;
-            _imgInside.color = new Color(_imgInside.color.r, _imgInside.color.g, _imgInside.color.b, Mathf.Max(_imgInside.color.a, _rotationSpeed / 40));
-            yield return null;
-        }
-    }
-
-    private IEnumerator StopPortal()
-    {
-        while (_rotationSpeed > 0)
-        {
-            _rotationSpeed -= 10 * Time.deltaTime;
-            _imgInside.color = new Color(_imgInside.color.r, _imgInside.color.g, _imgInside.color.b, Mathf.Min(_imgInside.color.a, _rotationSpeed / 40));
-            yield return null;
-        }
     }
 
     public void SetOtherPortal(Portal other)

@@ -1,22 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class Lamp : MonoBehaviour, IActivable
+public class Lamp : MonoBehaviour, IWakeable
 {
+    protected Animator _animator;
+
     protected Light2D _light;
+    public Light2D Light { get { if (Utils.IsNull(_light)) _light = gameObject.GetComponent<Light2D>(); return _light; } }
+
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     protected virtual void Awake()
     {
-        _light = GetComponent<Light2D>();
+        _animator = GetComponent<Animator>();
     }
 
-    public virtual void Activate()
+    public virtual void Wake()
     {
-        _light.enabled = true;
+        _animator.SetTrigger("TurnOn");
     }
 
-    public virtual void Deactivate()
+    public virtual void Sleep()
     {
-        _light.enabled = false;
+        _animator.SetTrigger("TurnOff");
     }
 }

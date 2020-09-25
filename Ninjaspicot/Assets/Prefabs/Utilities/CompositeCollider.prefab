@@ -87,8 +87,8 @@ CompositeCollider2D:
   m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
-  m_VertexDistance: 0.5005
-  m_OffsetDistance: 0.5
+  m_VertexDistance: 0.05
+  m_OffsetDistance: 0
 --- !u!114 &-7727576460457174441
 MonoBehaviour:
   m_ObjectHideFlags: 0

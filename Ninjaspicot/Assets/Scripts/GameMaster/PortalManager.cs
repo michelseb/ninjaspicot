@@ -137,7 +137,6 @@ public class PortalManager : MonoBehaviour
         _cameraBehaviour.Teleport(Hero.Instance.Stickiness.Rigidbody.position);
         _uiCamera.CameraAppear();
         entrance.Reinit();
-        exit.Reinit();
         ClosePreviousZone(entrance.Id);
 
         yield return new WaitForSecondsRealtime(2);
@@ -146,6 +145,7 @@ public class PortalManager : MonoBehaviour
         rb.isKinematic = false;
         rb.velocity = exit.transform.right * EJECT_SPEED;
         Hero.Instance.SetCapeActivation(true);
+        exit.Reinit();
         TerminateConnection();
     }
 

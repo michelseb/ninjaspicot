@@ -22,10 +22,8 @@ public class GuardEnemy : EnemyNinja, IListener
         _initPos = Transform.position;
     }
 
-    protected override void Update()
+    protected virtual void Update()
     {
-        base.Update();
-
         switch (_guardMode)
         {
             case GuardMode.Guarding:
