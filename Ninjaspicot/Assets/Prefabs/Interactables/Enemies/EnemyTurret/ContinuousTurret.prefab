@@ -44,14 +44,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1094991356898940100}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eec79f845e4cd6347bb30e5d5ddc2ad8, type: 3}
+  m_Script: {fileID: 11500000, guid: b1379d971676075489e90d220c747420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 100
-  _viewAngle: 45
-  _detailAmount: 30
-  _offset: {x: 0, y: 10, z: 0}
-  _startAngle: 90
+  _size: 0
+  _viewAngle: 0
+  _detailAmount: 0
+  _offset: {x: 0, y: 0, z: 0}
+  _startAngle: 0
   _customColor: 0
 --- !u!222 &3736005685020107487
 CanvasRenderer:
@@ -457,11 +457,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fc9cd0b02c2627479c0c889097a8453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lightColor: 0
   _viewAngle: 360
   _rotationSpeed: 20
   _clockWise: 0
   _initRotation: 0
   _aimSpeed: 0
+  _searchSpeed: 0
   _wonderTime: 0
   _autoShoot: 0
   _strength: 200

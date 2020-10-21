@@ -9,17 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 6402197398745198192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25a63edd4a3bb7f4cb65c3366ef3c267, type: 3}
+  m_Script: {fileID: 11500000, guid: c5cd5568e25c5d142bd5bd423c53be31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lightColor: 0
   _viewAngle: 180
-  _rotationSpeed: 100
+  _rotationSpeed: 10
   _clockWise: 0
-  _initRotation: 0
-  _aimSpeed: 0.5
-  _searchSpeed: 2
-  _wonderTime: 3
-  _loadTime: 0.2
+  _initRotation: 180
+  _aimSpeed: 5
+  _searchSpeed: 3
+  _wonderTime: 2
+  _loadTime: 1
 --- !u!1001 &6341155298802420213
 PrefabInstance:
   m_ObjectHideFlags: 0

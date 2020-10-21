@@ -32,7 +32,7 @@ public class TemporaryButton : ActivationButton
 
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("hero") && !Pressing)
+        if (Pressed(collision) && !Pressing)
         {
             _remainingTime = _activeTime;
             _audioManager.PlaySound(_audioSource, "Bip", .3f);

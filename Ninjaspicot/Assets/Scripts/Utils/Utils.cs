@@ -116,7 +116,7 @@ public static class Utils
         return hit;
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "", Type ignoreType = null)
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "", Type ignoreType = null)
     {
         RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers, ignoreType);
 
@@ -193,7 +193,7 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, Type ignoreType = null)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, Type ignoreType = null)
     {
         RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination);
 
@@ -222,7 +222,7 @@ public static class Utils
 
 
             if (raycastable == null ||
-                raycastable.Id == ignore ||
+                ignore.Any(x => x == raycastable.Id) ||
                 (!includeTriggers && hit.collider.isTrigger))
                 continue;
 

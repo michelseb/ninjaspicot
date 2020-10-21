@@ -3,7 +3,8 @@ using UnityEngine;
 
 public interface IKillable
 {
-    Transform Transform { get; }
+    bool Dead { get; }
     void Die(Transform killer);
     IEnumerator Dying();
+    Transform Transform { get; }
 }

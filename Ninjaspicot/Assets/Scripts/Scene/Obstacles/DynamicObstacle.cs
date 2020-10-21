@@ -19,15 +19,14 @@ public class DynamicObstacle : Obstacle, IDynamic
 
     protected override void OnCollisionEnter2D(Collision2D collision)
     {
-        base.OnCollisionEnter2D(collision);
-
         if (!DynamicActive || !collision.collider.CompareTag("hero"))
             return;
 
         var stickiness = collision.collider.GetComponent<Stickiness>();
-
-        if (stickiness == null)
+        if (stickiness == null || stickiness.Attached)
             return;
+
+        base.OnCollisionEnter2D(collision);
 
         stickiness.SetContactPosition(collision.contacts[collision.contacts.Length - 1].point);
 
@@ -36,8 +35,8 @@ public class DynamicObstacle : Obstacle, IDynamic
         if (!dynamicInteraction.Active || dynamicInteraction.Interacting)
             return;
 
-        if (GetComponent<EnemyNinja>() != null)
-            return;
+        //if (GetComponent<EnemyNinja>() != null) ==> Why ? Should never be true
+        //    return;
 
         dynamicInteraction.StartInteraction(this);
     }

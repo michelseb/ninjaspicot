@@ -7,6 +7,7 @@ public class ActivationButton : MonoBehaviour, IWakeable
     [SerializeField] protected GameObject _activableObject;
     [SerializeField] protected bool _triggerOnStart;
     [SerializeField] protected bool _desactivationButton;
+    [SerializeField] protected bool _activableByEnemy;
     public bool Pressing { get; set; }
 
     protected AudioSource _audioSource;
@@ -44,7 +45,7 @@ public class ActivationButton : MonoBehaviour, IWakeable
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("hero") && !Pressing)
+        if (Pressed(collision))
         {
             ToggleActivation(_active);
             Pressing = true;
@@ -99,5 +100,10 @@ public class ActivationButton : MonoBehaviour, IWakeable
     public void Wake()
     {
         _light.enabled = true;
+    }
+
+    protected bool Pressed(Collider2D collider)
+    {
+        return !Pressing && (collider.CompareTag("hero") || (_activableByEnemy && collider.CompareTag("Enemy")));
     }
 }
