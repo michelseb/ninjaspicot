@@ -40,7 +40,7 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
     }
 
-    public override void Die(Transform killer)
+    public override void Die(Transform killer = null)
     {
         if (Dead)
             return;
@@ -48,6 +48,12 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
         Dead = true;
         Stickiness.Detach();
         Jumper?.CancelJump();
+        
+        if (killer != null)
+        {
+            Stickiness.Rigidbody.AddForce((Transform.position - killer.position).normalized * 30000);
+        }
+        
         SetAllBehavioursActivation(false, false);
         StopDisplayGhosts();
         Renderer.color = ColorUtils.Red;
@@ -58,6 +64,8 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
         {
             DynamicInteraction.StopInteraction(false);
         }
+
+
 
         StartCoroutine(Dying());
     }

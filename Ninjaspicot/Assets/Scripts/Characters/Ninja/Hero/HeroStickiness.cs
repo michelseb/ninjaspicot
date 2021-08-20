@@ -9,6 +9,9 @@ public class HeroStickiness : Stickiness
     private AudioManager _audioManager;
     private AudioSource _audioSource;
     private AudioClip _impact;
+
+    private Vector3 _previousPosition;
+
     public override void Awake()
     {
         base.Awake();
@@ -19,6 +22,21 @@ public class HeroStickiness : Stickiness
         _impact = _audioManager.FindByName("Blob");
     }
 
+    public override void Start()
+    {
+        base.Start();
+        _previousPosition = Transform.position;
+    }
+
+    public void LateUpdate()
+    {
+        if (!Attached && _previousPosition != Transform.position)
+        {
+            Transform.rotation = Quaternion.LookRotation(Vector3.forward, Transform.position - _previousPosition);
+            _previousPosition = Transform.position;
+        }
+    }
+
     public override bool ReactToObstacle(Obstacle obstacle, Vector3 position)
     {
         if (base.ReactToObstacle(obstacle, position))
@@ -26,10 +44,10 @@ public class HeroStickiness : Stickiness
             _jumper.GainAllJumps();
 
             //Sound effect
-            var intensity = (int)ImpactVelocity / 50;
-            _audioSource.PlayOneShot(_impact, intensity);
-            var soundEffect = _poolManager.GetPoolable<SoundEffect>(position, Quaternion.identity, intensity);
-            soundEffect.SetComposite(CurrentAttachment.Collider);
+            //var intensity = (int)ImpactVelocity / 50;
+            //_audioSource.PlayOneShot(_impact, intensity);
+            //var soundEffect = _poolManager.GetPoolable<SoundEffect>(position, Quaternion.identity, intensity);
+            //soundEffect.SetComposite(CurrentAttachment.Collider);
 
             return true;
         }
@@ -50,7 +68,7 @@ public class HeroStickiness : Stickiness
 
         while (true)
         {
-            var speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CollisionNormal, CurrentSpeed);
+            var speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CurrentSpeed);
             if (speedFactor == 0)
             {
                 Rigidbody.velocity = Vector2.zero;
@@ -100,14 +118,8 @@ public class HeroStickiness : Stickiness
         base.Detach();
     }
 
-    private float GetHeroSpeed(Vector3 direction, Vector3 platformNormal, float speed)
+    private float GetHeroSpeed(Vector3 direction, float speed)
     {
-        var dir = Vector3.Dot(direction, platformNormal);
-        var sign = Mathf.Sign(dir);
-
-        if (sign * dir > .3f)
-            return sign * speed;
-
-        return 0;
+        return direction.normalized.magnitude * Mathf.Sign(direction.x) * speed;
     }
 }

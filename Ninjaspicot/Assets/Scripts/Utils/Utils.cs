@@ -98,22 +98,24 @@ public static class Utils
     {
         RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers, ignoreType);
 
-        RaycastHit2D hit = new RaycastHit2D();
-        if (hits.Length > 0)
-        {
-            var dist = float.PositiveInfinity;
-            foreach (var actualHit in hits)
-            {
-                var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
-                if (newDist < dist)
-                {
-                    hit = actualHit;
-                    dist = newDist;
-                }
-            }
-        }
+        if (hits.Length == 0)
+            return new RaycastHit2D();
 
-        return hit;
+        return hits[0];
+        //RaycastHit2D hit = new RaycastHit2D();
+        //if (hits.Length > 0)
+        //{
+        //    var dist = float.PositiveInfinity;
+        //    foreach (var actualHit in hits)
+        //    {
+        //        var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
+        //        if (newDist < dist)
+        //        {
+        //            hit = actualHit;
+        //            dist = newDist;
+        //        }
+        //    }
+        //}
     }
 
     public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "", Type ignoreType = null)
@@ -298,6 +300,11 @@ public static class Utils
 
     public static bool IsNull(object obj)
     {
-        return obj == null || obj.Equals(null);
+        return obj == null || obj.Equals(null) || obj == "null";
+    }
+
+    public static Vector2 ToVector2(Vector3 vector)
+    {
+        return new Vector2(vector.x, vector.y);
     }
 }

@@ -33,10 +33,6 @@ public class FollowingRobotBall : RobotBall
         if (!Active)
             return;
 
-        if (Utils.IsNull(Renderer))
-        {
-            Renderer = GetComponentInChildren<SpriteRenderer>();
-        }
         SetAvailableOffset();
         _targetPosition = _master.Transform.position + _currentOffset;
 

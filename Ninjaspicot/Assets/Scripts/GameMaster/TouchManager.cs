@@ -89,7 +89,7 @@ public class TouchManager : MonoBehaviour
         {
             if (_jumper.ReadyToJump())
             {
-                Debug.DrawLine(_jumper.Trajectory.GetLinePosition(0), _jumper.Trajectory.GetLinePosition(8), Color.red, 5);
+                //Debug.DrawLine(_jumper.Trajectory.GetLinePosition(0), _jumper.Trajectory.GetLinePosition(8), Color.red, 5);
                 if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(0, 8))//Add ninja to new layer
                 {
                     _jumper.CancelJump();

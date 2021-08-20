@@ -72,7 +72,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     protected virtual IEnumerator FadeAway()
     {
-        _audioSimulator.Deactivate();
+        _audioSimulator?.Deactivate();
         _audioSimulator = null;
 
         _timeManager.SetNormalTime();

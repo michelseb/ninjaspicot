@@ -14,9 +14,4 @@ public class CharacterLight : Lamp
     {
         _transform.rotation = Quaternion.identity;
     }
-
-    public void SetColor(Color color)
-    {
-        Light.color = color;
-    }
 }

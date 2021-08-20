@@ -23,7 +23,7 @@ public class Cannon : TurretWall
         var hero = collision.collider.GetComponent<Hero>() ?? collision.collider.GetComponentInParent<Hero>();
         if (hero != null)
         {
-            hero.Die(transform);
+            hero.Die();
         }
     }
 }

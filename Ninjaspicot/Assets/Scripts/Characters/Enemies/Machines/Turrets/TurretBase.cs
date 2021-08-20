@@ -14,7 +14,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
     [SerializeField] protected float _searchSpeed;
     [SerializeField] protected float _wonderTime;
 
-    public IKillable Target { get; set; }
+    public IKillable TargetEntity { get; set; }
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
     public bool Active { get; protected set; }
@@ -56,7 +56,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         switch (TurretMode)
         {
             case Mode.Aim:
-                Aim(Target);
+                Aim(TargetEntity);
                 break;
 
             case Mode.Scan:
@@ -99,15 +99,15 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
 
     protected virtual void Wonder()
     {
-        if (Target != null && _aim.TargetVisible(Target, Id))
+        if (TargetEntity != null && _aim.TargetVisible(TargetEntity, Id))
         {
-            StartAim(Target);
+            StartAim(TargetEntity);
         }
     }
 
     public void StartAim(IKillable target)
     {
-        Target = target;
+        TargetEntity = target;
         TurretMode = Mode.Aim;
 
         if (_wait != null)
@@ -165,7 +165,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         Deactivate();
     }
 
-    public override void Die(Transform killer)
+    public override void Die(Transform killer = null)
     {
         throw new System.NotImplementedException();
     }

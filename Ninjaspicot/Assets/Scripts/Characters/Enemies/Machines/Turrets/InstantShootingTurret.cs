@@ -34,7 +34,7 @@ public class InstantShootingTurret : TurretBase
     public override void LookFor()
     {
         base.LookFor();
-        var dir = Vector3.Dot(Transform.up, (Target.Transform.position - Transform.position).normalized);
+        var dir = Vector3.Dot(Transform.up, (TargetEntity.Transform.position - Transform.position).normalized);
         if (dir > .98f)
         {
             StartWait();
@@ -52,7 +52,7 @@ public class InstantShootingTurret : TurretBase
         }
         else
         {
-            if (Target != null && _aim.TargetAimedAt(Target, Id))
+            if (TargetEntity != null && _aim.TargetAimedAt(TargetEntity, Id))
             {
                 if (Loaded)
                 {
@@ -72,9 +72,9 @@ public class InstantShootingTurret : TurretBase
         StartCoroutine(Shoot(SHOOTING_TIME));
         _audioManager.PlaySound(_audioSource, "Gun");
 
-        if (_aim.TargetCentered(Transform, Target.Transform.tag, Id))
+        if (_aim.TargetCentered(Transform, TargetEntity.Transform.tag, Id))
         {
-            Target.Die(Transform);
+            TargetEntity.Die(Transform);
         }
     }
 

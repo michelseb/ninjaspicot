@@ -1,15 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
 
 public class Zone : MonoBehaviour
 {
     private List<IWakeable> _wakeables;
-    private Light2D _ambiantLight;
     private ZoneManager _zoneManager;
-    private float _lightIntensity;
+    public ZoneManager ZoneManager { get { if (Utils.IsNull(_zoneManager)) _zoneManager = ZoneManager.Instance; return _zoneManager; } }
     private Animator _animator;
 
     private long _id;
@@ -19,8 +16,6 @@ public class Zone : MonoBehaviour
 
     private void Awake()
     {
-        _ambiantLight = GetComponent<Light2D>();
-        _lightIntensity = _ambiantLight.intensity;
         _animator = GetComponent<Animator>();
     }
 
@@ -28,8 +23,7 @@ public class Zone : MonoBehaviour
     {
         _wakeables = GetComponentsInChildren<IWakeable>().ToList();
         Close();
-        _zoneManager = ZoneManager.Instance;
-        _zoneManager.AddZone(this);
+        ZoneManager.AddZone(this);
         Exited = true;
     }
 
@@ -51,7 +45,7 @@ public class Zone : MonoBehaviour
         if (!collision.CompareTag("hero"))
             return;
 
-        _zoneManager.SetZone(this);
+        ZoneManager.SetZone(this);
         Exited = false;
     }
 
@@ -60,8 +54,6 @@ public class Zone : MonoBehaviour
         SetItemsActivation(true);
 
         _animator.SetTrigger("Open");
-        //StopAllCoroutines();
-        //StartCoroutine(OpenZone());
     }
 
     public void Close()
@@ -69,38 +61,7 @@ public class Zone : MonoBehaviour
         SetItemsActivation(false);
 
         _animator.SetTrigger("Close");
-        //StopAllCoroutines();
-        //StartCoroutine(CloseZone());
     }
-
-    //private IEnumerator OpenZone()
-    //{
-    //    _ambiantLight.intensity = 0;
-    //    _ambiantLight.enabled = true;
-    //    while (_ambiantLight.intensity < _lightIntensity)
-    //    {
-    //        _ambiantLight.intensity += Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //    _ambiantLight.intensity = _lightIntensity;
-    //}
-
-    //private IEnumerator CloseZone()
-    //{
-    //    while(_ambiantLight.intensity > 0)
-    //    {
-    //        _ambiantLight.intensity -= Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //    Close();
-    //}
-
-    //private void Close()
-    //{
-    //    _ambiantLight.enabled = false;
-    //}
 
     private void SetItemsActivation(bool active)
     {

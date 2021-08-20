@@ -6,7 +6,7 @@ public class Laser : MonoBehaviour {
     {
         if (collision.CompareTag("hero"))
         {
-            Hero.Instance.Die(null);
+            Hero.Instance.Die();
         }
     }
 }

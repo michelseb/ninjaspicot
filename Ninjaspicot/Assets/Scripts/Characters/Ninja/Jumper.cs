@@ -112,7 +112,7 @@ public class Jumper : MonoBehaviour
             var charge = Trajectory as ChargeTrajectory;
             if (charge.Target != null)
             {
-                charge.Target.Die(_transform);
+                charge.Target.Die();
             }
         }
         else

@@ -42,7 +42,7 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable, IWake
 
             if (!Attacking)
             {
-                Die(hero.transform);
+                Die();
             }
             else
             {
@@ -52,7 +52,7 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable, IWake
         }
     }
 
-    public override void Die(Transform killer)
+    public override void Die(Transform killer = null)
     {
         if (Dead)
             return;

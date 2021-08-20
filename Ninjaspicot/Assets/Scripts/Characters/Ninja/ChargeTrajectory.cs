@@ -72,6 +72,7 @@ public class ChargeTrajectory : TrajectoryBase
                     if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("DynamicWall"))
                     {
                         _line.positionCount = i;
+                        SetAudioSimulator(_line.GetPosition(i - 1), (int)velocity.magnitude / 50);
                         break;
                     }
                 }

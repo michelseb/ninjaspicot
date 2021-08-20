@@ -3,10 +3,18 @@ using UnityEngine;
 
 public abstract class Enemy : Character, IWakeable
 {
+    [SerializeField] protected ReactionType _reactionType;
+    protected Reaction _reaction;
     public bool Attacking { get; protected set; }
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
+    protected override void Start()
+    {
+        base.Start();
+        SetReaction(_reactionType);
+    }
 
     public override IEnumerator Dying()
     {
@@ -76,5 +84,36 @@ public abstract class Enemy : Character, IWakeable
         {
             Image.enabled = true;
         }
+    }
+
+    public void SetReaction(ReactionType reactionType)
+    {
+        if (_reaction != null && _reactionType == reactionType)
+            return;
+
+        string reaction = string.Empty;
+        _reactionType = reactionType;
+        switch (reactionType)
+        {
+            case ReactionType.Sleep:
+                reaction = "Zzz";
+                break;
+            case ReactionType.Wonder:
+                reaction = "??";
+                break;
+            case ReactionType.Find:
+                reaction = "!!";
+                break;
+            case ReactionType.Patrol:
+                reaction = "🐱‍";
+                break;
+        }
+
+        if (!Utils.IsNull(_reaction))
+        {
+            _reaction.Deactivate();
+        }
+        _reaction = _poolManager.GetPoolable<Reaction>(transform.position, Quaternion.identity, 1f/Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
+        _reaction.SetReaction(reaction);
     }
 }

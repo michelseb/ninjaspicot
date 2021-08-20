@@ -16,7 +16,27 @@ public class PoolManager : MonoBehaviour
     //Returns first deactivated poolable of chosen type. If none, instanciate one
     public T GetPoolable<T>(Vector3 position, Quaternion rotation, float size = 1f, PoolableType type = PoolableType.None, Transform parent = null, bool defaultParent = true) where T : IPoolable
     {
-        var poolable = (T)Poolables.Where(x => type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
+        T poolable = default(T);
+
+        foreach (var p in Poolables.ToArray())
+        {
+            if (Utils.IsNull(p))
+            {
+                Poolables.Remove(p);
+                continue;
+            }
+
+            if (type != PoolableType.None && p.PoolableType != type)
+                continue;
+
+            if (p is T && !((MonoBehaviour)p).gameObject.activeSelf)
+            {
+                poolable = (T)p;
+                break;
+            }
+        }
+
+        //var poolable = (T)Poolables.Where(type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
 
         if (poolable == null)
         {

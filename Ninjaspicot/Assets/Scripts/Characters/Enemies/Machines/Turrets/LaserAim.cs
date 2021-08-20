@@ -31,7 +31,7 @@ public class LaserAim : Aim
         base.OnTriggerStay2D(collision);
         //if (Charged && TargetAimedAt(collision.transform, Turret.Id) && TargetCentered(_transform, CurrentTarget, Turret.Id))
         //{
-        //    Hero.Instance.Die(_transform);
+        //    Hero.Instance.Die();
         //}
     }
 

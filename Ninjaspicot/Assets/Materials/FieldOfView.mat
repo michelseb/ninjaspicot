@@ -69,6 +69,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - PixelSnap: 0
     - _AlphaClip: 0
@@ -152,7 +153,7 @@ Material:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _Color: {r: 1, g: 0.18396229, b: 0.18396229, a: 0.39607844}
     - _EmisColor: {r: 1, g: 0.13679248, b: 0.13679248, a: 0.5019608}
-    - _EmissionColor: {r: 1, g: 0.08962262, b: 0.08962262, a: 1}
+    - _EmissionColor: {r: 1, g: 0.008487134, b: 0.008487134, a: 1}
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -160,6 +161,7 @@ Material:
     - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_BuildTextureStacks: []
 --- !u!114 &6596746919910439887
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -172,4 +174,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 2
+  version: 4

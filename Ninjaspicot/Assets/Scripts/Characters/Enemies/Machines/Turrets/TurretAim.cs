@@ -32,7 +32,7 @@ public class TurretAim : Aim
             if (target == null)
                 return;
 
-            _turret.Target = target;
+            _turret.TargetEntity = target;
             TargetInView = true;
 
             if (TargetAimedAt(target, Viewer.Id))
@@ -44,12 +44,12 @@ public class TurretAim : Aim
 
     protected override void OnTriggerStay2D(Collider2D collider)
     {
-        if (!collider.CompareTag("hero") || _turret.Target == null)
+        if (!collider.CompareTag("hero") || _turret.TargetEntity == null)
             return;
 
-        if (TargetAimedAt(_turret.Target, Viewer.Id))
+        if (TargetAimedAt(_turret.TargetEntity, Viewer.Id))
         {
-            _turret.StartAim(_turret.Target);
+            _turret.StartAim(_turret.TargetEntity);
         }
         TargetInView = true;
     }

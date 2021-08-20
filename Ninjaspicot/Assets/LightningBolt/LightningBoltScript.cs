@@ -131,7 +131,7 @@ namespace DigitalRuby.LightningBolt
         {
             if (collision.CompareTag("hero"))
             {
-                Hero.Instance.Die(_transform);
+                Hero.Instance.Die();
             }
         }
 

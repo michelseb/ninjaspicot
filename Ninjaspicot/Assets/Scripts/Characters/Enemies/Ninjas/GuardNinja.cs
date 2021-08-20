@@ -24,7 +24,6 @@ public class GuardNinja : EnemyNinja, IListener
     private GuardMode _nextState;
     private GuardStickiness _guardStickiness;
     private EnemyJumper _enemyJumper;
-    private Reaction _reaction;
     private HearingPerimeter _hearingPerimeter;
 
     private float _wonderElapsedTime;
@@ -83,10 +82,7 @@ public class GuardNinja : EnemyNinja, IListener
     private void StartWondering()
     {
         GuardMode = GuardMode.Wondering;
-        _reaction = _poolManager.GetPoolable<Reaction>(transform.position + transform.up * 10, transform.rotation);
-
-        var reaction = _nextState == GuardMode.Checking ? "!" : "?";
-        _reaction.SetReaction(reaction);
+        SetReaction(ReactionType.Wonder);
 
         _wonderElapsedTime = 0;
         //_robot.Activate();
@@ -98,8 +94,6 @@ public class GuardNinja : EnemyNinja, IListener
 
         if (_wonderElapsedTime >= _wonderTime)
         {
-            _reaction?.Deactivate();
-
             switch (_nextState)
             {
                 case GuardMode.Checking:
@@ -192,7 +186,7 @@ public class GuardNinja : EnemyNinja, IListener
         if (GuardMode == GuardMode.Guarding)
         {
             _nextState = GuardMode.Checking;
-            _wonderTime = 1f;
+            _wonderTime = 2f;
             StartWondering();
         }
         else

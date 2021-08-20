@@ -13,7 +13,7 @@ public class Lamp : MonoBehaviour, IWakeable
 
     protected virtual void Awake()
     {
-        _animator = GetComponent<Animator>();
+        _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
     }
 
     public virtual void Wake()
@@ -24,5 +24,10 @@ public class Lamp : MonoBehaviour, IWakeable
     public virtual void Sleep()
     {
         _animator.SetTrigger("TurnOff");
+    }
+
+    public void SetColor(Color color)
+    {
+        Light.color = color;
     }
 }

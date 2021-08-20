@@ -7,7 +7,23 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
     [SerializeField] protected CustomColor _lightColor;
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-    public SpriteRenderer Renderer { get; protected set; }
+    private SpriteRenderer _renderer;
+    public SpriteRenderer Renderer
+    {
+        get
+        {
+            if (Utils.IsNull(_renderer))
+            {
+                _renderer = GetComponent<SpriteRenderer>();
+                if (Utils.IsNull(_renderer))
+                {
+                    _renderer = GetComponentInChildren<SpriteRenderer>();
+                }
+            }
+
+            return _renderer;
+        }
+    }
     public Image Image { get; private set; }
 
     private Transform _transform;
@@ -27,7 +43,6 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
         _audioManager = AudioManager.Instance;
         _characterLight = GetComponentInChildren<CharacterLight>();
         _cameraBehaviour = CameraBehaviour.Instance;
-        Renderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
         Image = GetComponent<Image>();
     }
 
@@ -37,6 +52,6 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
         _characterLight?.SetColor(ColorUtils.GetColor(_lightColor));
     }
 
-    public abstract void Die(Transform killer);
+    public abstract void Die(Transform killer = null);
     public abstract IEnumerator Dying();
 }

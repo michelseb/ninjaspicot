@@ -34,7 +34,7 @@ public abstract class Aim : FieldOfView
             if (target == null)
                 return;
 
-            Viewer.Target = target;
+            Viewer.TargetEntity = target;
             TargetInView = true;
 
             if (TargetAimedAt(target, Viewer.Id))
@@ -46,12 +46,12 @@ public abstract class Aim : FieldOfView
 
     protected virtual void OnTriggerStay2D(Collider2D collider)
     {
-        if (!collider.CompareTag("hero") || Viewer.Target == null)
+        if (!collider.CompareTag("hero") || Viewer.TargetEntity == null)
             return;
 
-        if (TargetAimedAt(Viewer.Target, Viewer.Id))
+        if (TargetAimedAt(Viewer.TargetEntity, Viewer.Id))
         {
-            Viewer.StartAim(Viewer.Target);
+            Viewer.StartAim(Viewer.TargetEntity);
         }
         TargetInView = true;
     }
