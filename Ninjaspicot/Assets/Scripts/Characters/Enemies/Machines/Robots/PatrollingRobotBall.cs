@@ -4,23 +4,27 @@ using UnityEngine;
 
 public class PatrollingRobotBall : RobotBall
 {
-    protected Vector3? _targetPosition;
+    [SerializeField] TargetPoint _target;
+    [SerializeField] TargetPoint[] _targetPoints;
     protected IList<Vector3> _pathPositions;
 
     private Vector3 _currentPathTarget;
+    private Vector3? _targetPosition;
 
     protected override void Awake()
     {
         base.Awake();
-        var positions = transform.parent.GetComponentsInChildren<TargetPoint>();
-        _targetPosition = positions.FirstOrDefault(p => p.IsAim)?.transform.position;
-        _pathPositions = positions.Where(p => !p.IsAim).Select(x => x.transform.position).ToList();
+        _pathPositions = _targetPoints.Where(p => !p.IsAim).Select(x => x.transform.position).ToList();
+        _targetPosition = _target?.transform.position;
         InitPathTarget();
     }
     protected override void Start()
     {
         Laser.SetActive(true);
-        _sprite.rotation = Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
+        if (_targetPosition.HasValue)
+        {
+            _sprite.rotation = Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
+        }
         base.Start();
     }
 
@@ -31,7 +35,7 @@ public class PatrollingRobotBall : RobotBall
         if (!Active)
             return;
 
-        if (_targetPosition != null)
+        if (_targetPosition.HasValue)
         {
             _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position), Time.deltaTime * _rotateSpeed);
         }

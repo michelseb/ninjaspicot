@@ -30,6 +30,8 @@ public class Stickiness : MonoBehaviour, IDynamic
     protected Jumper _jumper;
     protected Transform _transform;
     private float _velocityBeforePhysicsUpdate;
+    private float _detachTime;
+    private Vector2 _detachPos;
 
     public virtual void Awake()
     {
@@ -81,25 +83,32 @@ public class Stickiness : MonoBehaviour, IDynamic
     }
 
 
-    public virtual void Attach(Obstacle obstacle)
+    public virtual bool Attach(Obstacle obstacle)
     {
         if (Attached)
-            return;
+            return false;
 
         var dynamic = obstacle as DynamicObstacle;
 
         if (dynamic != null && !dynamic.DynamicActive)
-            return;
+            return false;
+
+        var anchorPos = _transform.InverseTransformPoint(GetContactPosition());
+        
+        if (Time.time - _detachTime < .1f && (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude < .4f)
+            return false;
 
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
-        WallJoint.anchor = _transform.InverseTransformPoint(GetContactPosition());
+        WallJoint.anchor = anchorPos;
         WallJoint.connectedAnchor = WallJoint.anchor;
 
         Attached = true;
 
         Rigidbody.gravityScale = 0;
         Rigidbody.velocity = Vector2.zero;
+
+        return true;
     }
 
     public virtual void Detach()
@@ -107,6 +116,8 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (!Attached)
             return;
 
+        _detachTime = Time.time;
+        _detachPos = WallJoint.anchor;
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
@@ -121,7 +132,10 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall") || obstacle.CompareTag("TutorialWall"))
         {
             Detach();
-            Attach(obstacle);
+
+            if (!Attach(obstacle))
+                return false;
+
             CurrentAttachment = obstacle;
             LocationPoint = obstacle.Composite?.GetClosestLocationPoint(transform.position);
             SetContactPosition(contactPoint);

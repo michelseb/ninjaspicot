@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable, IWakeable
+public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
 {
     public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
 

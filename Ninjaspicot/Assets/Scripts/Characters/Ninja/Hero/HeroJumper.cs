@@ -31,6 +31,12 @@ public class HeroJumper : Jumper
         Trajectory = null;
     }
 
+    public override void Charge(Vector2 direction)
+    {
+        base.Charge(direction);
+        _cameraBehaviour.DoShake(.3f, 2f);
+    }
+
     public override bool CanJump()
     {
         if (CompareTag("Dynamic"))

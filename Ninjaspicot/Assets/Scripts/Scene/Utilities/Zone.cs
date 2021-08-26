@@ -6,8 +6,10 @@ public class Zone : MonoBehaviour
 {
     private List<IWakeable> _wakeables;
     private ZoneManager _zoneManager;
-    public ZoneManager ZoneManager { get { if (Utils.IsNull(_zoneManager)) _zoneManager = ZoneManager.Instance; return _zoneManager; } }
     private Animator _animator;
+    private CheckPoint _checkpoint;
+    private SpawnManager _spawnManager;
+    public ZoneManager ZoneManager { get { if (Utils.IsNull(_zoneManager)) _zoneManager = ZoneManager.Instance; return _zoneManager; } }
 
     private long _id;
     public long Id { get { if (_id == 0) _id = GetInstanceID(); return _id; } }
@@ -25,6 +27,8 @@ public class Zone : MonoBehaviour
         Close();
         ZoneManager.AddZone(this);
         Exited = true;
+        _spawnManager = SpawnManager.Instance;
+        _checkpoint = GetComponentInChildren<CheckPoint>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -76,6 +80,7 @@ public class Zone : MonoBehaviour
             if (active)
             {
                 _wakeables[i].Wake();
+                _spawnManager.SetSpawn(_checkpoint);
             }
             else
             {

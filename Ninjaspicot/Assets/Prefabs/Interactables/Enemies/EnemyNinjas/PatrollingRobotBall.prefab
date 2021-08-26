@@ -4993,8 +4993,10 @@ MonoBehaviour:
   _lightColor: 1
   _reactionType: 3
   _rotateSpeed: 600
-  _moveSpeed: 20
+  _moveSpeed: 60
   _sprite: {fileID: 7455689082476472355}
+  _target: {fileID: 0}
+  _targetPoints: []
 --- !u!1 &7455689082476472354
 GameObject:
   m_ObjectHideFlags: 0

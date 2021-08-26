@@ -6,6 +6,8 @@ public class CameraCatcher : MonoBehaviour, IActivable
     protected CameraBehaviour _cameraBehaviour;
     public virtual Transform ZoomCenter => transform;
 
+    private bool _activated;
+
     protected virtual void Awake()
     {
         _cameraBehaviour = CameraBehaviour.Instance;
@@ -14,6 +16,13 @@ public class CameraCatcher : MonoBehaviour, IActivable
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("hero"))
+        {
+            Activate();
+        }
+    }
+    protected virtual void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("hero") && !_activated)
         {
             Activate();
         }
@@ -33,6 +42,7 @@ public class CameraCatcher : MonoBehaviour, IActivable
         {
             _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
             _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
+            _activated = true;
         }
     }
 
@@ -40,5 +50,6 @@ public class CameraCatcher : MonoBehaviour, IActivable
     {
         _cameraBehaviour.Zoom(ZoomType.Init);
         _cameraBehaviour.SetFollowMode(Hero.Instance.transform);
+        _activated = false;
     }
 }

@@ -1,39 +1,65 @@
 ﻿using UnityEngine;
 
-public class Laser : MonoBehaviour
+public class Laser : MonoBehaviour, IWakeable
 {
 
-    [SerializeField] private RectTransform _start;
-    [SerializeField] private RectTransform _end;
-    [SerializeField] private int _pointsAmount;
+    [SerializeField] protected RectTransform _start;
+    [SerializeField] protected RectTransform _end;
+    [SerializeField] protected int _pointsAmount;
+    [SerializeField] protected bool _horizontal;
 
-    private LineRenderer _laser;
-    private PolygonCollider2D _collider;
+    protected LineRenderer _laser;
+    protected PolygonCollider2D _collider;
+    protected bool _active;
 
-    private void Awake()
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
+    protected virtual void Awake()
     {
         _laser = GetComponent<LineRenderer>();
         _collider = GetComponent<PolygonCollider2D>();
+        _pointsAmount = _pointsAmount * (int)(_end.position - _start.position).magnitude / 2;
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         _laser.positionCount = _pointsAmount;
-        _laser.SetPosition(0, _start.position);
-        _laser.SetPosition(_pointsAmount - 1, _end.position);
+
         SetCollider();
+        InitPointsPosition();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
-        for (int i = 1; i < _pointsAmount - 1; i++)
+        if (!_active)
+            return;
+
+        if (Time.frameCount % Utils.EXPENSIVE_FRAME_INTERVAL == 0)
         {
-            var pos = _start.position + ((_end.position - _start.position) * (i + 1) / _pointsAmount);
-            _laser.SetPosition(i, new Vector2(pos.x, pos.y) + new Vector2(Random.Range(-.5f, .5f), Random.Range(-.5f, .5f)));
+            SetPointsPosition();
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void InitPointsPosition()
+    {
+        _laser.SetPosition(0, _start.position + _start.right);
+        _laser.SetPosition(_pointsAmount - 1, _end.position + _end.right);
+    }
+
+    protected virtual void SetPointsPosition()
+    {
+        var delta = Random.Range(0, 2) * 2 - 1; // -1 or 1
+
+        for (int i = 1; i < _pointsAmount - 1; i++)
+        {
+            var pos = _start.position + ((_end.position - _start.position) * (i + 1) / _pointsAmount);
+            _laser.SetPosition(i, pos + transform.up * delta);
+            delta *= -1;
+        }
+    }
+
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("hero"))
         {
@@ -41,18 +67,46 @@ public class Laser : MonoBehaviour
         }
     }
 
-    private void SetCollider()
+    protected virtual void SetCollider()
     {
         var startCorners = new Vector3[4];
         var endCorners = new Vector3[4];
         _start.GetWorldCorners(startCorners);
         _end.GetWorldCorners(endCorners);
-        _collider.SetPath(0, new Vector2[]
+
+        if (_horizontal)
         {
-            transform.InverseTransformPoint(startCorners[0]),
-            transform.InverseTransformPoint(startCorners[3]),
-            transform.InverseTransformPoint(endCorners[0]),
-            transform.InverseTransformPoint(endCorners[3])
-        });
+            _collider.SetPath(0, new Vector2[]
+            {
+                transform.InverseTransformPoint(startCorners[2]),
+                transform.InverseTransformPoint(startCorners[3]),
+                transform.InverseTransformPoint(endCorners[3]),
+                transform.InverseTransformPoint(endCorners[2])
+            });
+        }
+        else
+        {
+            _collider.SetPath(0, new Vector2[]
+            {
+                transform.InverseTransformPoint(startCorners[1]),
+                transform.InverseTransformPoint(startCorners[2]),
+                transform.InverseTransformPoint(endCorners[1]),
+                transform.InverseTransformPoint(endCorners[2])
+            });
+        }
+    }
+
+    public void Sleep()
+    {
+        _collider.enabled = false;
+        _laser.enabled = false;
+        _active = false;
+    }
+
+    public void Wake()
+    {
+        _collider.enabled = true;
+        _laser.enabled = true;
+        _active = true;
     }
 }

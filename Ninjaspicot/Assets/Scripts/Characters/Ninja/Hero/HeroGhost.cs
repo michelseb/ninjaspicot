@@ -9,6 +9,7 @@ public class HeroGhost : MonoBehaviour, IPoolable
     private SpriteRenderer _renderer;
     private Transform _transform;
     public PoolableType PoolableType => PoolableType.None;
+    private Vector3 _initSize;
 
     private void Awake()
     {
@@ -35,11 +36,14 @@ public class HeroGhost : MonoBehaviour, IPoolable
     {
         _transform.position = position;
         _transform.rotation = rotation;
+        _initSize = _transform.localScale;
+        _transform.localScale = new Vector3(_transform.localScale.x * size, _transform.localScale.y * size);
     }
 
     public void Deactivate()
     {
         gameObject.SetActive(false);
+        _transform.localScale = _initSize;
     }
 
     public void Activate()

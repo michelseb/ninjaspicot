@@ -1,8 +1,12 @@
 ﻿public class PatrollingStickiness : Stickiness
 {
-    public override void Attach(Obstacle obstacle)
+    public override bool Attach(Obstacle obstacle)
     {
-        base.Attach(obstacle);
+        if (!base.Attach(obstacle))
+            return false;
+
         StartWalking();
+
+        return true;
     }
 }

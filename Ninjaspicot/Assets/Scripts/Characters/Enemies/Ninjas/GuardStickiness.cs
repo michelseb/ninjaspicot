@@ -72,12 +72,16 @@ public class GuardStickiness : Stickiness
         }
     }
 
-    public override void Attach(Obstacle obstacle)
+    public override bool Attach(Obstacle obstacle)
     {
-        base.Attach(obstacle);
+        if (!base.Attach(obstacle))
+            return false;
+
         if (_guard.GuardMode == GuardMode.Chasing)
         {
             StartWalkingTowards(_guard.TargetLocation, _guard.Target);
         }
+
+        return true;
     }
 }

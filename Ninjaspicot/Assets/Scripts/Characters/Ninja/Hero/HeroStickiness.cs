@@ -98,25 +98,29 @@ public class HeroStickiness : Stickiness
         callback(false);
     }
 
-    public override void Attach(Obstacle obstacle)
+    public override bool Attach(Obstacle obstacle)
     {
-        base.Attach(obstacle);
+        if (!base.Attach(obstacle))
+            return false;
+
         if (!_touchManager.Touching)
         {
             Rigidbody.velocity = Vector2.zero;
             Rigidbody.angularVelocity = 0;
             Rigidbody.isKinematic = true;
         }
+
+        return true;
     }
 
-    public override void Detach()
-    {
-        if (!Attached)
-            return;
+    //public override void Detach()
+    //{
+    //    if (!Attached)
+    //        return;
 
-        CurrentAttachment.LaunchQuickDeactivate();
-        base.Detach();
-    }
+    //    CurrentAttachment.LaunchQuickDeactivate();
+    //    base.Detach();
+    //}
 
     private float GetHeroSpeed(Vector3 direction, float speed)
     {

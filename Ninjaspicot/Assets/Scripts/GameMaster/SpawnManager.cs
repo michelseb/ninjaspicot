@@ -54,17 +54,10 @@ public class SpawnManager : MonoBehaviour
         _timeManager.SetNormalTime();
         _cameraBehaviour.Zoom(ZoomType.Init);
 
-        if (!_checkPoints.Any(c => c.Attained))
-        {
-            hero.transform.position = _spawnPosition;
-            return;
-        }
-
-        var pos = _checkPoints.Last(c => c.Attained).transform.position;
-        hero.transform.position = pos;
+        hero.transform.position = _spawnPosition;
     }
 
-    public void InitActiveSceneSpawns(int checkPoint = -1)
+    public void InitActiveSceneSpawns(int checkPoint = 0)
     {
         var scene = SceneManager.GetActiveScene();
         var sceneObjects = scene.GetRootGameObjects();
@@ -74,13 +67,17 @@ public class SpawnManager : MonoBehaviour
             .ToArray(); //TODO : make checkpoint specific to scene => Add property in class to link to scene
 
 
-        var spawn = checkPoint == -1 ? 
-            sceneObjects.FirstOrDefault(s => s.CompareTag("Spawn"))?.transform.position :
-            _checkPoints.ElementAtOrDefault(checkPoint)?.transform.position;
+        var spawn = _checkPoints.FirstOrDefault(x => x.Order == checkPoint)?.transform.position ?? _checkPoints[0].transform.position;
 
-        if (!spawn.HasValue)
+        _spawnPosition = new Vector3(spawn.x, spawn.y, -5);
+    }
+
+    public void SetSpawn(CheckPoint checkPoint)
+    {
+        if (checkPoint.Attained)
             return;
 
-        _spawnPosition = new Vector3(spawn.Value.x, spawn.Value.y, -5);
+        _spawnPosition = new Vector3(checkPoint.transform.position.x, checkPoint.transform.position.y, -5);
+        checkPoint.Attain();
     }
 }

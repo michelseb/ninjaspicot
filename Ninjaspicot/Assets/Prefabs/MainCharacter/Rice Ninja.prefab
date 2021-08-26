@@ -37,7 +37,6 @@ Transform:
   m_LocalScale: {x: 7, y: 20, z: 1}
   m_Children:
   - {fileID: 4852849227686926}
-  - {fileID: 264067439958403171}
   - {fileID: 1595966069014657332}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -239,8 +238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c28c3003f12c9d42a9aee61864a1046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxJumps: 2
-  _strength: 85
+  _maxJumps: 1
+  _strength: 65
   JumpMode: 0
 --- !u!114 &9131827216875105256
 MonoBehaviour:
@@ -255,7 +254,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 700
-  _directionIndicator: {fileID: 0}
 --- !u!82 &-2423949984176087067
 AudioSource:
   m_ObjectHideFlags: 0
@@ -716,53 +714,6 @@ Cloth:
   - {x: 0.6666667, y: 0.16666667, z: 0.16666667}
   - {x: 0.5, y: 0.5, z: 0}
   m_VirtualParticleIndices: 
---- !u!1 &8954716417773625745
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 264067439958403171}
-  - component: {fileID: 1888180117468135905}
-  m_Layer: 0
-  m_Name: Trigger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &264067439958403171
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8954716417773625745}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4480492593544226}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!70 &1888180117468135905
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8954716417773625745}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.5, y: 0.8}
-  m_Direction: 0
 --- !u!1001 &4174073704453231747
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1128,7 +1079,7 @@ PrefabInstance:
     - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}

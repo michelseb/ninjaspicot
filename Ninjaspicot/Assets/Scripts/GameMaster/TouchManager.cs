@@ -90,24 +90,24 @@ public class TouchManager : MonoBehaviour
             if (_jumper.ReadyToJump())
             {
                 //Debug.DrawLine(_jumper.Trajectory.GetLinePosition(0), _jumper.Trajectory.GetLinePosition(8), Color.red, 5);
-                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(0, 8))//Add ninja to new layer
-                {
-                    _jumper.CancelJump();
-                }
-                else
-                {
-                    _stickiness.StopWalking(false);
+                //if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(0, 8))//Add ninja to new layer
+                //{
+                //    _jumper.CancelJump();
+                //}
+                //else
+                //{
+                _stickiness.StopWalking(false);
 
-                    switch (_jumper.JumpMode)
-                    {
-                        case JumpMode.Classic:
-                            _jumper.NormalJump(-_joystick2.Direction);
-                            break;
-                        case JumpMode.Charge:
-                            _jumper.Charge(-_joystick2.Direction);
-                            break;
-                    }
+                switch (_jumper.JumpMode)
+                {
+                    case JumpMode.Classic:
+                        _jumper.NormalJump(-_joystick2.Direction);
+                        break;
+                    case JumpMode.Charge:
+                        _jumper.Charge(-_joystick2.Direction);
+                        break;
                 }
+                //}
             }
 
             _joystick2.StartFading();

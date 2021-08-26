@@ -5820,6 +5820,8 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 6035734add1596745b007bfe3ad9548b, type: 3}
   - Name: Explode
     Clip: {fileID: 8300000, guid: ea5e09f5a8287f9438b48137528997f3, type: 3}
+  - Name: Dash
+    Clip: {fileID: 8300000, guid: a9c9516c4f8375d4cbec643962a19c96, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

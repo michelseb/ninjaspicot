@@ -14,7 +14,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     protected SimulatedSoundEffect _audioSimulator;
 
-    protected const float FADE_SPEED = .5f;
+    protected virtual float _fadeSpeed => .5f;
     protected const int MAX_VERTEX = 300; //50
     protected const float LENGTH = .01f;
 
@@ -80,7 +80,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         while (col.a > 0)
         {
             col = _line.material.color;
-            col.a -= Time.deltaTime * FADE_SPEED;
+            col.a -= Time.deltaTime * _fadeSpeed;
             _line.material.color = col;
             yield return null;
         }

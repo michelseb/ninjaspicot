@@ -29,7 +29,6 @@ public class ScenesManager : MonoBehaviour
 
     private CameraBehaviour _cameraBehaviour;
     private SpawnManager _spawnManager;
-    private LightManager _lightManager;
 
     private static ScenesManager _instance;
     public static ScenesManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ScenesManager>(); return _instance; } }
@@ -40,7 +39,6 @@ public class ScenesManager : MonoBehaviour
 
         _cameraBehaviour = CameraBehaviour.Instance;
         _spawnManager = SpawnManager.Instance;
-        _lightManager = LightManager.Instance;
 
         if (_startScene < 2)
         {

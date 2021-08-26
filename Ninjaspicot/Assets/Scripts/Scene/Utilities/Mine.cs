@@ -1,13 +1,18 @@
 ﻿using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.UI;
 
-public class Mine : MonoBehaviour, IActivable
+public class Mine : MonoBehaviour, IActivable, IWakeable
 {
     protected Image _renderer;
     protected Color _initialColor;
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
+    protected Light2D _light;
+
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     protected virtual void Awake()
     {
@@ -16,6 +21,7 @@ public class Mine : MonoBehaviour, IActivable
         _initialColor = _renderer.color;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
+        _light = GetComponent<Light2D>();
     }
 
     protected void OnTriggerEnter2D(Collider2D collider)
@@ -35,5 +41,15 @@ public class Mine : MonoBehaviour, IActivable
     public virtual void Deactivate()
     {
         _renderer.color = _initialColor;
+    }
+
+    public void Sleep()
+    {
+        _light.enabled = false;
+    }
+
+    public void Wake()
+    {
+        _light.enabled = true;
     }
 }

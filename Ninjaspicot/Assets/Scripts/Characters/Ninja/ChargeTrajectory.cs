@@ -4,7 +4,8 @@ public class ChargeTrajectory : TrajectoryBase
 {
     public EnemyNinja Target { get; private set; }
     private Jumper _jumper;
-    private const float CHARGE_LENGTH = 30f;
+    protected override float _fadeSpeed => 5;
+    private const float CHARGE_LENGTH = 60f;
 
     public void SetJumper(Jumper jumper)
     {
@@ -38,7 +39,7 @@ public class ChargeTrajectory : TrajectoryBase
             }
             else
             {
-                chargePos = chargeHit.point - direction * 5;
+                chargePos = chargeHit.point - direction * 10;
             }
         }
 

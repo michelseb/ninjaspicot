@@ -48,7 +48,7 @@ public class Jumper : MonoBehaviour
 
         _audioManager = AudioManager.Instance;
         _normalJumpSound = _audioManager.FindByName("Jump");
-        _chargeJumpSound = _audioManager.FindByName("Tap4");
+        _chargeJumpSound = _audioManager.FindByName("Dash");
     }
 
     public virtual void CalculatedJump(Vector2 velocity)
@@ -93,7 +93,7 @@ public class Jumper : MonoBehaviour
 
         while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
         {
-            _poolManager.GetPoolable<HeroGhost>(pos, _dynamicEntity.Transform.rotation);
+            _poolManager.GetPoolable<HeroGhost>(pos, Quaternion.AngleAxis(Utils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((ChargeDestination - pos).magnitude / 15, 1));
             pos += dir * 10;
         }
 
