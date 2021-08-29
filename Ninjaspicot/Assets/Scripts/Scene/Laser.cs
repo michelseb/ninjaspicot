@@ -45,6 +45,12 @@ public class Laser : MonoBehaviour, IWakeable
     {
         _laser.SetPosition(0, _start.position + _start.right);
         _laser.SetPosition(_pointsAmount - 1, _end.position + _end.right);
+        SetPointsPosition();
+    }
+
+    protected virtual Vector3 GetLineVariation()
+    {
+        return transform.up;
     }
 
     protected virtual void SetPointsPosition()
@@ -54,7 +60,7 @@ public class Laser : MonoBehaviour, IWakeable
         for (int i = 1; i < _pointsAmount - 1; i++)
         {
             var pos = _start.position + ((_end.position - _start.position) * (i + 1) / _pointsAmount);
-            _laser.SetPosition(i, pos + transform.up * delta);
+            _laser.SetPosition(i, pos + GetLineVariation() * delta);
             delta *= -1;
         }
     }

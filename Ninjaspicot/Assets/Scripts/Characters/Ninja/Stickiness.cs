@@ -94,10 +94,11 @@ public class Stickiness : MonoBehaviour, IDynamic
             return false;
 
         var anchorPos = _transform.InverseTransformPoint(GetContactPosition());
-        
-        if (Time.time - _detachTime < .1f && (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude < .4f)
+        var deltaTime = Time.time - _detachTime;
+        var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
+        if (deltaTime < .05f && deltaPos < .6f)
             return false;
-
+        Debug.Log("time : " + deltaTime + " - pos : " + deltaPos);
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
         WallJoint.anchor = anchorPos;

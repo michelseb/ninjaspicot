@@ -28,10 +28,16 @@ public class DynamicLaser : Laser
         }
     }
 
+    protected override Vector3 GetLineVariation()
+    {
+        return transform.right;
+    }
+
     protected override void InitPointsPosition()
     {
         _laser.SetPosition(0, _start.position);
         _laser.SetPosition(_pointsAmount - 1, _end.position);
+        SetPointsPosition();
     }
 
     private void Toggle(ref bool toggled)
