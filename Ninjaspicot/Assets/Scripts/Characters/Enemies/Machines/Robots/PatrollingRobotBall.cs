@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class PatrollingRobotBall : RobotBall
+public class PatrollingRobotBall : GuardRobotBall
 {
     [SerializeField] TargetPoint _target;
     [SerializeField] TargetPoint[] _targetPoints;
@@ -20,24 +20,21 @@ public class PatrollingRobotBall : RobotBall
     }
     protected override void Start()
     {
-        Laser.SetActive(true);
         if (_targetPosition.HasValue)
         {
             _sprite.rotation = Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
         }
+
         base.Start();
+
+        Laser.SetActive(true);
     }
 
-    protected override void Update()
+    protected override void Guard()
     {
-        base.Update();
-
-        if (!Active)
-            return;
-
         if (_targetPosition.HasValue)
         {
-            _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position), Time.deltaTime * _rotateSpeed);
+            _sprite.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
         }
 
         var direction = Utils.ToVector2(_currentPathTarget - Transform.position);
@@ -48,6 +45,54 @@ public class PatrollingRobotBall : RobotBall
         {
             SetNextPathTarget();
         }
+    }
+
+    protected override void Check()
+    {
+        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), Time.deltaTime * _rotateSpeed);
+
+        if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
+        {
+            _hearingPerimeter.SoundMark?.Deactivate();
+            StartWondering(GuardMode.Returning, 3f);
+        }
+
+        if (Hero.Instance.Dead)
+        {
+            StartWondering(GuardMode.Returning, 1f);
+        }
+    }
+
+    protected override void Chase(Vector3 target)
+    {
+        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
+
+        if (Hero.Instance.Dead)
+        {
+            StartWondering(GuardMode.Returning, 1f);
+        }
+    }
+
+    protected override void Return()
+    {
+        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, _initRotation, Time.deltaTime * _rotateSpeed);
+
+        if (Quaternion.Angle(_initRotation, _sprite.rotation) < .1f)
+        {
+            StartGuarding();
+        }
+    }
+
+    protected override void StartReturning()
+    {
+        GuardMode = GuardMode.Returning;
+        SetReaction(ReactionType.Patrol);
+        Renderer.color = ColorUtils.White;
+    }
+    protected override void StartGuarding()
+    {
+        GuardMode = GuardMode.Guarding;
+        Renderer.color = ColorUtils.White;
     }
 
     private void InitPathTarget()

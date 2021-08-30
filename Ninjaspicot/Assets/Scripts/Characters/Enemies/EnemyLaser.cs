@@ -8,6 +8,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
     protected Enemy _enemy;
     protected int _pointsAmount;
     protected bool _active;
+    public bool Active => _active;
 
     protected virtual void Awake()
     {

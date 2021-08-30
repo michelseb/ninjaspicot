@@ -63,11 +63,7 @@ public class RobotBall : Enemy, IActivable
 
     public override void Die(Transform killer = null)
     {
-        throw new System.NotImplementedException();
+        Deactivate();
     }
 
-    public override IEnumerator Dying()
-    {
-        throw new System.NotImplementedException();
-    }
 }

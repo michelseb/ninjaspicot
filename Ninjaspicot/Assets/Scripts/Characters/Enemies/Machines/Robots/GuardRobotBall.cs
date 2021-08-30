@@ -3,24 +3,23 @@ using UnityEngine;
 
 public class GuardRobotBall : RobotBall, IListener
 {
-    public GuardMode GuardMode { get; private set; }
-    public Vector3 TargetPosition { get; private set; }
-    public LocationPoint TargetLocation { get; private set; }
+    public GuardMode GuardMode { get; protected set; }
+    public Vector3 TargetPosition { get; protected set; }
+    public LocationPoint TargetLocation { get; protected set; }
 
 
-    private HearingPerimeter _hearingPerimeter;
-    private Quaternion _initRotation;
+    protected HearingPerimeter _hearingPerimeter;
+    protected GuardMode _nextState;
+    protected float _wonderTime;
+    protected float _wonderElapsedTime;
+    protected Quaternion _initRotation;
     private Vector3 _initPos;
-    private GuardMode _nextState;
-    private float _wonderTime;
-    private float _wonderElapsedTime;
 
     public float Range => 80f;
 
     protected override void Awake()
     {
         base.Awake();
-        _rigidbody = GetComponent<Rigidbody2D>();
         _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
     }
 
@@ -41,7 +40,12 @@ public class GuardRobotBall : RobotBall, IListener
         if (!Active)
             return;
 
-        switch (GuardMode)
+        HandleState(GuardMode);
+    }
+
+    protected virtual void HandleState(GuardMode mode)
+    {
+        switch (mode)
         {
             case GuardMode.Guarding:
                 Guard();
@@ -62,22 +66,27 @@ public class GuardRobotBall : RobotBall, IListener
             case GuardMode.Returning:
                 Return();
                 break;
-
         }
-
     }
 
-    private void StartWondering()
+    protected void StartWondering(GuardMode nextState, float wonderTime)
     {
         GuardMode = GuardMode.Wondering;
+        _wonderTime = wonderTime;
+        _nextState = nextState;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Wonder);
         _wonderElapsedTime = 0;
     }
 
-    private void Wonder()
+    protected virtual void Wonder()
     {
         _wonderElapsedTime += Time.deltaTime;
+
+        if (_nextState == GuardMode.Returning && Hero.Instance.Dead && _wonderTime > 1f)
+        {
+            StartWondering(GuardMode.Returning, 1f);
+        }
 
         if (_wonderElapsedTime >= _wonderTime)
         {
@@ -95,41 +104,52 @@ public class GuardRobotBall : RobotBall, IListener
         }
     }
 
-    private void StartChecking()
+    protected virtual void StartChecking()
     {
         GuardMode = GuardMode.Checking;
         Renderer.color = ColorUtils.Red;
         _nextState = GuardMode.Returning;
-        Laser.SetActive(true);
+        //Laser.SetActive(true);
     }
 
-    private void Check()
+    protected virtual void Check()
     {
         var deltaX = TargetPosition.x - Transform.position.x;
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), Time.deltaTime * _rotateSpeed);
 
+        var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f;
+
+        if (alignedWithTarget && !Laser.Active)
+        {
+            Laser.SetActive(true);
+        }
+
         if (Mathf.Abs(deltaX) > 2)
         {
             _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
         }
-        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
+        else if (alignedWithTarget)
         {
             _hearingPerimeter.SoundMark?.Deactivate();
-            _wonderTime = 5f;
-            StartWondering();
+            StartWondering(GuardMode.Returning, 3f);
+        }
+
+        if (Hero.Instance.Dead)
+        {
+            StartWondering(GuardMode.Returning, 1f);
         }
     }
 
-    private void StartChasing()
+    protected virtual void StartChasing()
     {
         GuardMode = GuardMode.Chasing;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Find);
-        Laser.SetActive(true);
+        //Laser.SetActive(true);
     }
 
-    private void Chase(Vector3 target)
+    protected virtual void Chase(Vector3 target)
     {
         var deltaX = target.x - Transform.position.x;
 
@@ -139,9 +159,22 @@ public class GuardRobotBall : RobotBall, IListener
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
+
+        var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
+
+        if (alignedWithTarget && !Laser.Active)
+        {
+            Laser.SetActive(true);
+        }
+
+        if (Hero.Instance.Dead)
+        {
+            StartWondering(GuardMode.Returning, 1f);
+        }
+
     }
 
-    private void StartReturning()
+    protected virtual void StartReturning()
     {
         GuardMode = GuardMode.Returning;
         SetReaction(ReactionType.Patrol);
@@ -149,12 +182,12 @@ public class GuardRobotBall : RobotBall, IListener
         Laser.SetActive(false);
     }
 
-    private void Return()
+    protected virtual void Return()
     {
         var deltaX = _initPos.x - Transform.position.x;
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, _initRotation, Time.deltaTime * _rotateSpeed);
-        
+
         if (deltaX > 2)
         {
             _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
@@ -165,17 +198,14 @@ public class GuardRobotBall : RobotBall, IListener
         }
     }
 
-    private void StartGuarding()
+    protected virtual void StartGuarding()
     {
         GuardMode = GuardMode.Guarding;
         Renderer.color = ColorUtils.White;
         Laser.SetActive(false);
     }
 
-    public void Guard()
-    {
-
-    }
+    protected virtual void Guard() { }
 
     public void Hear(HearingArea hearingArea)
     {
@@ -184,9 +214,7 @@ public class GuardRobotBall : RobotBall, IListener
 
         if (_reactionType == ReactionType.Sleep)
         {
-            _nextState = GuardMode.Checking;
-            _wonderTime = 1f;
-            StartWondering();
+            StartWondering(GuardMode.Checking, 1f);
         }
         else if (GuardMode == GuardMode.Guarding)
         {
@@ -202,6 +230,7 @@ public class GuardRobotBall : RobotBall, IListener
     {
         Active = true;
         Laser?.Activate();
+        _hearingPerimeter.Activate();
         _reaction?.Activate();
         _characterLight.Wake();
     }
@@ -211,6 +240,7 @@ public class GuardRobotBall : RobotBall, IListener
         Active = false;
         Renderer.color = ColorUtils.White;
         Laser?.Deactivate();
+        _hearingPerimeter.Deactivate();
         _reaction?.Deactivate();
         _characterLight.Sleep();
     }
@@ -223,15 +253,5 @@ public class GuardRobotBall : RobotBall, IListener
     public override void Wake()
     {
         Activate();
-    }
-
-    public override void Die(Transform killer = null)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override IEnumerator Dying()
-    {
-        throw new System.NotImplementedException();
     }
 }

@@ -34,7 +34,7 @@ public abstract class Enemy : Character, IWakeable
                 yield return null;
             }
         }
-        Deactivate();
+        Die();
     }
 
     protected void SetAttacking(bool attacking)

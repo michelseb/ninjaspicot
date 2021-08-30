@@ -134,7 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lightColor: 1
   _reactionType: 0
-  _rotateSpeed: 60
+  _rotateSpeed: 100
   _moveSpeed: 20
   _sprite: {fileID: 8170439968612277734}
 --- !u!1 &8170439968612277735

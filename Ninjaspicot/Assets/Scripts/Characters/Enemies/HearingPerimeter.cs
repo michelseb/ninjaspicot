@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class HearingPerimeter : MonoBehaviour
+public abstract class HearingPerimeter : MonoBehaviour, IActivable
 {
     public virtual float Size => _listener?.Range ?? 1f;
     public SoundMark SoundMark { get; private set; }
@@ -63,5 +63,15 @@ public abstract class HearingPerimeter : MonoBehaviour
         }
 
         SoundMark = _poolManager.GetPoolable<SoundMark>(Hero.Instance.Transform.position, Hero.Instance.Transform.rotation);
+    }
+
+    public void Activate()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Deactivate()
+    {
+        gameObject.SetActive(false);
     }
 }
