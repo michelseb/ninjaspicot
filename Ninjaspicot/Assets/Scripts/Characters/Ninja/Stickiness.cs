@@ -19,7 +19,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
     public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
     public Vector3 CollisionNormal { get; private set; }
-    public LocationPoint LocationPoint { get; set; }
     public float ImpactVelocity { get; private set; }
     public bool DynamicActive => true;
     public bool Running { get; protected set; }
@@ -96,9 +95,11 @@ public class Stickiness : MonoBehaviour, IDynamic
         var anchorPos = _transform.InverseTransformPoint(GetContactPosition());
         var deltaTime = Time.time - _detachTime;
         var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
+
+        // Threshold to attach
         if (deltaTime < .05f && deltaPos < .6f)
             return false;
-        Debug.Log("time : " + deltaTime + " - pos : " + deltaPos);
+
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
         WallJoint.anchor = anchorPos;
@@ -138,7 +139,7 @@ public class Stickiness : MonoBehaviour, IDynamic
                 return false;
 
             CurrentAttachment = obstacle;
-            LocationPoint = obstacle.Composite?.GetClosestLocationPoint(transform.position);
+            CurrentAttachment = obstacle;
             SetContactPosition(contactPoint);
             return true;
         }

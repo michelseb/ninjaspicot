@@ -12,6 +12,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     protected TimeManager _timeManager;
     protected PoolManager _poolManager;
 
+
     protected SimulatedSoundEffect _audioSimulator;
 
     protected virtual float _fadeSpeed => .5f;
@@ -99,8 +100,11 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         if (Used)
             return;
 
-        _timeManager.SlowDown();
-        _timeManager.StartTimeRestore();
+        if (!Hero.Instance.Stickiness.Attached)
+        {
+            _timeManager.SlowDown();
+            _timeManager.StartTimeRestore();
+        }
 
         Color col = _line.material.color;
         _line.material.color = new Color(col.r, col.g, col.b, 1);

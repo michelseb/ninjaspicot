@@ -14,7 +14,7 @@ public abstract class Aim : FieldOfView
         if (!Active)
             return;
 
-        var dist = Vector3.Distance(Hero.Instance.transform.position, _transform.position - _offset);
+        var dist = Vector3.Distance(Hero.Instance.transform.position, _transform.position);
         TargetInRange = dist < _size;
         if (!TargetInRange && TargetInView)
         {
@@ -30,16 +30,15 @@ public abstract class Aim : FieldOfView
 
         if (!string.IsNullOrEmpty(CurrentTarget) && collider.CompareTag(CurrentTarget))
         {
-            var target = collider.GetComponent<IKillable>();
-            if (target == null)
-                return;
-
-            Viewer.TargetEntity = target;
-            TargetInView = true;
-
-            if (TargetAimedAt(target, Viewer.Id))
+            if (collider.TryGetComponent(out IKillable target))
             {
-                Viewer.StartAim(target);
+                Viewer.TargetEntity = target;
+                TargetInView = true;
+
+                if (TargetAimedAt(target, Viewer.Id))
+                {
+                    Viewer.StartAim(target);
+                }
             }
         }
     }

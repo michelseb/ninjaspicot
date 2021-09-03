@@ -80,9 +80,8 @@ public class InstantShootingTurret : TurretBase
 
     private IEnumerator Shoot(float time)
     {
-        var startPos = Transform.position + Transform.up * AimField.Offset.magnitude;
-        var bullet = _poolManager.GetPoolable<InstantBullet>(startPos, Transform.rotation);
-        var ray = Utils.RayCast(startPos, Transform.up, AimField.Size * 2, ignore: Id, includeTriggers: false);
+        var bullet = _poolManager.GetPoolable<InstantBullet>(Transform.position, Transform.rotation);
+        var ray = Utils.RayCast(Transform.position, Transform.up, AimField.Size * 2, ignore: Id, includeTriggers: false);
         var line = bullet.LineRenderer;
         line.positionCount = 2;
         line.SetPosition(0, Transform.position);

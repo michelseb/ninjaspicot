@@ -2,8 +2,6 @@
 
 public class SoundEffect : MonoBehaviour, IPoolable
 {
-    public CompositeContainer CompositeContainer { get; private set; }
-
     private float _currentLifeTime;
     private const float LIFE_TIME = 1;
     private Transform _transform;
@@ -34,11 +32,6 @@ public class SoundEffect : MonoBehaviour, IPoolable
         _transform.localScale = Vector3.one * size;
         _transform.position = new Vector3(position.x, position.y, -5);
         _transform.rotation = rotation;
-    }
-
-    public void SetComposite(Collider2D collider)
-    {
-        CompositeContainer = collider.GetComponent<CompositeContainer>();
     }
 
     public void Deactivate()

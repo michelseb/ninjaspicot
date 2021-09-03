@@ -5,8 +5,15 @@ public class TimeManager : MonoBehaviour, IActivable
 {
     public float TimeScale => Time.timeScale;
 
+    private AudioManager _audioManager;
+    private Audio _slowDown;
     private bool _active;
 
+    private AudioSource _globalAudioSource;
+    public AudioSource GlobalAudioSource { get { if (Utils.IsNull(_globalAudioSource)) _globalAudioSource = GetComponent<AudioSource>(); return _globalAudioSource; } }
+
+    private AudioSource _heroAudioSource;
+    public AudioSource HeroAudioSource { get { if (Utils.IsNull(_heroAudioSource)) _heroAudioSource = Hero.Instance?.GetComponent<AudioSource>(); return _heroAudioSource; } }
     private static TimeManager _instance;
     public static TimeManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TimeManager>(); return _instance; } }
 
@@ -14,8 +21,15 @@ public class TimeManager : MonoBehaviour, IActivable
     private const float DECREASE_INTERPOLATION = .8f;
     private const float TIME_SLOW = .05f;
 
+    private void Awake()
+    {
+        _audioManager = AudioManager.Instance;
+    }
+
     private void Start()
     {
+        _slowDown = _audioManager.FindAudioByName("SlowDown");
+
         Activate();
     }
 
@@ -24,6 +38,8 @@ public class TimeManager : MonoBehaviour, IActivable
         if (!_active || Time.timeScale <= slowValue)
             return;
 
+        GlobalAudioSource?.Pause();
+        _audioManager.PlaySound(HeroAudioSource, _slowDown);
         SetTimeScale(slowValue);
     }
 
@@ -48,7 +64,7 @@ public class TimeManager : MonoBehaviour, IActivable
             yield return null;
         }
 
-        Time.timeScale = 1;
+        SetNormalTime();
     }
 
     public void StartSlowDownProgressive(float value)
@@ -64,6 +80,16 @@ public class TimeManager : MonoBehaviour, IActivable
     public void SetNormalTime()
     {
         SetTimeScale(1);
+
+        if (HeroAudioSource != null && _audioManager.GetSourceClip(HeroAudioSource.GetInstanceID()) == "SlowDown")
+        {
+            HeroAudioSource.Stop();
+        }
+
+        if (GlobalAudioSource != null && !GlobalAudioSource.isPlaying)
+        {
+            _audioManager.StartPlayProgressive(GlobalAudioSource);
+        }
     }
 
     public void StopTime()

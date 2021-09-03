@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,17 +15,53 @@ public class AudioManager : MonoBehaviour
 {
     [SerializeField] private List<Audio> _audios;
     public List<Audio> Audios => _audios;
+
+    private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
+
     private static AudioManager _instance;
     public static AudioManager Instance { get { if (_instance == null) _instance = FindObjectOfType<AudioManager>(); return _instance; } }
 
-    public AudioClip FindByName(string name)
+    public Audio FindAudioByName(string name)
     {
-        return _audios.FirstOrDefault(audio => audio.Name == name)?.Clip;
+        return _audios.FirstOrDefault(audio => audio.Name == name);
     }
 
-    public void PlaySound (AudioSource source, string clip, float volume = 1)
+    public string GetSourceClip(int sourceId)
     {
-        source.PlayOneShot(FindByName(clip), volume);
+        return _playedClips.ContainsKey(sourceId) ? _playedClips[sourceId] : string.Empty;
+    }
+
+    public void PlaySound(AudioSource source, string clipName, float volume = 1)
+    {
+        PlaySound(source, FindAudioByName(clipName), volume);
+    }
+
+    public void PlaySound(AudioSource source, Audio audio, float volume = 1)
+    {
+        if (source == null)
+            return;
+
+        _playedClips[source.GetInstanceID()] = audio.Name;
+        source.PlayOneShot(audio.Clip, volume);
+    }
+
+    public void StartPlayProgressive(AudioSource source, float volume = 1f)
+    {
+        StartCoroutine(PlayProgressive(source, volume));
+    }
+
+    private IEnumerator PlayProgressive(AudioSource source, float volume)
+    {
+        source.volume = 0;
+        source.Play();
+
+        while (source.volume < volume)
+        {
+            source.volume += Time.deltaTime / 10;
+            yield return null;
+        }
+
+        source.volume = volume;
     }
 
 }

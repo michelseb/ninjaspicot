@@ -16,11 +16,9 @@ public class GuardNinja : EnemyNinja, IListener
 
     public GuardMode GuardMode { get; private set; }
     public Vector3 Target { get; private set; }
-    public LocationPoint TargetLocation { get; private set; }
 
     private float _wonderTime;
     private Vector3 _initPos;
-    private LocationPoint _initLocation;
     private GuardMode _nextState;
     private GuardStickiness _guardStickiness;
     private EnemyJumper _enemyJumper;
@@ -48,12 +46,6 @@ public class GuardNinja : EnemyNinja, IListener
 
     protected virtual void Update()
     {
-        if (_initLocation == null)
-        {
-            _initLocation = _guardStickiness.LocationPoint;
-            _initPos = Transform.position;
-        }
-
         switch (GuardMode)
         {
             case GuardMode.Guarding:
@@ -111,7 +103,7 @@ public class GuardNinja : EnemyNinja, IListener
         Attacking = true;
         GuardMode = GuardMode.Checking;
         _nextState = GuardMode.Returning;
-        _guardStickiness.StartWalkingTowards(TargetLocation, Target);
+        _guardStickiness.StartWalkingTowards(Target);
         //StartCoroutine(Check());
     }
 
@@ -140,7 +132,7 @@ public class GuardNinja : EnemyNinja, IListener
         Attacking = true;
         _enemyJumper.Active = true;
         GuardMode = GuardMode.Chasing;
-        _guardStickiness.StartWalkingTowards(TargetLocation, Target);
+        _guardStickiness.StartWalkingTowards(Target);
     }
 
     private void Chase(Vector3 target)
@@ -156,7 +148,7 @@ public class GuardNinja : EnemyNinja, IListener
         Attacking = false;
         _enemyJumper.Active = false;
         GuardMode = GuardMode.Returning;
-        _guardStickiness.StartWalkingTowards(_initLocation, _initPos);
+        _guardStickiness.StartWalkingTowards(_initPos);
     }
 
     private void Return()
@@ -180,8 +172,7 @@ public class GuardNinja : EnemyNinja, IListener
 
     public void Hear(HearingArea hearingArea)
     {
-        Target = hearingArea.GetSource();
-        TargetLocation = hearingArea.ClosestLocation;
+        Target = hearingArea.SourcePoint;
 
         if (GuardMode == GuardMode.Guarding)
         {

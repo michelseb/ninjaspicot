@@ -96,15 +96,11 @@ public class FollowingRobotBall : RobotBall
         for (int i = 0; i < 4; i++)
         {
             var lineCast = Utils.LineCast(_master.Transform.position, masterPos + _offsets[i], new int[] { _master.Id, Id });
+            
             if (!lineCast)
             {
-                Debug.Log(i);
                 _currentOffset = _offsets[i];
                 return true;
-            }
-            else
-            {
-                Debug.Log(lineCast.collider.name);
             }
         }
 

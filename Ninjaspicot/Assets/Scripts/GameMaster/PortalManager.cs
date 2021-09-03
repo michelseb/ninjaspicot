@@ -28,8 +28,8 @@ public class PortalManager : MonoBehaviour
     private UICamera _uiCamera;
     private AudioSource _audioSource;
     private AudioManager _audioManager;
-    private AudioClip _enterClip;
-    private AudioClip _exitClip;
+    private Audio _enterClip;
+    private Audio _exitClip;
 
 
     public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
@@ -50,8 +50,8 @@ public class PortalManager : MonoBehaviour
 
     private void Start()
     {
-        _enterClip = _audioManager.FindByName("EnterPortal");
-        _exitClip = _audioManager.FindByName("ExitPortal");
+        _enterClip = _audioManager.FindAudioByName("EnterPortal");
+        _exitClip = _audioManager.FindAudioByName("ExitPortal");
     }
 
     private int? GetExitIndexByEntranceId(int entranceId)
@@ -131,7 +131,7 @@ public class PortalManager : MonoBehaviour
 
     public IEnumerator Teleport(Portal entrance, Portal exit)
     {
-        _audioSource.PlayOneShot(_exitClip, .3f);
+        _audioManager.PlaySound(_audioSource, _exitClip, .3f);
         var rb = Hero.Instance.Stickiness.Rigidbody;
         rb.position = exit.transform.position - exit.transform.right * 4;
         _cameraBehaviour.Teleport(Hero.Instance.Stickiness.Rigidbody.position);
@@ -151,6 +151,6 @@ public class PortalManager : MonoBehaviour
 
     public void StartPortalSound()
     {
-        _audioSource.PlayOneShot(_enterClip, .3f);
+        _audioManager.PlaySound(_audioSource, _enterClip, .3f);
     }
 }

@@ -151,7 +151,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
             return;
 
         StopAllCoroutines();
-        _targetLocation = hearingArea.GetSource();
+        _targetLocation = hearingArea.SourcePoint;
         TurretMode = Mode.LookFor;
     }
 

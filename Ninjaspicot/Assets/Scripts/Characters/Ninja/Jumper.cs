@@ -25,8 +25,8 @@ public class Jumper : MonoBehaviour
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
-    protected AudioClip _normalJumpSound;
-    protected AudioClip _chargeJumpSound;
+    protected Audio _normalJumpSound;
+    protected Audio _chargeJumpSound;
     protected Transform _transform;
 
     protected virtual void Awake()
@@ -47,8 +47,8 @@ public class Jumper : MonoBehaviour
         GainAllJumps();
 
         _audioManager = AudioManager.Instance;
-        _normalJumpSound = _audioManager.FindByName("Jump");
-        _chargeJumpSound = _audioManager.FindByName("Dash");
+        _normalJumpSound = _audioManager.FindAudioByName("Jump");
+        _chargeJumpSound = _audioManager.FindAudioByName("Dash");
     }
 
     public virtual void CalculatedJump(Vector2 velocity)
@@ -106,9 +106,11 @@ public class Jumper : MonoBehaviour
         if (Trajectory == null || !Trajectory.Active)
             return;
 
+        Trajectory.StartFading();
+
         if (Trajectory is ChargeTrajectory)
         {
-            _audioSource.PlayOneShot(_chargeJumpSound);
+            _audioManager.PlaySound(_audioSource, _chargeJumpSound);
             var charge = Trajectory as ChargeTrajectory;
             if (charge.Target != null)
             {
@@ -117,10 +119,9 @@ public class Jumper : MonoBehaviour
         }
         else
         {
-            _audioSource.PlayOneShot(_normalJumpSound);
+            _audioManager.PlaySound(_audioSource, _normalJumpSound);
         }
 
-        Trajectory.StartFading();
     }
 
     public virtual void CancelJump()

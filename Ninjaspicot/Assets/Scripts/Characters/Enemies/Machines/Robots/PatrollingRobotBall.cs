@@ -26,8 +26,8 @@ public class PatrollingRobotBall : GuardRobotBall
         }
 
         base.Start();
-
-        Laser.SetActive(true);
+        FieldOfView.Activate();
+        //Laser.SetActive(true);
     }
 
     protected override void Guard()

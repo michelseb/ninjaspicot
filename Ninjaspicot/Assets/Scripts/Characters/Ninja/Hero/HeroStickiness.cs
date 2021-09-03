@@ -5,21 +5,22 @@ using UnityEngine;
 public class HeroStickiness : Stickiness
 {
     private TouchManager _touchManager;
-    private PoolManager _poolManager;
     private AudioManager _audioManager;
     private AudioSource _audioSource;
-    private AudioClip _impact;
-
+    private Audio _impact;
+    private Audio _walkAudio;
+    private Audio _runAudio;
     private Vector3 _previousPosition;
 
     public override void Awake()
     {
         base.Awake();
         _touchManager = TouchManager.Instance;
-        _poolManager = PoolManager.Instance;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
-        _impact = _audioManager.FindByName("Blob");
+        _impact = _audioManager.FindAudioByName("Blob");
+        _walkAudio = _audioManager.FindAudioByName("Whoosh3");
+        _runAudio = _audioManager.FindAudioByName("Whoosh2");
     }
 
     public override void Start()
@@ -62,8 +63,6 @@ public class HeroStickiness : Stickiness
 
         var jointMotor = hinge.motor;
         hinge.useMotor = true;
-        var walkAudio = _audioManager.FindByName("Whoosh3");
-        var runAudio = _audioManager.FindByName("Whoosh2");
         var whooshing = false;
 
         while (true)
@@ -76,8 +75,8 @@ public class HeroStickiness : Stickiness
             else if (!whooshing)
             {
                 var coroutine = Running ?
-                    Whoosh(runAudio, .07f, .13f, callback => { whooshing = callback; }) :
-                    Whoosh(walkAudio, .04f, .26f, callback => { whooshing = callback; });
+                    Whoosh(_runAudio, .07f, .13f, callback => { whooshing = callback; }) :
+                    Whoosh(_walkAudio, .04f, .26f, callback => { whooshing = callback; });
 
                 StartCoroutine(coroutine);
                 whooshing = true;
@@ -91,9 +90,10 @@ public class HeroStickiness : Stickiness
         }
     }
 
-    private IEnumerator Whoosh(AudioClip audio, float intensity, float time, Action<bool> callback)
+    private IEnumerator Whoosh(Audio audio, float intensity, float time, Action<bool> callback)
     {
-        _audioSource.PlayOneShot(audio, intensity);
+        _audioManager.PlaySound(_audioSource, audio, intensity);
+
         yield return new WaitForSeconds(time);
         callback(false);
     }

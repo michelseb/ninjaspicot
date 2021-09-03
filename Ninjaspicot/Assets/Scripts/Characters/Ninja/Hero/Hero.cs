@@ -149,8 +149,7 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
             _poolManager.GetPoolable<HeroGhost>(Transform.position, Transform.rotation);
             if (iteration % GHOST_SOUND_FREQUENCY == 0)
             {
-                var soundEffect = _poolManager.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
-                soundEffect.SetComposite(Stickiness.CurrentAttachment.Collider);
+                _poolManager.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
             }
             iteration++;
             yield return new WaitForSeconds(delay);

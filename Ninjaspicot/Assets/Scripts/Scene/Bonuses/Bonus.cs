@@ -9,6 +9,8 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
     protected Collider2D[] _colliders;
     protected SpriteRenderer[] _renderers;
     protected Animator _animator;
+    protected AudioSource _audioSource;
+    protected AudioManager _audioManager;
     protected bool _active;
 
     private Zone _zone;
@@ -19,6 +21,8 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
         _colliders = GetComponentsInChildren<Collider2D>();
         _renderers = GetComponentsInChildren<SpriteRenderer>();
         _animator = GetComponent<Animator>();
+        _audioSource = GetComponent<AudioSource>();
+        _audioManager = AudioManager.Instance;
     }
 
     protected virtual void Start()

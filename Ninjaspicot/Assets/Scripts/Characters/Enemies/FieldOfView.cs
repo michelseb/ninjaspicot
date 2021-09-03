@@ -7,13 +7,11 @@ public class FieldOfView : MonoBehaviour, IActivable
     [SerializeField] protected float _size;
     [SerializeField] protected float _viewAngle;
     [SerializeField] protected int _detailAmount;
-    [SerializeField] protected Vector3 _offset;
     [SerializeField] protected float _startAngle;
     [SerializeField] protected CustomColor _customColor;
 
     public bool Active { get; protected set; }
     public float Size => _size;
-    public Vector3 Offset => _offset;
     protected Mesh _mesh;
     protected MeshFilter _filter;
     protected IRaycastable _parent;
@@ -26,6 +24,8 @@ public class FieldOfView : MonoBehaviour, IActivable
     private bool _isVisible;
     private bool _isColliding;
     private int _collidingAmount;
+    private float _angleStep;
+    private Quaternion _angleAxis;
 
     private int _colorPropertyId;
     private int _emissionPropertyId;
@@ -49,9 +49,15 @@ public class FieldOfView : MonoBehaviour, IActivable
         _colorPropertyId = Shader.PropertyToID("_Color");
         _emissionPropertyId = Shader.PropertyToID("_EmissionColor");
 
+
+        _angleStep = _viewAngle / _detailAmount;
+        _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * Quaternion.Euler(0, 0, _startAngle);
+
         Active = true;
-        _mesh = InitMesh(_size, _viewAngle, _detailAmount, _offset);
+
+        _mesh = InitMesh(_size, _detailAmount);
         _filter.sharedMesh = _mesh;
+
         _contactFilter = new ContactFilter2D
         {
             useLayerMask = true,
@@ -59,12 +65,11 @@ public class FieldOfView : MonoBehaviour, IActivable
             useTriggers = false
         };
 
-        _transform.Rotate(0, 0, _startAngle);
     }
 
     protected virtual void Start()
     {
-        if (UpdateVertices(_size, _viewAngle, _detailAmount, _offset))
+        if (UpdateVertices(_size, _detailAmount))
         {
             _mesh.vertices = _vertices.Select(x => x.ModifiedPos).ToArray();
             _filter.sharedMesh = _mesh;
@@ -90,49 +95,97 @@ public class FieldOfView : MonoBehaviour, IActivable
         if (!Active || !_isColliding || !_isVisible)
             return;
 
-        if (UpdateVertices(_size, _viewAngle, _detailAmount, _offset))
+        if (UpdateVertices(_size, _detailAmount))
         {
             _mesh.vertices = _vertices.Select(x => x.ModifiedPos).ToArray();
             _filter.sharedMesh = _mesh;
         }
     }
 
-    private bool UpdateVertices(float size, float angle, int pointCount, Vector3 offset)
+    private Mesh InitMesh(float size, int pointCount)
+    {
+        var mesh = new Mesh();
+
+        var initRotation = _transform.rotation.normalized;
+
+        _vertices = new Vertex[pointCount + 1];
+        var uvs = new Vector2[_vertices.Length];
+        var triangles = new int[pointCount * 6];
+        var colliderPoints = new List<Vector2>();
+
+        colliderPoints.Add(Vector2.zero);
+        _vertices[0] = new Vertex(Vector2.zero);
+
+        var direction = (_angleAxis * _transform.up).normalized;
+
+        var triangleIndex = 0;
+        var colliderInterval = 3;
+
+        for (int i = 1; i <= pointCount; i++)
+        {
+            if (i > 1)
+            {
+                direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
+            }
+
+            _vertices[i] = new Vertex(initRotation * direction * size);
+
+            if (i % colliderInterval == 1)
+            {
+                colliderPoints.Add(initRotation * direction * size);
+            }
+
+            if (i < pointCount)
+            {
+                triangles[triangleIndex] = 0;
+                triangles[triangleIndex + 1] = i;
+                triangles[triangleIndex + 2] = i + 1;
+                triangles[triangleIndex + 3] = 0;
+                triangles[triangleIndex + 4] = i + 1;
+                triangles[triangleIndex + 5] = i;
+
+                triangleIndex += 6;
+            }
+        }
+
+        if (!colliderPoints.Contains(initRotation * direction * size))
+        {
+            colliderPoints.Add(initRotation * direction * size);
+        }
+
+        mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();
+        mesh.triangles = triangles;
+        mesh.uv = uvs;
+
+
+        var collPoints = colliderPoints.ToArray();
+        _collider.points = collPoints;
+        _collider.pathCount = 1;
+        _collider.SetPath(0, collPoints);
+
+        return mesh;
+    }
+
+    private bool UpdateVertices(float size, int pointCount)
     {
         var updated = false;
+        var direction = (_angleAxis * _transform.up).normalized;
 
-        float angleStep = angle / pointCount;
-
-        offset = _transform.TransformPoint(offset);
-        var direction = _transform.TransformDirection(Quaternion.AngleAxis(angle / 2f, Vector3.forward) * _transform.InverseTransformDirection(_transform.up));
-
-        RaycastHit2D[] results = new RaycastHit2D[1];
-
-        Debug.DrawRay(offset, direction * size, Color.yellow); //=> gourmand
-        var hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
-        if (hits > 0)
+        for (int i = 1; i <= pointCount; i++)
         {
-            _vertices[1].Modified = true;
-            _vertices[1].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
-            updated = true;
-        }
-        else if (_vertices[1].Modified)
-        {
-            _vertices[1].ModifiedPos = _vertices[1].DefaultPos;
-            _vertices[1].Modified = false;
-            updated = true;
-        }
+            if (i > 1)
+            {
+                direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
+            }
 
+            Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
 
-        for (int i = 2; i <= pointCount; i++)
-        {
-            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
-            Debug.DrawRay(offset, direction * size, Color.yellow); //=> gourmand
-            hits = Physics2D.Raycast(offset, direction, _contactFilter, results, size);
+            var results = new RaycastHit2D[1];
+            var hits = Physics2D.Raycast(_transform.position, direction, _contactFilter, results, size);
             if (hits > 0)
             {
-                _vertices[i - 1].Modified = true;
-                _vertices[i - 1].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
+                _vertices[i].Modified = true;
+                _vertices[i].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
                 updated = true;
             }
             else if (_vertices[i].Modified)
@@ -142,57 +195,8 @@ public class FieldOfView : MonoBehaviour, IActivable
                 updated = true;
             }
         }
+
         return updated;
-    }
-
-
-    private Mesh InitMesh(float size, float angle, int pointCount, Vector3 offset)
-    {
-        var mesh = new Mesh();
-
-        _vertices = new Vertex[pointCount + 1];
-        var uvs = new Vector2[_vertices.Length];
-        var triangles = new int[pointCount * 3];
-        var points = new List<Vector2>();
-        points.Add(offset);
-
-        float angleStep = angle / pointCount;
-
-        _vertices[0] = new Vertex(offset);
-
-        var direction = _transform.TransformDirection(Quaternion.AngleAxis(angle / 2f, Vector3.forward) * _transform.InverseTransformDirection(_transform.up));
-
-        var triangleIndex = 0;
-        var colliderInterval = 3;
-
-        for (int i = 1; i < pointCount - 1; i++)
-        {
-            direction = Quaternion.AngleAxis(-angleStep, Vector3.forward) * direction;
-            _vertices[i] = new Vertex(direction * (size + offset.magnitude));
-            if (i % colliderInterval == 1)
-            {
-                points.Add(direction * (size + offset.magnitude));
-            }
-
-            triangles[triangleIndex] = 0;
-            triangles[triangleIndex + 1] = i - 1;
-            triangles[triangleIndex + 2] = i;
-            triangleIndex += 3;
-        }
-        points.Add(direction * (size + offset.magnitude));
-        points.Add(offset);
-
-        mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();
-        mesh.triangles = triangles;
-        mesh.uv = uvs;
-
-
-        var collPoints = points.ToArray();
-        _collider.points = collPoints;
-        _collider.pathCount = 1;
-        _collider.SetPath(0, collPoints);
-
-        return mesh;
     }
 
     protected void SetColor(Color color)

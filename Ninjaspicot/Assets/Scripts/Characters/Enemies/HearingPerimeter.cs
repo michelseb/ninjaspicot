@@ -27,34 +27,12 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
         if (!collider.CompareTag("Sound"))
             return;
 
-        var soundEffect = collider.GetComponent<SoundEffect>();
-
-        if (Utils.IsNull(soundEffect))
-            return;
-
-        var pos = collider.transform.position;
-
-        StartCoroutine(SetHearingArea(soundEffect, pos));
-    }
-
-    private IEnumerator SetHearingArea(SoundEffect soundEffect, Vector3 position)
-    {
-        float timer = 0f;
-
-        while (soundEffect.CompositeContainer == null)
-        {
-            timer += Time.deltaTime;
-
-            if (timer > .5f)
-                yield break;
-
-            yield return null;
-        }
+        //if (!collider.TryGetComponent(out SoundEffect soundEffect))
+        //    return;
 
         _listener.Hear(new HearingArea
         {
-            SourcePoint = position,
-            ClosestLocation = soundEffect.CompositeContainer.GetClosestLocationPoint(position)
+            SourcePoint = collider.transform.position
         });
 
         if (!Utils.IsNull(SoundMark))
@@ -69,7 +47,6 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
     {
         gameObject.SetActive(true);
     }
-
     public void Deactivate()
     {
         gameObject.SetActive(false);

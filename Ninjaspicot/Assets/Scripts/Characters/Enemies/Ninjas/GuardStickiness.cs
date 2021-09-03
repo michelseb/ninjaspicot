@@ -12,7 +12,7 @@ public class GuardStickiness : Stickiness
         _guard = GetComponent<GuardNinja>();
     }
 
-    public virtual void StartWalkingTowards(LocationPoint location, Vector3 destination)
+    public virtual void StartWalkingTowards(Vector3 destination)
     {
         if (!Active)
             return;
@@ -20,7 +20,7 @@ public class GuardStickiness : Stickiness
         StopWalkingTowards(true);
 
         Rigidbody.isKinematic = false;
-        _walkTowards = StartCoroutine(WalkTowards(WallJoint, location, destination));
+        _walkTowards = StartCoroutine(WalkTowards(WallJoint, destination));
     }
 
     public virtual void StopWalkingTowards(bool restart)
@@ -39,7 +39,7 @@ public class GuardStickiness : Stickiness
         }
     }
 
-    protected virtual IEnumerator WalkTowards(HingeJoint2D hinge, LocationPoint location, Vector3 destination)
+    protected virtual IEnumerator WalkTowards(HingeJoint2D hinge, Vector3 destination)
     {
         if (hinge == null)
         {
@@ -47,7 +47,7 @@ public class GuardStickiness : Stickiness
             yield break;
         }
 
-        CurrentSpeed = location.Id > LocationPoint.Id ? -_speed : _speed;
+        CurrentSpeed = _speed;
 
         var jointMotor = hinge.motor;
         jointMotor.motorSpeed = CurrentSpeed;
@@ -79,7 +79,7 @@ public class GuardStickiness : Stickiness
 
         if (_guard.GuardMode == GuardMode.Chasing)
         {
-            StartWalkingTowards(_guard.TargetLocation, _guard.Target);
+            StartWalkingTowards(_guard.Target);
         }
 
         return true;

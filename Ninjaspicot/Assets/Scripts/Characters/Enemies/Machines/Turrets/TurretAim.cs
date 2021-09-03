@@ -23,21 +23,21 @@ public class TurretAim : Aim
     protected override void OnTriggerEnter2D(Collider2D collider)
     {
         base.OnTriggerEnter2D(collider);
+
         if (!_turret.Active || !collider.CompareTag("hero"))
             return;
 
         if (!string.IsNullOrEmpty(CurrentTarget) && collider.CompareTag(CurrentTarget))
         {
-            var target = collider.GetComponent<IKillable>();
-            if (target == null)
-                return;
-
-            _turret.TargetEntity = target;
-            TargetInView = true;
-
-            if (TargetAimedAt(target, Viewer.Id))
+            if (collider.TryGetComponent(out IKillable target))
             {
-                _turret.StartAim(target);
+                _turret.TargetEntity = target;
+                TargetInView = true;
+
+                if (TargetAimedAt(target, Viewer.Id))
+                {
+                    _turret.StartAim(target);
+                }
             }
         }
     }

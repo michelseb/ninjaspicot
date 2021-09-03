@@ -5822,6 +5822,10 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: ea5e09f5a8287f9438b48137528997f3, type: 3}
   - Name: Dash
     Clip: {fileID: 8300000, guid: a9c9516c4f8375d4cbec643962a19c96, type: 3}
+  - Name: ExtraJump
+    Clip: {fileID: 8300000, guid: ce457f6468601af4abfd81d3d6885a1b, type: 3}
+  - Name: SlowDown
+    Clip: {fileID: 8300000, guid: 0d821d3228859b547bfc9b55d0667339, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

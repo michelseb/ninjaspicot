@@ -38,41 +38,43 @@ public class PoolManager : MonoBehaviour
 
         //var poolable = (T)Poolables.Where(type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
 
-        if (poolable == null)
+        if (poolable != null)
+            return SelectPoolable(poolable, position, rotation, size);
+
+        // Create poolable if doesn't exist
+        GameObject poolableModel = null;
+
+        foreach (var model in _poolableModels)
         {
-            GameObject poolableModel = null;
-
-            foreach (var model in _poolableModels)
+            if (model.TryGetComponent(out IPoolable pool) && pool is T && (type == PoolableType.None || pool.PoolableType == type))
             {
-                var pool = model.GetComponent<IPoolable>();
-                if (pool == null)
-                    continue;
-
-                if (pool is T && (type == PoolableType.None || pool.PoolableType == type))
-                {
-                    poolableModel = model;
-                    break;
-                }
+                poolableModel = model;
+                break;
             }
-
-            if (poolableModel == null)
-                return default;
-
-            if (defaultParent)
-            {
-                poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
-            }
-            else
-            {
-                var poolableObject = Instantiate(poolableModel);
-                poolableObject.transform.SetParent(parent, true);
-
-                poolable = poolableObject.GetComponent<T>();
-            }
-
-            Poolables.Add(poolable);
         }
 
+        if (poolableModel == null)
+            return default;
+
+        if (defaultParent)
+        {
+            poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
+        }
+        else
+        {
+            var poolableObject = Instantiate(poolableModel);
+            poolableObject.transform.SetParent(parent, true);
+
+            poolable = poolableObject.GetComponent<T>();
+        }
+
+        Poolables.Add(poolable);
+
+        return SelectPoolable(poolable, position, rotation, size);
+    }
+
+    public T SelectPoolable<T>(T poolable, Vector3 position, Quaternion rotation, float size = 1f) where T : IPoolable
+    {
         poolable.Activate();
         poolable.Pool(position, rotation, size);
 

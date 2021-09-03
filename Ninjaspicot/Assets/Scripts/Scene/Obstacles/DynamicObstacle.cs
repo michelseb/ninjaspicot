@@ -22,21 +22,15 @@ public class DynamicObstacle : Obstacle, IDynamic
         if (!DynamicActive || !collision.collider.CompareTag("hero"))
             return;
 
-        var stickiness = collision.collider.GetComponent<Stickiness>();
-        if (stickiness == null || stickiness.Attached)
+        if (!collision.collider.TryGetComponent(out Stickiness stickiness) || stickiness.Attached)
             return;
 
         base.OnCollisionEnter2D(collision);
 
         stickiness.SetContactPosition(collision.contacts[collision.contacts.Length - 1].point);
 
-        var dynamicInteraction = collision.collider.GetComponent<DynamicInteraction>();
-
-        if (!dynamicInteraction.Active || dynamicInteraction.Interacting)
+         if (!collision.collider.TryGetComponent(out DynamicInteraction dynamicInteraction) || !dynamicInteraction.Active || dynamicInteraction.Interacting)
             return;
-
-        //if (GetComponent<EnemyNinja>() != null) ==> Why ? Should never be true
-        //    return;
 
         dynamicInteraction.StartInteraction(this);
     }

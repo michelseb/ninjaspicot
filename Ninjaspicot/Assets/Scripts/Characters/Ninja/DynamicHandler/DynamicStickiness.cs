@@ -45,7 +45,6 @@ public class DynamicStickiness : Stickiness
         while (true)
         {
             var speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CollisionNormal, CurrentSpeed);
-            Debug.Log(_touchManager.GetWalkDirection() + " " + CollisionNormal + " " + CurrentSpeed);
             if (speedFactor == 0)
             {
                 Rigidbody.velocity = Vector2.zero;

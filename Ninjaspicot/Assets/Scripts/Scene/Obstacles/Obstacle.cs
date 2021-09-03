@@ -6,34 +6,30 @@ public class Obstacle : MonoBehaviour, IRaycastable, IActivable
     protected int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
-    public Collider2D Collider { get; private set; }
+    private Collider2D _collider;
+    public Collider2D Collider => _collider;
     public Transform Transform { get; private set; }
-
-    public CompositeContainer Composite { get; private set; }
 
     protected virtual void Awake()
     {
         Transform = transform;
-        Collider = GetComponent<Collider2D>() ?? GetComponentInChildren<Collider2D>() ?? GetComponentInParent<Collider2D>();
 
+        if (!TryGetComponent(out _collider))
+        {
+            _collider = GetComponentInChildren<Collider2D>() ?? GetComponentInParent<Collider2D>();
+        }
         if (!Utils.IsNull(Collider) && (Collider is PolygonCollider2D || Collider is BoxCollider2D))
         {
             Collider.usedByComposite = true;
         }
-
-        Composite = Collider.composite?.GetComponent<CompositeContainer>() ?? Collider.GetComponent<CompositeContainer>();
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        var ninja = collision.gameObject.GetComponent<INinja>();
-        
-        if (ninja == null)
-            return;
-
-        var contact = collision.contacts[0];
-
-        ninja.Stickiness.ReactToObstacle(this, contact.point);
+        if (collision.gameObject.TryGetComponent(out INinja ninja))
+        {
+            ninja.Stickiness.ReactToObstacle(this, collision.contacts[0].point);
+        }
     }
 
     public virtual void Activate()

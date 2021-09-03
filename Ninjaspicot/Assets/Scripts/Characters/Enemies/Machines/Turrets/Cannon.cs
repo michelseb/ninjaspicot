@@ -20,10 +20,9 @@ public class Cannon : TurretWall
         if (!Turret.Active)
             return;
 
-        var hero = collision.collider.GetComponent<Hero>() ?? collision.collider.GetComponentInParent<Hero>();
-        if (hero != null)
-        {
-            hero.Die();
-        }
+        if (!collision.collider.CompareTag("hero"))
+            return;
+
+        Hero.Instance.Die();
     }
 }

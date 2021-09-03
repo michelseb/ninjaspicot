@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class RobotBall : Enemy, IActivable
 {
@@ -10,6 +9,8 @@ public class RobotBall : Enemy, IActivable
     public bool Active { get; protected set; }
     protected Rigidbody2D _rigidbody;
 
+    protected FieldOfView _fieldOfView;
+    public FieldOfView FieldOfView { get { if (Utils.IsNull(_fieldOfView)) _fieldOfView = GetComponentInChildren<FieldOfView>(); return _fieldOfView; } }
     protected EnemyLaser _laser;
     public EnemyLaser Laser { get { if (Utils.IsNull(_laser)) _laser = GetComponentInChildren<EnemyLaser>(); return _laser; } }
 
@@ -38,6 +39,7 @@ public class RobotBall : Enemy, IActivable
     {
         Active = true;
         Laser?.Activate();
+        FieldOfView.Activate();
         _reaction?.Activate();
         _characterLight.Wake();
     }
@@ -46,6 +48,7 @@ public class RobotBall : Enemy, IActivable
     {
         Active = false;
         Renderer.color = ColorUtils.White;
+        FieldOfView.Deactivate();
         Laser?.Deactivate();
         _reaction?.Deactivate();
         _characterLight.Sleep();

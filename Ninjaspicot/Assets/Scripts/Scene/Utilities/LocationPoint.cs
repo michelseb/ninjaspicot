@@ -29,7 +29,7 @@ public class LocationPoint : MonoBehaviour
             if (Utils.IsNull(stickiness))
                 return;
 
-            stickiness.LocationPoint = this;
+            //stickiness.LocationPoint = this;
         }
     }
 }

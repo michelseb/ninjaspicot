@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GuardRobotBall : RobotBall, IListener
 {
     public GuardMode GuardMode { get; protected set; }
     public Vector3 TargetPosition { get; protected set; }
-    public LocationPoint TargetLocation { get; protected set; }
-
 
     protected HearingPerimeter _hearingPerimeter;
     protected GuardMode _nextState;
@@ -209,14 +206,17 @@ public class GuardRobotBall : RobotBall, IListener
 
     public void Hear(HearingArea hearingArea)
     {
-        TargetPosition = hearingArea.GetSource();
-        TargetLocation = hearingArea.ClosestLocation;
+        TargetPosition = hearingArea.SourcePoint;
+
+        if (GuardMode == GuardMode.Chasing || (GuardMode == GuardMode.Wondering && _nextState == GuardMode.Checking))
+            return;
 
         if (_reactionType == ReactionType.Sleep)
         {
-            StartWondering(GuardMode.Checking, 1f);
+            FieldOfView.Activate();
+            StartWondering(GuardMode.Checking, 2f);
         }
-        else if (GuardMode == GuardMode.Guarding)
+        else if (GuardMode != GuardMode.Checking)
         {
             StartChecking();
         }
@@ -233,6 +233,11 @@ public class GuardRobotBall : RobotBall, IListener
         _hearingPerimeter.Activate();
         _reaction?.Activate();
         _characterLight.Wake();
+
+        if (_reactionType != ReactionType.Sleep)
+        {
+            FieldOfView.Activate();
+        }
     }
 
     public override void Deactivate()
@@ -243,6 +248,7 @@ public class GuardRobotBall : RobotBall, IListener
         _hearingPerimeter.Deactivate();
         _reaction?.Deactivate();
         _characterLight.Sleep();
+        FieldOfView.Deactivate();
     }
 
     public override void Sleep()

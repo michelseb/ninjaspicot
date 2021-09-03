@@ -55,7 +55,7 @@ Material:
     - LaserThickness: 31.14
     - _EnableExternalAlpha: 0
     m_Colors:
-    - Color_31EE1CB8: {r: 25.688938, g: 3.2881846, b: 3.7268744, a: 1}
+    - Color_31EE1CB8: {r: 4.438403, g: 2.2864501, b: 28.513376, a: 1}
     - LaserSpeed: {r: -5, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}

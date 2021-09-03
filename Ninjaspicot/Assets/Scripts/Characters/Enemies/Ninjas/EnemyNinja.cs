@@ -11,14 +11,14 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
     private Stickiness _stickiness;
     public Stickiness Stickiness { get { if (Utils.IsNull(_stickiness)) _stickiness = GetComponent<Stickiness>() ?? GetComponentInChildren<Stickiness>(); return _stickiness; } }
 
-    protected AudioClip _slash;
+    protected Audio _slash;
     private Canvas _canvas;
 
     protected override void Start()
     {
         base.Start();
 
-        _slash = _audioManager.FindByName("Slash");
+        _slash = _audioManager.FindAudioByName("Slash");
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.MainCamera;
     }
@@ -34,19 +34,15 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
         if (Dead || Hero.Instance.Dead)
             return;
 
-        if (collision.CompareTag("hero"))
+        if (collision.CompareTag("hero") && collision.TryGetComponent(out Hero hero))
         {
-            var hero = collision.GetComponent<Hero>();
-            if (Utils.IsNull(hero))
-                return;
-
             if (!Attacking)
             {
                 Die();
             }
             else
             {
-                _audioSource.PlayOneShot(_slash, .3f);
+                _audioManager.PlaySound(_audioSource, _slash, .3f);
                 hero.Die(Transform);
             }
         }
