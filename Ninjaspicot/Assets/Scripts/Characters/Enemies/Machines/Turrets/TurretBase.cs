@@ -133,6 +133,11 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         }
     }
 
+    public void See(Transform target)
+    {
+
+    }
+
     public override void Activate()
     {
         Active = true;

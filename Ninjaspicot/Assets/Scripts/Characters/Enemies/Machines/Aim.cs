@@ -32,12 +32,12 @@ public abstract class Aim : FieldOfView
         {
             if (collider.TryGetComponent(out IKillable target))
             {
-                Viewer.TargetEntity = target;
+                //Viewer.TargetEntity = target;
                 TargetInView = true;
 
                 if (TargetAimedAt(target, Viewer.Id))
                 {
-                    Viewer.StartAim(target);
+                    //Viewer.StartAim(target);
                 }
             }
         }
@@ -45,14 +45,14 @@ public abstract class Aim : FieldOfView
 
     protected virtual void OnTriggerStay2D(Collider2D collider)
     {
-        if (!collider.CompareTag("hero") || Viewer.TargetEntity == null)
-            return;
+        //if (!collider.CompareTag("hero") || Viewer.TargetEntity == null)
+        //    return;
 
-        if (TargetAimedAt(Viewer.TargetEntity, Viewer.Id))
-        {
-            Viewer.StartAim(Viewer.TargetEntity);
-        }
-        TargetInView = true;
+        //if (TargetAimedAt(Viewer.TargetEntity, Viewer.Id))
+        //{
+        //    Viewer.StartAim(Viewer.TargetEntity);
+        //}
+        //TargetInView = true;
     }
 
     protected override void OnTriggerExit2D(Collider2D collider)

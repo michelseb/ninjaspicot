@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-public class GuardRobotBall : RobotBall, IListener
+public class GuardRobotBall : RobotBall, IListener, IViewer
 {
     public GuardMode GuardMode { get; protected set; }
     public Vector3 TargetPosition { get; protected set; }
+    public Transform TargetTransform { get; protected set; }
 
     protected HearingPerimeter _hearingPerimeter;
     protected GuardMode _nextState;
@@ -115,18 +116,18 @@ public class GuardRobotBall : RobotBall, IListener
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), Time.deltaTime * _rotateSpeed);
 
-        var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f;
+        //var alignedWithTarget = 
 
-        if (alignedWithTarget && !Laser.Active)
-        {
-            Laser.SetActive(true);
-        }
+        //if (alignedWithTarget && !Laser.Active)
+        //{
+        //    Laser.SetActive(true);
+        //}
 
         if (Mathf.Abs(deltaX) > 2)
         {
             _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
         }
-        else if (alignedWithTarget)
+        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.SoundMark?.Deactivate();
             StartWondering(GuardMode.Returning, 3f);
@@ -138,8 +139,9 @@ public class GuardRobotBall : RobotBall, IListener
         }
     }
 
-    protected virtual void StartChasing()
+    protected virtual void StartChasing(Transform target)
     {
+        TargetTransform = target;
         GuardMode = GuardMode.Chasing;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Find);
@@ -218,12 +220,21 @@ public class GuardRobotBall : RobotBall, IListener
         }
         else if (GuardMode != GuardMode.Checking)
         {
+
             StartChecking();
+
         }
-        else
-        {
-            StartChasing();
-        }
+    }
+
+    public void See(Transform target)
+    {
+        var hero = Hero.Instance;
+        var raycast = Utils.LineCast(Transform.position, hero.Transform.position, new int[] { Id, hero.Id });
+
+        if (raycast)
+            return;
+
+        StartChasing(target);
     }
 
     public override void Activate()

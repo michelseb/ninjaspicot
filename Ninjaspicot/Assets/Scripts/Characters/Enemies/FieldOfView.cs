@@ -12,6 +12,7 @@ public class FieldOfView : MonoBehaviour, IActivable
 
     public bool Active { get; protected set; }
     public float Size => _size;
+    protected IViewer _viewer;
     protected Mesh _mesh;
     protected MeshFilter _filter;
     protected IRaycastable _parent;
@@ -39,6 +40,7 @@ public class FieldOfView : MonoBehaviour, IActivable
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
         _parent = _transform.parent?.GetComponent<IRaycastable>();
+        _viewer = GetComponent<IViewer>() ?? GetComponentInChildren<IViewer>() ?? GetComponentInParent<IViewer>();
 
         if (_customColor != CustomColor.None)
         {
@@ -110,7 +112,7 @@ public class FieldOfView : MonoBehaviour, IActivable
 
         _vertices = new Vertex[pointCount + 1];
         var uvs = new Vector2[_vertices.Length];
-        var triangles = new int[pointCount * 6];
+        var triangles = new int[pointCount * 3];
         var colliderPoints = new List<Vector2>();
 
         colliderPoints.Add(Vector2.zero);
@@ -140,11 +142,8 @@ public class FieldOfView : MonoBehaviour, IActivable
                 triangles[triangleIndex] = 0;
                 triangles[triangleIndex + 1] = i;
                 triangles[triangleIndex + 2] = i + 1;
-                triangles[triangleIndex + 3] = 0;
-                triangles[triangleIndex + 4] = i + 1;
-                triangles[triangleIndex + 5] = i;
 
-                triangleIndex += 6;
+                triangleIndex += 3;
             }
         }
 
