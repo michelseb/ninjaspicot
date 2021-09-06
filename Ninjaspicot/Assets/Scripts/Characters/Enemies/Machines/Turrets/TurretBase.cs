@@ -170,7 +170,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         Deactivate();
     }
 
-    public override void Die(Transform killer = null)
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
         throw new System.NotImplementedException();
     }

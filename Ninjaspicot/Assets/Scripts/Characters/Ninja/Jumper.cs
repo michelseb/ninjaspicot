@@ -27,6 +27,7 @@ public class Jumper : MonoBehaviour
     protected AudioManager _audioManager;
     protected Audio _normalJumpSound;
     protected Audio _chargeJumpSound;
+    protected Audio _impactSound;
     protected Transform _transform;
 
     protected virtual void Awake()
@@ -37,7 +38,7 @@ public class Jumper : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
         _transform = transform;
-        
+
     }
 
     protected virtual void Start()
@@ -49,6 +50,7 @@ public class Jumper : MonoBehaviour
         _audioManager = AudioManager.Instance;
         _normalJumpSound = _audioManager.FindAudioByName("Jump");
         _chargeJumpSound = _audioManager.FindAudioByName("Dash");
+        _impactSound = _audioManager.FindAudioByName("Impact");
     }
 
     public virtual void CalculatedJump(Vector2 velocity)
@@ -97,7 +99,9 @@ public class Jumper : MonoBehaviour
             pos += dir * 10;
         }
 
-        _dynamicEntity.Rigidbody.position = ChargeDestination;
+        direction = direction.normalized;
+        _dynamicEntity.Rigidbody.position = ChargeDestination - (direction * 7);
+
         NormalJump(direction);
     }
 
@@ -108,14 +112,17 @@ public class Jumper : MonoBehaviour
 
         Trajectory.StartFading();
 
-        if (Trajectory is ChargeTrajectory)
+        if (Trajectory is ChargeTrajectory chargeTrajectory)
         {
             _audioManager.PlaySound(_audioSource, _chargeJumpSound);
-            var charge = Trajectory as ChargeTrajectory;
-            if (charge.Target != null)
+
+            if (chargeTrajectory.Collides)
             {
-                charge.Target.Die();
+                _audioManager.PlaySound(_audioSource, _impactSound);
+                //Hero.Instance.PlaySoundEffect("Impact", 1f);
+                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 50);
             }
+            chargeTrajectory.Target?.Die();
         }
         else
         {
@@ -134,7 +141,12 @@ public class Jumper : MonoBehaviour
 
     protected TrajectoryBase GetTrajectory<T>() where T : TrajectoryBase
     {
-        if (Trajectory == null || !Trajectory.Active)
+        if (Trajectory != null && !(Trajectory is T))
+        {
+            Trajectory.StartFading();
+        }
+
+        if (Trajectory == null || !Trajectory.Active || !(Trajectory is T))
             return _poolManager.GetPoolable<T>(transform.position, Quaternion.identity);
 
         Trajectory.ReUse(_transform.position);
@@ -198,9 +210,10 @@ public class Jumper : MonoBehaviour
 
     public T SetTrajectory<T>() where T : TrajectoryBase
     {
-        if (TrajectoryInUse())
-            return (T)Trajectory;
+        if (TrajectoryInUse() && Trajectory is T trajectory)
+            return trajectory;
 
+        Debug.Log(typeof(T));
         Trajectory = GetTrajectory<T>();
         Trajectory.Strength = _strength;
         return (T)Trajectory;

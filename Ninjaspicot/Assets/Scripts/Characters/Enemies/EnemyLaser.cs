@@ -6,6 +6,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
     protected Transform _transform;
     protected ParticleSystem _dust;
     protected Enemy _enemy;
+    private Audio _electrocutionSound;
     protected int _pointsAmount;
     protected bool _active;
     public bool Active => _active;
@@ -27,6 +28,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
     private void Cast()
     {
         var cast = Utils.RayCast(_transform.position, _transform.right, ignore: _enemy.Id, includeTriggers: false);
+        
         if (cast)
         {
             for (int i = 1; i < _pointsAmount; i++)
@@ -35,12 +37,13 @@ public class EnemyLaser : MonoBehaviour, IActivable
                 _laser.SetPosition(i, new Vector2(pos.x, pos.y) + new Vector2(Random.Range(-.5f, .5f), Random.Range(-.5f, .5f)));
             }
             _dust.transform.position = cast.point;
+
+            if (cast.collider.CompareTag("hero"))
+            {
+                Hero.Instance.Die(sound: _electrocutionSound, volume: .4f);
+            }
         }
 
-        if (cast.collider.CompareTag("hero"))
-        {
-            Hero.Instance.Die();
-        }
     }
 
     public void SetActive(bool active)

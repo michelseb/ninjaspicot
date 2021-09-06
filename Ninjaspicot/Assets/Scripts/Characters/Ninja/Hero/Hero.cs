@@ -40,7 +40,7 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
     }
 
-    public override void Die(Transform killer = null)
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
         if (Dead)
             return;
@@ -52,6 +52,11 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
         if (killer != null)
         {
             Stickiness.Rigidbody.AddForce((Transform.position - killer.position).normalized * 30000);
+        }
+
+        if (sound != null)
+        {
+            _audioManager.PlaySound(_audioSource, sound, volume);
         }
         
         SetAllBehavioursActivation(false, false);
@@ -247,5 +252,10 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
     public virtual bool NeedsToWalk()
     {
         return _touchManager.WalkDragging;
+    }
+
+    public void PlaySoundEffect(string sound, float volume = 1f)
+    {
+        _audioManager.PlaySound(_audioSource, _audioManager.FindAudioByName(sound), volume);
     }
 }

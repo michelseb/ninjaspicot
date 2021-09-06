@@ -52,6 +52,6 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
         _characterLight?.SetColor(ColorUtils.GetColor(_lightColor));
     }
 
-    public abstract void Die(Transform killer = null);
+    public abstract void Die(Transform killer = null, Audio sound = null, float volume = 1f);
     public abstract IEnumerator Dying();
 }

@@ -11,8 +11,9 @@ public class Laser : MonoBehaviour, IWakeable
     protected LineRenderer _laser;
     protected PolygonCollider2D _collider;
     protected bool _active;
-
+    private AudioManager _audioManager;
     private Zone _zone;
+    private Audio _electrocutionSound;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     protected virtual void Awake()
@@ -20,11 +21,13 @@ public class Laser : MonoBehaviour, IWakeable
         _laser = GetComponent<LineRenderer>();
         _collider = GetComponent<PolygonCollider2D>();
         _pointsAmount = _pointsAmount * (int)(_end.position - _start.position).magnitude / 2;
+        _audioManager = AudioManager.Instance;
     }
 
     protected virtual void Start()
     {
         _laser.positionCount = _pointsAmount;
+        _electrocutionSound = _audioManager.FindAudioByName("Electrocution");
 
         SetCollider();
         InitPointsPosition();
@@ -69,7 +72,7 @@ public class Laser : MonoBehaviour, IWakeable
     {
         if (collision.CompareTag("hero"))
         {
-            Hero.Instance.Die();
+            Hero.Instance.Die(sound: _electrocutionSound, volume: .5f);
         }
     }
 

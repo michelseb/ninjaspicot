@@ -12,7 +12,6 @@ public class Portal : MonoBehaviour
     public Portal Other { get; private set; }
 
     public Hero Hero;
-    private float _rotationSpeed;
     public LayerMask TeleportedLayer;
     public SpriteRenderer TeleportedRenderer;
     public SpriteMaskInteraction SpriteMaskInteraction;
@@ -31,11 +30,6 @@ public class Portal : MonoBehaviour
     protected void Start()
     {
         _portalManager.AddPortal(this);
-    }
-
-    protected void FixedUpdate()
-    {
-        _imgInside.transform.Rotate(0, 0, _rotationSpeed);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

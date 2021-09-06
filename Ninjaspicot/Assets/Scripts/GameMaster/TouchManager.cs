@@ -145,13 +145,13 @@ public class TouchManager : MonoBehaviour
             {
                 if (WalkTouching && !WalkDragging)
                 {
-                    var trajectory = _jumper.SetTrajectory<ChargeTrajectory>();
-                    trajectory.SetJumper(_jumper);
+                    var chargeTrajectory = _jumper.SetTrajectory<ChargeTrajectory>();
+                    chargeTrajectory.SetJumper(_jumper);
                     _jumper.JumpMode = JumpMode.Charge;
                 }
                 else
                 {
-                    var trajectory = _jumper.SetTrajectory<ClassicTrajectory>();
+                    var classicTrajectory = _jumper.SetTrajectory<ClassicTrajectory>();
                     //trajectory.SetJumper(_jumper);
                     _jumper.JumpMode = JumpMode.Classic;
                 }

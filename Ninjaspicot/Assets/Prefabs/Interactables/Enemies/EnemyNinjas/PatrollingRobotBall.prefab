@@ -4994,7 +4994,7 @@ MonoBehaviour:
   _lightColor: 1
   _reactionType: 3
   _rotateSpeed: 60
-  _moveSpeed: 40
+  _moveSpeed: 30
   _sprite: {fileID: 7455689082476472355}
   _target: {fileID: 0}
   _targetPoints: []

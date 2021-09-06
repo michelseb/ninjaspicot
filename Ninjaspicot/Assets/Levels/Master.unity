@@ -5826,6 +5826,12 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: ce457f6468601af4abfd81d3d6885a1b, type: 3}
   - Name: SlowDown
     Clip: {fileID: 8300000, guid: 0d821d3228859b547bfc9b55d0667339, type: 3}
+  - Name: RobotReact
+    Clip: {fileID: 8300000, guid: 9892672aef0795b46b40227c61929f62, type: 3}
+  - Name: Electrocution
+    Clip: {fileID: 8300000, guid: 156ae3021684c5a46a78cbf89dee226a, type: 3}
+  - Name: Impact
+    Clip: {fileID: 8300000, guid: 816b895ff682e29449e8f78cb0d87c2b, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

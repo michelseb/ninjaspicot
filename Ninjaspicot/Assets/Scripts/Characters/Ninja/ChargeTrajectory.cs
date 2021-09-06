@@ -2,7 +2,8 @@
 
 public class ChargeTrajectory : TrajectoryBase
 {
-    public EnemyNinja Target { get; private set; }
+    public Enemy Target { get; private set; }
+    public bool Collides { get; private set; }
     private Jumper _jumper;
     protected override float _fadeSpeed => 5;
     private const float CHARGE_LENGTH = 60f;
@@ -14,13 +15,13 @@ public class ChargeTrajectory : TrajectoryBase
 
     public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
     {
-        Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+        //Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
         direction = -direction.normalized;
-        Vector2 velocity = direction * Strength;
+        //Vector2 velocity = direction * Strength;
 
-        bool anyTarget = false;
+        //bool anyTarget = false;
 
-        _line.positionCount = MAX_VERTEX;
+        _line.positionCount = 2; //MAX_VERTEX;
 
         _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
         var chargePos = linePosition + direction * CHARGE_LENGTH;
@@ -31,16 +32,23 @@ public class ChargeTrajectory : TrajectoryBase
         {
             if (chargeHit.collider.CompareTag("Enemy"))
             {
-                anyTarget = true;
+                //anyTarget = true;
                 if (Target == null)
                 {
-                    Target = chargeHit.collider.GetComponent<EnemyNinja>();
+                    Target = chargeHit.collider.GetComponent<Enemy>();
                 }
             }
             else
             {
-                chargePos = chargeHit.point - direction * 10;
+                chargePos = chargeHit.point;
+                Collides = true;
+                SetAudioSimulator(_line.GetPosition(1), 50);
             }
+        }
+        else
+        {
+            Target = null;
+            Collides = false;
         }
 
         if (_jumper != null)
@@ -49,39 +57,41 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         _line.SetPosition(1, chargePos);
-        linePosition = chargePos;
+        //linePosition = chargePos;
 
-        for (var i = 2; i < _line.positionCount; i++)
-        {
-            velocity = velocity + gravity * LENGTH;
-            linePosition = linePosition + velocity * LENGTH;
-            _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y, 0));
+        // NE PAS SUPPRIMER => ANCIENNE TRAJECTOIRE DE LA CHARGE
 
-            if (i > 1)
-            {
-                var hit = StepClear(_line.GetPosition(i - 1), _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f);
-                if (hit)
-                {
-                    if (hit.collider.CompareTag("Enemy"))
-                    {
-                        anyTarget = true;
-                        if (Target == null)
-                        {
-                            Target = chargeHit.collider.GetComponent<EnemyNinja>();
-                        }
-                    }
-                    if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("DynamicWall"))
-                    {
-                        _line.positionCount = i;
-                        SetAudioSimulator(_line.GetPosition(i - 1), 30);
-                        break;
-                    }
-                }
-            }
-        }
-        if (!anyTarget && Target != null) // Reinit target
-        {
-            Target = null;
-        }
+        //for (var i = 2; i < _line.positionCount; i++)
+        //{
+        //    velocity = velocity + gravity * LENGTH;
+        //    linePosition = linePosition + velocity * LENGTH;
+        //    _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y, 0));
+
+        //    if (i > 1)
+        //    {
+        //        var hit = StepClear(_line.GetPosition(i - 1), _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f);
+        //        if (hit)
+        //        {
+        //            if (hit.collider.CompareTag("Enemy"))
+        //            {
+        //                anyTarget = true;
+        //                if (Target == null)
+        //                {
+        //                    Target = chargeHit.collider.GetComponent<EnemyNinja>();
+        //                }
+        //            }
+        //            if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("DynamicWall"))
+        //            {
+        //                _line.positionCount = i;
+        //                SetAudioSimulator(_line.GetPosition(i - 1), 30);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
+        //if (!anyTarget && Target != null) // Reinit target
+        //{
+        //    Target = null;
+        //}
     }
 }

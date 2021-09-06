@@ -64,7 +64,7 @@ public class RobotBall : Enemy, IActivable
         Activate();
     }
 
-    public override void Die(Transform killer = null)
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
         Deactivate();
     }

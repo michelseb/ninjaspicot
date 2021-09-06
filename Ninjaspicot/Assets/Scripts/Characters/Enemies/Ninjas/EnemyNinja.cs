@@ -48,7 +48,7 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
         }
     }
 
-    public override void Die(Transform killer = null)
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
         if (Dead)
             return;

@@ -65,9 +65,25 @@ public class PatrollingRobotBall : GuardRobotBall
 
     protected override void Chase(Vector3 target)
     {
+        var hero = Hero.Instance;
+
+        var raycast = Utils.LineCast(Transform.position, target, new int[] { Id, hero.Id });
+
+        if (raycast)
+        {
+            StartWondering(GuardMode.Returning, 3f);
+        }
+
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
 
-        if (Hero.Instance.Dead)
+        var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
+
+        if (alignedWithTarget && !Laser.Active)
+        {
+            Laser.SetActive(true);
+        }
+
+        if (hero.Dead)
         {
             StartWondering(GuardMode.Returning, 1f);
         }
@@ -87,6 +103,7 @@ public class PatrollingRobotBall : GuardRobotBall
     {
         GuardMode = GuardMode.Returning;
         SetReaction(ReactionType.Patrol);
+        Laser.SetActive(false);
         Renderer.color = ColorUtils.White;
     }
     protected override void StartGuarding()

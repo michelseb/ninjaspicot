@@ -12,6 +12,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     protected float _wonderElapsedTime;
     protected Quaternion _initRotation;
     private Vector3 _initPos;
+    private Audio _reactionSound;
 
     public float Range => 80f;
 
@@ -24,6 +25,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     protected override void Start()
     {
         base.Start();
+        _reactionSound = _audioManager.FindAudioByName("RobotReact");
         _initPos = Transform.position;
         _initRotation = _sprite.rotation;
         GuardMode = GuardMode.Guarding;
@@ -58,7 +60,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
                 break;
 
             case GuardMode.Chasing:
-                Chase(Hero.Instance.Transform.position);
+                Chase(TargetTransform.position);
                 break;
 
             case GuardMode.Returning:
@@ -75,6 +77,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Wonder);
         _wonderElapsedTime = 0;
+        _audioManager.PlaySound(_audioSource, _reactionSound, .4f);
     }
 
     protected virtual void Wonder()
@@ -150,11 +153,21 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     protected virtual void Chase(Vector3 target)
     {
+        var hero = Hero.Instance;
         var deltaX = target.x - Transform.position.x;
 
-        if (Mathf.Abs(deltaX) > 2)
+        var wallNear = Utils.RayCast(Transform.position, Transform.forward, 3, Id);
+        if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
             _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
+        }
+
+
+        var heroVisible = Utils.LineCast(Transform.position, target, new int[] { Id, hero.Id });
+
+        if (heroVisible)
+        {
+            StartWondering(GuardMode.Returning, 3f);
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -166,7 +179,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             Laser.SetActive(true);
         }
 
-        if (Hero.Instance.Dead)
+        if (hero.Dead)
         {
             StartWondering(GuardMode.Returning, 1f);
         }
@@ -218,11 +231,9 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             FieldOfView.Activate();
             StartWondering(GuardMode.Checking, 2f);
         }
-        else if (GuardMode != GuardMode.Checking)
+        else if (GuardMode != GuardMode.Checking && GuardMode != GuardMode.Chasing)
         {
-
             StartChecking();
-
         }
     }
 
