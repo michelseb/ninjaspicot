@@ -150,6 +150,15 @@ public class Joystick : MonoBehaviour, IPoolable
         return 0;
     }
 
+    public virtual void ChangeColor(CustomColor color)
+    {
+        if (_customColor == color)
+            return;
+
+        _customColor = color;
+        SetColor(ColorUtils.GetColor(_customColor, _alpha));
+    }
+
     public virtual void OnPointerDown()
     {
         SetColor(ColorUtils.GetColor(_customColor, _alpha));

@@ -18,6 +18,7 @@ TagManager:
   - DynamicWall
   - TutorialWall
   - Sound
+  - Bonus
   layers:
   - Default
   - TransparentFX

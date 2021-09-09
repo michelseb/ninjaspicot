@@ -22,7 +22,7 @@ public class CameraCatcher : MonoBehaviour, IActivable
     }
     protected virtual void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("hero") && !_activated)
+        if (collision.CompareTag("hero") && (!_activated || _cameraBehaviour.CameraMode == CameraMode.Follow))
         {
             Activate();
         }
@@ -38,12 +38,12 @@ public class CameraCatcher : MonoBehaviour, IActivable
 
     public virtual void Activate()
     {
-        if (_cameraBehaviour.CameraMode == CameraMode.Follow)
-        {
-            _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
-            _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
-            _activated = true;
-        }
+        if (_cameraBehaviour.CameraMode != CameraMode.Follow)
+            return;
+
+        _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
+        _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
+        _activated = true;
     }
 
     public virtual void Deactivate()

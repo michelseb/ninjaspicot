@@ -119,9 +119,10 @@ public class Jumper : MonoBehaviour
             if (chargeTrajectory.Collides)
             {
                 _audioManager.PlaySound(_audioSource, _impactSound);
-                //Hero.Instance.PlaySoundEffect("Impact", 1f);
-                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 50);
+                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 30);
             }
+
+            chargeTrajectory.Bonuses.ForEach(x => x.Take());
             chargeTrajectory.Target?.Die();
         }
         else
@@ -213,7 +214,6 @@ public class Jumper : MonoBehaviour
         if (TrajectoryInUse() && Trajectory is T trajectory)
             return trajectory;
 
-        Debug.Log(typeof(T));
         Trajectory = GetTrajectory<T>();
         Trajectory.Strength = _strength;
         return (T)Trajectory;

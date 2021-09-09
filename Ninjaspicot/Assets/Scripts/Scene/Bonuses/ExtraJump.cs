@@ -1,15 +1,10 @@
-﻿using UnityEngine;
-
-public class ExtraJump : Bonus
+﻿public class ExtraJump : Bonus
 {
-    protected override void OnTriggerEnter2D(Collider2D collision)
+    public override void Take()
     {
-        if (collision.TryGetComponent(out Jumper jumpManager))
-        {
-            jumpManager.GainJumps(1);
-            _audioManager.PlaySound(_audioSource, "ExtraJump", .5f);
-        }
+        _hero.Jumper.GainJumps(1);
+        _audioManager.PlaySound(_audioSource, "ExtraJump", .5f);
 
-        base.OnTriggerEnter2D(collision);
+        base.Take();
     }
 }

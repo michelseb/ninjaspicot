@@ -71,13 +71,17 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     protected void StartWondering(GuardMode nextState, float wonderTime)
     {
+        if (GuardMode == GuardMode.Guarding || GuardMode == GuardMode.Returning)
+        {
+            _audioManager.PlaySound(_audioSource, _reactionSound, .4f);
+        }
+
         GuardMode = GuardMode.Wondering;
         _wonderTime = wonderTime;
         _nextState = nextState;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Wonder);
         _wonderElapsedTime = 0;
-        _audioManager.PlaySound(_audioSource, _reactionSound, .4f);
     }
 
     protected virtual void Wonder()
@@ -126,9 +130,13 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         //    Laser.SetActive(true);
         //}
 
-        if (Mathf.Abs(deltaX) > 2)
+        var direction = Vector2.right * Mathf.Sign(deltaX);
+
+        var wallNear = Utils.RayCast(_rigidbody.position, direction, 6, Id);
+
+        if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * Time.deltaTime * _moveSpeed);
         }
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
@@ -156,16 +164,18 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         var hero = Hero.Instance;
         var deltaX = target.x - Transform.position.x;
 
-        var wallNear = Utils.RayCast(Transform.position, Transform.forward, 3, Id);
+        var direction = Vector2.right * Mathf.Sign(deltaX);
+
+        var wallNear = Utils.RayCast(_rigidbody.position, direction, 6, Id);
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * Time.deltaTime * _moveSpeed);
         }
 
 
-        var heroVisible = Utils.LineCast(Transform.position, target, new int[] { Id, hero.Id });
+        var heroNotVisible = Utils.LineCast(Transform.position, target, new int[] { Id, hero.Id });
 
-        if (heroVisible)
+        if (heroNotVisible)
         {
             StartWondering(GuardMode.Returning, 3f);
         }

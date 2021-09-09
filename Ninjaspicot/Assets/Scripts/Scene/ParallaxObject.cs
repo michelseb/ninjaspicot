@@ -32,16 +32,28 @@ public class ParallaxObject : MonoBehaviour
         {
             var scaleFactor = ParallaxManager.SCALE_AMPLITUDE - (ParallaxManager.SCALE_AMPLITUDE * ((float)Depth / ParallaxManager.MAX_DEPTH));
             ParallaxFactor = (float)Depth / ParallaxManager.MAX_DEPTH;
-            _renderer.color = Color.Lerp(_beginColor, _endColor, 1 - scaleFactor);
+
+            if (_renderer != null)
+            {
+                _renderer.color = Color.Lerp(_beginColor, _endColor, 1 - scaleFactor);
+            }
 
             var factor = 2 * Mathf.Log(Depth + 1);
             Transform.Translate(0, factor * factor, 0, Space.World);
             Transform.localScale = Transform.localScale * scaleFactor;
         }
 
-        _renderer.sortingOrder = ParallaxManager.MAX_DEPTH - Depth;
+        if (_renderer != null)
+        {
+            _renderer.sortingOrder = ParallaxManager.MAX_DEPTH - Depth;
+        }
 
         _parallaxManager.AddObject(this);
+    }
+
+    public void SetParallaxFactor(float factor)
+    {
+        ParallaxFactor = factor;
     }
 
 }

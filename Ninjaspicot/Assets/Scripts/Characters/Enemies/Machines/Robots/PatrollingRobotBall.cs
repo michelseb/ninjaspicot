@@ -8,13 +8,13 @@ public class PatrollingRobotBall : GuardRobotBall
     [SerializeField] TargetPoint[] _targetPoints;
     protected IList<Vector3> _pathPositions;
 
-    private Vector3 _currentPathTarget;
+    private Vector3? _currentPathTarget;
     private Vector3? _targetPosition;
 
     protected override void Awake()
     {
         base.Awake();
-        _pathPositions = _targetPoints.Where(p => !p.IsAim).Select(x => x.transform.position).ToList();
+        _pathPositions = _targetPoints != null ? _targetPoints.Where(p => p != null && !p.IsAim).Select(x => x.transform.position).ToList() : new List<Vector3>();
         _targetPosition = _target?.transform.position;
         InitPathTarget();
     }
@@ -37,7 +37,10 @@ public class PatrollingRobotBall : GuardRobotBall
             _sprite.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
         }
 
-        var direction = Utils.ToVector2(_currentPathTarget - Transform.position);
+        if (!_currentPathTarget.HasValue)
+            return;
+
+        var direction = Utils.ToVector2(_currentPathTarget.Value - Transform.position);
 
         _rigidbody.MovePosition(_rigidbody.position + direction.normalized * Time.deltaTime * _moveSpeed);
 
@@ -144,8 +147,11 @@ public class PatrollingRobotBall : GuardRobotBall
 
     private void SetNextPathTarget()
     {
+        if (_pathPositions == null || _pathPositions.Count == 0)
+            return;
+
         _pathPositions.RemoveAt(0);
-        _pathPositions.Add(_currentPathTarget);
+        _pathPositions.Add(_currentPathTarget.Value);
         _currentPathTarget = _pathPositions[0];
     }
 }

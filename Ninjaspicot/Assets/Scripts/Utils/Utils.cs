@@ -224,8 +224,8 @@ public static class Utils
 
 
             if (raycastable == null ||
-                ignore.Any(x => x == raycastable.Id) ||
-                (!includeTriggers && hit.collider.isTrigger))
+                (ignore != null && ignore.Any(x => x == raycastable.Id)) ||
+                (!includeTriggers && hit && hit.collider.isTrigger))
                 continue;
 
             actualHits.Add(hit);

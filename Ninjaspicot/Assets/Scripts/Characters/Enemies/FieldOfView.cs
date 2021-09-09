@@ -7,7 +7,6 @@ public class FieldOfView : MonoBehaviour, IActivable
     [SerializeField] protected float _size;
     [SerializeField] protected float _viewAngle;
     [SerializeField] protected int _detailAmount;
-    [SerializeField] protected float _startAngle;
     [SerializeField] protected CustomColor _customColor;
 
     public bool Active { get; protected set; }
@@ -53,7 +52,7 @@ public class FieldOfView : MonoBehaviour, IActivable
 
 
         _angleStep = _viewAngle / _detailAmount;
-        _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * Quaternion.Euler(0, 0, _startAngle);
+        _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * Quaternion.Euler(0, 0, -90);
 
         Active = true;
 
@@ -108,17 +107,16 @@ public class FieldOfView : MonoBehaviour, IActivable
     {
         var mesh = new Mesh();
 
-        var initRotation = _transform.rotation.normalized;
+        var initRotation = _transform.rotation;
 
         _vertices = new Vertex[pointCount + 1];
-        var uvs = new Vector2[_vertices.Length];
+        var uvs = new Vector2[pointCount + 1];
         var triangles = new int[pointCount * 3];
-        var colliderPoints = new List<Vector2>();
+        var colliderPoints = new List<Vector2> { Vector2.zero };
 
-        colliderPoints.Add(Vector2.zero);
         _vertices[0] = new Vertex(Vector2.zero);
 
-        var direction = (_angleAxis * _transform.up).normalized;
+        var direction = Quaternion.Euler(0, 0, _viewAngle / 2) * Vector3.right;
 
         var triangleIndex = 0;
         var colliderInterval = 3;
@@ -127,14 +125,14 @@ public class FieldOfView : MonoBehaviour, IActivable
         {
             if (i > 1)
             {
-                direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
+                direction = Quaternion.Euler(0, 0, -_angleStep) * direction;
             }
 
-            _vertices[i] = new Vertex(initRotation * direction * size);
+            _vertices[i] = new Vertex(direction * size);
 
             if (i % colliderInterval == 1)
             {
-                colliderPoints.Add(initRotation * direction * size);
+                colliderPoints.Add(direction * size);
             }
 
             if (i < pointCount)
@@ -142,15 +140,12 @@ public class FieldOfView : MonoBehaviour, IActivable
                 triangles[triangleIndex] = 0;
                 triangles[triangleIndex + 1] = i;
                 triangles[triangleIndex + 2] = i + 1;
-
                 triangleIndex += 3;
             }
         }
 
-        if (!colliderPoints.Contains(initRotation * direction * size))
-        {
-            colliderPoints.Add(initRotation * direction * size);
-        }
+        //_vertices[pointCount] = new Vertex(direction * size);
+        colliderPoints.Add(direction * size);
 
         mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();
         mesh.triangles = triangles;
@@ -194,6 +189,8 @@ public class FieldOfView : MonoBehaviour, IActivable
                 updated = true;
             }
         }
+
+        //Debug.DrawRay(_transform.position, direction * size, Color.yellow);
 
         return updated;
     }

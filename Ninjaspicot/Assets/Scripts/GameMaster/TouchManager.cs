@@ -146,12 +146,14 @@ public class TouchManager : MonoBehaviour
                 if (WalkTouching && !WalkDragging)
                 {
                     var chargeTrajectory = _jumper.SetTrajectory<ChargeTrajectory>();
+                    _joystick2.ChangeColor(CustomColor.Red);
                     chargeTrajectory.SetJumper(_jumper);
                     _jumper.JumpMode = JumpMode.Charge;
                 }
                 else
                 {
-                    var classicTrajectory = _jumper.SetTrajectory<ClassicTrajectory>();
+                    _joystick2.ChangeColor(CustomColor.Blue);
+                    _jumper.SetTrajectory<ClassicTrajectory>();
                     //trajectory.SetJumper(_jumper);
                     _jumper.JumpMode = JumpMode.Classic;
                 }

@@ -1,8 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class ChargeTrajectory : TrajectoryBase
 {
     public Enemy Target { get; private set; }
+    private List<Bonus> _bonuses;
+    public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
     public bool Collides { get; private set; }
     private Jumper _jumper;
     protected override float _fadeSpeed => 5;
@@ -26,7 +30,7 @@ public class ChargeTrajectory : TrajectoryBase
         _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
         var chargePos = linePosition + direction * CHARGE_LENGTH;
 
-        var chargeHit = StepClear(linePosition, chargePos - linePosition, Vector3.Distance(linePosition, chargePos));
+        var chargeHit = StepClear(linePosition, chargePos - linePosition, CHARGE_LENGTH);
 
         if (chargeHit)
         {
@@ -35,8 +39,17 @@ public class ChargeTrajectory : TrajectoryBase
                 //anyTarget = true;
                 if (Target == null)
                 {
-                    Target = chargeHit.collider.GetComponent<Enemy>();
+                    if (chargeHit.collider.TryGetComponent(out Enemy enemy))
+                    {
+                        Target = enemy;
+                    }
+                    else
+                    {
+                        Target = chargeHit.collider.GetComponentInParent<Enemy>();
+                    }
                 }
+
+                chargePos = chargeHit.collider.transform.position;
             }
             else
             {
@@ -57,6 +70,17 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         _line.SetPosition(1, chargePos);
+
+        var bonusDetect = Utils.LineCastAll(linePosition, chargePos, includeTriggers: true).Where(b => b.transform.CompareTag("Bonus")).ToArray();
+        Bonuses.Clear();
+        foreach (var item in bonusDetect)
+        {
+            if (item.transform.TryGetComponent(out Bonus bonus))
+            {
+                Bonuses.Add(bonus);
+            }
+        }
+
         //linePosition = chargePos;
 
         // NE PAS SUPPRIMER => ANCIENNE TRAJECTOIRE DE LA CHARGE

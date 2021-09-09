@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Hero : Character, INinja, IRaycastable, ITriggerable
+public class Hero : Character, INinja, ITriggerable
 {
     [SerializeField] float _ghostSpacing;
     public bool Triggered { get; private set; }
@@ -252,10 +252,5 @@ public class Hero : Character, INinja, IRaycastable, ITriggerable
     public virtual bool NeedsToWalk()
     {
         return _touchManager.WalkDragging;
-    }
-
-    public void PlaySoundEffect(string sound, float volume = 1f)
-    {
-        _audioManager.PlaySound(_audioSource, _audioManager.FindAudioByName(sound), volume);
     }
 }

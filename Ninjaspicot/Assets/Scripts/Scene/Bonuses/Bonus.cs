@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
+public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
 {
     [SerializeField] protected bool _respawn;
     [SerializeField] protected float _respawnTime;
@@ -11,10 +11,14 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
     protected Animator _animator;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
+    protected Hero _hero;
     protected bool _active;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected virtual void Awake()
     {
@@ -28,6 +32,7 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
     protected virtual void Start()
     {
         _active = true;
+        _hero = Hero.Instance;
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -35,18 +40,7 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
         if (!collision.CompareTag("hero"))
             return;
 
-        if (_respawn)
-        {
-            if (_active)
-            {
-                StartCoroutine(TemporaryDeactivation(_respawnTime));
-            }
-        }
-        else
-        {
-            Deactivate();
-            Destroy(gameObject, 1f);
-        }
+        Take();
     }
 
     protected IEnumerator TemporaryDeactivation(float time)
@@ -96,5 +90,21 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable
     public void Wake()
     {
         _animator.SetTrigger("Wake");
+    }
+
+    public virtual void Take()
+    {
+        if (_respawn)
+        {
+            if (_active)
+            {
+                StartCoroutine(TemporaryDeactivation(_respawnTime));
+            }
+        }
+        else
+        {
+            Deactivate();
+            Destroy(gameObject, 1f);
+        }
     }
 }
