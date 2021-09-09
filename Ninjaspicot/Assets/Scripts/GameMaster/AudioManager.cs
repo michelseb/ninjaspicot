@@ -45,15 +45,15 @@ public class AudioManager : MonoBehaviour
         source.PlayOneShot(audio.Clip, volume);
     }
 
-    public void StartPlayProgressive(AudioSource source, float volume = 1f)
+    public void IncreaseVolumeProgressive(AudioSource source, float initVolume = 0f, float volume = 1f)
     {
-        StartCoroutine(PlayProgressive(source, volume));
+        StartCoroutine(PlayProgressive(source, initVolume, volume));
     }
 
-    private IEnumerator PlayProgressive(AudioSource source, float volume)
+    private IEnumerator PlayProgressive(AudioSource source, float initVolume, float volume)
     {
-        source.volume = 0;
-        source.Play();
+        source.volume = initVolume;
+        //source.Play();
 
         while (source.volume < volume)
         {

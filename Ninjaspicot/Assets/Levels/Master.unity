@@ -5569,7 +5569,7 @@ MonoBehaviour:
     FontColor: 6
     GlobalLightColor: 7
     FrontLightColor: 8
-  _startScene: 0
+  _startScene: -1
   _startCheckPoint: -1
 --- !u!4 &780851353
 Transform:
@@ -5782,28 +5782,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _audios:
-  - Name: Tap
-    Clip: {fileID: 8300000, guid: 378a1b82691a8054e94fa02622a815e4, type: 3}
-  - Name: Aspire
-    Clip: {fileID: 8300000, guid: 6ecd2a3e511797d42bf59061933c7e8f, type: 3}
-  - Name: Tu
-    Clip: {fileID: 8300000, guid: d50c364f08cd84343867810df1478f11, type: 3}
-  - Name: Glissement
-    Clip: {fileID: 8300000, guid: a690443ce184a664e8d9eebb7039466a, type: 3}
   - Name: Whoosh1
     Clip: {fileID: 8300000, guid: fc0c690f932e3304589287415165ab15, type: 3}
   - Name: Whoosh2
     Clip: {fileID: 8300000, guid: 67aee502972068842a728e157f5e2917, type: 3}
   - Name: Whoosh3
     Clip: {fileID: 8300000, guid: 03b7c2691eb51d14c948dd8b15762b9c, type: 3}
-  - Name: Blob
-    Clip: {fileID: 8300000, guid: 5b82a3e8b874f5044a7c4d5781ff1045, type: 3}
-  - Name: Tou
-    Clip: {fileID: 8300000, guid: decec4a99030e2c41a10f0db61d250a0, type: 3}
-  - Name: Tap3
-    Clip: {fileID: 8300000, guid: 22a198ae6a5123b4ba85ab6f0cdf1558, type: 3}
-  - Name: Tap4
-    Clip: {fileID: 8300000, guid: b796963f1dece8a46b37c9b7dfef5be9, type: 3}
   - Name: Jump
     Clip: {fileID: 8300000, guid: bce92ea7d13928447b689895405f92b1, type: 3}
   - Name: Slash
@@ -5832,6 +5816,8 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 156ae3021684c5a46a78cbf89dee226a, type: 3}
   - Name: Impact
     Clip: {fileID: 8300000, guid: 816b895ff682e29449e8f78cb0d87c2b, type: 3}
+  - Name: Discover
+    Clip: {fileID: 8300000, guid: 615e514ed8d4f504da67ad92f04e6ac1, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5844,7 +5830,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d2746596d8b9f934389c7fab2639d82a, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.352
+  m_Volume: 0.3
   m_Pitch: 1
   Loop: 1
   Mute: 0

@@ -5,12 +5,12 @@ public class Laser : MonoBehaviour, IWakeable
 
     [SerializeField] protected RectTransform _start;
     [SerializeField] protected RectTransform _end;
-    [SerializeField] protected int _pointsAmount;
     [SerializeField] protected bool _horizontal;
 
     protected LineRenderer _laser;
     protected PolygonCollider2D _collider;
     protected bool _active;
+    protected int _pointsAmount;
     private AudioManager _audioManager;
     private Zone _zone;
     private Audio _electrocutionSound;
@@ -20,7 +20,7 @@ public class Laser : MonoBehaviour, IWakeable
     {
         _laser = GetComponent<LineRenderer>();
         _collider = GetComponent<PolygonCollider2D>();
-        _pointsAmount = _pointsAmount * (int)(_end.position - _start.position).magnitude / 2;
+        _pointsAmount = (int)((_end.position - _start.position).magnitude / 2);
         _audioManager = AudioManager.Instance;
     }
 
@@ -51,11 +51,6 @@ public class Laser : MonoBehaviour, IWakeable
         SetPointsPosition();
     }
 
-    protected virtual Vector3 GetLineVariation()
-    {
-        return transform.up;
-    }
-
     protected virtual void SetPointsPosition()
     {
         var delta = Random.Range(0, 2) * 2 - 1; // -1 or 1
@@ -63,7 +58,7 @@ public class Laser : MonoBehaviour, IWakeable
         for (int i = 1; i < _pointsAmount - 1; i++)
         {
             var pos = _start.position + ((_end.position - _start.position) * (i + 1) / _pointsAmount);
-            _laser.SetPosition(i, pos + GetLineVariation() * delta);
+            _laser.SetPosition(i, pos + transform.up * delta);
             delta *= -1;
         }
     }

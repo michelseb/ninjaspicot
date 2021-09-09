@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class Zone : MonoBehaviour
 {
-    private List<IWakeable> _wakeables;
-    private ZoneManager _zoneManager;
-    private Animator _animator;
-    private CheckPoint _checkpoint;
-    private SpawnManager _spawnManager;
+    protected List<IWakeable> _wakeables;
+    protected ZoneManager _zoneManager;
+    protected Animator _animator;
+    protected CheckPoint _checkpoint;
+    protected SpawnManager _spawnManager;
     public ZoneManager ZoneManager { get { if (Utils.IsNull(_zoneManager)) _zoneManager = ZoneManager.Instance; return _zoneManager; } }
 
     private long _id;
     public long Id { get { if (_id == 0) _id = GetInstanceID(); return _id; } }
 
-    public bool Exited { get; private set; }
+    public bool Exited { get; protected set; }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _animator = GetComponent<Animator>();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         _wakeables = GetComponentsInChildren<IWakeable>().ToList();
         Close();
@@ -31,12 +31,12 @@ public class Zone : MonoBehaviour
         _checkpoint = GetComponentInChildren<CheckPoint>();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         OnTriggerStay2D(collision);
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    protected virtual void OnTriggerExit2D(Collider2D collision)
     {
         if (!collision.CompareTag("hero"))
             return;
@@ -44,7 +44,7 @@ public class Zone : MonoBehaviour
         Exited = true;
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    protected virtual void OnTriggerStay2D(Collider2D collision)
     {
         if (!collision.CompareTag("hero"))
             return;
@@ -80,12 +80,17 @@ public class Zone : MonoBehaviour
             if (active)
             {
                 _wakeables[i].Wake();
-                _spawnManager.SetSpawn(_checkpoint);
+                SetSpawn();
             }
             else
             {
                 _wakeables[i].Sleep();
             }
         }
+    }
+
+    protected virtual void SetSpawn()
+    {
+        _spawnManager.SetSpawn(_checkpoint);
     }
 }

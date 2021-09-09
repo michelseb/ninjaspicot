@@ -10,11 +10,6 @@ public class Background : MonoBehaviour
     private Transform _cameraPos;
     private Material _litMaterial;
 
-    private void Awake()
-    {
-        gameObject.AddComponent<Canvas>().sortingLayerName = "Background";
-    }
-
     private void Start()
     {
         _litMaterial = Resources.Load<Material>("Sprite-Lit-Default");
@@ -47,7 +42,7 @@ public class Background : MonoBehaviour
         imageObject.AddComponent<ParallaxObject>().SetParallaxFactor(_depth);
 
         var rectTransform = imageObject.GetComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(Screen.width / 4, Screen.height / 4);
+        rectTransform.sizeDelta = new Vector2(Screen.width / 6, Screen.height / 6);
         rectTransform.pivot = pivot;
         rectTransform.position = _cameraPos.position;
         rectTransform.parent = transform;

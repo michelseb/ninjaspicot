@@ -69,7 +69,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
     }
 
-    protected void StartWondering(GuardMode nextState, float wonderTime)
+    protected virtual void StartWondering(GuardMode nextState, float wonderTime)
     {
         if (GuardMode == GuardMode.Guarding || GuardMode == GuardMode.Returning)
         {

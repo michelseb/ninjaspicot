@@ -13,7 +13,7 @@ public class ZoneManager : MonoBehaviour
     private static ZoneManager _instance;
     public static ZoneManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ZoneManager>(); return _instance; } }
 
-    public void SetZone(Zone zone)
+    public void SetZone(Zone zone, bool closePrevious = true)
     {
         if (zone.Id == _currentZoneId || !zone.Exited)
             return;
@@ -22,7 +22,10 @@ public class ZoneManager : MonoBehaviour
 
         if (CurrentZone)
         {
-            CurrentZone.Close();
+            if (closePrevious)
+            {
+                CurrentZone.Close();
+            }
         }
         else
         {

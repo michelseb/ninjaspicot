@@ -28,11 +28,6 @@ public class DynamicLaser : Laser
         }
     }
 
-    protected override Vector3 GetLineVariation()
-    {
-        return transform.right;
-    }
-
     protected override void InitPointsPosition()
     {
         _laser.SetPosition(0, _start.position);

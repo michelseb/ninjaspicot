@@ -17,9 +17,13 @@ public class TimeManager : MonoBehaviour, IActivable
     private static TimeManager _instance;
     public static TimeManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TimeManager>(); return _instance; } }
 
+    private float _globalAudioSourceInitVolume;
+
     private const float INCREASE_INTERPOLATION = .5f;
     private const float DECREASE_INTERPOLATION = .8f;
     private const float TIME_SLOW = .05f;
+    private const float VOLUME_SLOWDOWN = .05f;
+
 
     private void Awake()
     {
@@ -29,6 +33,7 @@ public class TimeManager : MonoBehaviour, IActivable
     private void Start()
     {
         _slowDown = _audioManager.FindAudioByName("SlowDown");
+        _globalAudioSourceInitVolume = GlobalAudioSource.volume;
 
         Activate();
     }
@@ -38,7 +43,7 @@ public class TimeManager : MonoBehaviour, IActivable
         if (!_active || Time.timeScale <= slowValue)
             return;
 
-        GlobalAudioSource?.Pause();
+        GlobalAudioSource.volume = VOLUME_SLOWDOWN;//.Pause();
         _audioManager.PlaySound(HeroAudioSource, _slowDown);
         SetTimeScale(slowValue);
     }
@@ -86,9 +91,9 @@ public class TimeManager : MonoBehaviour, IActivable
             HeroAudioSource.Stop();
         }
 
-        if (GlobalAudioSource != null && !GlobalAudioSource.isPlaying)
+        if (GlobalAudioSource != null && GlobalAudioSource.volume < _globalAudioSourceInitVolume)
         {
-            _audioManager.StartPlayProgressive(GlobalAudioSource);
+            _audioManager.IncreaseVolumeProgressive(GlobalAudioSource, VOLUME_SLOWDOWN, _globalAudioSourceInitVolume);
         }
     }
 

@@ -50,6 +50,16 @@ public class PatrollingRobotBall : GuardRobotBall
         }
     }
 
+    protected override void StartWondering(GuardMode nextState, float wonderTime)
+    {
+        if (nextState == GuardMode.Checking)
+        {
+            _initRotation = Transform.rotation;
+        }
+
+        base.StartWondering(nextState, wonderTime);
+    }
+
     protected override void Check()
     {
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -64,6 +74,16 @@ public class PatrollingRobotBall : GuardRobotBall
         {
             StartWondering(GuardMode.Returning, 1f);
         }
+    }
+
+    protected override void StartChasing(Transform target)
+    {
+        if (GuardMode == GuardMode.Guarding)
+        {
+            _initRotation = Transform.rotation;
+        }
+
+        base.StartChasing(target);
     }
 
     protected override void Chase(Vector3 target)
