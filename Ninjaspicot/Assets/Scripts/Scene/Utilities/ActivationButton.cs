@@ -18,6 +18,7 @@ public class ActivationButton : MonoBehaviour, IWakeable
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+    public bool Sleeping { get; set; }
 
     protected virtual void Awake()
     {

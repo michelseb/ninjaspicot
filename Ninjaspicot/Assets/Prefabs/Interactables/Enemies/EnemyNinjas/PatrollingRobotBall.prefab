@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf60ac6be3aef44bb0d5f4b5fa5533b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 50
+  _size: 40
   _viewAngle: 80
   _detailAmount: 20
   _customColor: 2

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Laser : MonoBehaviour, IWakeable
+public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
 {
 
     [SerializeField] protected RectTransform _start;
@@ -15,6 +15,11 @@ public class Laser : MonoBehaviour, IWakeable
     private Zone _zone;
     private Audio _electrocutionSound;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
+
+    public bool Sleeping { get; set; }
 
     protected virtual void Awake()
     {
@@ -67,7 +72,7 @@ public class Laser : MonoBehaviour, IWakeable
     {
         if (collision.CompareTag("hero"))
         {
-            Hero.Instance.Die(sound: _electrocutionSound, volume: .5f);
+            Activate();
         }
     }
 
@@ -113,4 +118,11 @@ public class Laser : MonoBehaviour, IWakeable
         _laser.enabled = true;
         _active = true;
     }
+
+    public void Activate()
+    {
+        Hero.Instance.Die(sound: _electrocutionSound, volume: .5f);
+    }
+
+    public void Deactivate() { }
 }

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public interface INinja
+﻿public interface INinja
 {
     Jumper Jumper { get; }
     Stickiness Stickiness { get; }

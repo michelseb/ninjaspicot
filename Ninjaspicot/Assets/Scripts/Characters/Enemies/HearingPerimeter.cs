@@ -8,6 +8,7 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
     protected Transform _transform;
     protected IListener _listener;
     protected PoolManager _poolManager;
+    protected bool _isActive;
 
     protected virtual void Awake()
     {
@@ -23,11 +24,8 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
 
     protected virtual void OnTriggerEnter2D(Collider2D collider) // Before => Stay2D
     {
-        if (!collider.CompareTag("Sound"))
+        if (!collider.CompareTag("Sound") || !_isActive)
             return;
-
-        //if (!collider.TryGetComponent(out SoundEffect soundEffect))
-        //    return;
 
         _listener.Hear(new HearingArea
         {
@@ -44,10 +42,12 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
 
     public void Activate()
     {
+        _isActive = true;
         gameObject.SetActive(true);
     }
     public void Deactivate()
     {
+        _isActive = false;
         gameObject.SetActive(false);
     }
 }

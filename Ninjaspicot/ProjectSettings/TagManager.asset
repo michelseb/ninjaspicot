@@ -19,6 +19,7 @@ TagManager:
   - TutorialWall
   - Sound
   - Bonus
+  - Interactive
   layers:
   - Default
   - TransparentFX

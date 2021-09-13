@@ -2,13 +2,30 @@
 
 public class RepulsiveObstacle : Obstacle
 {
-    protected override void OnCollisionEnter2D(Collision2D collision)
-    {
-        var ninja = collision.gameObject.GetComponent<INinja>();
-        
-        if (ninja == null)
-            return;
+    //private bool _isHeroAttached;
 
-        ninja.Stickiness.Detach();
+    //protected override void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (!collision.collider.CompareTag("hero"))
+    //        return;
+
+    //    _isHeroAttached = true;
+    //}
+
+    //protected virtual void OnCollisionExit2D(Collision2D collision)
+    //{
+    //    if (!collision.collider.CompareTag("hero"))
+    //        return;
+
+    //    _isHeroAttached = false;
+    //}
+
+    public void DetachHero()
+    {
+        var stickiness = Hero.Instance.Stickiness;
+        if (stickiness.CurrentAttachment == this)
+        {
+            stickiness.Detach();
+        }
     }
 }

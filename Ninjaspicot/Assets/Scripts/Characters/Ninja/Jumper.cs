@@ -123,6 +123,7 @@ public class Jumper : MonoBehaviour
             }
 
             chargeTrajectory.Bonuses.ForEach(x => x.Take());
+            chargeTrajectory.Interactives.ForEach(x => x.Activate());
             chargeTrajectory.Target?.Die();
         }
         else

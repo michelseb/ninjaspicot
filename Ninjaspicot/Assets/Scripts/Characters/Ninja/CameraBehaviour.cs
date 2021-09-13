@@ -41,6 +41,7 @@ public class CameraBehaviour : MonoBehaviour
     private Vector3 _movementOrigin;
     private Vector3 _movementDestination;
     private Vector3 _velocity;
+    private Vector3 _normalOffset;
 
     //Center mode
     private float _centerStart;
@@ -49,9 +50,10 @@ public class CameraBehaviour : MonoBehaviour
     private TimeManager _timeManager;
 
     private float _screenRatio;
-    private float INITIAL_CAMERA_SIZE;
+    private float _initialCamSize;
     private const float ZOOM_SPEED = 2f;
-    private const float FOLLOW_DELAY = .6f;
+    private const float FOLLOW_DELAY = 0.8f;
+    private const float OFFSET_ADJUST_DELAY = 1.8f;
     private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
@@ -67,7 +69,7 @@ public class CameraBehaviour : MonoBehaviour
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
         _screenRatio = (float)Screen.height / Screen.width * .5f;
-        INITIAL_CAMERA_SIZE = 200f * _screenRatio;
+        _initialCamSize = 200f * _screenRatio;
         var color = ColorUtils.GetColor(CustomColor.White);
         SetBaseColor(color, color, color, 0f);
     }
@@ -78,6 +80,7 @@ public class CameraBehaviour : MonoBehaviour
         _tracker = _hero?.transform;
         _velocity = Vector3.zero;
         InstantZoom(_beginZoom);
+        //SetFollowMode(_tracker);
         Zoom(ZoomType.Intro);
     }
 
@@ -92,7 +95,7 @@ public class CameraBehaviour : MonoBehaviour
         switch (CameraMode)
         {
             case CameraMode.Follow:
-                Follow(_tracker, FOLLOW_DELAY);
+                Follow(_tracker);
                 break;
 
             case CameraMode.Center:
@@ -117,18 +120,37 @@ public class CameraBehaviour : MonoBehaviour
             Colorize(_targetColor);
         }
     }
-    private void Follow(Transform tracker, float speed)
+    private void Follow(Transform tracker)
     {
-        Transform.position = Vector3.SmoothDamp(Transform.position, tracker.position, ref _velocity, speed);
+        float speed;
+        var stickiness = _hero.Stickiness;
+
+        if (stickiness.Walking || !stickiness.Attached)
+        {
+            speed = FOLLOW_DELAY;
+        }
+        else
+        {
+            _normalOffset = Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25;
+            speed = OFFSET_ADJUST_DELAY;
+        }
+
+        if (!stickiness.Attached || _normalOffset.magnitude > 0 && Vector3.Dot(_normalOffset, Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25) < .5f)
+        {
+            _normalOffset = Vector3.zero;
+        }
+
+        Transform.position = Vector3.SmoothDamp(Transform.position, tracker.position + _normalOffset, ref _velocity, speed);
     }
 
     private void Center(Vector3 origin, Vector3 destination, float duration)
     {
-        var interpolation = (Time.unscaledTime - _centerStart) / duration;
-        Transform.position = Vector3.Lerp(origin, destination, interpolation);
+        //var interpolation = (Time.unscaledTime - _centerStart) / duration;
+        //Transform.position = Vector3.Lerp(origin, destination, interpolation);
+        Transform.position = destination;
     }
 
-    public void Teleport (Vector3 position)
+    public void Teleport(Vector3 position)
     {
         Transform.position = new Vector3(position.x, position.y, Transform.position.z);
     }
@@ -181,32 +203,32 @@ public class CameraBehaviour : MonoBehaviour
 
     private IEnumerator ReinitZoom()
     {
-        var delta = INITIAL_CAMERA_SIZE - MainCamera.orthographicSize;
+        var delta = _initialCamSize - MainCamera.orthographicSize;
 
-        while (Mathf.Sign(delta) * (INITIAL_CAMERA_SIZE - MainCamera.orthographicSize) > 0)
+        while (Mathf.Sign(delta) * (_initialCamSize - MainCamera.orthographicSize) > 0)
         {
             MainCamera.orthographicSize += delta * Time.unscaledDeltaTime * ZOOM_SPEED * _screenRatio;
             yield return null;
         }
-        MainCamera.orthographicSize = INITIAL_CAMERA_SIZE;
+        MainCamera.orthographicSize = _initialCamSize;
     }
 
     private IEnumerator ZoomIntro(float speed)
     {
         yield return new WaitForSecondsRealtime(2);
 
-        while (MainCamera.orthographicSize > INITIAL_CAMERA_SIZE)
+        while (MainCamera.orthographicSize > _initialCamSize)
         {
             MainCamera.orthographicSize -= speed;
             yield return null;
         }
         SetFollowMode(_hero.transform);
-        _hero.Jumper.Active = true;
+        //_hero.Jumper.Active = true;
     }
 
-    private void InstantZoom(int zoom)
+    private void InstantZoom(float zoom)
     {
-        MainCamera.orthographicSize = INITIAL_CAMERA_SIZE + zoom * _screenRatio;
+        MainCamera.orthographicSize = _initialCamSize + zoom * _screenRatio;
     }
 
     public void Zoom(ZoomType type, int zoomAmount = 0)

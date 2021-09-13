@@ -69,7 +69,7 @@ public abstract class Aim : FieldOfView
         if (!TargetInView)
             return false;
 
-        var collider = Utils.RayCast(origin.position, origin.up, ignore: ignoreId, ignoreType: typeof(TurretWall)).collider;
+        var collider = Utils.RayCast(origin.position, origin.up, ignore: ignoreId).collider;
 
         if (collider == null)
             return false;
@@ -82,7 +82,7 @@ public abstract class Aim : FieldOfView
         if (target == null || !TargetInView)
             return false;
 
-        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag, typeof(TurretWall));
+        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }
@@ -92,7 +92,7 @@ public abstract class Aim : FieldOfView
         if (target == null || !TargetInRange)
             return false;
 
-        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag, typeof(TurretWall));
+        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }

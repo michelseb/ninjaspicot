@@ -41,9 +41,10 @@ public class CameraCatcher : MonoBehaviour, IActivable
         if (_cameraBehaviour.CameraMode != CameraMode.Follow)
             return;
 
-        _cameraBehaviour.Zoom(ZoomType.Progressive, _zoomAmount);
+        _cameraBehaviour.Zoom(ZoomType.Instant, _zoomAmount);
         _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
         _activated = true;
+        transform.localScale = Vector3.one * 1.1f;
     }
 
     public virtual void Deactivate()
@@ -51,5 +52,6 @@ public class CameraCatcher : MonoBehaviour, IActivable
         _cameraBehaviour.Zoom(ZoomType.Init);
         _cameraBehaviour.SetFollowMode(Hero.Instance.transform);
         _activated = false;
+        transform.localScale = Vector3.one;
     }
 }

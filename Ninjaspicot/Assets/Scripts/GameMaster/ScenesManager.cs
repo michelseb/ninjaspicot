@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,6 +27,8 @@ public class ScenesManager : MonoBehaviour
 
     public Coroutine SceneLoad { get; private set; }
     public SceneInfos CurrentScene { get; private set; }
+
+    private List<IWakeable> _wakeables;
 
     private CameraBehaviour _cameraBehaviour;
     private SpawnManager _spawnManager;
@@ -98,6 +101,15 @@ public class ScenesManager : MonoBehaviour
             SceneManager.SetActiveScene(sceneToLoad);
             _spawnManager.InitActiveSceneSpawns();
             CurrentScene = sceneInfos;
+
+            //Deactivate all wakeables
+            _wakeables = FindObjectsOfType<Zone>(true).SelectMany(zone => zone.GetComponentsInChildren<IWakeable>()).ToList();
+            _wakeables.ForEach(w => 
+            {
+                w.Sleep();
+                w.Sleeping = true;
+            });
+
             sceneInfos.Loaded = true;
         }
     }
@@ -130,11 +142,6 @@ public class ScenesManager : MonoBehaviour
     private SceneInfos FindSceneByName(string name)
     {
         return _scenes.FirstOrDefault(s => s.Name == name);
-    }
-
-    public void MoveObjectToCurrentScene(GameObject obj)
-    {
-        SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
     }
 
     private SceneInfos GetSceneByPortalId(int portalId)

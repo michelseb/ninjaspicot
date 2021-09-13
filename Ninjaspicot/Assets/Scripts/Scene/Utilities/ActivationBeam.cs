@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
 using UnityEngine.UI;
 
 public enum AccessGrant
@@ -9,20 +8,24 @@ public enum AccessGrant
     No = 2
 }
 
-public class ActivationBeam : MonoBehaviour, IWakeable
+public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
 {
     [SerializeField] protected GameObject _activableObject;
-    public bool Colliding { get; set; }
-
+    private int _collidingAmount;
+    public bool Colliding => _collidingAmount > 0;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
     protected IActivable _activable;
     protected Image _renderer;
     protected Lamp _light;
-    protected AccessGrant _accessGrant;
+    protected AccessGrant? _accessGrant;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+    public bool Sleeping { get; set; }
+
+    private int _id;
+    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected virtual void Awake()
     {
@@ -45,36 +48,20 @@ public class ActivationBeam : MonoBehaviour, IWakeable
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        UpdateState(GetAccessGrant(collision));
+        if (!collision.CompareTag("hero") && !collision.CompareTag("Enemy"))
+            return;
+
+        _collidingAmount++;
+        UpdateState(GetAccessGrant(collision.tag));
     }
 
     protected virtual void OnTriggerExit2D(Collider2D collision)
     {
-        Colliding = false;
-    }
-
-    protected virtual void UpdateState(AccessGrant accessGrant)
-    {
-        if (_activable == null)
+        if (!collision.CompareTag("hero") && !collision.CompareTag("Enemy"))
             return;
 
-        _accessGrant = accessGrant;
-
-        SetActiveColor(accessGrant);
-
-        if (accessGrant == AccessGrant.None)
-            return;
-
-        Colliding = true;
-
-        if (accessGrant == AccessGrant.Yes)
-        {
-            _activable.Activate();
-        }
-        else
-        {
-            _activable.Deactivate();
-        }
+        _collidingAmount--;
+        UpdateState(GetAccessGrant(collision.tag));
     }
 
     protected virtual void SetActiveColor(AccessGrant accessGrant)
@@ -107,17 +94,64 @@ public class ActivationBeam : MonoBehaviour, IWakeable
         _light.enabled = true;
     }
 
-    protected AccessGrant GetAccessGrant(Collider2D collider)
+    protected AccessGrant GetAccessGrant(string entityTag)
     {
-        if (Colliding)
-            return _accessGrant;
+        //if (Colliding)
+        //    return _accessGrant.Value;
+        if (!Colliding)
+            return AccessGrant.None;
 
-        if (collider.CompareTag("hero"))
+        if (entityTag == null || entityTag == "hero")
             return AccessGrant.No;
 
-        if (collider.CompareTag("Enemy"))
+        if (entityTag == "Enemy")
             return AccessGrant.Yes;
 
         return AccessGrant.None;
+    }
+
+    protected void UpdateState(AccessGrant accessGrant)
+    {
+        if (_collidingAmount > 1)
+            return;
+
+        if (accessGrant == AccessGrant.None)
+        {
+            ResetState();
+        }
+        else if (accessGrant == AccessGrant.Yes)
+        {
+            Activate();
+        }
+        else
+        {
+            Deactivate();
+        }
+    }
+
+    public void ResetState()
+    {
+        _accessGrant = AccessGrant.None;
+        SetActiveColor(AccessGrant.None);
+    }
+
+    public void Activate()
+    {
+        // Hack => if activated by charge
+        if (!Colliding)
+        {
+            Deactivate();
+            return;
+        }
+        _accessGrant = AccessGrant.Yes;
+        SetActiveColor(AccessGrant.Yes);
+        _activable.Activate();
+    }
+
+    public void Deactivate() 
+    {
+        _accessGrant = AccessGrant.No;
+        SetActiveColor(AccessGrant.No);
+        _activable.Deactivate();
     }
 }

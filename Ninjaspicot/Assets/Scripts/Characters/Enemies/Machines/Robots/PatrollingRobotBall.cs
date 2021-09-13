@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,15 +7,16 @@ public class PatrollingRobotBall : GuardRobotBall
 {
     [SerializeField] TargetPoint _target;
     [SerializeField] TargetPoint[] _targetPoints;
-    protected IList<Vector3> _pathPositions;
+    protected IList<TargetPoint> _pathTargets;
 
-    private Vector3? _currentPathTarget;
+    private TargetPoint _currentPathTarget;
     private Vector3? _targetPosition;
+    private Coroutine _waitAtTarget;
 
     protected override void Awake()
     {
         base.Awake();
-        _pathPositions = _targetPoints != null ? _targetPoints.Where(p => p != null && !p.IsAim).Select(x => x.transform.position).ToList() : new List<Vector3>();
+        _pathTargets = _targetPoints != null ? _targetPoints.Where(p => p != null && !p.IsAim).ToList() : new List<TargetPoint>();
         _targetPosition = _target?.transform.position;
         InitPathTarget();
     }
@@ -32,21 +34,24 @@ public class PatrollingRobotBall : GuardRobotBall
 
     protected override void Guard()
     {
+        if (_waitAtTarget != null)
+            return;
+
         if (_targetPosition.HasValue)
         {
             _sprite.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
         }
 
-        if (!_currentPathTarget.HasValue)
+        if (_currentPathTarget == null)
             return;
 
-        var direction = Utils.ToVector2(_currentPathTarget.Value - Transform.position);
+        var direction = Utils.ToVector2(_currentPathTarget.transform.position - Transform.position);
 
         _rigidbody.MovePosition(_rigidbody.position + direction.normalized * Time.deltaTime * _moveSpeed);
 
         if (direction.magnitude < 1)
         {
-            SetNextPathTarget();
+            UpdateTarget(_currentPathTarget);
         }
     }
 
@@ -138,40 +143,61 @@ public class PatrollingRobotBall : GuardRobotBall
     private void InitPathTarget()
     {
         float previousDelta = float.MaxValue;
-        Vector3? previousPos = null;
-        foreach (var position in _pathPositions)
+        TargetPoint previousTarget = null;
+
+        foreach (var target in _pathTargets)
         {
-            var magnitude = (position - Transform.position).magnitude;
+            var magnitude = (target.transform.position - Transform.position).magnitude;
             if (magnitude < previousDelta)
             {
                 previousDelta = magnitude;
-                previousPos = position;
+                previousTarget = target;
             }
         }
 
-        if (!previousPos.HasValue)
+        if (previousTarget == null)
             return;
 
-        foreach (var position in _pathPositions.ToArray())
+        foreach (var targets in _pathTargets.ToArray())
         {
-            if (position == previousPos.Value)
+            if (targets == previousTarget)
                 break;
 
-            _pathPositions.RemoveAt(0);
-            _pathPositions.Add(position);
+            _pathTargets.RemoveAt(0);
+            _pathTargets.Add(targets);
         }
 
 
-        _currentPathTarget = previousPos.Value;
+        _currentPathTarget = previousTarget;
+    }
+
+    private void UpdateTarget(TargetPoint targetPoint)
+    {
+        if (targetPoint.PauseAmount == 0)
+        {
+            SetNextPathTarget();
+        }
+        else
+        {
+            _waitAtTarget = StartCoroutine(WaitAtTarget(targetPoint.PauseAmount));
+        }
     }
 
     private void SetNextPathTarget()
     {
-        if (_pathPositions == null || _pathPositions.Count == 0)
+        if (_pathTargets == null || _pathTargets.Count == 0)
             return;
 
-        _pathPositions.RemoveAt(0);
-        _pathPositions.Add(_currentPathTarget.Value);
-        _currentPathTarget = _pathPositions[0];
+        _pathTargets.RemoveAt(0);
+        _pathTargets.Add(_currentPathTarget);
+        _currentPathTarget = _pathTargets[0];
+    }
+
+    private IEnumerator WaitAtTarget(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        _waitAtTarget = null;
+        SetNextPathTarget();
     }
 }

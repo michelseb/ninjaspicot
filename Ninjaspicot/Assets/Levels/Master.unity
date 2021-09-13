@@ -5569,8 +5569,8 @@ MonoBehaviour:
     FontColor: 6
     GlobalLightColor: 7
     FrontLightColor: 8
-  _startScene: -1
-  _startCheckPoint: -1
+  _startScene: 3
+  _startCheckPoint: 3
 --- !u!4 &780851353
 Transform:
   m_ObjectHideFlags: 0
@@ -5818,6 +5818,10 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 816b895ff682e29449e8f78cb0d87c2b, type: 3}
   - Name: Discover
     Clip: {fileID: 8300000, guid: 615e514ed8d4f504da67ad92f04e6ac1, type: 3}
+  - Name: DoorBang
+    Clip: {fileID: 8300000, guid: 1c97f6867bdb6174ead261323a731f33, type: 3}
+  - Name: DoorOpen
+    Clip: {fileID: 8300000, guid: ddedab5fefdb4d34295bcdd89bf8bfac, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

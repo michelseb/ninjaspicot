@@ -15,9 +15,9 @@ public class CompositeContainer : MonoBehaviour, IRaycastable
 
     private void Awake()
     {
-        _collider = GetComponent<CompositeCollider2D>();
-        _locationPoints = new List<LocationPoint>();
-        SetPaths();
+        //_collider = GetComponent<CompositeCollider2D>();
+        //_locationPoints = new List<LocationPoint>();
+        //SetPaths();
     }
 
     private void SetPaths()

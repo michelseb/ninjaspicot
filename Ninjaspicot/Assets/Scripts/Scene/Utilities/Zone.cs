@@ -71,20 +71,25 @@ public class Zone : MonoBehaviour
     {
         for (int i = 0; i < _wakeables.Count; i++)
         {
-            if (Utils.IsNull(_wakeables[i]))
+            var item = _wakeables[i];
+
+            if (Utils.IsNull(item))
             {
                 _wakeables.RemoveAt(i);
                 continue;
             }
 
-            if (active)
+            if (active && item.Sleeping)
             {
-                _wakeables[i].Wake();
+                item.Wake();
+                item.Sleeping = false;
+
                 SetSpawn();
             }
-            else
+            else if (!active && !item.Sleeping)
             {
-                _wakeables[i].Sleep();
+                item.Sleep();
+                item.Sleeping = true;
             }
         }
     }

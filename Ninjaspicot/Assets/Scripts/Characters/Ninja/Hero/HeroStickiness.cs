@@ -7,7 +7,6 @@ public class HeroStickiness : Stickiness
     private TouchManager _touchManager;
     private AudioManager _audioManager;
     private AudioSource _audioSource;
-    private Audio _impact;
     private Audio _walkAudio;
     private Audio _runAudio;
     private Vector3 _previousPosition;
@@ -18,7 +17,6 @@ public class HeroStickiness : Stickiness
         _touchManager = TouchManager.Instance;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
-        _impact = _audioManager.FindAudioByName("Blob");
         _walkAudio = _audioManager.FindAudioByName("Whoosh3");
         _runAudio = _audioManager.FindAudioByName("Whoosh2");
     }

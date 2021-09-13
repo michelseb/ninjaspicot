@@ -19,6 +19,8 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
+    public bool Sleeping { get; set; }
+
 
     protected virtual void Awake()
     {
@@ -37,7 +39,7 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("hero"))
+        if (!collision.CompareTag("hero") || Hero.Instance.Dead)
             return;
 
         Take();

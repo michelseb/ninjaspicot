@@ -19,4 +19,12 @@ public class RobotView : FieldOfView
             _robot.See(Hero.Instance.Transform);
         }
     }
+
+    protected virtual void OnTriggerStay2D(Collider2D collider)
+    {
+        if (collider.CompareTag("hero"))
+        {
+            _robot.See(Hero.Instance.Transform);
+        }
+    }
 }

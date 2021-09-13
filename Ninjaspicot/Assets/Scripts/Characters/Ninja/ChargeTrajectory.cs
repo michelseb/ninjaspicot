@@ -7,6 +7,9 @@ public class ChargeTrajectory : TrajectoryBase
     public Enemy Target { get; private set; }
     private List<Bonus> _bonuses;
     public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
+
+    private List<IActivable> _interactives;
+    public List<IActivable> Interactives { get { if (_interactives == null) _interactives = new List<IActivable>(); return _interactives; } }
     public bool Collides { get; private set; }
     private Jumper _jumper;
     protected override float _fadeSpeed => 5;
@@ -71,9 +74,21 @@ public class ChargeTrajectory : TrajectoryBase
 
         _line.SetPosition(1, chargePos);
 
-        var bonusDetect = Utils.LineCastAll(linePosition, chargePos, includeTriggers: true).Where(b => b.transform.CompareTag("Bonus")).ToArray();
+        var interactableDetect = Utils.LineCastAll(linePosition, chargePos, includeTriggers: true);
+        var interactives = interactableDetect.Where(i => i.transform.CompareTag("Interactive")).ToArray();
+
+        Interactives.Clear();
+        foreach (var interactive in interactives)
+        {
+            if (interactive.transform.TryGetComponent(out IActivable activable))
+            {
+                Interactives.Add(activable);
+            }
+        }
+
+        var bonuses = interactableDetect.Where(b => b.transform.CompareTag("Bonus")).ToArray();
         Bonuses.Clear();
-        foreach (var item in bonusDetect)
+        foreach (var item in bonuses)
         {
             if (item.transform.TryGetComponent(out Bonus bonus))
             {

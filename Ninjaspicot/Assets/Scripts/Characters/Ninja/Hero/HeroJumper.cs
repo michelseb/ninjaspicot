@@ -15,6 +15,12 @@ public class HeroJumper : Jumper
         _timeManager = TimeManager.Instance;
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        Active = true;
+    }
+
     public override void NormalJump(Vector2 direction)
     {
         if (_dynamicInteraction.Interacting)
