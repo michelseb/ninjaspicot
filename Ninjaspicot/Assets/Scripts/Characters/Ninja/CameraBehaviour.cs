@@ -14,8 +14,7 @@ public enum CameraMode
 {
     None = 0,
     Follow = 1,
-    Center = 2,
-    Stick = 3
+    Center = 2
 }
 
 
@@ -23,38 +22,22 @@ public class CameraBehaviour : MonoBehaviour
 {
     [SerializeField]
     private int _beginZoom;
-    [SerializeField]
-    private Light2D _globalLight;
-    [SerializeField]
-    private Light2D _frontLight;
-    public Transform Transform { get; private set; }
+    public Transform ParentTransform { get; private set; }
     public Camera MainCamera { get; private set; }
     public CameraMode CameraMode { get; private set; }
-    public Coroutine ColorLerp { get; private set; }
 
     private Hero _hero;
-    private float _colorInterpolation;
-    private Color _baseColor;
-    private Color _targetColor;
     private Transform _tracker;
     private Transform _transform;
-    private Vector3 _movementOrigin;
     private Vector3 _movementDestination;
     private Vector3 _velocity;
     private Vector3 _normalOffset;
-
-    //Center mode
-    private float _centerStart;
-    private float _centerDuration;
-
-    private TimeManager _timeManager;
 
     private float _screenRatio;
     private float _initialCamSize;
     private const float ZOOM_SPEED = 2f;
     private const float FOLLOW_DELAY = 0.8f;
     private const float OFFSET_ADJUST_DELAY = 1.8f;
-    private const float COLOR_THRESHOLD = .01f;
 
     private static CameraBehaviour _instance;
     public static CameraBehaviour Instance { get { if (_instance == null) _instance = FindObjectOfType<CameraBehaviour>(); return _instance; } }
@@ -62,22 +45,17 @@ public class CameraBehaviour : MonoBehaviour
     private void Awake()
     {
         MainCamera = GetComponent<Camera>();
-        _timeManager = TimeManager.Instance;
         _transform = transform;
-        Transform = _transform.parent.transform;
+        ParentTransform = _transform.parent.transform;
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
         _screenRatio = (float)Screen.height / Screen.width * .5f;
         _initialCamSize = 200f * _screenRatio;
-        var color = ColorUtils.GetColor(CustomColor.White);
-        SetBaseColor(color, color, color, 0f);
     }
 
     private void Start()
     {
-        _hero = Hero.Instance;
-        _tracker = _hero?.transform;
         _velocity = Vector3.zero;
         InstantZoom(_beginZoom);
         //SetFollowMode(_tracker);
@@ -90,6 +68,12 @@ public class CameraBehaviour : MonoBehaviour
         {
             _hero = Hero.Instance;
             _tracker = _hero?.transform;
+            ParentTransform.position = _tracker.position;
+            var background = FindObjectOfType<Background>();
+            if (background != null)
+            {
+                background.CenterBackground();
+            }
         }
 
         switch (CameraMode)
@@ -99,25 +83,8 @@ public class CameraBehaviour : MonoBehaviour
                 break;
 
             case CameraMode.Center:
-                Center(_movementOrigin, _movementDestination, _centerDuration);
+                Center(_movementDestination);
                 break;
-
-            case CameraMode.Stick:
-                Stick(_tracker.position);
-                break;
-        }
-
-        var newCol = _baseColor * _timeManager.TimeScale;
-        _targetColor = newCol;//new Color(Mathf.Clamp(newCol.r, .3f, 1), Mathf.Clamp(newCol.g, .3f, 1), Mathf.Clamp(newCol.b, .3f, 1));
-
-        if (Mathf.Abs(MainCamera.backgroundColor.grayscale - _targetColor.grayscale) > COLOR_THRESHOLD && _colorInterpolation >= 1)
-        {
-            _colorInterpolation = 0;
-        }
-
-        if (_colorInterpolation < 1)
-        {
-            Colorize(_targetColor);
         }
     }
     private void Follow(Transform tracker)
@@ -134,60 +101,32 @@ public class CameraBehaviour : MonoBehaviour
             _normalOffset = Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25;
             speed = OFFSET_ADJUST_DELAY;
         }
-
+        //Debug.Log(_normalOffset);
         if (!stickiness.Attached || _normalOffset.magnitude > 0 && Vector3.Dot(_normalOffset, Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25) < .5f)
         {
             _normalOffset = Vector3.zero;
         }
 
-        Transform.position = Vector3.SmoothDamp(Transform.position, tracker.position + _normalOffset, ref _velocity, speed);
+        ParentTransform.position = Vector3.SmoothDamp(ParentTransform.position, tracker.position + _normalOffset, ref _velocity, speed);
     }
 
-    private void Center(Vector3 origin, Vector3 destination, float duration)
+    public void Center(Vector3 destination)
     {
-        //var interpolation = (Time.unscaledTime - _centerStart) / duration;
-        //Transform.position = Vector3.Lerp(origin, destination, interpolation);
-        Transform.position = destination;
-    }
-
-    public void Teleport(Vector3 position)
-    {
-        Transform.position = new Vector3(position.x, position.y, Transform.position.z);
-    }
-
-    public void Stick(Vector3 tracker)
-    {
-        Transform.position = tracker;
+        ParentTransform.position = new Vector3(destination.x, destination.y, ParentTransform.position.z);
     }
 
     public void SetFollowMode(Transform tracker)
     {
         CameraMode = CameraMode.Follow;
         _tracker = tracker;
-        _tracker.position = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
+        _velocity = Vector3.zero;
     }
 
-    public void SetStickMode(Transform tracker)
-    {
-        CameraMode = CameraMode.Stick;
-        _tracker = tracker;
-        _tracker.position = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
-    }
-
-    public void SetCenterMode(Transform tracker, float duration)
+    public void SetCenterMode(Transform tracker)
     {
         CameraMode = CameraMode.Center;
         _tracker = tracker;
-        _centerDuration = duration;
-        _movementOrigin = Transform.position;
-        _movementDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, Transform.position.z);
-        _centerStart = Time.unscaledTime;
-    }
-
-    private void Colorize(Color color)
-    {
-        _colorInterpolation += Time.unscaledDeltaTime * 10;
-        MainCamera.backgroundColor = Color.Lerp(MainCamera.backgroundColor, color, _colorInterpolation);
+        _movementDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, ParentTransform.position.z);
     }
 
     private IEnumerator ZoomProgressive(int zoom)
@@ -278,36 +217,5 @@ public class CameraBehaviour : MonoBehaviour
         }
 
         _transform.localPosition = pos;
-    }
-
-    public void SetBaseColor(Color fontColor, Color globalLightColor, Color frontLightColor, float duration)
-    {
-        if (ColorLerp != null)
-        {
-            StopCoroutine(ColorLerp);
-            ColorLerp = null;
-        }
-
-        ColorLerp = StartCoroutine(LerpFont(_baseColor, fontColor, globalLightColor, frontLightColor, duration));
-    }
-
-    private IEnumerator LerpFont(Color init, Color goal, Color lightGoal, Color frontGoal, float duration)
-    {
-        var currTime = Time.unscaledTime;
-        var interpolation = (Time.unscaledTime - currTime) / duration;
-        var lightColor = _globalLight.color;
-        var frontColor = _frontLight.color;
-
-        while (interpolation < 1)
-        {
-            interpolation = (Time.unscaledTime - currTime) / duration;
-            _baseColor = Color.Lerp(init, goal, interpolation);
-            _globalLight.color = Color.Lerp(lightColor, lightGoal, interpolation);
-            _frontLight.color = Color.Lerp(frontColor, frontGoal, interpolation);
-            yield return null;
-        }
-
-        _baseColor = goal;
-        ColorLerp = null;
     }
 }

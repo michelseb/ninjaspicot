@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, IListener
+public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 {
     public enum Mode { Scan, LookFor, Aim, Wonder };
 
@@ -13,6 +13,8 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
     [SerializeField] protected float _aimSpeed;
     [SerializeField] protected float _searchSpeed;
     [SerializeField] protected float _wonderTime;
+    [SerializeField] protected Transform _shootingPosition;
+    [SerializeField] protected Transform _turretHead;
 
     public IKillable TargetEntity { get; set; }
     public bool Loaded { get; protected set; }
@@ -32,7 +34,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         base.Awake();
         _aim = GetComponentInChildren<Aim>();
         _aim.CurrentTarget = "hero";
-        _image = GetComponent<Image>();
+        _image = _turretHead.GetComponent<Image>();
         _aimSpeed = .5f;
     }
 
@@ -42,7 +44,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
         TurretMode = Mode.Scan;
         Loaded = true;
         Activate();
-        Transform.Rotate(0, 0, _initRotation);
+        _turretHead.Rotate(0, 0, _initRotation);
 
     }
 
@@ -78,20 +80,20 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
     public virtual void Aim(IKillable target)
     {
         var speed = _aim.TargetInView ? _aimSpeed : _searchSpeed;
-        Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - Transform.position), speed);
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - _turretHead.position), speed);
     }
 
     public virtual void LookFor()
     {
-        Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - Transform.position), _searchSpeed);
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _turretHead.position), _searchSpeed);
     }
 
     protected virtual void Scan()
     {
         var dir = _clockWise ? 1 : -1;
-        Transform.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+        _turretHead.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
 
-        if (dir * (Transform.rotation.eulerAngles.z - _initRotation) > _viewAngle)
+        if (dir * (_turretHead.rotation.eulerAngles.z - _initRotation) > _viewAngle)
         {
             _clockWise = !_clockWise;
         }
@@ -135,7 +137,10 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer, ILi
 
     public void See(Transform target)
     {
-
+        if (target.TryGetComponent(out IKillable killable))
+        {
+            StartAim(killable);
+        }
     }
 
     public override void Activate()

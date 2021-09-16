@@ -25,19 +25,19 @@ public class ParallaxManager : MonoBehaviour
 
     private void Start()
     {
-        _previousCameraPosition = _cameraBehaviour.Transform.position;
+        _previousCameraPosition = _cameraBehaviour.ParentTransform.position;
     }
 
     private void Update()
     {
-        var deltaPosition = _cameraBehaviour.Transform.position - _previousCameraPosition;
+        var deltaPosition = _cameraBehaviour.ParentTransform.position - _previousCameraPosition;
 
         if (deltaPosition.magnitude == 0)
             return;
 
         OperateParallax(deltaPosition);
 
-        _previousCameraPosition = _cameraBehaviour.Transform.position;
+        _previousCameraPosition = _cameraBehaviour.ParentTransform.position;
     }
 
     public void AddObject(ParallaxObject parallaxObject)

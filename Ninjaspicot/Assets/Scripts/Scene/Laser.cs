@@ -6,6 +6,7 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
     [SerializeField] protected RectTransform _start;
     [SerializeField] protected RectTransform _end;
     [SerializeField] protected bool _horizontal;
+    [SerializeField] protected bool _startAwake;
 
     protected LineRenderer _laser;
     protected PolygonCollider2D _collider;
@@ -27,6 +28,10 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
         _collider = GetComponent<PolygonCollider2D>();
         _pointsAmount = (int)((_end.position - _start.position).magnitude / 2);
         _audioManager = AudioManager.Instance;
+        if (_startAwake)
+        {
+            Wake();
+        }
     }
 
     protected virtual void Start()

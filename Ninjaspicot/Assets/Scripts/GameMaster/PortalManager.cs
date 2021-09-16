@@ -99,7 +99,6 @@ public class PortalManager : MonoBehaviour
         if (otherId == null)
             return;
 
-        _scenesManager.InitColorChange(otherId.Value);
         Connection = StartCoroutine(CreateConnection(entrance, otherId.Value));
     }
 
@@ -134,7 +133,7 @@ public class PortalManager : MonoBehaviour
         _audioManager.PlaySound(_audioSource, _exitClip, .3f);
         var rb = Hero.Instance.Stickiness.Rigidbody;
         rb.position = exit.transform.position - exit.transform.right * 4;
-        _cameraBehaviour.Teleport(Hero.Instance.Stickiness.Rigidbody.position);
+        _cameraBehaviour.Center(Hero.Instance.Stickiness.Rigidbody.position);
         _uiCamera.CameraAppear();
         entrance.Reinit();
         ClosePreviousZone(entrance.Id);

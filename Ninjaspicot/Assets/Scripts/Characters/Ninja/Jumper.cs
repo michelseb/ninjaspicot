@@ -119,7 +119,7 @@ public class Jumper : MonoBehaviour
             if (chargeTrajectory.Collides)
             {
                 _audioManager.PlaySound(_audioSource, _impactSound);
-                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 30);
+                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 3);
             }
 
             chargeTrajectory.Bonuses.ForEach(x => x.Take());

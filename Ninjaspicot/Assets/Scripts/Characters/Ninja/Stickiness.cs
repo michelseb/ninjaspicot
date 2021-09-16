@@ -73,14 +73,8 @@ public class Stickiness : MonoBehaviour, IDynamic
     {
         var contact = GetContactPoint(collision.contacts, _previousContactPoint);
         SetContactPosition(contact.point);
-        SetCollisionNormal(contact);
-    }
-
-    public void SetCollisionNormal(ContactPoint2D contact)
-    {
         CollisionNormal = Quaternion.Euler(0, 0, -90) * contact.normal;
     }
-
 
     public virtual bool Attach(Obstacle obstacle)
     {

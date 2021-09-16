@@ -24,6 +24,7 @@ public class ScenesManager : MonoBehaviour
     [SerializeField] private SceneInfos[] _scenes;
     [SerializeField] private int _startScene;
     [SerializeField] private int _startCheckPoint;
+    [SerializeField] private AudioClip[] _sceneAudios;
 
     public Coroutine SceneLoad { get; private set; }
     public SceneInfos CurrentScene { get; private set; }
@@ -32,6 +33,8 @@ public class ScenesManager : MonoBehaviour
 
     private CameraBehaviour _cameraBehaviour;
     private SpawnManager _spawnManager;
+    private AudioSource _audioSource;
+    private Coroutine _volumeDown;
 
     private static ScenesManager _instance;
     public static ScenesManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ScenesManager>(); return _instance; } }
@@ -42,6 +45,7 @@ public class ScenesManager : MonoBehaviour
 
         _cameraBehaviour = CameraBehaviour.Instance;
         _spawnManager = SpawnManager.Instance;
+        _audioSource = GetComponent<AudioSource>();
 
         if (_startScene < 2)
         {
@@ -62,12 +66,35 @@ public class ScenesManager : MonoBehaviour
     {
         var lobby = FindSceneByName("Lobby");
         SceneManager.LoadScene(lobby.Name);
+        SwitchAudio(1);
         lobby.Loaded = true;
     }
 
     public void LoadSceneById(int sceneId)
     {
         SceneManager.LoadScene(sceneId);
+        SwitchAudio(sceneId);
+    }
+
+    private void SwitchAudio(int sceneId)
+    {
+        if (_sceneAudios.Length >= sceneId)
+        {
+            _audioSource.Stop();
+            _audioSource.clip = _sceneAudios[sceneId];
+            _audioSource.volume = 1;
+            _audioSource.Play();
+        }
+    }
+    private IEnumerator VolumeDown()
+    {
+        while (_audioSource.volume > 0)
+        {
+            _audioSource.volume -= Time.deltaTime;
+            yield return null;
+        }
+
+        _volumeDown = null;
     }
 
     private IEnumerator LoadAdditionalZone(int portalId)
@@ -77,10 +104,11 @@ public class ScenesManager : MonoBehaviour
         if (scene == null || scene.Loaded)
             yield break;
 
+        _volumeDown = StartCoroutine(VolumeDown());
         var operation = SceneManager.LoadSceneAsync(scene.Name, LoadSceneMode.Additive);
         operation.allowSceneActivation = false;
 
-        while (operation.progress < .9f)
+        while (operation.progress < .9f || _volumeDown != null)
             yield return null;
 
         operation.allowSceneActivation = true;
@@ -101,10 +129,10 @@ public class ScenesManager : MonoBehaviour
             SceneManager.SetActiveScene(sceneToLoad);
             _spawnManager.InitActiveSceneSpawns();
             CurrentScene = sceneInfos;
-
+            SwitchAudio(sceneToLoad.buildIndex);
             //Deactivate all wakeables
             _wakeables = FindObjectsOfType<Zone>(true).SelectMany(zone => zone.GetComponentsInChildren<IWakeable>()).ToList();
-            _wakeables.ForEach(w => 
+            _wakeables.ForEach(w =>
             {
                 w.Sleep();
                 w.Sleeping = true;
@@ -148,16 +176,6 @@ public class ScenesManager : MonoBehaviour
     {
         var id = int.Parse(portalId.ToString().Substring(0, 2));
         return FindSceneById(id);
-    }
-
-    public void InitColorChange(int exitId)
-    {
-        var scene = GetSceneByPortalId(exitId);
-
-        _cameraBehaviour.SetBaseColor(ColorUtils.GetColor(scene.FontColor), 
-            ColorUtils.GetColor(scene.GlobalLightColor), 
-            ColorUtils.GetColor(scene.FontColor),
-            PortalManager.TRANSFER_SPEED);
     }
 
 }

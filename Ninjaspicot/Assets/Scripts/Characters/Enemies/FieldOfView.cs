@@ -8,6 +8,7 @@ public class FieldOfView : MonoBehaviour, IActivable
     [SerializeField] protected float _viewAngle;
     [SerializeField] protected int _detailAmount;
     [SerializeField] protected CustomColor _customColor;
+    [SerializeField] protected bool _isHorizontal;
 
     public bool Active { get; protected set; }
     public float Size => _size;
@@ -26,6 +27,8 @@ public class FieldOfView : MonoBehaviour, IActivable
     private int _collidingAmount;
     private float _angleStep;
     private Quaternion _angleAxis;
+    private Quaternion _startAngle => _isHorizontal ? Quaternion.Euler(0, 0, -90) : Quaternion.identity;
+    private Vector3 _startDirection => _isHorizontal ? Vector3.right : Vector3.up;
 
     private int _colorPropertyId;
     private int _emissionPropertyId;
@@ -52,7 +55,7 @@ public class FieldOfView : MonoBehaviour, IActivable
 
 
         _angleStep = _viewAngle / _detailAmount;
-        _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * Quaternion.Euler(0, 0, -90);
+        _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * _startAngle;
 
         Active = true;
 
@@ -116,7 +119,7 @@ public class FieldOfView : MonoBehaviour, IActivable
 
         _vertices[0] = new Vertex(Vector2.zero);
 
-        var direction = Quaternion.Euler(0, 0, _viewAngle / 2) * Vector3.right;
+        var direction = Quaternion.Euler(0, 0, _viewAngle / 2) * _startDirection;
 
         var triangleIndex = 0;
         var colliderInterval = 3;
@@ -172,7 +175,7 @@ public class FieldOfView : MonoBehaviour, IActivable
                 direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
             }
 
-            Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
+            //Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
 
             var results = new RaycastHit2D[1];
             var hits = Physics2D.Raycast(_transform.position, direction, _contactFilter, results, size);

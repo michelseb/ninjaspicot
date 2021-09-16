@@ -24,6 +24,8 @@ public class Hero : Character, INinja, ITriggerable
     private Coroutine _fade;
     private Coroutine _trigger;
     private static Hero _instance;
+    private UICamera _uiCamera;
+    private AudioSource _mainAudioSource;
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
     private const int GHOST_SOUND_FREQUENCY = 3;
@@ -32,10 +34,12 @@ public class Hero : Character, INinja, ITriggerable
     protected override void Awake()
     {
         base.Awake();
+        _mainAudioSource = ScenesManager.Instance.GetComponent<AudioSource>();
         _timeManager = TimeManager.Instance;
         _spawnManager = SpawnManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
         _touchManager = TouchManager.Instance;
+        _uiCamera = UICamera.Instance;
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
     }
@@ -51,7 +55,7 @@ public class Hero : Character, INinja, ITriggerable
         
         if (killer != null)
         {
-            Stickiness.Rigidbody.AddForce((Transform.position - killer.position).normalized * 30000);
+            Stickiness.Rigidbody.AddForce((Transform.position - killer.position).normalized * 10000);
         }
 
         if (sound != null)
@@ -63,7 +67,6 @@ public class Hero : Character, INinja, ITriggerable
         StopDisplayGhosts();
         Renderer.color = ColorUtils.Red;
         _timeManager.StartSlowDownProgressive(.3f);
-
 
         if (DynamicInteraction.Interacting)
         {
@@ -77,13 +80,21 @@ public class Hero : Character, INinja, ITriggerable
 
     public override IEnumerator Dying()
     {
+        _mainAudioSource.Stop();
+
+        yield return new WaitForSeconds(.5f);
+
+        _uiCamera.CameraFade();
+
         yield return new WaitForSeconds(1);
 
         SetCapeActivation(false);
         _spawnManager.Respawn();
         SetAllBehavioursActivation(true, false);
-        _cameraBehaviour.SetCenterMode(Transform, 1f);
+        _cameraBehaviour.SetCenterMode(Transform);
         SetCapeActivation(true);
+        _uiCamera.CameraAppear();
+        _mainAudioSource.Play();
 
         yield return new WaitForSeconds(1f);
 

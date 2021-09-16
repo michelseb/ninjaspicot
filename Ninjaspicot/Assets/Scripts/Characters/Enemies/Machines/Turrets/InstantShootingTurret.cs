@@ -34,7 +34,7 @@ public class InstantShootingTurret : TurretBase
     public override void LookFor()
     {
         base.LookFor();
-        var dir = Vector3.Dot(Transform.up, (TargetEntity.Transform.position - Transform.position).normalized);
+        var dir = Vector3.Dot(_turretHead.up, (TargetEntity.Transform.position - _turretHead.position).normalized);
         if (dir > .98f)
         {
             StartWait();
@@ -72,19 +72,19 @@ public class InstantShootingTurret : TurretBase
         StartCoroutine(Shoot(SHOOTING_TIME));
         _audioManager.PlaySound(_audioSource, "Gun");
 
-        if (_aim.TargetCentered(Transform, TargetEntity.Transform.tag, Id))
+        if (_aim.TargetCentered(_shootingPosition, TargetEntity.Transform.tag, Id))
         {
-            TargetEntity.Die(Transform);
+            TargetEntity.Die(_turretHead);
         }
     }
 
     private IEnumerator Shoot(float time)
     {
-        var bullet = _poolManager.GetPoolable<InstantBullet>(Transform.position, Transform.rotation);
-        var ray = Utils.RayCast(Transform.position, Transform.up, AimField.Size * 2, ignore: Id, includeTriggers: false);
+        var bullet = _poolManager.GetPoolable<InstantBullet>(_turretHead.position, _turretHead.rotation);
+        var ray = Utils.RayCast(_turretHead.position, _turretHead.up, AimField.Size * 2, ignore: Id, includeTriggers: false);
         var line = bullet.LineRenderer;
         line.positionCount = 2;
-        line.SetPosition(0, Transform.position);
+        line.SetPosition(0, _turretHead.position);
         line.SetPosition(1, ray.point);
 
         yield return new WaitForSeconds(time);

@@ -13,7 +13,7 @@ public class Background : MonoBehaviour
     private void Start()
     {
         _litMaterial = Resources.Load<Material>("Sprite-Lit-Default");
-        _cameraPos = CameraBehaviour.Instance.Transform;
+        _cameraPos = CameraBehaviour.Instance.ParentTransform;
 
         _images = new List<RectTransform>
         {
@@ -32,6 +32,14 @@ public class Background : MonoBehaviour
         }
     }
 
+    public void CenterBackground()
+    {
+        foreach (var image in _images)
+        {
+            image.position = new Vector3(_cameraPos.position.x, _cameraPos.position.y, 10);
+        }
+    }
+
     private RectTransform CreateImage(Sprite sprite, Vector2 pivot)
     {
         var imageObject = new GameObject("backgroundImage", typeof(Image));
@@ -44,7 +52,6 @@ public class Background : MonoBehaviour
         var rectTransform = imageObject.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(Screen.width / 6, Screen.height / 6);
         rectTransform.pivot = pivot;
-        rectTransform.position = _cameraPos.position;
         rectTransform.parent = transform;
 
         return rectTransform;

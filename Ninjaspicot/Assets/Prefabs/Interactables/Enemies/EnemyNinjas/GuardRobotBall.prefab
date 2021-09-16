@@ -16,6 +16,7 @@ MonoBehaviour:
   _viewAngle: 45
   _detailAmount: 20
   _customColor: 2
+  _isHorizontal: 1
 --- !u!1 &6288530826630689008
 GameObject:
   m_ObjectHideFlags: 0
@@ -4943,6 +4944,7 @@ MonoBehaviour:
   _rotateSpeed: 60
   _moveSpeed: 20
   _sprite: {fileID: 8170439968612277734}
+  _hearingRange: 60
 --- !u!82 &3641038844173001595
 AudioSource:
   m_ObjectHideFlags: 0

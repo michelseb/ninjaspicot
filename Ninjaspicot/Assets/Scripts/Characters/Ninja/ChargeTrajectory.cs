@@ -58,7 +58,7 @@ public class ChargeTrajectory : TrajectoryBase
             {
                 chargePos = chargeHit.point;
                 Collides = true;
-                SetAudioSimulator(_line.GetPosition(1), 50);
+                SetAudioSimulator(_line.GetPosition(1), 3);
             }
         }
         else

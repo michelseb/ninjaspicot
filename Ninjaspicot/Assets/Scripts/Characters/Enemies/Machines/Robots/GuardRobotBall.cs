@@ -2,6 +2,8 @@
 
 public class GuardRobotBall : RobotBall, IListener, IViewer
 {
+    [SerializeField] private float _hearingRange;
+
     public GuardMode GuardMode { get; protected set; }
     public Vector3 TargetPosition { get; protected set; }
     public Transform TargetTransform { get; protected set; }
@@ -14,7 +16,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     private Vector3 _initPos;
     private Audio _reactionSound;
 
-    public float Range => 80f;
+    public float Range => _hearingRange;
 
     protected override void Awake()
     {

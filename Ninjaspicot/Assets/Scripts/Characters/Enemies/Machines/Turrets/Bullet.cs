@@ -38,7 +38,7 @@ public class Bullet : MonoBehaviour, IPoolable
         }
         if (collision.CompareTag("hero"))
         {
-            collision.GetComponent<Hero>().Die(transform);
+            Hero.Instance.Die(transform);
             Deactivate();
         }
 

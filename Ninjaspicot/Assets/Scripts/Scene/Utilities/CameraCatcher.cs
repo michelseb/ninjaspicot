@@ -42,7 +42,7 @@ public class CameraCatcher : MonoBehaviour, IActivable
             return;
 
         _cameraBehaviour.Zoom(ZoomType.Instant, _zoomAmount);
-        _cameraBehaviour.SetCenterMode(ZoomCenter, .5f);
+        _cameraBehaviour.SetCenterMode(ZoomCenter);
         _activated = true;
         transform.localScale = Vector3.one * 1.1f;
     }
