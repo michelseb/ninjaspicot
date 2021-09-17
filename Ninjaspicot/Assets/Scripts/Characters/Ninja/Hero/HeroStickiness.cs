@@ -130,9 +130,8 @@ public class HeroStickiness : Stickiness
         var directionChange = (direction - _walkDirection).magnitude;
         //Keep old speed unless different direction
         if (_speedFactor != 0 && directionChange < .01f)
-            return _speedFactor;
+            return Mathf.Clamp(_speedFactor, -1, 1) * speed;
 
-        Debug.Log("Regular");
         return sign * speed;
 
 

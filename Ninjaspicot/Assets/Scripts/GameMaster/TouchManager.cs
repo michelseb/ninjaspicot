@@ -16,7 +16,7 @@ public class TouchManager : MonoBehaviour
     public bool WalkTouching => IsTouching(TouchType.Left);
     public bool JumpTouching => IsTouching(TouchType.Right);
     public bool Touching => WalkTouching || JumpTouching;
-    public bool WalkDragging => _joystick1 != null && _joystick1.Direction.magnitude > .2f;
+    public bool WalkDragging { get; private set; }
     public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
     public bool DoubleTouching { get; private set; }
     private Vector3? LeftTouch => GetTouch(TouchType.Left);
@@ -58,12 +58,24 @@ public class TouchManager : MonoBehaviour
         _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
 
 
-        if (!_walkInitialized && WalkTouching)
+        if (WalkTouching)
         {
-            var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
-            _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch1, _canvasTransform, false);
-            _joystick1.OnPointerDown();
-            _walkInitialized = true;
+            if (!_walkInitialized)
+            {
+                var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
+                _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch1, _canvasTransform, false);
+                _joystick1.OnPointerDown();
+                _walkInitialized = true;
+            }
+
+            if (_joystick1 != null && _joystick1.Direction.magnitude > .2f)
+            {
+                WalkDragging = true;
+            }
+        }
+        else
+        {
+            WalkDragging = false;
         }
 
         if (!_jumpInitialized && JumpTouching)
