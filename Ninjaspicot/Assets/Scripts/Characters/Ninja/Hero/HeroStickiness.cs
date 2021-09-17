@@ -10,6 +10,7 @@ public class HeroStickiness : Stickiness
     private Audio _walkAudio;
     private Audio _runAudio;
     private Vector3 _previousPosition;
+    private Vector3 _walkDirection;
 
     public override void Awake()
     {
@@ -65,8 +66,9 @@ public class HeroStickiness : Stickiness
 
         while (true)
         {
-            var speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CurrentSpeed);
-            if (speedFactor == 0)
+            _speedFactor = GetHeroSpeed(_touchManager.GetWalkDirection(), CollisionNormal, CurrentSpeed);
+            _walkDirection = _touchManager.GetWalkDirection();
+            if (_speedFactor == 0)
             {
                 Rigidbody.velocity = Vector2.zero;
             }
@@ -80,7 +82,7 @@ public class HeroStickiness : Stickiness
                 whooshing = true;
             }
 
-            jointMotor.motorSpeed = speedFactor;
+            jointMotor.motorSpeed = _speedFactor;
             hinge.motor = jointMotor;
             hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
 
@@ -120,8 +122,21 @@ public class HeroStickiness : Stickiness
     //    base.Detach();
     //}
 
-    private float GetHeroSpeed(Vector3 direction, float speed)
+    private float GetHeroSpeed(Vector3 direction, Vector3 platformNormal, float speed)
     {
-        return direction.normalized.magnitude * Mathf.Sign(direction.x) * speed;
+        var dir = Vector3.Dot(direction, platformNormal);
+        var sign = Mathf.Sign(dir);
+
+        var directionChange = (direction - _walkDirection).magnitude;
+        //Keep old speed unless different direction
+        if (_speedFactor != 0 && directionChange < .01f)
+            return _speedFactor;
+
+        Debug.Log("Regular");
+        return sign * speed;
+
+
+        //For 2D direction
+        //return direction.normalized.magnitude * Mathf.Sign(direction.x) * speed;
     }
 }

@@ -120,7 +120,7 @@ public class TouchManager : MonoBehaviour
 
         if (_walkInitialized && WalkTouching)
         {
-            _joystick1.Drag(LeftTouch.Value);
+            _joystick1.Drag(LeftTouch.Value, true);
         }
 
         if (_jumpInitialized && JumpTouching)

@@ -1,10 +1,12 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _imgInside;
     [SerializeField] private int _id;
+    [SerializeField] private TextMeshProUGUI _title;
 
     public int Id => _id;
     public bool Exit { get; set; }
@@ -18,18 +20,48 @@ public class Portal : MonoBehaviour
     private UICamera _uiCamera;
     private PortalManager _portalManager;
     private Coroutine _connect;
+    private Coroutine _updateColor;
     private Animator _animator;
+    private bool _titleVisible;
 
     protected void Awake()
     {
         _uiCamera = UICamera.Instance;
         _portalManager = PortalManager.Instance;
         _animator = GetComponent<Animator>();
+        _titleVisible = true;
     }
 
     protected void Start()
     {
         _portalManager.AddPortal(this);
+    }
+
+    protected void Update()
+    {
+        if (Time.frameCount % Utils.EXPENSIVE_FRAME_INTERVAL == 0)
+        {
+            var distFromHero = Vector3.Distance(Hero.Instance.Transform.position, transform.position);
+
+            if (distFromHero < 40 && !_titleVisible)
+            {
+                if (_updateColor != null)
+                {
+                    StopCoroutine(_updateColor);
+                }
+                _updateColor = StartCoroutine(TitleAppear(_title, 2));
+                _titleVisible = true;
+            }
+            else if (distFromHero >= 40 && _titleVisible)
+            {
+                if (_updateColor != null)
+                {
+                    StopCoroutine(_updateColor);
+                }
+                _updateColor = StartCoroutine(TitleDisappear(_title, 2));
+                _titleVisible = false;
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -53,6 +85,34 @@ public class Portal : MonoBehaviour
             Hero.StartFading();
             _connect = StartCoroutine(Connect());
         }
+    }
+
+    private IEnumerator TitleAppear(TextMeshProUGUI text, float duration)
+    {
+        float t = 0;
+        var col = text.color;
+        var endColor = new Color(col.r, col.g, col.b, 1);
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            text.color = Color.Lerp(col, endColor, t);
+            yield return null;
+        }
+        _updateColor = null;
+    }
+
+    private IEnumerator TitleDisappear(TextMeshProUGUI text, float duration)
+    {
+        float t = 0;
+        var col = text.color;
+        var endColor = new Color(col.r, col.g, col.b, 0);
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            text.color = Color.Lerp(col, endColor, t);
+            yield return null;
+        }
+        _updateColor = null;
     }
 
     private IEnumerator Connect()

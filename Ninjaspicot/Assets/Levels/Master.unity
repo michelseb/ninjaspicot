@@ -5476,8 +5476,8 @@ MonoBehaviour:
     FontColor: 6
     GlobalLightColor: 7
     FrontLightColor: 8
-  _startScene: 3
-  _startCheckPoint: 3
+  _startScene: -1
+  _startCheckPoint: -1
   _sceneAudios:
   - {fileID: 8300000, guid: b771dc66ed0226d469923a5ba4865bbf, type: 3}
   - {fileID: 8300000, guid: b771dc66ed0226d469923a5ba4865bbf, type: 3}

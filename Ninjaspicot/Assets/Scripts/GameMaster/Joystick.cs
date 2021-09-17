@@ -49,6 +49,7 @@ public class Joystick : MonoBehaviour, IPoolable
     private Coroutine _appear;
 
     private Vector2 _input = Vector2.zero;
+    private Vector3 _joystickVelocity = Vector3.zero;
 
     private const float APPEAR_SPEED = 4f;
     private const float FADE_SPEED = 1.5f;
@@ -84,7 +85,7 @@ public class Joystick : MonoBehaviour, IPoolable
         SetColor(ColorUtils.GetColor(_customColor, _alpha));
     }
 
-    public void Drag(Vector2 touchPosition)
+    public void Drag(Vector2 touchPosition, bool follow = false)
     {
         if (_cam == null)
             return;
@@ -95,6 +96,16 @@ public class Joystick : MonoBehaviour, IPoolable
         FormatInput();
         HandleInput(_input.magnitude, _input.normalized, radius, _cam);
         _handle.anchoredPosition = _input * radius * _handleRange;
+
+        if (follow)
+        {
+            FollowDrag(_handle.anchoredPosition);
+        }
+    }
+
+    protected void FollowDrag(Vector2 target)
+    {
+        transform.position = Vector3.SmoothDamp(transform.position, _handle.TransformPoint(target), ref _joystickVelocity, .2f);
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)

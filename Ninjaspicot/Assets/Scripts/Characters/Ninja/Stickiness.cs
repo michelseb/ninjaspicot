@@ -24,6 +24,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool Running { get; protected set; }
     public PoolableType PoolableType => PoolableType.None;
 
+    protected float _speedFactor;
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumper;
@@ -179,6 +180,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (!Attached)
             return;
 
+        _speedFactor = 0;
         Rigidbody.velocity = Vector2.zero;
         Rigidbody.angularVelocity = 0;
         WallJoint.useMotor = false;
