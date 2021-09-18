@@ -218,7 +218,7 @@ public class Stickiness : MonoBehaviour, IDynamic
     public void StartRunning()
     {
         Running = true;
-        CurrentSpeed *= 2;
+        CurrentSpeed *= 2.5f;
     }
 
     public void ReinitSpeed()

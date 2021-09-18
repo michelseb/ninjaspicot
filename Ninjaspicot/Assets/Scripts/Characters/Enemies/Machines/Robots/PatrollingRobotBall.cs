@@ -129,6 +129,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
     protected override void StartReturning()
     {
+        TargetTransform = null;
         GuardMode = GuardMode.Returning;
         SetReaction(ReactionType.Patrol);
         Laser.SetActive(false);

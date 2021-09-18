@@ -15,6 +15,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     protected Quaternion _initRotation;
     private Vector3 _initPos;
     private Audio _reactionSound;
+    private TimeManager _timeManager;
 
     public float Range => _hearingRange;
 
@@ -22,6 +23,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     {
         base.Awake();
         _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
+        _timeManager = TimeManager.Instance;
     }
 
     protected override void Start()
@@ -104,6 +106,9 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
                 case GuardMode.Checking:
                     StartChecking();
                     break;
+                case GuardMode.Chasing:
+                    StartChasing(TargetTransform);
+                    break;
                 case GuardMode.Returning:
                     StartReturning();
                     break;
@@ -158,7 +163,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         GuardMode = GuardMode.Chasing;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Find);
-        //Laser.SetActive(true);
+        Laser.SetActive(true);
     }
 
     protected virtual void Chase(Vector3 target)
@@ -184,12 +189,12 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
 
-        var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
+        //var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
 
-        if (alignedWithTarget && !Laser.Active)
-        {
-            Laser.SetActive(true);
-        }
+        //if (alignedWithTarget && !Laser.Active)
+        //{
+        //    Laser.SetActive(true);
+        //}
 
         if (hero.Dead)
         {
@@ -200,6 +205,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     protected virtual void StartReturning()
     {
+        TargetTransform = null;
         GuardMode = GuardMode.Returning;
         SetReaction(ReactionType.Patrol);
         Renderer.color = ColorUtils.White;
@@ -257,7 +263,19 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (raycast)
             return;
 
-        StartChasing(target);
+
+        // Temps de réaction
+        if (TargetTransform == null)
+        {
+            _timeManager.SlowDown();
+            _timeManager.StartTimeRestore();
+            TargetTransform = target;
+            StartWondering(GuardMode.Chasing, .5f);
+        }
+        else
+        {
+            StartChasing(target);
+        }
     }
 
     public override void Activate()
