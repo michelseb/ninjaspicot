@@ -42,22 +42,6 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
     }
 
-    public virtual bool IsClear(int originIndex, int lineIndex, int layer = 0)
-    {
-        if (_line.positionCount < 10)
-            return false;
-
-        var origin = _line.GetPosition(0);
-        var pos = _line.GetPosition(originIndex);
-        var layerIndex = (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle"));
-        RaycastHit2D hit = Physics2D.Linecast(origin, pos, layer != 0 ? layer : layerIndex);
-
-        if (hit && !hit.collider.CompareTag("hero") && !hit.collider.isTrigger)
-            return false;
-
-        return true;
-    }
-
     public void StartFading()
     {
         Used = false;

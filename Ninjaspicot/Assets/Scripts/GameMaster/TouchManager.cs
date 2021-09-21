@@ -55,7 +55,7 @@ public class TouchManager : MonoBehaviour
         if (!HeroSpawned())
             return;
 
-        _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
+        _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance.Stickiness;
 
 
         if (WalkTouching)
@@ -101,13 +101,6 @@ public class TouchManager : MonoBehaviour
         {
             if (_jumper.ReadyToJump())
             {
-                //Debug.DrawLine(_jumper.Trajectory.GetLinePosition(0), _jumper.Trajectory.GetLinePosition(8), Color.red, 5);
-                //if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(0, 8))//Add ninja to new layer
-                //{
-                //    _jumper.CancelJump();
-                //}
-                //else
-                //{
                 _stickiness.StopWalking(false);
 
                 switch (_jumper.JumpMode)
@@ -119,7 +112,6 @@ public class TouchManager : MonoBehaviour
                         _jumper.Charge(-_joystick2.Direction);
                         break;
                 }
-                //}
             }
 
             _joystick2.StartFading();
@@ -155,7 +147,7 @@ public class TouchManager : MonoBehaviour
 
             if (_jumper.CanJump())
             {
-                if (WalkTouching && !WalkDragging)
+                if (WalkTouching && (!WalkDragging || Application.platform == RuntimePlatform.WindowsEditor))
                 {
                     var chargeTrajectory = _jumper.SetTrajectory<ChargeTrajectory>();
                     _joystick2.ChangeColor(CustomColor.Red);
@@ -202,11 +194,13 @@ public class TouchManager : MonoBehaviour
         if (_hero == null)
         {
             _hero = Hero.Instance;
-            _stickiness = _hero?.Stickiness;
-            _jumper = _hero?.Jumper as HeroJumper;
-            _dynamicInteraction = _hero?.DynamicInteraction;
+            
             if (_hero == null)
                 return false;
+
+            _stickiness = _hero.Stickiness;
+            _jumper = _hero.Jumper as HeroJumper;
+            _dynamicInteraction = _hero.DynamicInteraction;
         }
 
         return true;

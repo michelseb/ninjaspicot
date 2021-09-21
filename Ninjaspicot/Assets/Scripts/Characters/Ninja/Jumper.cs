@@ -143,7 +143,7 @@ public class Jumper : MonoBehaviour
 
     protected TrajectoryBase GetTrajectory<T>() where T : TrajectoryBase
     {
-        if (Trajectory != null && !(Trajectory is T))
+        if (TrajectoryInUse() && !(Trajectory is T))
         {
             Trajectory.StartFading();
         }
