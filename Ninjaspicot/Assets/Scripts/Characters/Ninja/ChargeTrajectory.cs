@@ -17,26 +17,23 @@ public class ChargeTrajectory : TrajectoryBase
     protected override float _fadeSpeed => 5;
     private const float CHARGE_LENGTH = 60f;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        _line.positionCount = 2;
+    }
+
     public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
     {
-        //Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        direction = -direction.normalized;
-        //Vector2 velocity = direction * Strength;
-
-        //bool anyTarget = false;
-
-        _line.positionCount = 2; //MAX_VERTEX;
-
         _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
-        var chargePos = linePosition + direction * CHARGE_LENGTH;
 
+        var chargePos = linePosition - direction.normalized * CHARGE_LENGTH;
         var chargeHit = StepClear(linePosition, chargePos - linePosition, CHARGE_LENGTH);
 
         if (chargeHit)
         {
             if (chargeHit.collider.CompareTag("Enemy"))
             {
-                //anyTarget = true;
                 if (Target == null)
                 {
                     if (chargeHit.collider.TryGetComponent(out Enemy enemy))
@@ -54,6 +51,7 @@ public class ChargeTrajectory : TrajectoryBase
             else
             {
                 chargePos = chargeHit.point;
+                Target = null;
                 Collides = true;
                 SetAudioSimulator(_line.GetPosition(1), 3);
             }
@@ -70,7 +68,6 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         _line.SetPosition(1, chargePos);
-
         var interactableDetect = Utils.LineCastAll(linePosition, chargePos, includeTriggers: true);
         var interactives = interactableDetect.Where(i => i.transform.CompareTag("Interactive")).ToArray();
 
@@ -92,42 +89,5 @@ public class ChargeTrajectory : TrajectoryBase
                 Bonuses.Add(bonus);
             }
         }
-
-        //linePosition = chargePos;
-
-        // NE PAS SUPPRIMER => ANCIENNE TRAJECTOIRE DE LA CHARGE
-
-        //for (var i = 2; i < _line.positionCount; i++)
-        //{
-        //    velocity = velocity + gravity * LENGTH;
-        //    linePosition = linePosition + velocity * LENGTH;
-        //    _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y, 0));
-
-        //    if (i > 1)
-        //    {
-        //        var hit = StepClear(_line.GetPosition(i - 1), _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f);
-        //        if (hit)
-        //        {
-        //            if (hit.collider.CompareTag("Enemy"))
-        //            {
-        //                anyTarget = true;
-        //                if (Target == null)
-        //                {
-        //                    Target = chargeHit.collider.GetComponent<EnemyNinja>();
-        //                }
-        //            }
-        //            if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("DynamicWall"))
-        //            {
-        //                _line.positionCount = i;
-        //                SetAudioSimulator(_line.GetPosition(i - 1), 30);
-        //                break;
-        //            }
-        //        }
-        //    }
-        //}
-        //if (!anyTarget && Target != null) // Reinit target
-        //{
-        //    Target = null;
-        //}
     }
 }

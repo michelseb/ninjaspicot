@@ -41,7 +41,8 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {
-        return Physics2D.CircleCast(origin, 1, direction, distance,
+        // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
+        return Physics2D.CircleCast(origin, .82f, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
     }
 
@@ -55,13 +56,6 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         Used = false;
         StartCoroutine(FadeAway());
     }
-
-    public Vector3 GetLinePosition(int index)
-    {
-        index = Mathf.Min(index, _line.positionCount - 1);
-        return _line.GetPosition(index);
-    }
-
 
     protected virtual IEnumerator FadeAway()
     {

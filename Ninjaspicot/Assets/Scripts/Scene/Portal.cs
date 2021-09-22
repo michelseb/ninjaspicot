@@ -24,6 +24,8 @@ public class Portal : MonoBehaviour
     private Animator _animator;
     private bool _titleVisible;
 
+    private const float TITLE_DISTANCE = 50f;
+
     protected void Awake()
     {
         _uiCamera = UICamera.Instance;
@@ -43,7 +45,7 @@ public class Portal : MonoBehaviour
         {
             var distFromHero = Vector3.Distance(Hero.Instance.Transform.position, transform.position);
 
-            if (distFromHero < 40 && !_titleVisible)
+            if (distFromHero < TITLE_DISTANCE && !_titleVisible)
             {
                 if (_updateColor != null)
                 {
@@ -52,7 +54,7 @@ public class Portal : MonoBehaviour
                 _updateColor = StartCoroutine(TitleAppear(_title, 2));
                 _titleVisible = true;
             }
-            else if (distFromHero >= 40 && _titleVisible)
+            else if (distFromHero >= TITLE_DISTANCE && _titleVisible)
             {
                 if (_updateColor != null)
                 {
