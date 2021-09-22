@@ -2,6 +2,9 @@
 
 public class ClassicTrajectory : TrajectoryBase
 {
+    public override CustomColor Color => CustomColor.Blue;
+    public override JumpMode JumpMode => JumpMode.Classic;
+
     public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
     {
         Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);

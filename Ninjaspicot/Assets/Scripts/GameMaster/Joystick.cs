@@ -5,8 +5,8 @@ using UnityEngine.UI;
 public class Joystick : MonoBehaviour, IPoolable
 {
     public bool Active { get; private set; }
-    public float Horizontal { get { return (_snapX) ? SnapFloat(_input.x, AxisOptions.Horizontal) : _input.x; } }
-    public float Vertical { get { return (_snapY) ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; } }
+    public float Horizontal { get { return _snapX ? SnapFloat(_input.x, AxisOptions.Horizontal) : _input.x; } }
+    public float Vertical { get { return _snapY ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; } }
     public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
 
     private Transform _transform;

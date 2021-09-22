@@ -8,17 +8,14 @@ public class ChargeTrajectory : TrajectoryBase
     private List<Bonus> _bonuses;
     public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
 
+    public override CustomColor Color => CustomColor.Red;
+    public override JumpMode JumpMode => JumpMode.Charge;
+
     private List<IActivable> _interactives;
     public List<IActivable> Interactives { get { if (_interactives == null) _interactives = new List<IActivable>(); return _interactives; } }
     public bool Collides { get; private set; }
-    private Jumper _jumper;
     protected override float _fadeSpeed => 5;
     private const float CHARGE_LENGTH = 60f;
-
-    public void SetJumper(Jumper jumper)
-    {
-        _jumper = jumper;
-    }
 
     public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
     {

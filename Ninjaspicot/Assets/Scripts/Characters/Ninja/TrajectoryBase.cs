@@ -7,11 +7,14 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     public bool Active { get; private set; }
     public float Strength { get; set; }
 
+    public abstract CustomColor Color { get; }
+    public abstract JumpMode JumpMode { get; }
+
     protected LineRenderer _line;
     protected Transform _transform;
     protected TimeManager _timeManager;
     protected PoolManager _poolManager;
-
+    protected Jumper _jumper;
 
     protected SimulatedSoundEffect _audioSimulator;
 
@@ -40,6 +43,11 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     {
         return Physics2D.CircleCast(origin, 1, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+    }
+
+    public void SetJumper(Jumper jumper)
+    {
+        _jumper = jumper;
     }
 
     public void StartFading()
