@@ -34,6 +34,7 @@ public class ChargeTrajectory : TrajectoryBase
         {
             if (chargeHit.collider.CompareTag("Enemy"))
             {
+
                 if (Target == null)
                 {
                     if (chargeHit.collider.TryGetComponent(out Enemy enemy))
@@ -52,9 +53,10 @@ public class ChargeTrajectory : TrajectoryBase
             {
                 chargePos = chargeHit.point;
                 Target = null;
-                Collides = true;
-                SetAudioSimulator(_line.GetPosition(1), 3);
+                SetAudioSimulator(_line.GetPosition(1), 5);
             }
+
+            Collides = true;
         }
         else
         {

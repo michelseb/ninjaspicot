@@ -119,7 +119,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     {
         if (Utils.IsNull(_audioSimulator))
         {
-            _audioSimulator = _poolManager.GetPoolable<SimulatedSoundEffect>(position, Quaternion.identity);
+            _audioSimulator = _poolManager.GetPoolable<SimulatedSoundEffect>(position, Quaternion.identity, size);
         }
 
         _audioSimulator.Transform.position = position;

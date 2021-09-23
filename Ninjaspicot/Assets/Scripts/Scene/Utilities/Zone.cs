@@ -4,6 +4,20 @@ using UnityEngine;
 
 public class Zone : MonoBehaviour
 {
+    [SerializeField] protected GameObject _centerObject;
+    private Vector3? _center;
+    public Vector3? Center 
+    { 
+        get 
+        {
+            if (_centerObject == null || !_centerObject.activeInHierarchy)
+                return null;
+
+            if (_center == null) _center = _centerObject.transform.position; 
+            return _center; 
+        } 
+    }
+
     protected List<IWakeable> _wakeables;
     protected ZoneManager _zoneManager;
     protected Animator _animator;

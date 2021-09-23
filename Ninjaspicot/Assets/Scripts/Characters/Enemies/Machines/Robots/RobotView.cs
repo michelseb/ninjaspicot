@@ -27,4 +27,14 @@ public class RobotView : FieldOfView
             _robot.See(Hero.Instance.Transform);
         }
     }
+
+    protected override void OnTriggerExit2D(Collider2D collider)
+    {
+        base.OnTriggerExit2D(collider);
+
+        if (collider.CompareTag("hero"))
+        {
+            _robot.Seeing = false;
+        }
+    }
 }

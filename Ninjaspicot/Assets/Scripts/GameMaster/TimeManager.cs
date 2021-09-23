@@ -9,6 +9,8 @@ public class TimeManager : MonoBehaviour, IActivable
     private Audio _slowDown;
     private bool _active;
 
+    private Coroutine _slowDownProgressive;
+
     private AudioSource _globalAudioSource;
     public AudioSource GlobalAudioSource { get { if (Utils.IsNull(_globalAudioSource)) _globalAudioSource = GetComponent<AudioSource>(); return _globalAudioSource; } }
 
@@ -21,7 +23,7 @@ public class TimeManager : MonoBehaviour, IActivable
 
     private const float INCREASE_INTERPOLATION = .5f;
     private const float DECREASE_INTERPOLATION = .8f;
-    private const float TIME_SLOW = .05f;
+    private const float TIME_SLOW = .01f;
     private const float VOLUME_SLOWDOWN = .05f;
 
 
@@ -57,6 +59,7 @@ public class TimeManager : MonoBehaviour, IActivable
         }
 
         Time.timeScale = slowValue;
+        _slowDownProgressive = null;
     }
 
     private IEnumerator RestoreTime()
@@ -74,7 +77,7 @@ public class TimeManager : MonoBehaviour, IActivable
 
     public void StartSlowDownProgressive(float value)
     {
-        StartCoroutine(SlowDownProgressive(value));
+        _slowDownProgressive = StartCoroutine(SlowDownProgressive(value));
     }
 
     public void StartTimeRestore()
@@ -84,6 +87,11 @@ public class TimeManager : MonoBehaviour, IActivable
 
     public void SetNormalTime()
     {
+        if (_slowDownProgressive != null)
+        {
+            StopCoroutine(_slowDownProgressive);
+        }
+
         SetTimeScale(1);
 
         if (HeroAudioSource != null && _audioManager.GetSourceClip(HeroAudioSource.GetInstanceID()) == "SlowDown")

@@ -18,6 +18,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     private TimeManager _timeManager;
 
     public float Range => _hearingRange;
+    public bool Seeing { get; set; }
 
     protected override void Awake()
     {
@@ -198,6 +199,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         if (hero.Dead)
         {
+            Seeing = false;
             StartWondering(GuardMode.Returning, 1f);
         }
 
@@ -257,12 +259,16 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     public void See(Transform target)
     {
+        if (Seeing)
+            return;
+
         var hero = Hero.Instance;
         var raycast = Utils.LineCast(Transform.position, hero.Transform.position, new int[] { Id, hero.Id });
 
         if (raycast)
             return;
 
+        Seeing = true;
 
         // Temps de réaction
         if (TargetTransform == null)
@@ -270,12 +276,9 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             _timeManager.SlowDown();
             _timeManager.StartTimeRestore();
             TargetTransform = target;
-            StartWondering(GuardMode.Chasing, .5f);
         }
-        else
-        {
-            StartChasing(target);
-        }
+
+        StartChasing(target);
     }
 
     public override void Activate()

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
 
 public enum ZoomType
 {
@@ -27,9 +26,10 @@ public class CameraBehaviour : MonoBehaviour
     public CameraMode CameraMode { get; private set; }
 
     private Hero _hero;
-    private Transform _tracker;
+    private Transform _heroTransform;
+    private Stickiness _heroStickiness;
     private Transform _transform;
-    private Vector3 _movementDestination;
+    private Vector3 _centerPos;
     private Vector3 _velocity;
     private Vector3 _normalOffset;
 
@@ -67,8 +67,9 @@ public class CameraBehaviour : MonoBehaviour
         if (_hero == null)
         {
             _hero = Hero.Instance;
-            _tracker = _hero?.transform;
-            ParentTransform.position = _tracker.position;
+            _heroTransform = _hero?.Transform;
+            _heroStickiness = _hero?.Stickiness;
+            ParentTransform.position = _heroTransform.position;
             var background = FindObjectOfType<Background>();
             if (background != null)
             {
@@ -79,30 +80,29 @@ public class CameraBehaviour : MonoBehaviour
         switch (CameraMode)
         {
             case CameraMode.Follow:
-                Follow(_tracker);
+                Follow(_heroTransform);
                 break;
 
             case CameraMode.Center:
-                Center(_movementDestination);
+                Center(_centerPos);
                 break;
         }
     }
     private void Follow(Transform tracker)
     {
         float speed;
-        var stickiness = _hero.Stickiness;
 
-        if (stickiness.Walking || !stickiness.Attached)
+        if (_heroStickiness.Walking || !_heroStickiness.Attached)
         {
             speed = FOLLOW_DELAY;
         }
         else
         {
-            _normalOffset = Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25;
+            _normalOffset = Quaternion.Euler(0, 0, 90) * _heroStickiness.CollisionNormal * 25;
             speed = OFFSET_ADJUST_DELAY;
         }
         //Debug.Log(_normalOffset);
-        if (!stickiness.Attached || _normalOffset.magnitude > 0 && Vector3.Dot(_normalOffset, Quaternion.Euler(0, 0, 90) * stickiness.CollisionNormal * 25) < .5f)
+        if (!_heroStickiness.Attached || _normalOffset.magnitude > 0 && Vector3.Dot(_normalOffset, Quaternion.Euler(0, 0, 90) * _heroStickiness.CollisionNormal * 25) < .5f)
         {
             _normalOffset = Vector3.zero;
         }
@@ -110,23 +110,27 @@ public class CameraBehaviour : MonoBehaviour
         ParentTransform.position = Vector3.SmoothDamp(ParentTransform.position, tracker.position + _normalOffset, ref _velocity, speed);
     }
 
-    public void Center(Vector3 destination)
+    public void MoveTo(Vector3 pos)
     {
-        ParentTransform.position = new Vector3(destination.x, destination.y, ParentTransform.position.z);
+        ParentTransform.position = new Vector3(pos.x, pos.y, ParentTransform.position.z);
     }
 
-    public void SetFollowMode(Transform tracker)
+    private void Center(Vector3 centerPos)
+    {
+        var middle = (_heroTransform.position + centerPos) / 2;
+        ParentTransform.position = Vector3.SmoothDamp(ParentTransform.position, middle, ref _velocity, FOLLOW_DELAY);
+    }
+
+    public void SetFollowMode()
     {
         CameraMode = CameraMode.Follow;
-        _tracker = tracker;
         _velocity = Vector3.zero;
     }
 
-    public void SetCenterMode(Transform tracker)
+    public void SetCenterMode(Vector3 centerPos)
     {
         CameraMode = CameraMode.Center;
-        _tracker = tracker;
-        _movementDestination = new Vector3(tracker.transform.position.x, tracker.transform.position.y, ParentTransform.position.z);
+        _centerPos = new Vector3(centerPos.x, centerPos.y, ParentTransform.position.z);
     }
 
     private IEnumerator ZoomProgressive(int zoom)
@@ -161,7 +165,7 @@ public class CameraBehaviour : MonoBehaviour
             MainCamera.orthographicSize -= speed;
             yield return null;
         }
-        SetFollowMode(_hero.transform);
+        SetFollowMode();
         //_hero.Jumper.Active = true;
     }
 

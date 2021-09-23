@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class Enemy : Character, IWakeable
 {
     [SerializeField] protected ReactionType _reactionType;
+    [SerializeField] protected Collider2D _castArea;
     protected Reaction _reaction;
     public bool Attacking { get; protected set; }
 

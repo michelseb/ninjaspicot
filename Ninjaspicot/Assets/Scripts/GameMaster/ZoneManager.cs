@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class ZoneManager : MonoBehaviour
@@ -9,9 +8,16 @@ public class ZoneManager : MonoBehaviour
 
     private List<Zone> _zones;
     private long _currentZoneId;
+
+    private CameraBehaviour _cameraBehaviour;
     
     private static ZoneManager _instance;
     public static ZoneManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ZoneManager>(); return _instance; } }
+
+    private void Awake()
+    {
+        _cameraBehaviour = CameraBehaviour.Instance;
+    }
 
     public void SetZone(Zone zone, bool closePrevious = true)
     {
@@ -45,6 +51,15 @@ public class ZoneManager : MonoBehaviour
 
         CurrentZone = zone;
         CurrentZone.Open();
+
+        if (CurrentZone.Center.HasValue)
+        {
+            _cameraBehaviour.SetCenterMode(CurrentZone.Center.Value);
+        }
+        else
+        {
+            _cameraBehaviour.SetFollowMode();
+        }
     }
 
     public void AddZone(Zone zone)

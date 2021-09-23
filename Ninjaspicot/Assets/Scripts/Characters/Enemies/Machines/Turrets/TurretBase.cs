@@ -23,6 +23,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     public Aim AimField => _aim;
 
     public float Range => 50f;
+    public bool Seeing { get; set; }
 
     protected Aim _aim;
     protected Image _image;

@@ -24,6 +24,25 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
             return _renderer;
         }
     }
+
+    private Collider2D _collider;
+    public Collider2D Collider
+    {
+        get
+        {
+            if (Utils.IsNull(_collider))
+            {
+                _collider = GetComponent<Collider2D>();
+                if (Utils.IsNull(_collider))
+                {
+                    _collider = GetComponentInChildren<Collider2D>();
+                }
+            }
+
+            return _collider;
+        }
+    }
+
     public Image Image { get; private set; }
 
     private Transform _transform;

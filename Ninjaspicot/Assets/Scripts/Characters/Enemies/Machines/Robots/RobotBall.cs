@@ -42,6 +42,8 @@ public class RobotBall : Enemy, IActivable
         FieldOfView.Activate();
         _reaction?.Activate();
         _characterLight.Wake();
+        Collider.enabled = true;
+        _castArea.enabled = true;
     }
 
     public override void Deactivate()
@@ -52,6 +54,8 @@ public class RobotBall : Enemy, IActivable
         Laser?.Deactivate();
         _reaction?.Deactivate();
         _characterLight.Sleep();
+        Collider.enabled = false;
+        _castArea.enabled = false;
     }
 
     public override void Sleep()
@@ -66,7 +70,18 @@ public class RobotBall : Enemy, IActivable
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
+        if (killer != null)
+        {
+            _rigidbody.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
+
+            if (killer.TryGetComponent(out IDynamic dynamic))
+            {
+                dynamic.Rigidbody.velocity = Vector2.zero;
+                dynamic.Rigidbody.AddForce(((killer.position - Transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
+            }
+        }
         Deactivate();
+        Destroy(gameObject, 1f);
     }
 
 }

@@ -82,23 +82,19 @@ public class Hero : Character, INinja, ITriggerable
     {
         _mainAudioSource.Stop();
 
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSecondsRealtime(.5f);
 
         _uiCamera.CameraFade();
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSecondsRealtime(1.5f);
 
+        _timeManager.SetNormalTime();
         SetCapeActivation(false);
         _spawnManager.Respawn();
         SetAllBehavioursActivation(true, false);
-        _cameraBehaviour.SetCenterMode(Transform);
         SetCapeActivation(true);
         _uiCamera.CameraAppear();
         _mainAudioSource.Play();
-
-        yield return new WaitForSeconds(1f);
-
-        _cameraBehaviour.SetFollowMode(Transform);
     }
 
     public void SetCapeActivation(bool active)

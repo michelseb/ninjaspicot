@@ -21,6 +21,7 @@ public class Jumper : MonoBehaviour
     public JumpMode JumpMode;
 
     protected IDynamic _dynamicEntity;
+    public IDynamic DynamicEntity => _dynamicEntity;
     protected Stickiness _stickiness;
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
@@ -119,12 +120,8 @@ public class Jumper : MonoBehaviour
             if (chargeTrajectory.Collides)
             {
                 _audioManager.PlaySound(_audioSource, _impactSound);
-                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 3);
+                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
             }
-
-            chargeTrajectory.Bonuses.ForEach(x => x.Take());
-            chargeTrajectory.Interactives.ForEach(x => x.Activate());
-            chargeTrajectory.Target?.Die();
         }
         else
         {

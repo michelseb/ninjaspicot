@@ -40,7 +40,7 @@ public class HeroJumper : Jumper
     public override void Charge(Vector2 direction)
     {
         base.Charge(direction);
-        _cameraBehaviour.DoShake(.3f, 2f);
+        _cameraBehaviour.DoShake(.3f, .5f);
     }
 
     public override bool CanJump()
@@ -73,5 +73,27 @@ public class HeroJumper : Jumper
     {
         TrajectoryOrigin = origin;
         TrajectoryDestination = destination;
+    }
+
+    public override void CommitJump()
+    {
+        if (Trajectory == null || !Trajectory.Active)
+            return;
+
+        base.CommitJump();
+
+        if (Trajectory is ChargeTrajectory chargeTrajectory)
+        {
+            chargeTrajectory.Bonuses.ForEach(x => x.Take());
+            chargeTrajectory.Interactives.ForEach(x => x.Activate());
+
+            if (chargeTrajectory.Target != null)
+            {
+                chargeTrajectory.Target.Die(_transform);
+                GainJumps(1);
+                _timeManager.SlowDown();
+                _timeManager.StartTimeRestore();
+            }
+        }
     }
 }
