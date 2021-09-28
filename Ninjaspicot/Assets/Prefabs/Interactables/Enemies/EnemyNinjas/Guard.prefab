@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6776722808749130194}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Guard
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -55,6 +55,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GuardNinja Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282468423896318899, guid: 8f11a33f4d4bd9943af78a89ea3cdf19,
+        type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 7298891898954102292, guid: 8f11a33f4d4bd9943af78a89ea3cdf19,
         type: 3}

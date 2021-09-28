@@ -3,6 +3,8 @@
 public class GuardRobotBall : RobotBall, IListener, IViewer
 {
     [SerializeField] private float _hearingRange;
+    [SerializeField] protected float _checkWonderTime;
+    [SerializeField] protected float _returnWonderTime;
 
     public GuardMode GuardMode { get; protected set; }
     public Vector3 TargetPosition { get; protected set; }
@@ -95,7 +97,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         if (_nextState == GuardMode.Returning && Hero.Instance.Dead && _wonderTime > 1f)
         {
-            StartWondering(GuardMode.Returning, 1f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
         if (_wonderElapsedTime >= _wonderTime)
@@ -149,12 +151,12 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.SoundMark?.Deactivate();
-            StartWondering(GuardMode.Returning, 3f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
         if (Hero.Instance.Dead)
         {
-            StartWondering(GuardMode.Returning, 1f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
     }
 
@@ -185,7 +187,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         if (heroNotVisible)
         {
-            StartWondering(GuardMode.Returning, 3f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -200,7 +202,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (hero.Dead)
         {
             Seeing = false;
-            StartWondering(GuardMode.Returning, 1f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
     }
@@ -249,7 +251,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (_reactionType == ReactionType.Sleep)
         {
             FieldOfView.Activate();
-            StartWondering(GuardMode.Checking, 2f);
+            StartWondering(GuardMode.Checking, _checkWonderTime);
         }
         else if (GuardMode != GuardMode.Checking && GuardMode != GuardMode.Chasing)
         {
@@ -300,6 +302,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         Active = false;
         Renderer.color = ColorUtils.White;
         Laser?.Deactivate();
+        _hearingPerimeter.SoundMark?.Deactivate();
         _hearingPerimeter.Deactivate();
         _reaction?.Deactivate();
         _characterLight.Sleep();
@@ -314,5 +317,11 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     public override void Wake()
     {
         Activate();
+    }
+
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
+    {
+        _hearingPerimeter.SoundMark?.Deactivate();
+        base.Die(killer, sound, volume);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Enemy : Character, IWakeable
+public abstract class Enemy : Character, IWakeable, IFocusable
 {
     [SerializeField] protected ReactionType _reactionType;
     [SerializeField] protected Collider2D _castArea;
@@ -118,5 +118,25 @@ public abstract class Enemy : Character, IWakeable
         }
         _reaction = _poolManager.GetPoolable<Reaction>(transform.position, Quaternion.identity, 1f/Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
         _reaction.SetReaction(reaction);
+    }
+
+    public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
+    {
+        if (!Utils.IsNull(_reaction))
+        {
+            _reaction.Transform.parent = null;
+            _reaction.Deactivate();
+            _reaction = null;
+        }
+
+        if (!Utils.IsNull(_castArea))
+        {
+            _castArea.enabled = false;
+        }
+
+        if (!Utils.IsNull(Collider))
+        {
+            Collider.enabled = false;
+        }
     }
 }

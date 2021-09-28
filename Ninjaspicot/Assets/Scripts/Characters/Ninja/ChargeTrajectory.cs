@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChargeTrajectory : TrajectoryBase
 {
-    public Enemy Target { get; private set; }
+    public Enemy Target { get; set; }
     private List<Bonus> _bonuses;
     public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
 
@@ -13,7 +13,10 @@ public class ChargeTrajectory : TrajectoryBase
 
     private List<IActivable> _interactives;
     public List<IActivable> Interactives { get { if (_interactives == null) _interactives = new List<IActivable>(); return _interactives; } }
+
     public bool Collides { get; private set; }
+    private AimIndicator _aimIndicator;
+    private Transform _targetTransform;
     protected override float _fadeSpeed => 5;
     private const float CHARGE_LENGTH = 60f;
 
@@ -30,39 +33,7 @@ public class ChargeTrajectory : TrajectoryBase
         var chargePos = linePosition - direction.normalized * CHARGE_LENGTH;
         var chargeHit = StepClear(linePosition, chargePos - linePosition, CHARGE_LENGTH);
 
-        if (chargeHit)
-        {
-            if (chargeHit.collider.CompareTag("Enemy"))
-            {
-
-                if (Target == null)
-                {
-                    if (chargeHit.collider.TryGetComponent(out Enemy enemy))
-                    {
-                        Target = enemy;
-                    }
-                    else
-                    {
-                        Target = chargeHit.collider.GetComponentInParent<Enemy>();
-                    }
-                }
-
-                chargePos = chargeHit.collider.transform.position;
-            }
-            else
-            {
-                chargePos = chargeHit.point;
-                Target = null;
-                SetAudioSimulator(_line.GetPosition(1), 5);
-            }
-
-            Collides = true;
-        }
-        else
-        {
-            Target = null;
-            Collides = false;
-        }
+        HandleTrajectoryHit(chargeHit, ref chargePos);
 
         if (_jumper != null)
         {
@@ -70,10 +41,99 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         _line.SetPosition(1, chargePos);
-        var interactableDetect = Utils.LineCastAll(linePosition, chargePos, includeTriggers: true);
+
+        Interact(linePosition, chargePos);
+    }
+
+    private bool HandleTrajectoryHit(RaycastHit2D hit, ref Vector2 chargePos)
+    {
+        if (!hit)
+        {
+            DeactivateAim();
+            Target = null;
+            Collides = false;
+            return false;
+        }
+
+        if (!HandleEnemyCast(hit, ref chargePos))
+        {
+            Target = null;
+            SetAudioSimulator(_line.GetPosition(1), 5);
+
+            if (hit.collider.TryGetComponent(out IFocusable focusable))
+            {
+                if (focusable is MonoBehaviour focusableObject)
+                {
+                    chargePos = focusableObject.transform.position;
+                    if (_aimIndicator == null) _aimIndicator = _poolManager.GetPoolable<AimIndicator>(chargePos, Quaternion.identity);
+                    _aimIndicator.Transform.position = chargePos;
+                }
+
+            }
+            else
+            {
+                DeactivateAim();
+                chargePos = hit.point;
+            }
+        }
+
+        Collides = true;
+
+        return true;
+    }
+
+    private bool HandleEnemyCast(RaycastHit2D hit, ref Vector2 chargePos)
+    {
+        if (!hit.collider.CompareTag("Enemy"))
+            return false;
+
+        var hitTransform = hit.collider.transform; 
+        chargePos = hitTransform.position;
+
+        // if other enemy
+        if (Target != null && Vector2.Distance(chargePos, Utils.ToVector2(Target.transform.position)) > 1f)
+        {
+            DeactivateAim();
+            Target = null;
+        }
+
+        if (Target == null)
+        {
+            if (hit.collider.TryGetComponent(out Enemy enemy))
+            {
+                Target = enemy;
+                _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
+                var pos = _targetTransform?.position ?? chargePos;
+
+                _aimIndicator = _poolManager.GetPoolable<AimIndicator>(pos, Quaternion.identity);
+            }
+            else
+            {
+                Target = hit.collider.GetComponentInParent<Enemy>();
+                enemy = Target;
+                _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
+                var pos = _targetTransform?.position ?? chargePos;
+
+                _aimIndicator = _poolManager.GetPoolable<AimIndicator>(pos, Quaternion.identity);
+            }
+        }
+
+        if (_aimIndicator != null)
+        {
+            _aimIndicator.Transform.position = _targetTransform.position;
+        }
+
+        return true;
+    }
+
+    private void Interact(Vector2 lineOrigin, Vector2 chargePos)
+    {
+        Interactives.Clear();
+        Bonuses.Clear();
+
+        var interactableDetect = Utils.LineCastAll(lineOrigin, chargePos, includeTriggers: true);
         var interactives = interactableDetect.Where(i => i.transform.CompareTag("Interactive")).ToArray();
 
-        Interactives.Clear();
         foreach (var interactive in interactives)
         {
             if (interactive.transform.TryGetComponent(out IActivable activable))
@@ -83,7 +143,6 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         var bonuses = interactableDetect.Where(b => b.transform.CompareTag("Bonus")).ToArray();
-        Bonuses.Clear();
         foreach (var item in bonuses)
         {
             if (item.transform.TryGetComponent(out Bonus bonus))
@@ -91,5 +150,20 @@ public class ChargeTrajectory : TrajectoryBase
                 Bonuses.Add(bonus);
             }
         }
+    }
+
+    private void DeactivateAim()
+    {
+        if (_aimIndicator == null)
+            return;
+
+        _aimIndicator.Deactivate();
+        _aimIndicator = null;
+    }
+
+    public override void StartFading()
+    {
+        base.StartFading();
+        DeactivateAim();
     }
 }

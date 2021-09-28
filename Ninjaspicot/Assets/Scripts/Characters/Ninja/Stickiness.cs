@@ -126,20 +126,16 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (!Active || obstacle == CurrentAttachment)
             return false;
 
-        if (obstacle.CompareTag("Wall") || obstacle.CompareTag("DynamicWall") || obstacle.CompareTag("TutorialWall"))
-        {
-            Detach();
+        Detach();
 
-            if (!Attach(obstacle))
-                return false;
+        if (!Attach(obstacle))
+            return false;
 
-            CurrentAttachment = obstacle;
-            CurrentAttachment = obstacle;
-            SetContactPosition(contactPoint);
-            return true;
-        }
+        CurrentAttachment = obstacle;
+        CurrentAttachment = obstacle;
+        SetContactPosition(contactPoint);
 
-        return false;
+        return true;
     }
 
     public ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!

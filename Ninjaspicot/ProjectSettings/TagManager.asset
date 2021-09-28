@@ -9,14 +9,11 @@ TagManager:
   - Trigger
   - Turret
   - GrabableWall
-  - Moving
   - Enemy
   - Bullet
   - hero
-  - Spawn
   - Dynamic
   - DynamicWall
-  - TutorialWall
   - Sound
   - Bonus
   - Interactive
@@ -27,8 +24,6 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
   - Hero
   - Obstacle
   - Bullet
@@ -36,12 +31,14 @@ TagManager:
   - Teleporter
   - Enemy
   - DynamicObstacle
-  - PoppingObstacle
   - DynamicCollider
   - WorldUI
   - EnemyTrigger
   - Light
   - Sound
+  - 
+  - 
+  - 
   - 
   - 
   - 

@@ -70,6 +70,8 @@ public class RobotBall : Enemy, IActivable
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
+        base.Die(killer, sound, volume);
+
         if (killer != null)
         {
             _rigidbody.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
@@ -80,6 +82,7 @@ public class RobotBall : Enemy, IActivable
                 dynamic.Rigidbody.AddForce(((killer.position - Transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
             }
         }
+
         Deactivate();
         Destroy(gameObject, 1f);
     }

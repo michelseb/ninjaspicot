@@ -72,12 +72,12 @@ public class PatrollingRobotBall : GuardRobotBall
         if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.SoundMark?.Deactivate();
-            StartWondering(GuardMode.Returning, 3f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
         if (Hero.Instance.Dead)
         {
-            StartWondering(GuardMode.Returning, 1f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
     }
 
@@ -99,7 +99,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (raycast)
         {
-            StartWondering(GuardMode.Returning, 3f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -113,7 +113,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (hero.Dead)
         {
-            StartWondering(GuardMode.Returning, 1f);
+            StartWondering(GuardMode.Returning, _returnWonderTime);
         }
     }
 

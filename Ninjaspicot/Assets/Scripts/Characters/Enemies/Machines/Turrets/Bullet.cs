@@ -32,7 +32,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Wall") || collision.CompareTag("DynamicWall") || collision.CompareTag("TutorialWall"))
+        if (collision.CompareTag("Wall") || collision.CompareTag("DynamicWall"))
         {
             Deactivate();
         }

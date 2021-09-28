@@ -52,7 +52,7 @@ public class HeroJumper : Jumper
             return false;
 
         return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Hero.Instance.Id,
-        layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+        layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")));
     }
 
     public override bool ReadyToJump()
@@ -90,10 +90,12 @@ public class HeroJumper : Jumper
             if (chargeTrajectory.Target != null)
             {
                 chargeTrajectory.Target.Die(_transform);
+                chargeTrajectory.Target = null;
                 GainJumps(1);
                 _timeManager.SlowDown();
                 _timeManager.StartTimeRestore();
             }
         }
+
     }
 }

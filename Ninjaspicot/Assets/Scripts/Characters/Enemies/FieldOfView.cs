@@ -118,6 +118,7 @@ public class FieldOfView : MonoBehaviour, IActivable
         var colliderPoints = new List<Vector2> { Vector2.zero };
 
         _vertices[0] = new Vertex(Vector2.zero);
+        uvs[0] = Vector2.zero;
 
         var direction = Quaternion.Euler(0, 0, _viewAngle / 2) * _startDirection;
 
@@ -131,7 +132,9 @@ public class FieldOfView : MonoBehaviour, IActivable
                 direction = Quaternion.Euler(0, 0, -_angleStep) * direction;
             }
 
-            _vertices[i] = new Vertex(direction * size);
+            var vertexVector = direction * size;
+            _vertices[i] = new Vertex(vertexVector);
+            uvs[i] = new Vector2(vertexVector.x, vertexVector.y);
 
             if (i % colliderInterval == 1)
             {
@@ -147,7 +150,6 @@ public class FieldOfView : MonoBehaviour, IActivable
             }
         }
 
-        //_vertices[pointCount] = new Vertex(direction * size);
         colliderPoints.Add(direction * size);
 
         mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();

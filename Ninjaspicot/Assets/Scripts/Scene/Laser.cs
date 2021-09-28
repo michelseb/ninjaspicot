@@ -15,6 +15,7 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
     private AudioManager _audioManager;
     private Zone _zone;
     private Audio _electrocutionSound;
+    private bool _broken;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     private int _id;
@@ -119,6 +120,9 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
 
     public void Wake()
     {
+        if (_broken)
+            return;
+
         _collider.enabled = true;
         _laser.enabled = true;
         _active = true;
@@ -129,5 +133,9 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
         Hero.Instance.Die(sound: _electrocutionSound, volume: .5f);
     }
 
-    public void Deactivate() { }
+    public void Deactivate() 
+    {
+        _broken = true;
+        Sleep();
+    }
 }

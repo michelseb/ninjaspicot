@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3195029132367923279}
   - component: {fileID: 6388034709768160271}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: CastArea
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -4889,7 +4889,7 @@ GameObject:
   - component: {fileID: 5967133941036817458}
   - component: {fileID: 4526333287131717533}
   - component: {fileID: 3641038844173001595}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: GuardRobotBall
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -4995,10 +4995,12 @@ MonoBehaviour:
   _lightColor: 1
   _reactionType: 0
   _castArea: {fileID: 6388034709768160271}
-  _rotateSpeed: 60
+  _rotateSpeed: 130
   _moveSpeed: 20
   _sprite: {fileID: 8170439968612277734}
   _hearingRange: 60
+  _checkWonderTime: 0.5
+  _returnWonderTime: 2
 --- !u!82 &3641038844173001595
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5106,7 +5108,7 @@ GameObject:
   - component: {fileID: 8170439968612277734}
   - component: {fileID: 8170439968612277737}
   - component: {fileID: 7524265289006262012}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: sprite
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -10072,7 +10074,7 @@ PrefabInstance:
     - target: {fileID: 3443929097045683637, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
       propertyPath: m_Layer
-      value: 13
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
@@ -10834,7 +10836,7 @@ PrefabInstance:
     - target: {fileID: 8713196575654194123, guid: addbd47c8579c0748acc38fb4b205fa3,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8713196575654194123, guid: addbd47c8579c0748acc38fb4b205fa3,
         type: 3}

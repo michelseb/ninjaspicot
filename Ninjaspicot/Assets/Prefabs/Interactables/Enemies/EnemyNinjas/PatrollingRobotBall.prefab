@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 5817158929391033556}
   - component: {fileID: 1454303347493070735}
   - component: {fileID: 8348038814666603777}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: Electricity
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4835,7 +4835,7 @@ GameObject:
   - component: {fileID: 5862628225789036863}
   - component: {fileID: 7197498210539690252}
   - component: {fileID: 545212571173984229}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9695,7 +9695,7 @@ GameObject:
   - component: {fileID: 5945155895245782918}
   - component: {fileID: 4961650533914929655}
   - component: {fileID: 619266234837643095}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: PatrollingRobotBall
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -9799,10 +9799,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lightColor: 1
   _reactionType: 3
+  _castArea: {fileID: 0}
   _rotateSpeed: 60
   _moveSpeed: 30
   _sprite: {fileID: 7455689082476472355}
   _hearingRange: 60
+  _checkWonderTime: 0.5
+  _returnWonderTime: 2
   _target: {fileID: 0}
   _targetPoints: []
 --- !u!1 &7455689082476472354
@@ -9816,7 +9819,7 @@ GameObject:
   - component: {fileID: 7455689082476472355}
   - component: {fileID: 7455689082476472364}
   - component: {fileID: 5069061827769328842}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: sprite
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -10234,6 +10237,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EnemyLaser
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283091357783496053, guid: 82a657c5f2fdb0c4db44740f5b2c90b3,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 82a657c5f2fdb0c4db44740f5b2c90b3, type: 3}
@@ -10724,6 +10732,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: FieldOfView
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430314514506290235, guid: b58802812ee1103448b86cd061689ccc,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7430314514506290238, guid: b58802812ee1103448b86cd061689ccc,
         type: 3}

@@ -43,7 +43,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     {
         // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
         return Physics2D.CircleCast(origin, .82f, direction, distance,
-                    (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")) | (1 << LayerMask.NameToLayer("PoppingObstacle")));
+                    (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")));
     }
 
     public void SetJumper(Jumper jumper)
@@ -51,7 +51,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         _jumper = jumper;
     }
 
-    public void StartFading()
+    public virtual void StartFading()
     {
         Used = false;
         StartCoroutine(FadeAway());

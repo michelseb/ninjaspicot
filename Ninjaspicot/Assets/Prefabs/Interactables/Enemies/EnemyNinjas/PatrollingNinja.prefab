@@ -70,7 +70,7 @@ GameObject:
   - component: {fileID: 5420039215652656388}
   - component: {fileID: 6310273098783873180}
   - component: {fileID: -7933038635033273079}
-  m_Layer: 13
+  m_Layer: 11
   m_Name: PatrollingNinja
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -231,7 +231,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightColor: 1
-  _bottom: {fileID: 0}
+  _reactionType: 0
+  _castArea: {fileID: 0}
 --- !u!222 &4494649555327570752
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -384,6 +385,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -399,6 +405,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
+        type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -411,16 +422,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683639, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
