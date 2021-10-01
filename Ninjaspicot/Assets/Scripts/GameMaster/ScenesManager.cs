@@ -31,7 +31,6 @@ public class ScenesManager : MonoBehaviour
 
     private List<IWakeable> _wakeables;
 
-    private CameraBehaviour _cameraBehaviour;
     private SpawnManager _spawnManager;
     private AudioSource _audioSource;
     private Coroutine _volumeDown;
@@ -43,7 +42,6 @@ public class ScenesManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
-        _cameraBehaviour = CameraBehaviour.Instance;
         _spawnManager = SpawnManager.Instance;
         _audioSource = GetComponent<AudioSource>();
 
@@ -68,6 +66,14 @@ public class ScenesManager : MonoBehaviour
         SceneManager.LoadScene(lobby.Name);
         SwitchAudio(1);
         lobby.Loaded = true;
+
+        // Wake lobby wakeables
+        _wakeables = Utils.FindObjectsOfTypeInScene<IWakeable>("Lobby");
+        _wakeables.ForEach(w =>
+        {
+            w.Wake();
+            w.Sleeping = false;
+        });
     }
 
     public void LoadSceneById(int sceneId)

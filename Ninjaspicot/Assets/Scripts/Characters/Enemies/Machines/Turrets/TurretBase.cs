@@ -144,13 +144,13 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
         }
     }
 
-    public override void Activate()
+    public virtual void Activate()
     {
         Active = true;
         _aim.Activate();
     }
 
-    public override void Deactivate()
+    public virtual void Deactivate()
     {
         Active = false;
         _aim.Deactivate();

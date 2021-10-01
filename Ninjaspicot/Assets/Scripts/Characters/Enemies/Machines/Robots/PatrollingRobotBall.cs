@@ -99,6 +99,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (raycast)
         {
+            Seeing = false;
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 

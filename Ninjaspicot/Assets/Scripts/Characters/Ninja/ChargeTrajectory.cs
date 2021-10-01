@@ -60,17 +60,7 @@ public class ChargeTrajectory : TrajectoryBase
             Target = null;
             SetAudioSimulator(_line.GetPosition(1), 5);
 
-            if (hit.collider.TryGetComponent(out IFocusable focusable))
-            {
-                if (focusable is MonoBehaviour focusableObject)
-                {
-                    chargePos = focusableObject.transform.position;
-                    if (_aimIndicator == null) _aimIndicator = _poolManager.GetPoolable<AimIndicator>(chargePos, Quaternion.identity);
-                    _aimIndicator.Transform.position = chargePos;
-                }
-
-            }
-            else
+            if (!HandleFocusableCast(hit, ref chargePos))
             {
                 DeactivateAim();
                 chargePos = hit.point;
@@ -78,6 +68,25 @@ public class ChargeTrajectory : TrajectoryBase
         }
 
         Collides = true;
+
+        return true;
+    }
+
+    private bool HandleFocusableCast(RaycastHit2D hit, ref Vector2 chargePos)
+    {
+        if (!hit.collider.CompareTag("Interactive"))
+            return false;
+
+        if (hit.collider.TryGetComponent(out IFocusable focusable))
+        {
+            if (focusable is MonoBehaviour focusableObject)
+            {
+                chargePos = focusableObject.transform.position;
+                if (_aimIndicator == null) _aimIndicator = _poolManager.GetPoolable<AimIndicator>(chargePos, Quaternion.identity);
+                _aimIndicator.Transform.position = chargePos;
+            }
+
+        }
 
         return true;
     }

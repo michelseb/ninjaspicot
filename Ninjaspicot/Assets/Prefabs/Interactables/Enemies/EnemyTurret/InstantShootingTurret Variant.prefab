@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lightColor: 1
   _reactionType: 3
+  _castArea: {fileID: 0}
   _viewAngle: 90
-  _rotationSpeed: 10
+  _rotationSpeed: 50
   _clockWise: 0
   _initRotation: 0
   _aimSpeed: 5

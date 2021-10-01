@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
+public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable, IResettable
 {
 
     [SerializeField] protected RectTransform _start;
@@ -20,6 +20,9 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
+
+    private Transform _transform;
+    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
 
     public bool Sleeping { get; set; }
 
@@ -69,7 +72,7 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
         for (int i = 1; i < _pointsAmount - 1; i++)
         {
             var pos = _start.position + ((_end.position - _start.position) * (i + 1) / _pointsAmount);
-            _laser.SetPosition(i, pos + transform.up * delta);
+            _laser.SetPosition(i, pos + Transform.up * delta);
             delta *= -1;
         }
     }
@@ -93,20 +96,20 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
         {
             _collider.SetPath(0, new Vector2[]
             {
-                transform.InverseTransformPoint(startCorners[2]),
-                transform.InverseTransformPoint(startCorners[3]),
-                transform.InverseTransformPoint(endCorners[3]),
-                transform.InverseTransformPoint(endCorners[2])
+                Transform.InverseTransformPoint(startCorners[2]),
+                Transform.InverseTransformPoint(startCorners[3]),
+                Transform.InverseTransformPoint(endCorners[3]),
+                Transform.InverseTransformPoint(endCorners[2])
             });
         }
         else
         {
             _collider.SetPath(0, new Vector2[]
             {
-                transform.InverseTransformPoint(startCorners[1]),
-                transform.InverseTransformPoint(startCorners[2]),
-                transform.InverseTransformPoint(endCorners[1]),
-                transform.InverseTransformPoint(endCorners[2])
+                Transform.InverseTransformPoint(startCorners[1]),
+                Transform.InverseTransformPoint(startCorners[2]),
+                Transform.InverseTransformPoint(endCorners[1]),
+                Transform.InverseTransformPoint(endCorners[2])
             });
         }
     }
@@ -137,5 +140,15 @@ public class Laser : MonoBehaviour, IWakeable, IActivable, IRaycastable
     {
         _broken = true;
         Sleep();
+    }
+
+    public void DoReset()
+    {
+        _broken = false;
+
+        if (ZoneManager.Instance.CurrentZone == _zone)
+        {
+            Wake();
+        }
     }
 }

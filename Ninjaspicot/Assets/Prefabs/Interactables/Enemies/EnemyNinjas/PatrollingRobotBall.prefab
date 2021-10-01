@@ -9800,7 +9800,7 @@ MonoBehaviour:
   _lightColor: 1
   _reactionType: 3
   _castArea: {fileID: 0}
-  _rotateSpeed: 60
+  _rotateSpeed: 130
   _moveSpeed: 30
   _sprite: {fileID: 7455689082476472355}
   _hearingRange: 60
@@ -10262,11 +10262,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CharacterLight
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443929097045683637, guid: 1c625cc13688e8444bc2b84a06504ebe,
-        type: 3}
-      propertyPath: m_Layer
-      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}

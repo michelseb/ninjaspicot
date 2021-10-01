@@ -42,7 +42,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {
         // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-        return Physics2D.CircleCast(origin, .82f, direction, distance,
+        return Physics2D.CircleCast(origin, .8f, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")) | (1 << LayerMask.NameToLayer("Enemy")));
     }
 

@@ -69,5 +69,4 @@ public class ZoneManager : MonoBehaviour
 
         Zones.Add(zone);
     }
-
 }

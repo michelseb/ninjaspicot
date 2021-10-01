@@ -78,6 +78,9 @@ public class Portal : MonoBehaviour
 
         Hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
 
+        if (Hero.Dead)
+            return;
+
         Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
         Hero.Stickiness.Rigidbody.isKinematic = true;
 

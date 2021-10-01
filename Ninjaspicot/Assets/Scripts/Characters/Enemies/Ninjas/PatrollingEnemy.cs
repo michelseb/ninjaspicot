@@ -41,4 +41,12 @@ public class PatrollingEnemy : EnemyNinja, ITriggerable
             _trigger = StartCoroutine(Trigger(trigger));
         }
     }
+
+    public override void DoReset()
+    {
+        Dead = false;
+        Transform.position = _initPosition;
+        Transform.rotation = _initRotation;
+        Wake();
+    }
 }

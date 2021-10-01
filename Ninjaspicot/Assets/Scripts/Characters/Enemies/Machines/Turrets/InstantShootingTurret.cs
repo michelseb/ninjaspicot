@@ -94,4 +94,10 @@ public class InstantShootingTurret : TurretBase
         bullet.Deactivate();
     }
 
+    public override void DoReset()
+    {
+        Dead = false;
+        Wake();
+    }
+
 }

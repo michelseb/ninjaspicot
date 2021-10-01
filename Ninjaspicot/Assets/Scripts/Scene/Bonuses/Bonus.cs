@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
+public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable, IResettable
 {
     [SerializeField] protected bool _respawn;
     [SerializeField] protected float _respawnTime;
@@ -11,8 +11,10 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
     protected Animator _animator;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
+    protected Coroutine _temporaryDeactivate;
     protected Hero _hero;
     protected bool _active;
+    protected bool _taken;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
@@ -20,6 +22,7 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     public bool Sleeping { get; set; }
+
 
 
     protected virtual void Awake()
@@ -50,10 +53,15 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
         Deactivate();
         yield return new WaitForSeconds(time);
         Activate();
+
+        _temporaryDeactivate = null;
     }
 
     public void Activate()
     {
+        if (_taken)
+            return;
+
         _active = true;
         _animator.enabled = true;
 
@@ -100,13 +108,15 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
         {
             if (_active)
             {
-                StartCoroutine(TemporaryDeactivation(_respawnTime));
+                _temporaryDeactivate = StartCoroutine(TemporaryDeactivation(_respawnTime));
             }
         }
         else
         {
+            _taken = true;
             Deactivate();
-            Destroy(gameObject, 1f);
         }
     }
+
+    public abstract void DoReset();
 }

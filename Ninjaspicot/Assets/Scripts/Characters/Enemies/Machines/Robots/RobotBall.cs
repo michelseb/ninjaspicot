@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class RobotBall : Enemy, IActivable
+public class RobotBall : Enemy
 {
     [SerializeField] protected float _rotateSpeed;
     [SerializeField] protected float _moveSpeed;
@@ -23,7 +23,7 @@ public class RobotBall : Enemy, IActivable
     protected override void Start()
     {
         base.Start();
-        Activate();
+        Wake();
     }
 
     protected virtual void Update()
@@ -35,21 +35,10 @@ public class RobotBall : Enemy, IActivable
         Renderer.flipY = rot > 90 && rot < 270;
     }
 
-    public override void Activate()
-    {
-        Active = true;
-        Laser?.Activate();
-        FieldOfView.Activate();
-        _reaction?.Activate();
-        _characterLight.Wake();
-        Collider.enabled = true;
-        _castArea.enabled = true;
-    }
-
-    public override void Deactivate()
+    public override void Sleep()
     {
         Active = false;
-        Renderer.color = ColorUtils.White;
+        Renderer.enabled = false;
         FieldOfView.Deactivate();
         Laser?.Deactivate();
         _reaction?.Deactivate();
@@ -58,19 +47,22 @@ public class RobotBall : Enemy, IActivable
         _castArea.enabled = false;
     }
 
-    public override void Sleep()
-    {
-        Deactivate();
-    }
-
     public override void Wake()
     {
-        Activate();
+        Active = true;
+        Laser?.Activate();
+        Renderer.enabled = true;
+        FieldOfView.Activate();
+        _reaction?.Activate();
+        _characterLight.Wake();
+        Collider.enabled = true;
+        _castArea.enabled = true;
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
-        base.Die(killer, sound, volume);
+        if (Dead)
+            return;
 
         if (killer != null)
         {
@@ -83,8 +75,15 @@ public class RobotBall : Enemy, IActivable
             }
         }
 
-        Deactivate();
-        Destroy(gameObject, 1f);
+        base.Die(killer, sound, volume);
+        //Deactivate();
     }
 
+    public override void DoReset()
+    {
+        Dead = false;
+        Transform.position = _initPosition;
+        Transform.rotation = _initRotation;
+        Wake();
+    }
 }

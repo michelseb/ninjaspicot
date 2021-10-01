@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
-public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
+public abstract class EnemyNinja : Enemy, INinja, IRaycastable
 {
-    public virtual PoolableType PoolableType => PoolableType.EnemyNinja;
-
     private EnemyJumper _jumper;
     public Jumper Jumper { get { if (Utils.IsNull(_jumper)) _jumper = GetComponent<EnemyJumper>() ?? GetComponentInChildren<EnemyJumper>(); return _jumper; } }
 
@@ -21,12 +18,6 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
         _slash = _audioManager.FindAudioByName("Slash");
         _canvas = GetComponent<Canvas>();
         _canvas.worldCamera = _cameraBehaviour.MainCamera;
-    }
-
-    public void Pool(Vector3 position, Quaternion rotation, float size)
-    {
-        Transform.position = position;
-        Transform.rotation = rotation;
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -58,27 +49,6 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable, IPoolable
         Jumper?.CancelJump();
         SetAllBehavioursActivation(false, false);
         StartCoroutine(Dying());
-    }
-
-    public override IEnumerator Dying()
-    {
-        if (Renderer != null)
-        {
-            while (Renderer.color.a > 0)
-            {
-                Renderer.color = new Color(Renderer.color.r, Renderer.color.g, Renderer.color.b, Renderer.color.a - Time.deltaTime);
-                yield return null;
-            }
-        }
-        else if (Image != null)
-        {
-            while (Image.color.a > 0)
-            {
-                Image.color = new Color(Image.color.r, Image.color.g, Image.color.b, Image.color.a - Time.deltaTime);
-                yield return null;
-            }
-        }
-        yield return StartCoroutine(base.Dying());
     }
 
     public void SetJumpingActivation(bool active)

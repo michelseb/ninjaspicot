@@ -17,7 +17,6 @@ public class MarauderEnemy : EnemyNinja
     private MarauderMode _marauderMode;
     private bool _readyToStop;
     private Coroutine _slowDown;
-    public override PoolableType PoolableType => PoolableType.Marauder;
 
     protected override void Awake()
     {
@@ -100,5 +99,13 @@ public class MarauderEnemy : EnemyNinja
         _fieldOfView.Activate();
         _readyToStop = false;
         _slowDown = null;
+    }
+
+    public override void DoReset()
+    {
+        Dead = false;
+        Transform.position = _initPosition;
+        Transform.rotation = _initRotation;
+        Wake();
     }
 }

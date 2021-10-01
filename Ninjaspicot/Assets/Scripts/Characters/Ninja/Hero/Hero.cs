@@ -20,6 +20,7 @@ public class Hero : Character, INinja, ITriggerable
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
     private TouchManager _touchManager;
+    private ZoneManager _zoneManager;
     private Coroutine _displayGhosts;
     private Coroutine _fade;
     private Coroutine _trigger;
@@ -39,6 +40,7 @@ public class Hero : Character, INinja, ITriggerable
         _spawnManager = SpawnManager.Instance;
         _cameraBehaviour = CameraBehaviour.Instance;
         _touchManager = TouchManager.Instance;
+        _zoneManager = ZoneManager.Instance;
         _uiCamera = UICamera.Instance;
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
@@ -88,6 +90,7 @@ public class Hero : Character, INinja, ITriggerable
 
         yield return new WaitForSecondsRealtime(1.5f);
 
+        _zoneManager.CurrentZone.ResetItems();
         _timeManager.SetNormalTime();
         SetCapeActivation(false);
         _spawnManager.Respawn();

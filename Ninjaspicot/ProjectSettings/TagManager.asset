@@ -32,10 +32,10 @@ TagManager:
   - Enemy
   - DynamicObstacle
   - DynamicCollider
-  - WorldUI
-  - EnemyTrigger
-  - Light
   - Sound
+  - 
+  - 
+  - 
   - 
   - 
   - 

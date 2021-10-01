@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Generator : MonoBehaviour, IWakeable, IActivable, IRaycastable, IFocusable
+public class Generator : MonoBehaviour, IActivable, IRaycastable, IFocusable
 {
     [SerializeField] protected Laser[] _lasers;
     
@@ -19,19 +19,11 @@ public class Generator : MonoBehaviour, IWakeable, IActivable, IRaycastable, IFo
         _light = GetComponentInChildren<Lamp>();
     }
 
-
-    public void Sleep()
-    {
-        _light.enabled = false;
-    }
-
-    public void Wake()
-    {
-        _light.enabled = true;
-    }
-
     public void Activate() 
     {
+        _light.Animator.enabled = false;
+        _light.Light.enabled = false;
+
         foreach (var laser in _lasers)
         {
             laser.Deactivate();

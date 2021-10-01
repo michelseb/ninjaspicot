@@ -185,4 +185,12 @@ public class GuardNinja : EnemyNinja, IListener
             StartChasing();
         }
     }
+
+    public override void DoReset()
+    {
+        Transform.position = _initPosition;
+        Transform.rotation = _initRotation;
+        Dead = false;
+        Wake();
+    }
 }

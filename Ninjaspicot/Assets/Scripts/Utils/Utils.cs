@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class Utils
 {
@@ -188,5 +189,19 @@ public static class Utils
     public static Vector2 ToVector2(Vector3 vector)
     {
         return new Vector2(vector.x, vector.y);
+    }
+
+    public static List<T> FindObjectsOfTypeInScene<T>(string scene)
+    {
+        return SceneManager.GetSceneByName(scene)
+            .GetRootGameObjects()
+            .Select(go => go.GetComponentInChildren<T>())
+            .Where(x => !IsNull(x))
+            .ToList();
+
+        //return Object.FindObjectsOfType<MonoBehaviour>()
+        //    .Where(go => sceneObjectsIds.Contains(go.GetInstanceID()))
+        //    .OfType<T>()
+        //    .ToList();
     }
 }

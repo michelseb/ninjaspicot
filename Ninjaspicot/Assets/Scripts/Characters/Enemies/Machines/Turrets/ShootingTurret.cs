@@ -68,4 +68,10 @@ public class ShootingTurret : TurretBase
         bullet.Speed = _strength;
         Loaded = false;
     }
+
+    public override void DoReset()
+    {
+        Dead = false;
+        Wake();
+    }
 }

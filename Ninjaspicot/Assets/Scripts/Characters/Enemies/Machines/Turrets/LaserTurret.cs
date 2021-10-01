@@ -29,4 +29,10 @@ public class LaserTurret : TurretBase
         yield return StartCoroutine(base.Wait());
         _laserAim.StopLaserize();
     }
+
+    public override void DoReset()
+    {
+        Dead = false;
+        Wake();
+    }
 }

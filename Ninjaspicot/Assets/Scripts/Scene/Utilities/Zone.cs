@@ -19,6 +19,7 @@ public class Zone : MonoBehaviour
     }
 
     protected List<IWakeable> _wakeables;
+    protected List<IResettable> _resettables;
     protected ZoneManager _zoneManager;
     protected Animator _animator;
     protected CheckPoint _checkpoint;
@@ -38,6 +39,7 @@ public class Zone : MonoBehaviour
     protected virtual void Start()
     {
         _wakeables = GetComponentsInChildren<IWakeable>().ToList();
+        _resettables = GetComponentsInChildren<IResettable>().ToList();
         Close();
         ZoneManager.AddZone(this);
         Exited = true;
@@ -111,5 +113,10 @@ public class Zone : MonoBehaviour
     protected virtual void SetSpawn()
     {
         _spawnManager.SetSpawn(_checkpoint);
+    }
+
+    public void ResetItems()
+    {
+        _resettables.ForEach(r => r.DoReset());
     }
 }

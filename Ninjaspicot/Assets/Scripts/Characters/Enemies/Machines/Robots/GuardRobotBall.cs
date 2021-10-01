@@ -37,7 +37,6 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         _initRotation = _sprite.rotation;
         GuardMode = GuardMode.Guarding;
         Laser.SetActive(false);
-        Activate();
     }
 
     protected override void Update()
@@ -84,7 +83,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
 
         GuardMode = GuardMode.Wondering;
-        _wonderTime = wonderTime;
+        _wonderTime = wonderTime * GetReactionFactor(_reactionType);
         _nextState = nextState;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Wonder);
@@ -187,6 +186,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         if (heroNotVisible)
         {
+            Seeing = false;
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
@@ -283,10 +283,23 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         StartChasing(target);
     }
 
-    public override void Activate()
+    public override void Sleep()
+    {
+        Active = false;
+        Renderer.enabled = false;
+        Laser?.Deactivate();
+        _hearingPerimeter.SoundMark?.Deactivate();
+        _hearingPerimeter.Deactivate();
+        _reaction?.Deactivate();
+        _characterLight.Sleep();
+        FieldOfView.Deactivate();
+    }
+
+    public override void Wake()
     {
         Active = true;
         Laser?.Activate();
+        Renderer.enabled = true;
         _hearingPerimeter.Activate();
         _reaction?.Activate();
         _characterLight.Wake();
@@ -297,31 +310,24 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
     }
 
-    public override void Deactivate()
-    {
-        Active = false;
-        Renderer.color = ColorUtils.White;
-        Laser?.Deactivate();
-        _hearingPerimeter.SoundMark?.Deactivate();
-        _hearingPerimeter.Deactivate();
-        _reaction?.Deactivate();
-        _characterLight.Sleep();
-        FieldOfView.Deactivate();
-    }
-
-    public override void Sleep()
-    {
-        Deactivate();
-    }
-
-    public override void Wake()
-    {
-        Activate();
-    }
-
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
         _hearingPerimeter.SoundMark?.Deactivate();
         base.Die(killer, sound, volume);
+    }
+
+    protected float GetReactionFactor(ReactionType reactionType)
+    {
+        switch (reactionType)
+        {
+            case ReactionType.Sleep:
+                return 3;
+            case ReactionType.Patrol:
+                return 1.5f;
+            case ReactionType.Wonder:
+                return 1;
+            default:
+                return 1;
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Enemy : Character, IWakeable, IFocusable
+public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
 {
     [SerializeField] protected ReactionType _reactionType;
     [SerializeField] protected Collider2D _castArea;
@@ -13,30 +13,37 @@ public abstract class Enemy : Character, IWakeable, IFocusable
 
     public bool Sleeping { get; set; }
 
+    protected Vector3 _initPosition;
+    protected Quaternion _initRotation;
+
     protected override void Start()
     {
         base.Start();
         SetReaction(_reactionType);
+        _initPosition = Transform.position;
+        _initRotation = Transform.rotation;
     }
 
     public override IEnumerator Dying()
     {
-        if (Renderer != null)
+        var col = Renderer?.color ?? Image.color;
+        var alpha = col.a;
+
+        while (alpha > 0)
         {
-            while (Renderer.color.a > 0)
+            alpha -= Time.deltaTime;
+            if (Renderer != null)
             {
                 Renderer.color = new Color(Renderer.color.r, Renderer.color.g, Renderer.color.b, Renderer.color.a - Time.deltaTime);
-                yield return null;
             }
-        }
-        else if (Image != null)
-        {
-            while (Image.color.a > 0)
+            else if (Image != null)
             {
                 Image.color = new Color(Image.color.r, Image.color.g, Image.color.b, Image.color.a - Time.deltaTime);
-                yield return null;
             }
+
+            yield return null;
         }
+
         Die();
     }
 
@@ -55,15 +62,15 @@ public abstract class Enemy : Character, IWakeable, IFocusable
     }
 
 
-    public virtual void Deactivate()
-    {
-        gameObject.SetActive(false);
-    }
+    //public virtual void Deactivate()
+    //{
+    //    gameObject.SetActive(false);
+    //}
 
-    public virtual void Activate()
-    {
-        gameObject.SetActive(true);
-    }
+    //public virtual void Activate()
+    //{
+    //    gameObject.SetActive(true);
+    //}
 
     public virtual void Sleep()
     {
@@ -75,10 +82,16 @@ public abstract class Enemy : Character, IWakeable, IFocusable
         {
             Image.enabled = false;
         }
+
+        Collider.enabled = false;
     }
 
     public virtual void Wake()
     {
+        // This game is not called the walking dead!
+        if (Dead)
+            return;
+
         if (Renderer != null)
         {
             Renderer.enabled = true;
@@ -138,5 +151,10 @@ public abstract class Enemy : Character, IWakeable, IFocusable
         {
             Collider.enabled = false;
         }
+
+        Dead = true;
+        Sleep();
     }
+
+    public abstract void DoReset();
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3080529043691264612}
   - component: {fileID: 4819409324247886693}
   - component: {fileID: 2551675255560199487}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3418846343770563117}
   - component: {fileID: 3694856617715737200}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -295,7 +295,7 @@ GameObject:
   - component: {fileID: 5550590094037015102}
   - component: {fileID: 1727937675555222051}
   - component: {fileID: 3522871990513266723}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: Teleporter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -431,7 +431,7 @@ GameObject:
   - component: {fileID: 4067093718027855209}
   - component: {fileID: 1947584414827436844}
   - component: {fileID: 761122917422876828}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: TeleporterImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -536,7 +536,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2434093622347707497}
   - component: {fileID: 842561634802802567}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: Inside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -620,7 +620,7 @@ GameObject:
   - component: {fileID: 5334684903327643376}
   - component: {fileID: 5330082818447081310}
   - component: {fileID: 6244243377383203415}
-  m_Layer: 14
+  m_Layer: 10
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}

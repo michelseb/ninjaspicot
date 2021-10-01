@@ -3,7 +3,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 public class Lamp : MonoBehaviour, IWakeable
 {
-    protected Animator _animator;
+    public Animator Animator { get; private set; }
 
     protected Light2D _light;
     public Light2D Light { get { if (Utils.IsNull(_light)) _light = gameObject.GetComponent<Light2D>(); return _light; } }
@@ -15,17 +15,17 @@ public class Lamp : MonoBehaviour, IWakeable
 
     protected virtual void Awake()
     {
-        _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        Animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
     }
 
     public virtual void Wake()
     {
-        _animator.SetTrigger("TurnOn");
+        Animator.SetTrigger("TurnOn");
     }
 
     public virtual void Sleep()
     {
-        _animator.SetTrigger("TurnOff");
+        Animator.SetTrigger("TurnOff");
     }
 
     public void SetColor(Color color)
