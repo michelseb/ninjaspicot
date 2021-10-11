@@ -30,6 +30,7 @@ public class PortalManager : MonoBehaviour
     private AudioManager _audioManager;
     private Audio _enterClip;
     private Audio _exitClip;
+    private ZoneManager _zoneManager;
 
 
     public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
@@ -46,6 +47,7 @@ public class PortalManager : MonoBehaviour
         _uiCamera = UICamera.Instance;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
+        _zoneManager = ZoneManager.Instance;
     }
 
     private void Start()
@@ -57,6 +59,11 @@ public class PortalManager : MonoBehaviour
     private int? GetExitIndexByEntranceId(int entranceId)
     {
         return _doorEntranceExitPairs.FirstOrDefault(d => d.EntranceId == entranceId)?.ExitId;
+    }
+
+    public bool ConnectionExists(Portal portal)
+    {
+        return GetExitIndexByEntranceId(portal.Id) != null;
     }
 
     public Portal GetPortalById(int portalId)
@@ -137,7 +144,7 @@ public class PortalManager : MonoBehaviour
         _uiCamera.CameraAppear();
         entrance.Reinit();
         ClosePreviousZone(entrance.Id);
-
+        _zoneManager.SetZone(exit.Zone);
         yield return new WaitForSecondsRealtime(2);
 
         Hero.Instance.StartAppear();

@@ -8,7 +8,7 @@ public enum AccessGrant
     No = 2
 }
 
-public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
+public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable
 {
     [SerializeField] protected GameObject _activableObject;
     private int _collidingAmount;
@@ -19,19 +19,21 @@ public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
     protected Image _renderer;
     protected Lamp _light;
     protected AccessGrant? _accessGrant;
+    private ZoneManager _zoneManager;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-    public bool Sleeping { get; set; }
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected virtual void Awake()
     {
+        _zoneManager = ZoneManager.Instance;
         _audioManager = AudioManager.Instance;
         _audioSource = GetComponent<AudioSource>();
         _light = GetComponentInChildren<Lamp>();
+        _light.StayOn = true;
         _renderer = GetComponent<Image>();
         if (!_renderer)
         {
@@ -50,6 +52,11 @@ public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
     {
         if (!collision.CompareTag("hero") && !collision.CompareTag("Enemy"))
             return;
+
+        if (collision.CompareTag("hero"))
+        {
+            _zoneManager.SetZone(Zone);
+        }
 
         _collidingAmount++;
         UpdateState(GetAccessGrant(collision.tag));
@@ -82,16 +89,6 @@ public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
 
         _renderer.color = color;
         _light.SetColor(color);
-    }
-
-    public void Sleep()
-    {
-        _light.enabled = false;
-    }
-
-    public void Wake()
-    {
-        _light.enabled = true;
     }
 
     protected AccessGrant GetAccessGrant(string entityTag)
@@ -141,6 +138,8 @@ public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
         if (!Colliding)
         {
             Deactivate();
+            _zoneManager.SetZone(Zone);
+
             return;
         }
         _accessGrant = AccessGrant.Yes;
@@ -148,7 +147,7 @@ public class ActivationBeam : MonoBehaviour, IWakeable, IActivable, IRaycastable
         _activable.Activate();
     }
 
-    public void Deactivate() 
+    public void Deactivate()
     {
         _accessGrant = AccessGrant.No;
         SetActiveColor(AccessGrant.No);

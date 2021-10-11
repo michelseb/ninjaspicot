@@ -10,7 +10,7 @@ public class ZoneManager : MonoBehaviour
     private long _currentZoneId;
 
     private CameraBehaviour _cameraBehaviour;
-    
+
     private static ZoneManager _instance;
     public static ZoneManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ZoneManager>(); return _instance; } }
 
@@ -19,19 +19,16 @@ public class ZoneManager : MonoBehaviour
         _cameraBehaviour = CameraBehaviour.Instance;
     }
 
-    public void SetZone(Zone zone, bool closePrevious = true)
+    public void SetZone(Zone zone)
     {
-        if (zone.Id == _currentZoneId || !zone.Exited)
+        if (zone.Id == _currentZoneId)
             return;
 
         _currentZoneId = zone.Id;
 
         if (CurrentZone)
         {
-            if (closePrevious)
-            {
-                CurrentZone.Close();
-            }
+            CurrentZone.Close();
         }
         else
         {
@@ -51,6 +48,28 @@ public class ZoneManager : MonoBehaviour
 
         CurrentZone = zone;
         CurrentZone.Open();
+
+        UpdateCurrentZoneCameraBehavior();
+    }
+
+    public void OpenExtraZone(Zone zone)
+    {
+        zone.Open();
+
+        if (zone.Center.HasValue)
+        {
+            _cameraBehaviour.SetCenterMode(zone.Center.Value);
+        }
+        else
+        {
+            _cameraBehaviour.SetFollowMode();
+        }
+    }
+
+    public void UpdateCurrentZoneCameraBehavior()
+    {
+        if (Utils.IsNull(CurrentZone))
+            return;
 
         if (CurrentZone.Center.HasValue)
         {

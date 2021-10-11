@@ -6,6 +6,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
     protected Transform _transform;
     protected ParticleSystem _dust;
     protected Enemy _enemy;
+    private AudioManager _audioManager;
     private Audio _electrocutionSound;
     protected int _pointsAmount;
     protected bool _active;
@@ -18,6 +19,12 @@ public class EnemyLaser : MonoBehaviour, IActivable
         _dust = GetComponentInChildren<ParticleSystem>();
         _enemy = GetComponentInParent<Enemy>();
         _pointsAmount = _laser.positionCount;
+        _audioManager = AudioManager.Instance;
+    }
+
+    protected virtual void Start()
+    {
+        _electrocutionSound = _audioManager.FindAudioByName("Electrocution");
     }
 
     protected void Update()

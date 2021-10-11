@@ -24,5 +24,6 @@ public class Coin : Bonus
     {
         _taken = false;
         Activate();
+        base.DoReset();
     }
 }

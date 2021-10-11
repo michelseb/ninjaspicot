@@ -5,8 +5,8 @@ public class RobotBall : Enemy
     [SerializeField] protected float _rotateSpeed;
     [SerializeField] protected float _moveSpeed;
     [SerializeField] protected Transform _sprite;
+    [SerializeField] protected ParticleSystem _electricity;
 
-    public bool Active { get; protected set; }
     protected Rigidbody2D _rigidbody;
 
     protected FieldOfView _fieldOfView;
@@ -37,26 +37,26 @@ public class RobotBall : Enemy
 
     public override void Sleep()
     {
-        Active = false;
-        Renderer.enabled = false;
+        base.Sleep();
+
         FieldOfView.Deactivate();
         Laser?.Deactivate();
-        _reaction?.Deactivate();
-        _characterLight.Sleep();
-        Collider.enabled = false;
         _castArea.enabled = false;
+        _electricity.Stop();
     }
 
     public override void Wake()
     {
-        Active = true;
+        base.Wake();
+
         Laser?.Activate();
-        Renderer.enabled = true;
-        FieldOfView.Activate();
-        _reaction?.Activate();
-        _characterLight.Wake();
-        Collider.enabled = true;
         _castArea.enabled = true;
+        _electricity.Play();
+
+        if (_initReactionType != ReactionType.Sleep)
+        {
+            FieldOfView.Activate();
+        }
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
@@ -76,14 +76,14 @@ public class RobotBall : Enemy
         }
 
         base.Die(killer, sound, volume);
-        //Deactivate();
     }
 
     public override void DoReset()
     {
-        Dead = false;
-        Transform.position = _initPosition;
-        Transform.rotation = _initRotation;
-        Wake();
+        StopAllCoroutines();
+        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.angularVelocity = 0;
+        Laser.Deactivate();
+        base.DoReset();
     }
 }

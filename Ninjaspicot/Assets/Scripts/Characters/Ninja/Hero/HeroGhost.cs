@@ -23,7 +23,7 @@ public class HeroGhost : MonoBehaviour, IPoolable
 
         if (color.a <= .01f)
         {
-            Deactivate();
+            Sleep();
         }
         else
         {
@@ -40,13 +40,13 @@ public class HeroGhost : MonoBehaviour, IPoolable
         _transform.localScale = new Vector3(_transform.localScale.x * size, _transform.localScale.y * size);
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
         _transform.localScale = _initSize;
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         var color = Hero.Instance.Renderer.color;

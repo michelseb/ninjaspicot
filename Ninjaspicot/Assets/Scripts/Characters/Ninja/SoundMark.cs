@@ -9,7 +9,6 @@ public class SoundMark : MonoBehaviour, IPoolable
     private ParticleSystem _particleSystem;
 
     public PoolableType PoolableType => PoolableType.None;
-
     private void Awake()
     {
         _transform = transform;
@@ -23,18 +22,14 @@ public class SoundMark : MonoBehaviour, IPoolable
         _transform.rotation = rotation;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         _particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         StartCoroutine(FadeAway());
     }
 
-    public void Activate()
+    public void Wake()
     {
-        //var main = _particleSystem.main;
-        //var col = main.startColor.color;
-        //col.a = 1;
-        //main.startColor = col;
         gameObject.SetActive(true);
     }
 

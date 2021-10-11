@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable, IResettable
+public abstract class Bonus : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastable, IResettable
 {
     [SerializeField] protected bool _respawn;
     [SerializeField] protected float _respawnTime;
@@ -21,9 +21,6 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-    public bool Sleeping { get; set; }
-
-
 
     protected virtual void Awake()
     {
@@ -118,5 +115,10 @@ public abstract class Bonus : MonoBehaviour, IActivable, IWakeable, IRaycastable
         }
     }
 
-    public abstract void DoReset();
+    public virtual void DoReset()
+    {
+        _animator.Rebind();
+        _animator.Update(0);
+        //_animator.Play(_animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+    }
 }

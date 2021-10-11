@@ -12,13 +12,13 @@ public class DynamicNinjaCollider : MonoBehaviour, IPoolable
         Transform = transform;
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         Active = true;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
         Active = false;

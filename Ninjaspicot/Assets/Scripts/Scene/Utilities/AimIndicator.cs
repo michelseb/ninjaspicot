@@ -20,12 +20,12 @@ public class AimIndicator : MonoBehaviour, IPoolable
         Transform.Rotate(0, 0, 1);
     }
 
-    public virtual void Activate()
+    public virtual void Wake()
     {
         gameObject.SetActive(true);
     }
 
-    public virtual void Deactivate()
+    public virtual void Sleep()
     {
         gameObject.SetActive(false);
     }

@@ -28,7 +28,6 @@ public class Joystick : MonoBehaviour, IPoolable
     public bool SnapY { get { return _snapY; } set { _snapY = value; } }
 
     public PoolableType PoolableType => _poolableType;
-
     [SerializeField] private PoolableType _poolableType;
     [SerializeField] private float _handleRange = 1;
     [SerializeField] private float _deadZone = 0;
@@ -214,7 +213,7 @@ public class Joystick : MonoBehaviour, IPoolable
             _image.color = col;
             yield return null;
         }
-        Deactivate();
+        Sleep();
     }
 
     private IEnumerator Appear()
@@ -237,13 +236,13 @@ public class Joystick : MonoBehaviour, IPoolable
         _appear = StartCoroutine(Appear());
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         Active = false;
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         Active = true;

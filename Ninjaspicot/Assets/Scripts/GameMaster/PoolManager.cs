@@ -75,7 +75,7 @@ public class PoolManager : MonoBehaviour
 
     public T SelectPoolable<T>(T poolable, Vector3 position, Quaternion rotation, float size = 1f) where T : IPoolable
     {
-        poolable.Activate();
+        poolable.Wake();
         poolable.Pool(position, rotation, size);
 
         return poolable;

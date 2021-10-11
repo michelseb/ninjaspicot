@@ -166,7 +166,7 @@ public class ChargeTrajectory : TrajectoryBase
         if (_aimIndicator == null)
             return;
 
-        _aimIndicator.Deactivate();
+        _aimIndicator.Sleep();
         _aimIndicator = null;
     }
 

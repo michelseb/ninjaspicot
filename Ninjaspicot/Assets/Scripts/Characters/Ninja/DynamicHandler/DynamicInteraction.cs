@@ -107,8 +107,8 @@ public class DynamicInteraction : MonoBehaviour, IActivable
         {
             CloneHeroStickiness = null;
             _cloneHeroCollider.Transform.SetParent(null);
-            _cloneHeroCollider.Deactivate();
-            _cloneOtherDynamic.Deactivate();
+            _cloneHeroCollider.Sleep();
+            _cloneOtherDynamic.Sleep();
         }
         _tempDynamic = null;
     }

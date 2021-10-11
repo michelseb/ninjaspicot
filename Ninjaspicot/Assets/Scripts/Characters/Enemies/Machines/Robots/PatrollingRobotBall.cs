@@ -29,7 +29,6 @@ public class PatrollingRobotBall : GuardRobotBall
 
         base.Start();
         FieldOfView.Activate();
-        //Laser.SetActive(true);
     }
 
     protected override void Guard()
@@ -71,7 +70,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
-            _hearingPerimeter.SoundMark?.Deactivate();
+            _hearingPerimeter.SoundMark?.Sleep();
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 

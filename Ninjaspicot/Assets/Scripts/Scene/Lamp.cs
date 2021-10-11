@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class Lamp : MonoBehaviour, IWakeable
+public class Lamp : MonoBehaviour, ISceneryWakeable
 {
     public Animator Animator { get; private set; }
 
@@ -11,7 +11,7 @@ public class Lamp : MonoBehaviour, IWakeable
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
-    public bool Sleeping { get; set; }
+    public bool StayOn { get; set; }
 
     protected virtual void Awake()
     {
@@ -25,7 +25,10 @@ public class Lamp : MonoBehaviour, IWakeable
 
     public virtual void Sleep()
     {
-        Animator.SetTrigger("TurnOff");
+        if (!StayOn)
+        {
+            Animator.SetTrigger("TurnOff");
+        }
     }
 
     public void SetColor(Color color)

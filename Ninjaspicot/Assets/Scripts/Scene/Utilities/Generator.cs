@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Generator : MonoBehaviour, IActivable, IRaycastable, IFocusable
+public class Generator : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastable, IFocusable, IResettable
 {
     [SerializeField] protected Laser[] _lasers;
     
@@ -9,8 +9,6 @@ public class Generator : MonoBehaviour, IActivable, IRaycastable, IFocusable
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-
-    public bool Sleeping { get; set; }
 
     private Lamp _light;
 
@@ -21,8 +19,7 @@ public class Generator : MonoBehaviour, IActivable, IRaycastable, IFocusable
 
     public void Activate() 
     {
-        _light.Animator.enabled = false;
-        _light.Light.enabled = false;
+        Sleep();
 
         foreach (var laser in _lasers)
         {
@@ -31,4 +28,26 @@ public class Generator : MonoBehaviour, IActivable, IRaycastable, IFocusable
     }
 
     public void Deactivate() { }
+
+    public void DoReset()
+    {
+        Wake();
+
+        foreach (var laser in _lasers)
+        {
+            laser.DoReset();
+        }
+    }
+
+    public void Sleep()
+    {
+        _light.Animator.enabled = false;
+        _light.Light.enabled = false;
+    }
+
+    public void Wake()
+    {
+        _light.Animator.enabled = true;
+        _light.Light.enabled = true;
+    }
 }

@@ -23,7 +23,6 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     protected const float LENGTH = .01f;
 
     public PoolableType PoolableType => PoolableType.None;
-
     protected virtual void Awake()
     {
         _transform = transform;
@@ -59,7 +58,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     protected virtual IEnumerator FadeAway()
     {
-        _audioSimulator?.Deactivate();
+        _audioSimulator?.Sleep();
         _audioSimulator = null;
 
         _timeManager.SetNormalTime();
@@ -72,7 +71,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
             yield return null;
         }
         Active = false;
-        Deactivate();
+        Sleep();
     }
 
     public virtual void ReUse(Vector3 position)
@@ -105,12 +104,12 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
         Appear();
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
     }

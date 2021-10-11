@@ -15,7 +15,6 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     protected float _wonderTime;
     protected float _wonderElapsedTime;
     protected Quaternion _initRotation;
-    private Vector3 _initPos;
     private Audio _reactionSound;
     private TimeManager _timeManager;
 
@@ -33,7 +32,6 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     {
         base.Start();
         _reactionSound = _audioManager.FindAudioByName("RobotReact");
-        _initPos = Transform.position;
         _initRotation = _sprite.rotation;
         GuardMode = GuardMode.Guarding;
         Laser.SetActive(false);
@@ -83,7 +81,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
 
         GuardMode = GuardMode.Wondering;
-        _wonderTime = wonderTime * GetReactionFactor(_reactionType);
+        _wonderTime = wonderTime * GetReactionFactor(_initReactionType);
         _nextState = nextState;
         Renderer.color = ColorUtils.Red;
         SetReaction(ReactionType.Wonder);
@@ -149,7 +147,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
-            _hearingPerimeter.SoundMark?.Deactivate();
+            _hearingPerimeter.SoundMark?.Sleep();
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
@@ -211,14 +209,14 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     {
         TargetTransform = null;
         GuardMode = GuardMode.Returning;
-        SetReaction(ReactionType.Patrol);
+        SetReaction(ReactionType.Guard);
         Renderer.color = ColorUtils.White;
         Laser.SetActive(false);
     }
 
     protected virtual void Return()
     {
-        var deltaX = _initPos.x - Transform.position.x;
+        var deltaX = _resetPosition.x - Transform.position.x;
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, _initRotation, Time.deltaTime * _rotateSpeed);
 
@@ -226,7 +224,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         {
             _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
         }
-        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(_initPos - Transform.position).normalized) > .99f)
+        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
         {
             StartGuarding();
         }
@@ -248,7 +246,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (GuardMode == GuardMode.Chasing || (GuardMode == GuardMode.Wondering && _nextState == GuardMode.Checking))
             return;
 
-        if (_reactionType == ReactionType.Sleep)
+        if (_initReactionType == ReactionType.Sleep)
         {
             FieldOfView.Activate();
             StartWondering(GuardMode.Checking, _checkWonderTime);
@@ -285,34 +283,22 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     public override void Sleep()
     {
-        Active = false;
-        Renderer.enabled = false;
-        Laser?.Deactivate();
-        _hearingPerimeter.SoundMark?.Deactivate();
+        base.Sleep();
+
+        _hearingPerimeter.SoundMark?.Sleep();
         _hearingPerimeter.Deactivate();
-        _reaction?.Deactivate();
-        _characterLight.Sleep();
-        FieldOfView.Deactivate();
     }
 
     public override void Wake()
     {
-        Active = true;
-        Laser?.Activate();
-        Renderer.enabled = true;
-        _hearingPerimeter.Activate();
-        _reaction?.Activate();
-        _characterLight.Wake();
+        base.Wake();
 
-        if (_reactionType != ReactionType.Sleep)
-        {
-            FieldOfView.Activate();
-        }
+        _hearingPerimeter.Activate();
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
-        _hearingPerimeter.SoundMark?.Deactivate();
+        _hearingPerimeter.SoundMark?.Sleep();
         base.Die(killer, sound, volume);
     }
 
@@ -323,11 +309,20 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             case ReactionType.Sleep:
                 return 3;
             case ReactionType.Patrol:
+            case ReactionType.Guard:
                 return 1.5f;
             case ReactionType.Wonder:
                 return 1;
             default:
                 return 1;
         }
+    }
+
+    public override void DoReset()
+    {
+        GuardMode = GuardMode.Guarding;
+        StartGuarding();
+        TargetTransform = null;
+        base.DoReset();
     }
 }

@@ -34,7 +34,7 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
 
         if (!Utils.IsNull(SoundMark))
         {
-            SoundMark.Deactivate();
+            SoundMark.Sleep();
         }
 
         SoundMark = _poolManager.GetPoolable<SoundMark>(Hero.Instance.Transform.position, Quaternion.identity);

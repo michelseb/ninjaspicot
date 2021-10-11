@@ -4993,11 +4993,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightColor: 1
-  _reactionType: 0
+  _initReactionType: 0
   _castArea: {fileID: 6388034709768160271}
   _rotateSpeed: 130
   _moveSpeed: 20
   _sprite: {fileID: 8170439968612277734}
+  _electricity: {fileID: 715557003562452089}
   _hearingRange: 60
   _checkWonderTime: 0.5
   _returnWonderTime: 2

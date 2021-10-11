@@ -1,27 +1,26 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
+public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettable
 {
-    [SerializeField] protected ReactionType _reactionType;
+    [SerializeField] protected ReactionType _initReactionType;
     [SerializeField] protected Collider2D _castArea;
     protected Reaction _reaction;
     public bool Attacking { get; protected set; }
+    public bool Active { get; protected set; }
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
-    public bool Sleeping { get; set; }
-
-    protected Vector3 _initPosition;
-    protected Quaternion _initRotation;
+    protected Vector3 _resetPosition;
+    protected Quaternion _resetRotation;
 
     protected override void Start()
     {
         base.Start();
-        SetReaction(_reactionType);
-        _initPosition = Transform.position;
-        _initRotation = Transform.rotation;
+        SetReaction(_initReactionType);
+        _resetPosition = Transform.position;
+        _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
     }
 
     public override IEnumerator Dying()
@@ -74,6 +73,8 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
 
     public virtual void Sleep()
     {
+        Active = false;
+
         if (Renderer != null)
         {
             Renderer.enabled = false;
@@ -84,6 +85,8 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
         }
 
         Collider.enabled = false;
+        _characterLight.Sleep();
+        _reaction?.Sleep();
     }
 
     public virtual void Wake()
@@ -91,6 +94,8 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
         // This game is not called the walking dead!
         if (Dead)
             return;
+
+        Active = true;
 
         if (Renderer != null)
         {
@@ -100,37 +105,23 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
         {
             Image.enabled = true;
         }
+
+        _characterLight.Wake();
+        _reaction?.Sleep();
     }
 
     public void SetReaction(ReactionType reactionType)
     {
-        if (_reaction != null && _reactionType == reactionType)
+        if (Utils.IsNull(_reaction))
+        {
+            _reaction = _poolManager.GetPoolable<Reaction>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
+        }
+        else if (_reaction.ReactionType == reactionType)
+        {
             return;
-
-        string reaction = string.Empty;
-        _reactionType = reactionType;
-        switch (reactionType)
-        {
-            case ReactionType.Sleep:
-                reaction = "Zzz";
-                break;
-            case ReactionType.Wonder:
-                reaction = "??";
-                break;
-            case ReactionType.Find:
-                reaction = "!!";
-                break;
-            case ReactionType.Patrol:
-                reaction = "🐱‍";
-                break;
         }
 
-        if (!Utils.IsNull(_reaction))
-        {
-            _reaction.Deactivate();
-        }
-        _reaction = _poolManager.GetPoolable<Reaction>(transform.position, Quaternion.identity, 1f/Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
-        _reaction.SetReaction(reaction);
+        _reaction.SetReaction(reactionType);
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
@@ -138,7 +129,7 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
         if (!Utils.IsNull(_reaction))
         {
             _reaction.Transform.parent = null;
-            _reaction.Deactivate();
+            _reaction.Sleep();
             _reaction = null;
         }
 
@@ -156,5 +147,22 @@ public abstract class Enemy : Character, IWakeable, IFocusable, IResettable
         Sleep();
     }
 
-    public abstract void DoReset();
+    public virtual void DoReset()
+    {
+        Attacking = false;
+        SetReaction(_initReactionType);
+        Transform.position = _resetPosition;
+
+        if (Renderer != null)
+        {
+            Renderer.transform.rotation = _resetRotation;
+        }
+        else
+        {
+            Image.transform.rotation = _resetRotation;
+        }
+
+        Dead = false;
+        Wake();
+    }
 }

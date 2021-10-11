@@ -24,12 +24,12 @@ public class InstantBullet : MonoBehaviour, IPoolable
         _transform.rotation = rotation;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
     }

@@ -91,13 +91,6 @@ public class InstantShootingTurret : TurretBase
 
         line.positionCount = 0;
 
-        bullet.Deactivate();
+        bullet.Sleep();
     }
-
-    public override void DoReset()
-    {
-        Dead = false;
-        Wake();
-    }
-
 }

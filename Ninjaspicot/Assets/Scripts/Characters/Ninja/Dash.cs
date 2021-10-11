@@ -18,7 +18,7 @@ public class Dash : MonoBehaviour, IPoolable
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {
-            Deactivate();
+            Sleep();
         }
     }
 
@@ -28,12 +28,12 @@ public class Dash : MonoBehaviour, IPoolable
         transform.rotation = rotation;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         _currentLifeTime = LIFE_TIME;

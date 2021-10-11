@@ -111,7 +111,7 @@ public class GuardNinja : EnemyNinja, IListener
     {
         if (Vector2.Distance(Transform.position, Target) < 5)
         {
-            _hearingPerimeter.SoundMark?.Deactivate();
+            _hearingPerimeter.SoundMark?.Sleep();
             _guardStickiness.StopWalkingTowards(false);
             _wonderTime = 5f;
             StartWondering();
@@ -184,13 +184,5 @@ public class GuardNinja : EnemyNinja, IListener
         {
             StartChasing();
         }
-    }
-
-    public override void DoReset()
-    {
-        Transform.position = _initPosition;
-        Transform.rotation = _initRotation;
-        Dead = false;
-        Wake();
     }
 }

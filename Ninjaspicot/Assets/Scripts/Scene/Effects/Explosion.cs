@@ -18,7 +18,7 @@ public class Explosion : MonoBehaviour, IPoolable
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {
-            Deactivate();
+            Sleep();
         }
     }
 
@@ -29,12 +29,12 @@ public class Explosion : MonoBehaviour, IPoolable
         transform.localScale = size * Vector3.one;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         _currentLifeTime = LIFE_TIME;

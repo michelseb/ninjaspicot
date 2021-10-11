@@ -351,12 +351,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2009920932496640556}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 037e35eae1e59bb4d98aae64c5ecfde9, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d85f71a400e360469c593781c939728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _start: {fileID: 1555558402484916003}
   _end: {fileID: 2009920931004097802}
-  _horizontal: 1
+  _horizontal: 0
+  _startAwake: 0
 --- !u!82 &5419851202940907987
 AudioSource:
   m_ObjectHideFlags: 0

@@ -45,7 +45,7 @@ public class TouchIndicator : MonoBehaviour, IPoolable
             _renderer.color = col;
             yield return null;
         }
-        Deactivate();
+        Sleep();
     }
 
     private IEnumerator Appear()
@@ -68,13 +68,13 @@ public class TouchIndicator : MonoBehaviour, IPoolable
         _appear = StartCoroutine(Appear());
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         Active = false;
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         Active = true;

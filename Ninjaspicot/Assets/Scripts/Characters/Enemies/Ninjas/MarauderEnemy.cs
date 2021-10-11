@@ -100,12 +100,4 @@ public class MarauderEnemy : EnemyNinja
         _readyToStop = false;
         _slowDown = null;
     }
-
-    public override void DoReset()
-    {
-        Dead = false;
-        Transform.position = _initPosition;
-        Transform.rotation = _initRotation;
-        Wake();
-    }
 }

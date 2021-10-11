@@ -292,7 +292,6 @@ GameObject:
   - component: {fileID: 780037601}
   - component: {fileID: 780037600}
   - component: {fileID: 780037598}
-  - component: {fileID: 780037597}
   - component: {fileID: 780037599}
   - component: {fileID: 780037604}
   - component: {fileID: 780037607}
@@ -307,18 +306,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &780037597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 780037596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47aba3537c9103940b5a1e8fc62c23d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!120 &780037598
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -5519,8 +5506,6 @@ MonoBehaviour:
     ExitId: 100
   - EntranceId: 102
     ExitId: 120
-  - EntranceId: 120
-    ExitId: 100
 --- !u!114 &780851355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5596,6 +5581,7 @@ MonoBehaviour:
   - {fileID: 7701567765306651841, guid: a64e5891db8b2c342864428e6a895b36, type: 3}
   - {fileID: 100012, guid: 1f1aa87040db08846a4332981b0a6fa7, type: 3}
   - {fileID: 1684626802101229462, guid: 5a86aadb4687ac04b8d5170cf49695fa, type: 3}
+  - {fileID: 8901945782568228957, guid: 27af8dc37abe1524a8dc2da2b890904b, type: 3}
   _poolableParent: {fileID: 117308930}
 --- !u!114 &780851359
 MonoBehaviour:

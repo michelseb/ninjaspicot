@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class ActivationButton : MonoBehaviour, IWakeable
+public class ActivationButton : MonoBehaviour, ISceneryWakeable
 {
     [SerializeField] protected bool _active;
     [SerializeField] protected GameObject _activableObject;
@@ -18,7 +18,6 @@ public class ActivationButton : MonoBehaviour, IWakeable
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-    public bool Sleeping { get; set; }
 
     protected virtual void Awake()
     {

@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour, IPoolable
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {
-            Deactivate();
+            Sleep();
         }
     }
 
@@ -34,12 +34,12 @@ public class Bullet : MonoBehaviour, IPoolable
     {
         if (collision.CompareTag("Wall") || collision.CompareTag("DynamicWall"))
         {
-            Deactivate();
+            Sleep();
         }
         if (collision.CompareTag("hero"))
         {
             Hero.Instance.Die(transform);
-            Deactivate();
+            Sleep();
         }
 
     }
@@ -51,12 +51,12 @@ public class Bullet : MonoBehaviour, IPoolable
         _currentLifeTime = LIFE_TIME;
     }
 
-    public void Deactivate()
+    public void Wake()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Sleep()
     {
         gameObject.SetActive(true);
     }

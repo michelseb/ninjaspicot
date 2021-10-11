@@ -2,23 +2,25 @@
 using System.Linq;
 using UnityEngine;
 
-public class Zone : MonoBehaviour
+public class Zone : MonoBehaviour, IWakeable
 {
     [SerializeField] protected GameObject _centerObject;
     private Vector3? _center;
-    public Vector3? Center 
-    { 
-        get 
+    public Vector3? Center
+    {
+        get
         {
             if (_centerObject == null || !_centerObject.activeInHierarchy)
                 return null;
 
-            if (_center == null) _center = _centerObject.transform.position; 
-            return _center; 
-        } 
+            if (_center == null) _center = _centerObject.transform.position;
+            return _center;
+        }
     }
 
-    protected List<IWakeable> _wakeables;
+    protected List<ISceneryWakeable> _wakeables;
+    // Hack for door that is in the next zone
+    [SerializeField] private List<GameObject> _additionalResettables;
     protected List<IResettable> _resettables;
     protected ZoneManager _zoneManager;
     protected Animator _animator;
@@ -29,61 +31,33 @@ public class Zone : MonoBehaviour
     private long _id;
     public long Id { get { if (_id == 0) _id = GetInstanceID(); return _id; } }
 
-    public bool Exited { get; protected set; }
-
     protected virtual void Awake()
     {
         _animator = GetComponent<Animator>();
+        _spawnManager = SpawnManager.Instance;
     }
 
     protected virtual void Start()
     {
-        _wakeables = GetComponentsInChildren<IWakeable>().ToList();
+        _wakeables = GetComponentsInChildren<ISceneryWakeable>().ToList();
         _resettables = GetComponentsInChildren<IResettable>().ToList();
-        Close();
         ZoneManager.AddZone(this);
-        Exited = true;
-        _spawnManager = SpawnManager.Instance;
         _checkpoint = GetComponentInChildren<CheckPoint>();
     }
 
-    protected virtual void OnTriggerEnter2D(Collider2D collision)
+    public virtual void Open()
     {
-        OnTriggerStay2D(collision);
-    }
-
-    protected virtual void OnTriggerExit2D(Collider2D collision)
-    {
-        if (!collision.CompareTag("hero"))
-            return;
-
-        Exited = true;
-    }
-
-    protected virtual void OnTriggerStay2D(Collider2D collision)
-    {
-        if (!collision.CompareTag("hero"))
-            return;
-
-        ZoneManager.SetZone(this);
-        Exited = false;
-    }
-
-    public void Open()
-    {
-        SetItemsActivation(true);
-
         _animator.SetTrigger("Open");
+        Wake();
     }
 
-    public void Close()
+    public virtual void Close()
     {
-        SetItemsActivation(false);
-
         _animator.SetTrigger("Close");
+        Sleep();
     }
 
-    private void SetItemsActivation(bool active)
+    public void Wake()
     {
         for (int i = 0; i < _wakeables.Count; i++)
         {
@@ -95,18 +69,24 @@ public class Zone : MonoBehaviour
                 continue;
             }
 
-            if (active && item.Sleeping)
-            {
-                item.Wake();
-                item.Sleeping = false;
+            item.Wake();
+            SetSpawn();
+        }
+    }
 
-                SetSpawn();
-            }
-            else if (!active && !item.Sleeping)
+    public void Sleep()
+    {
+        for (int i = 0; i < _wakeables.Count; i++)
+        {
+            var item = _wakeables[i];
+
+            if (Utils.IsNull(item))
             {
-                item.Sleep();
-                item.Sleeping = true;
+                _wakeables.RemoveAt(i);
+                continue;
             }
+
+            item.Sleep();
         }
     }
 
@@ -118,5 +98,8 @@ public class Zone : MonoBehaviour
     public void ResetItems()
     {
         _resettables.ForEach(r => r.DoReset());
+        _additionalResettables.ForEach(r => { if (r.TryGetComponent(out IResettable resettable)) resettable.DoReset(); });
+        var poolables = FindObjectsOfType<MonoBehaviour>().OfType<IPoolable>().ToList();
+        poolables.ForEach(p => p.Sleep());
     }
 }

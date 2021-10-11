@@ -7,7 +7,6 @@ public class SoundEffect : MonoBehaviour, IPoolable
     private Transform _transform;
 
     public PoolableType PoolableType => PoolableType.None;
-
     private void Awake()
     {
         _transform = transform;
@@ -23,7 +22,7 @@ public class SoundEffect : MonoBehaviour, IPoolable
         _currentLifeTime -= Time.deltaTime;
         if (_currentLifeTime <= 0)
         {
-            Deactivate();
+            Sleep();
         }
     }
 
@@ -34,12 +33,12 @@ public class SoundEffect : MonoBehaviour, IPoolable
         _transform.rotation = rotation;
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         _currentLifeTime = LIFE_TIME;

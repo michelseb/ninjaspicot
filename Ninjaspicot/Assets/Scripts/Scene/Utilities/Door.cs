@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Door : MonoBehaviour, IActivable
+public class Door : MonoBehaviour, IActivable, IResettable
 {
     [SerializeField] private bool _startOpened;
     
@@ -64,5 +64,14 @@ public class Door : MonoBehaviour, IActivable
     {
         _dust.Play();
         _audioManager.PlaySound(_audioSource, _bang, .5f);
+    }
+
+    public void DoReset()
+    {
+        if (!_startOpened)
+        {
+            _opened = true;
+            Deactivate();
+        }
     }
 }

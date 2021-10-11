@@ -9,7 +9,6 @@ public class SimulatedSoundEffect : MonoBehaviour, IPoolable
     private SpriteRenderer _renderer;
 
     public PoolableType PoolableType => PoolableType.None;
-
     private void Awake()
     {
         _renderer = GetComponent<SpriteRenderer>();
@@ -21,12 +20,12 @@ public class SimulatedSoundEffect : MonoBehaviour, IPoolable
         Transform.position = new Vector3(position.x, position.y, -5);
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         StartCoroutine(FadeAway());
     }
 
-    public void Activate()
+    public void Wake()
     {
         _renderer.color = new Color(_renderer.color.r, _renderer.color.g, _renderer.color.b, 1);
         gameObject.SetActive(true);

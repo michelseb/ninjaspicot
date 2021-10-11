@@ -19,7 +19,6 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     public IKillable TargetEntity { get; set; }
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
-    public bool Active { get; protected set; }
     public Aim AimField => _aim;
 
     public float Range => 50f;

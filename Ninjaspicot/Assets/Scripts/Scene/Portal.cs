@@ -12,6 +12,8 @@ public class Portal : MonoBehaviour
     public bool Exit { get; set; }
     public bool Entrance { get; set; }
     public Portal Other { get; private set; }
+    private Zone _zone;
+    public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     public Hero Hero;
     public LayerMask TeleportedLayer;
@@ -74,6 +76,9 @@ public class Portal : MonoBehaviour
         _animator.SetTrigger("Wake");
 
         if (_portalManager.Connecting)
+            return;
+
+        if (!_portalManager.ConnectionExists(this))
             return;
 
         Hero = collision.GetComponent<Hero>() ?? collision.GetComponentInParent<Hero>();
