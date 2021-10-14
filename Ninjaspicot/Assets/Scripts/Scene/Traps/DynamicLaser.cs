@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class DynamicLaser : Laser
 {
@@ -35,10 +36,31 @@ public class DynamicLaser : Laser
         SetPointsPosition();
     }
 
-    private void Toggle(ref bool toggled)
+    private void Toggle(ref bool turnedOn)
     {
-        toggled = !toggled;
-        _collider.enabled = toggled;
-        _laser.enabled = toggled;
+        turnedOn = !turnedOn;
+
+        if (turnedOn)
+        {
+            StartCoroutine(TurnOn());
+        }
+        else
+        {
+            StartCoroutine(TurnOff());
+        }
+    }
+
+    private IEnumerator TurnOff()
+    {
+        _collider.enabled = false;
+        yield return new WaitForSecondsRealtime(.2f);
+        _laser.enabled = false;
+    }
+
+    private IEnumerator TurnOn()
+    {
+        _laser.enabled = true;
+        yield return new WaitForSecondsRealtime(.2f);
+        _collider.enabled = true;
     }
 }

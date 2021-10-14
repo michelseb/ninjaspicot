@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public enum JumpMode
 {
     Classic,
-    Charge
+    Charge,
+    Direct
 }
 
 public class Jumper : MonoBehaviour
@@ -16,7 +18,7 @@ public class Jumper : MonoBehaviour
     public Vector3 TrajectoryOrigin { get; set; }
     public Vector3 TrajectoryDestination { get; set; }
     public Vector2 ChargeDestination { get; set; }
-
+    public Vector3 AimTarget { get; set; }
     protected int _jumps;
     public JumpMode JumpMode;
 
@@ -31,6 +33,8 @@ public class Jumper : MonoBehaviour
     protected Audio _impactSound;
     protected Transform _transform;
 
+    protected Coroutine _directJump;
+    protected float _initGravity;
     protected virtual void Awake()
     {
         _dynamicEntity = GetComponent<IDynamic>();
@@ -39,7 +43,7 @@ public class Jumper : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
         _transform = transform;
-
+        _initGravity = _dynamicEntity.Rigidbody.gravityScale;
     }
 
     protected virtual void Start()
@@ -87,6 +91,39 @@ public class Jumper : MonoBehaviour
         }
     }
 
+
+    public virtual void LaunchDirectJump(Vector3 target)
+    {
+        if (_directJump != null) StopCoroutine(_directJump);
+        _directJump = StartCoroutine(DirectJump(target));
+    }
+
+    public virtual IEnumerator DirectJump(Vector3 target)
+    {
+        var direction = (target - _transform.position).normalized;
+
+        _stickiness.Detach();
+        LoseJump();
+
+        _dynamicEntity.Rigidbody.velocity = Vector2.zero;
+        _dynamicEntity.Rigidbody.AddForce(direction * _strength * 3, ForceMode2D.Impulse);
+        _dynamicEntity.Rigidbody.gravityScale = 0;
+        _poolManager.GetPoolable<Dash>(_transform.position, Quaternion.LookRotation(Vector3.forward, direction));
+
+        if (TrajectoryInUse())
+        {
+            CommitJump();
+        }
+
+        while (Vector3.Dot(direction, target - _transform.position) > 0.5f)
+        {
+            yield return null;
+        }
+
+        _dynamicEntity.Rigidbody.gravityScale = _initGravity;
+        _directJump = null;
+    }
+
     public virtual void Charge(Vector2 direction)
     {
         var initialPos = _dynamicEntity.Rigidbody.position;
@@ -111,13 +148,11 @@ public class Jumper : MonoBehaviour
         if (Trajectory == null || !Trajectory.Active)
             return;
 
-        Trajectory.StartFading();
-
         if (Trajectory is ChargeTrajectory chargeTrajectory)
         {
-            _audioManager.PlaySound(_audioSource, _chargeJumpSound);
+            _audioManager.PlaySound(_audioSource, _chargeJumpSound, .3f);
 
-            if (chargeTrajectory.Collides)
+            if (chargeTrajectory.Collides && (chargeTrajectory.Focusable == null || !chargeTrajectory.Focusable.IsSilent))
             {
                 _audioManager.PlaySound(_audioSource, _impactSound);
                 _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
@@ -128,6 +163,7 @@ public class Jumper : MonoBehaviour
             _audioManager.PlaySound(_audioSource, _normalJumpSound);
         }
 
+        Trajectory.StartFading();
     }
 
     public virtual void CancelJump()

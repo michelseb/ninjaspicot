@@ -112,14 +112,14 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
         }
     }
 
-    public void Sleep()
+    public virtual void Sleep()
     {
         _collider.enabled = false;
         _laser.enabled = false;
         _active = false;
     }
 
-    public void Wake()
+    public virtual void Wake()
     {
         if (_broken)
             return;
@@ -129,12 +129,12 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
         _active = true;
     }
 
-    public void Activate()
+    public virtual void Activate()
     {
         Hero.Instance.Die(sound: _electrocutionSound, volume: .5f);
     }
 
-    public void Deactivate() 
+    public virtual void Deactivate()
     {
         _broken = true;
         Sleep();
@@ -143,10 +143,6 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
     public void DoReset()
     {
         _broken = false;
-
-        if (ZoneManager.Instance.CurrentZone == _zone)
-        {
-            Wake();
-        }
+        Wake();
     }
 }

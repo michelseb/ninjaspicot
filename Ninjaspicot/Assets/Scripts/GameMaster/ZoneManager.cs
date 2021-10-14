@@ -28,7 +28,7 @@ public class ZoneManager : MonoBehaviour
 
         if (CurrentZone)
         {
-            CurrentZone.Close();
+            CurrentZone.CloseForever();
         }
         else
         {

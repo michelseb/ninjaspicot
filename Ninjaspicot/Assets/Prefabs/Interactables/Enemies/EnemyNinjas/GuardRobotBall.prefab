@@ -65,7 +65,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _size: 50
-  _viewAngle: 45
+  _viewAngle: 100
   _detailAmount: 20
   _customColor: 2
   _isHorizontal: 1

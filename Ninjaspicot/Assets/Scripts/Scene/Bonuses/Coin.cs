@@ -19,11 +19,4 @@ public class Coin : Bonus
 
         base.Take();
     }
-
-    public override void DoReset()
-    {
-        _taken = false;
-        Activate();
-        base.DoReset();
-    }
 }

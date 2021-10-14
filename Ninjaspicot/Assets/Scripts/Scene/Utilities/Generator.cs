@@ -10,6 +10,9 @@ public class Generator : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastab
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
+    public bool IsSilent => false;
+    public bool Taken => false;
+
     private Lamp _light;
 
     private void Awake()
@@ -41,13 +44,11 @@ public class Generator : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastab
 
     public void Sleep()
     {
-        _light.Animator.enabled = false;
-        _light.Light.enabled = false;
+        _light.Sleep();
     }
 
     public void Wake()
     {
-        _light.Animator.enabled = true;
-        _light.Light.enabled = true;
+        _light.Wake();
     }
 }

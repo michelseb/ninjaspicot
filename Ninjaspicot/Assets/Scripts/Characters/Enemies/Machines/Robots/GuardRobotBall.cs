@@ -147,7 +147,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
-            _hearingPerimeter.SoundMark?.Sleep();
+            _hearingPerimeter.EraseSoundMark();
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 
@@ -285,7 +285,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     {
         base.Sleep();
 
-        _hearingPerimeter.SoundMark?.Sleep();
+        _hearingPerimeter.EraseSoundMark();
         _hearingPerimeter.Deactivate();
     }
 
@@ -298,7 +298,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
-        _hearingPerimeter.SoundMark?.Sleep();
+        _hearingPerimeter.EraseSoundMark();
         base.Die(killer, sound, volume);
     }
 

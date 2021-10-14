@@ -1,13 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ThrownLaser : Laser, IPoolable
 {
     [SerializeField] protected float _lifeTime;
     [SerializeField] protected float _speed;
 
+    private Image _startImage;
+    private Image _endImage;
     private float _remainingLifeTime;
 
     public PoolableType PoolableType => PoolableType.None;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _startImage = _start.GetComponent<Image>();
+        _endImage = _end.GetComponent<Image>();
+    }
 
     protected override void Update()
     {
@@ -36,5 +46,19 @@ public class ThrownLaser : Laser, IPoolable
     {
         Transform.position = position;
         _remainingLifeTime = _lifeTime;
+    }
+
+    public override void Sleep()
+    {
+        base.Sleep();
+        _startImage.enabled = false;
+        _endImage.enabled = false;
+    }
+
+    public override void Wake()
+    {
+        base.Wake();
+        _startImage.enabled = true;
+        _endImage.enabled = true;
     }
 }

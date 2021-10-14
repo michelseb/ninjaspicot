@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChargeTrajectory : TrajectoryBase
 {
-    public Enemy Target { get; set; }
+    public IKillable Target { get; set; }
     private List<Bonus> _bonuses;
     public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
 
@@ -15,7 +15,6 @@ public class ChargeTrajectory : TrajectoryBase
     public List<IActivable> Interactives { get { if (_interactives == null) _interactives = new List<IActivable>(); return _interactives; } }
 
     public bool Collides { get; private set; }
-    private AimIndicator _aimIndicator;
     private Transform _targetTransform;
     protected override float _fadeSpeed => 5;
     private const float CHARGE_LENGTH = 60f;
@@ -33,7 +32,7 @@ public class ChargeTrajectory : TrajectoryBase
         var chargePos = linePosition - direction.normalized * CHARGE_LENGTH;
         var chargeHit = StepClear(linePosition, chargePos - linePosition, CHARGE_LENGTH);
 
-        HandleTrajectoryHit(chargeHit, ref chargePos);
+        HandleTrajectoryHit(chargeHit, linePosition, ref chargePos);
 
         if (_jumper != null)
         {
@@ -45,7 +44,7 @@ public class ChargeTrajectory : TrajectoryBase
         Interact(linePosition, chargePos);
     }
 
-    private bool HandleTrajectoryHit(RaycastHit2D hit, ref Vector2 chargePos)
+    private bool HandleTrajectoryHit(RaycastHit2D hit, Vector2 linePosition, ref Vector2 chargePos)
     {
         if (!hit)
         {
@@ -58,10 +57,11 @@ public class ChargeTrajectory : TrajectoryBase
         if (!HandleEnemyCast(hit, ref chargePos))
         {
             Target = null;
-            SetAudioSimulator(_line.GetPosition(1), 5);
 
             if (!HandleFocusableCast(hit, ref chargePos))
             {
+                hit = StepClearWall(linePosition, chargePos - linePosition, CHARGE_LENGTH);
+                SetAudioSimulator(_line.GetPosition(1), 5);
                 DeactivateAim();
                 chargePos = hit.point;
             }
@@ -77,15 +77,18 @@ public class ChargeTrajectory : TrajectoryBase
         if (!hit.collider.CompareTag("Interactive"))
             return false;
 
-        if (hit.collider.TryGetComponent(out IFocusable focusable))
-        {
-            if (focusable is MonoBehaviour focusableObject)
-            {
-                chargePos = focusableObject.transform.position;
-                if (_aimIndicator == null) _aimIndicator = _poolManager.GetPoolable<AimIndicator>(chargePos, Quaternion.identity);
-                _aimIndicator.Transform.position = chargePos;
-            }
+        if (!hit.collider.TryGetComponent(out IFocusable focusable))
+            return false;
 
+        if (focusable.Taken)
+            return false;
+
+        if (focusable is MonoBehaviour focusableObject)
+        {
+            chargePos = focusableObject.transform.position;
+            ActivateAim(focusable, chargePos);
+            //_aimIndicator.Transform.position = chargePos;
+            if (!focusable.IsSilent) SetAudioSimulator(_line.GetPosition(1), 5);
         }
 
         return true;
@@ -96,11 +99,11 @@ public class ChargeTrajectory : TrajectoryBase
         if (!hit.collider.CompareTag("Enemy"))
             return false;
 
-        var hitTransform = hit.collider.transform; 
+        var hitTransform = hit.collider.transform;
         chargePos = hitTransform.position;
 
         // if other enemy
-        if (Target != null && Vector2.Distance(chargePos, Utils.ToVector2(Target.transform.position)) > 1f)
+        if (Target != null && Target is MonoBehaviour target && Vector2.Distance(chargePos, Utils.ToVector2(target.transform.position)) > 1f)
         {
             DeactivateAim();
             Target = null;
@@ -114,16 +117,16 @@ public class ChargeTrajectory : TrajectoryBase
                 _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
                 var pos = _targetTransform?.position ?? chargePos;
 
-                _aimIndicator = _poolManager.GetPoolable<AimIndicator>(pos, Quaternion.identity);
+                ActivateAim(enemy, pos);
             }
             else
             {
                 Target = hit.collider.GetComponentInParent<Enemy>();
-                enemy = Target;
+                enemy = Target as Enemy;
                 _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
                 var pos = _targetTransform?.position ?? chargePos;
 
-                _aimIndicator = _poolManager.GetPoolable<AimIndicator>(pos, Quaternion.identity);
+                ActivateAim(enemy, pos);
             }
         }
 
@@ -159,20 +162,5 @@ public class ChargeTrajectory : TrajectoryBase
                 Bonuses.Add(bonus);
             }
         }
-    }
-
-    private void DeactivateAim()
-    {
-        if (_aimIndicator == null)
-            return;
-
-        _aimIndicator.Sleep();
-        _aimIndicator = null;
-    }
-
-    public override void StartFading()
-    {
-        base.StartFading();
-        DeactivateAim();
     }
 }

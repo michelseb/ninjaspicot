@@ -70,7 +70,7 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
-            _hearingPerimeter.SoundMark?.Sleep();
+            _hearingPerimeter.EraseSoundMark();
             StartWondering(GuardMode.Returning, _returnWonderTime);
         }
 

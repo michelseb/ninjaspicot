@@ -137,21 +137,25 @@ public class PortalManager : MonoBehaviour
 
     public IEnumerator Teleport(Portal entrance, Portal exit)
     {
+        _zoneManager.SetZone(exit.Zone);
+
+        yield return new WaitForSecondsRealtime(1);
+
         _audioManager.PlaySound(_audioSource, _exitClip, .3f);
         var rb = Hero.Instance.Stickiness.Rigidbody;
         rb.position = exit.transform.position - exit.transform.right * 4;
         _cameraBehaviour.MoveTo(Hero.Instance.Stickiness.Rigidbody.position);
         _uiCamera.CameraAppear();
-        entrance.Reinit();
+        entrance.Deactivate();
         ClosePreviousZone(entrance.Id);
-        _zoneManager.SetZone(exit.Zone);
+
         yield return new WaitForSecondsRealtime(2);
 
         Hero.Instance.StartAppear();
         rb.isKinematic = false;
         rb.velocity = exit.transform.right * EJECT_SPEED;
         Hero.Instance.SetCapeActivation(true);
-        exit.Reinit();
+        exit.Deactivate();
         TerminateConnection();
     }
 

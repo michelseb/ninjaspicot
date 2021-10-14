@@ -20,12 +20,6 @@ public class RobotBall : Enemy
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
-    protected override void Start()
-    {
-        base.Start();
-        Wake();
-    }
-
     protected virtual void Update()
     {
         if (!Active)
@@ -67,12 +61,6 @@ public class RobotBall : Enemy
         if (killer != null)
         {
             _rigidbody.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
-
-            if (killer.TryGetComponent(out IDynamic dynamic))
-            {
-                dynamic.Rigidbody.velocity = Vector2.zero;
-                dynamic.Rigidbody.AddForce(((killer.position - Transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
-            }
         }
 
         base.Die(killer, sound, volume);

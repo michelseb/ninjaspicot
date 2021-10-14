@@ -263,4 +263,14 @@ public class Hero : Character, INinja, ITriggerable
     {
         return _touchManager.WalkDragging;
     }
+
+    public virtual void Hide()
+    {
+        Visible = false;
+    }
+
+    public virtual void Reveal()
+    {
+        Visible = true;
+    }
 }

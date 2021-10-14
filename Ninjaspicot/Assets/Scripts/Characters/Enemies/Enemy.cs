@@ -12,6 +12,11 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
+    #region IFocusable
+    public bool IsSilent => false;
+    public bool Taken => true;
+    #endregion
+
     protected Vector3 _resetPosition;
     protected Quaternion _resetRotation;
 
@@ -60,17 +65,6 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         }
     }
 
-
-    //public virtual void Deactivate()
-    //{
-    //    gameObject.SetActive(false);
-    //}
-
-    //public virtual void Activate()
-    //{
-    //    gameObject.SetActive(true);
-    //}
-
     public virtual void Sleep()
     {
         Active = false;
@@ -86,7 +80,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
 
         Collider.enabled = false;
         _characterLight.Sleep();
-        _reaction?.Sleep();
+        if (!Utils.IsNull(_reaction)) _reaction?.Sleep();
     }
 
     public virtual void Wake()
@@ -107,7 +101,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         }
 
         _characterLight.Wake();
-        _reaction?.Sleep();
+        if (!Utils.IsNull(_reaction)) _reaction.Wake();
     }
 
     public void SetReaction(ReactionType reactionType)
@@ -130,7 +124,6 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         {
             _reaction.Transform.parent = null;
             _reaction.Sleep();
-            _reaction = null;
         }
 
         if (!Utils.IsNull(_castArea))

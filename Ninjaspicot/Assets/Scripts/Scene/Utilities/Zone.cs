@@ -57,6 +57,13 @@ public class Zone : MonoBehaviour, IWakeable
         Sleep();
     }
 
+    public virtual void CloseForever()
+    {
+        _animator.SetTrigger("Close");
+        Sleep();
+        Destroy(gameObject, 2f);
+    }
+
     public void Wake()
     {
         for (int i = 0; i < _wakeables.Count; i++)
@@ -70,8 +77,9 @@ public class Zone : MonoBehaviour, IWakeable
             }
 
             item.Wake();
-            SetSpawn();
         }
+
+        SetSpawn();
     }
 
     public void Sleep()

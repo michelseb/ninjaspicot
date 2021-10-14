@@ -1,6 +1,6 @@
-﻿public class ExtraJump : Bonus
+﻿public class ExtraJump : Bonus, IResettable
 {
-    public override void DoReset()
+    public virtual void DoReset()
     {
         if (_temporaryDeactivate != null)
         {
@@ -8,6 +8,9 @@
         }
 
         Activate();
+        //_animator.Rebind();
+        //_animator.Update(0);
+        //_animator.Play(_animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
     }
 
     public override void Take()

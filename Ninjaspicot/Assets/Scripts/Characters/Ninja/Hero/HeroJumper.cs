@@ -6,6 +6,7 @@ public class HeroJumper : Jumper
     protected TimeManager _timeManager;
     protected CameraBehaviour _cameraBehaviour;
 
+
     protected override void Awake()
     {
         base.Awake();
@@ -87,14 +88,18 @@ public class HeroJumper : Jumper
             chargeTrajectory.Bonuses.ForEach(x => x.Take());
             chargeTrajectory.Interactives.ForEach(x => x.Activate());
 
-            if (chargeTrajectory.Target != null)
-            {
-                chargeTrajectory.Target.Die(_transform);
-                chargeTrajectory.Target = null;
-                GainJumps(1);
-                _timeManager.SlowDown();
-                _timeManager.StartTimeRestore();
-            }
+            if (chargeTrajectory.Target == null)
+                return;
+
+            chargeTrajectory.Target.Die(_transform);
+            chargeTrajectory.Target = null;
+            GainJumps(1);
+            _timeManager.SlowDown();
+            _timeManager.StartTimeRestore();
+
+            //Bounce
+            _stickiness.Rigidbody.velocity = Vector2.zero;
+            _stickiness.Rigidbody.AddForce(((_stickiness.Transform.position - ((MonoBehaviour)chargeTrajectory.Target).transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
         }
 
     }

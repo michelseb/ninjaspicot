@@ -16,8 +16,8 @@ MonoBehaviour:
   _end: {fileID: 8901945782048831355}
   _horizontal: 0
   _startAwake: 0
-  _lifeTime: 10
-  _speed: 15
+  _lifeTime: 20
+  _speed: 6
 --- !u!1001 &4064794536200351281
 PrefabInstance:
   m_ObjectHideFlags: 0

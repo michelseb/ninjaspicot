@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightColor: 1
-  _reactionType: 3
+  _initReactionType: 0
   _castArea: {fileID: 0}
   _viewAngle: 90
   _rotationSpeed: 50
@@ -41,6 +41,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1451503001298492443, guid: 55a8419f19f53774c8ae0fb5763089e2,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1451503001298492443, guid: 55a8419f19f53774c8ae0fb5763089e2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 9.16
       objectReference: {fileID: 0}
     - target: {fileID: 2062096728411803966, guid: 55a8419f19f53774c8ae0fb5763089e2,
         type: 3}
@@ -146,6 +156,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2193189626768179497, guid: 55a8419f19f53774c8ae0fb5763089e2,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 11.97
       objectReference: {fileID: 0}
     - target: {fileID: 3101564266176379795, guid: 55a8419f19f53774c8ae0fb5763089e2,
         type: 3}
@@ -485,6 +500,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 93584250774411383, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
     - {fileID: 2813462830290540690, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
+    - {fileID: 5726976299849827784, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
 --- !u!1 &6404012257646182032 stripped
 GameObject:

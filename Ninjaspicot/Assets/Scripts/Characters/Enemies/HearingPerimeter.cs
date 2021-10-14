@@ -32,11 +32,7 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
             SourcePoint = collider.transform.position
         });
 
-        if (!Utils.IsNull(SoundMark))
-        {
-            SoundMark.Sleep();
-        }
-
+        EraseSoundMark();
         SoundMark = _poolManager.GetPoolable<SoundMark>(Hero.Instance.Transform.position, Quaternion.identity);
     }
 
@@ -49,5 +45,14 @@ public abstract class HearingPerimeter : MonoBehaviour, IActivable
     {
         _isActive = false;
         gameObject.SetActive(false);
+    }
+
+    public void EraseSoundMark()
+    {
+        if (Utils.IsNull(SoundMark))
+            return;
+
+        SoundMark.Sleep();
+        SoundMark = null;
     }
 }

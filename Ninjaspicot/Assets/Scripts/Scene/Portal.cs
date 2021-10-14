@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-public class Portal : MonoBehaviour
+public class Portal : MonoBehaviour, IActivable, IFocusable
 {
     [SerializeField] private SpriteRenderer _imgInside;
     [SerializeField] private int _id;
@@ -11,6 +11,8 @@ public class Portal : MonoBehaviour
     public int Id => _id;
     public bool Exit { get; set; }
     public bool Entrance { get; set; }
+    public bool IsSilent => true;
+    public bool Taken { get; set; }
     public Portal Other { get; private set; }
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
@@ -73,8 +75,6 @@ public class Portal : MonoBehaviour
         if (!collision.CompareTag("hero"))
             return;
 
-        _animator.SetTrigger("Wake");
-
         if (_portalManager.Connecting)
             return;
 
@@ -86,15 +86,7 @@ public class Portal : MonoBehaviour
         if (Hero.Dead)
             return;
 
-        Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
-        Hero.Stickiness.Rigidbody.isKinematic = true;
-
-        if (_connect == null)
-        {
-            _uiCamera.CameraFade();
-            Hero.StartFading();
-            _connect = StartCoroutine(Connect());
-        }
+        Activate();
     }
 
     private IEnumerator TitleAppear(TextMeshProUGUI text, float duration)
@@ -138,7 +130,7 @@ public class Portal : MonoBehaviour
 
         if (Other == null || Exit)
         {
-            Reinit();
+            Deactivate();
             yield break;
         }
 
@@ -163,10 +155,28 @@ public class Portal : MonoBehaviour
         _connect = null;
     }
 
+    public void SetOtherPortal(Portal other)
+    {
+        Other = other;
+    }
 
+    public void Activate()
+    {
+        _animator.SetTrigger("Wake");
 
+        Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
+        Hero.Stickiness.Rigidbody.isKinematic = true;
+        Taken = true;
 
-    public void Reinit()
+        if (_connect == null)
+        {
+            _uiCamera.CameraFade();
+            Hero.StartFading();
+            _connect = StartCoroutine(Connect());
+        }
+    }
+
+    public void Deactivate()
     {
         _animator.SetTrigger("Sleep");
 
@@ -187,10 +197,6 @@ public class Portal : MonoBehaviour
 
         Hero.gameObject.layer = TeleportedLayer;
         Exit = false;
-    }
-
-    public void SetOtherPortal(Portal other)
-    {
-        Other = other;
+        Taken = false;
     }
 }

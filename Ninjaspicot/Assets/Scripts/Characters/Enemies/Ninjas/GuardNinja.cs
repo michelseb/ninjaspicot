@@ -111,7 +111,7 @@ public class GuardNinja : EnemyNinja, IListener
     {
         if (Vector2.Distance(Transform.position, Target) < 5)
         {
-            _hearingPerimeter.SoundMark?.Sleep();
+            _hearingPerimeter.EraseSoundMark();
             _guardStickiness.StopWalkingTowards(false);
             _wonderTime = 5f;
             StartWondering();

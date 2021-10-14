@@ -215,7 +215,7 @@ public class TouchManager : MonoBehaviour
             _jumpDragInitialized = true;
         }
 
-        _jumper.Trajectory.DrawTrajectory(_hero.transform.position, _joystick2.Direction);
+        _jumper.Trajectory.DrawTrajectory(_hero.Transform.position, _joystick2.Direction);
 
         return true;
     }
@@ -244,7 +244,7 @@ public class TouchManager : MonoBehaviour
             return;
 
         _stickiness.StopWalking(false);
-
+        Debug.Log(_jumper.JumpMode.ToString());
         switch (_jumper.JumpMode)
         {
             case JumpMode.Classic:
@@ -252,6 +252,9 @@ public class TouchManager : MonoBehaviour
                 break;
             case JumpMode.Charge:
                 _jumper.Charge(-_joystick2.Direction);
+                break;
+            case JumpMode.Direct:
+                _jumper.LaunchDirectJump(_jumper.AimTarget);
                 break;
         }
     }
