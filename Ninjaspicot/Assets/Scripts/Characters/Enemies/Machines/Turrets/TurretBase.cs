@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,10 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     [SerializeField] protected Transform _turretHead;
 
     public IKillable TargetEntity { get; set; }
+
+    private Hero _hero;
+    public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
+
     public bool Loaded { get; protected set; }
     public Mode TurretMode { get; protected set; }
     public Aim AimField => _aim;
@@ -33,7 +38,6 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     {
         base.Awake();
         _aim = GetComponentInChildren<Aim>();
-        _aim.CurrentTarget = "hero";
         _image = _turretHead.GetComponent<Image>();
         _aimSpeed = .5f;
     }
@@ -137,7 +141,21 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 
     public void See(Transform target)
     {
-        if (target.TryGetComponent(out IKillable killable))
+        // Visible when walking in the dark ?
+        if (!Hero.Visible /*&& !Hero.Stickiness.Walking*/)
+            return;
+
+        if (!Active || !target.CompareTag("hero"))
+            return;
+
+        if (!target.TryGetComponent(out IKillable killable))
+            return;
+
+
+        TargetEntity = killable;
+        AimField.TargetInView = true;
+
+        if (AimField.TargetAimedAt(killable, Id))
         {
             StartAim(killable);
         }
@@ -177,11 +195,16 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public override IEnumerator Dying()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
+    }
+
+    protected override Action GetActionFromState(StateType stateType, object parameter = null)
+    {
+        return null;
     }
 }

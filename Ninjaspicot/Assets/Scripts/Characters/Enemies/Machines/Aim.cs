@@ -1,11 +1,7 @@
 ﻿using UnityEngine;
 
-public abstract class Aim : FieldOfView
+public class Aim : FieldOfView
 {
-    protected IViewer _viewer;
-    public IViewer Viewer { get { if (_viewer == null) _viewer = GetComponentInParent<IViewer>() ?? GetComponentInChildren<IViewer>(); return _viewer; } }
-
-    public string CurrentTarget { get; set; }
     public bool TargetInRange { get; internal set; }
     public bool TargetInView { get; internal set; }
 
@@ -25,34 +21,19 @@ public abstract class Aim : FieldOfView
     protected override void OnTriggerEnter2D(Collider2D collider)
     {
         base.OnTriggerEnter2D(collider);
-        if (!Active || !collider.CompareTag("hero"))
+
+        if (!collider.CompareTag("hero"))
             return;
 
-        if (!string.IsNullOrEmpty(CurrentTarget) && collider.CompareTag(CurrentTarget))
-        {
-            if (collider.TryGetComponent(out IKillable target))
-            {
-                //Viewer.TargetEntity = target;
-                TargetInView = true;
-
-                if (TargetAimedAt(target, Viewer.Id))
-                {
-                    //Viewer.StartAim(target);
-                }
-            }
-        }
+        Viewer.See(Hero.Instance.Transform);
     }
 
     protected virtual void OnTriggerStay2D(Collider2D collider)
     {
-        //if (!collider.CompareTag("hero") || Viewer.TargetEntity == null)
-        //    return;
+        if (!collider.CompareTag("hero"))
+            return;
 
-        //if (TargetAimedAt(Viewer.TargetEntity, Viewer.Id))
-        //{
-        //    Viewer.StartAim(Viewer.TargetEntity);
-        //}
-        //TargetInView = true;
+        Viewer.See(Hero.Instance.Transform);
     }
 
     protected override void OnTriggerExit2D(Collider2D collider)

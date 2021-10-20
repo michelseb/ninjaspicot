@@ -13,6 +13,8 @@ public class FieldOfView : MonoBehaviour, IActivable
     public bool Active { get; protected set; }
     public float Size => _size;
     protected IViewer _viewer;
+    public IViewer Viewer { get { if (_viewer == null) _viewer = GetComponentInParent<IViewer>() ?? GetComponentInChildren<IViewer>(); return _viewer; } }
+
     protected Mesh _mesh;
     protected MeshFilter _filter;
     protected IRaycastable _parent;
@@ -42,7 +44,6 @@ public class FieldOfView : MonoBehaviour, IActivable
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
         _parent = _transform.parent?.GetComponent<IRaycastable>();
-        _viewer = GetComponent<IViewer>() ?? GetComponentInChildren<IViewer>() ?? GetComponentInParent<IViewer>();
 
         if (_customColor != CustomColor.None)
         {

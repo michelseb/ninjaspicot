@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class RobotBall : Enemy
+public abstract class RobotBall : Enemy
 {
     [SerializeField] protected float _rotateSpeed;
     [SerializeField] protected float _moveSpeed;
@@ -43,11 +43,10 @@ public class RobotBall : Enemy
     {
         base.Wake();
 
-        Laser?.Activate();
         _castArea.enabled = true;
         _electricity.Play();
 
-        if (_initReactionType != ReactionType.Sleep)
+        if (_initState != StateType.Sleep)
         {
             FieldOfView.Activate();
         }
@@ -71,7 +70,7 @@ public class RobotBall : Enemy
         StopAllCoroutines();
         _rigidbody.velocity = Vector2.zero;
         _rigidbody.angularVelocity = 0;
-        Laser.Deactivate();
+        Laser.SetActive(false);
         base.DoReset();
     }
 }

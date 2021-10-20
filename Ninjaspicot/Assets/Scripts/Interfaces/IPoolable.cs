@@ -17,7 +17,7 @@ public enum PoolableType
     Shovel
 }
 
-public interface IPoolable : IWakeable
+public interface IPoolable : IWakeable, IResettable
 {
     PoolableType PoolableType { get; }
     void Pool(Vector3 position, Quaternion rotation, float size = 1);

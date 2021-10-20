@@ -33,4 +33,9 @@ public class InstantBullet : MonoBehaviour, IPoolable
     {
         gameObject.SetActive(true);
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

@@ -244,7 +244,7 @@ public class TouchManager : MonoBehaviour
             return;
 
         _stickiness.StopWalking(false);
-        Debug.Log(_jumper.JumpMode.ToString());
+
         switch (_jumper.JumpMode)
         {
             case JumpMode.Classic:

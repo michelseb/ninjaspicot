@@ -29,4 +29,9 @@ public class DynamicNinjaCollider : MonoBehaviour, IPoolable
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

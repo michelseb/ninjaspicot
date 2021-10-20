@@ -43,4 +43,9 @@ public class SoundEffect : MonoBehaviour, IPoolable
         gameObject.SetActive(true);
         _currentLifeTime = LIFE_TIME;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

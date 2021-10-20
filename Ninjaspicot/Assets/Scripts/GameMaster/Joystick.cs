@@ -247,6 +247,11 @@ public class Joystick : MonoBehaviour, IPoolable
         gameObject.SetActive(true);
         Active = true;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }
 
 public enum AxisOptions { Both, Horizontal, Vertical }

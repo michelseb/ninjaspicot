@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettable
 {
-    [SerializeField] protected ReactionType _initReactionType;
+    [SerializeField] protected StateType _initState;
     [SerializeField] protected Collider2D _castArea;
-    protected Reaction _reaction;
+
+    protected CharacterState _state;
     public bool Attacking { get; protected set; }
     public bool Active { get; protected set; }
 
@@ -17,13 +19,21 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     public bool Taken => true;
     #endregion
 
+    protected Animator _animator;
+
     protected Vector3 _resetPosition;
     protected Quaternion _resetRotation;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+    }
 
     protected override void Start()
     {
         base.Start();
-        SetReaction(_initReactionType);
+        SetState(_initState);
         _resetPosition = Transform.position;
         _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
     }
@@ -69,18 +79,21 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     {
         Active = false;
 
-        if (Renderer != null)
-        {
-            Renderer.enabled = false;
-        }
-        else if (Image != null)
-        {
-            Image.enabled = false;
-        }
+        //if (Renderer != null)
+        //{
+        //    Renderer.enabled = false;
+        //}
+        //else if (Image != null)
+        //{
+        //    Image.enabled = false;
+        //}
 
-        Collider.enabled = false;
+        //Collider.enabled = false;
+
+        _animator.SetTrigger("Sleep");
+
         _characterLight.Sleep();
-        if (!Utils.IsNull(_reaction)) _reaction?.Sleep();
+        if (!Utils.IsNull(_state)) _state?.Sleep();
     }
 
     public virtual void Wake()
@@ -91,39 +104,62 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
 
         Active = true;
 
-        if (Renderer != null)
-        {
-            Renderer.enabled = true;
-        }
-        else if (Image != null)
-        {
-            Image.enabled = true;
-        }
+        //if (Renderer != null)
+        //{
+        //    Renderer.enabled = true;
+        //}
+        //else if (Image != null)
+        //{
+        //    Image.enabled = true;
+        //}
+
+        _animator.SetTrigger("Wake");
 
         _characterLight.Wake();
-        if (!Utils.IsNull(_reaction)) _reaction.Wake();
+        if (!Utils.IsNull(_state)) _state.Wake();
     }
 
-    public void SetReaction(ReactionType reactionType)
+    public void SetState(StateType stateType, object parameter = null)
     {
-        if (Utils.IsNull(_reaction))
+        if (Utils.IsNull(_state))
         {
-            _reaction = _poolManager.GetPoolable<Reaction>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
+            _state = _poolManager.GetPoolable<CharacterState>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
         }
-        else if (_reaction.ReactionType == reactionType)
+        else if (_state.StateType == stateType)
         {
             return;
         }
 
-        _reaction.SetReaction(reactionType);
+        _state.SetState(stateType);
+
+        // Launch related action
+        GetActionFromState(stateType, parameter)?.Invoke();
+    }
+
+    public void SetNextState(StateType stateType)
+    {
+        if (Utils.IsNull(_state))
+            return;
+
+        _state.SetNextState(stateType);
+    }
+
+    public bool IsState(StateType stateType)
+    {
+        return _state.StateType == stateType;
+    }
+
+    public bool IsNextState(StateType stateType)
+    {
+        return _state.NextState == stateType;
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
-        if (!Utils.IsNull(_reaction))
+        if (!Utils.IsNull(_state))
         {
-            _reaction.Transform.parent = null;
-            _reaction.Sleep();
+            _state.Transform.parent = null;
+            _state.Sleep();
         }
 
         if (!Utils.IsNull(_castArea))
@@ -143,7 +179,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     public virtual void DoReset()
     {
         Attacking = false;
-        SetReaction(_initReactionType);
+        SetState(_initState);
         Transform.position = _resetPosition;
 
         if (Renderer != null)
@@ -158,4 +194,6 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         Dead = false;
         Wake();
     }
+
+    protected abstract Action GetActionFromState(StateType stateType, object parameter = null);
 }

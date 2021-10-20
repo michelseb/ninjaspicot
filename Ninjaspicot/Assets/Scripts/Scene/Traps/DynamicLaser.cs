@@ -31,8 +31,8 @@ public class DynamicLaser : Laser
 
     protected override void InitPointsPosition()
     {
-        _laser.SetPosition(0, _start.position);
-        _laser.SetPosition(_pointsAmount - 1, _end.position);
+        _laser.SetPosition(0, _startPosition);
+        _laser.SetPosition(_pointsAmount - 1, _endPosition);
         SetPointsPosition();
     }
 

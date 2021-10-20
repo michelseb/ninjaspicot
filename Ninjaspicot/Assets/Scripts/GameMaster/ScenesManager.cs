@@ -29,8 +29,6 @@ public class ScenesManager : MonoBehaviour
     public Coroutine SceneLoad { get; private set; }
     public SceneInfos CurrentScene { get; private set; }
 
-    private List<ISceneryWakeable> _wakeables;
-
     private SpawnManager _spawnManager;
     private AudioSource _audioSource;
     private Coroutine _volumeDown;
@@ -68,8 +66,7 @@ public class ScenesManager : MonoBehaviour
         lobby.Loaded = true;
 
         // Wake lobby wakeables
-        _wakeables = Utils.FindObjectsOfTypeInScene<ISceneryWakeable>("Lobby");
-        _wakeables.ForEach(w => w.Wake());
+        Utils.FindObjectsOfTypeInScene<ISceneryWakeable>("Lobby").ForEach(w => w.Wake());
     }
 
     public void LoadSceneById(int sceneId)
@@ -132,10 +129,6 @@ public class ScenesManager : MonoBehaviour
             _spawnManager.InitActiveSceneSpawns();
             CurrentScene = sceneInfos;
             SwitchAudio(sceneToLoad.buildIndex);
-            //Deactivate all scenery wakeables
-            _wakeables = FindObjectsOfType<Zone>(true).SelectMany(zone => zone.GetComponentsInChildren<ISceneryWakeable>()).ToList();
-            _wakeables.ForEach(w => w.Sleep());
-
             sceneInfos.Loaded = true;
         }
     }

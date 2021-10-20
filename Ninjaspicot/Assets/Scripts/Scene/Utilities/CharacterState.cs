@@ -1,22 +1,26 @@
 ﻿using TMPro;
 using UnityEngine;
 
-public enum ReactionType
+public enum StateType
 {
     Sleep = 0,
     Wonder = 1,
-    Find = 2,
-    Patrol = 3,
-    Guard = 4
+    Check = 2,
+    Chase = 3,
+    Return = 4,
+    Patrol = 5,
+    Guard = 6,
+    LookFor = 7
 }
 
-public class Reaction : MonoBehaviour, IPoolable
+public class CharacterState : MonoBehaviour, IPoolable
 {
     [SerializeField] private Transform _text;
 
     public PoolableType PoolableType => PoolableType.None;
 
-    public ReactionType ReactionType { get; private set; }
+    public StateType StateType { get; private set; }
+    public StateType NextState { get; private set; }
     private Transform _transform;
     private TextMeshPro _textMesh;
     public Transform Transform { get { if (_transform == null) _transform = transform; return _transform; } }
@@ -52,30 +56,46 @@ public class Reaction : MonoBehaviour, IPoolable
 
 
 
-    public void SetReaction(ReactionType reactionType)
+    public void SetState(StateType stateType)
     {
-        string reactionText = string.Empty;
+        string stateText = string.Empty;
 
-        switch (reactionType)
+        switch (stateType)
         {
-            case ReactionType.Sleep:
-                reactionText = "Zzz";
+            case StateType.Sleep:
+                stateText = "Zzz";
                 break;
-            case ReactionType.Wonder:
-                reactionText = "??";
+            case StateType.Wonder:
+                stateText = "??";
                 break;
-            case ReactionType.Find:
-                reactionText = "!!";
+            case StateType.LookFor:
+                stateText = ":O";
                 break;
-            case ReactionType.Patrol:
-                reactionText = ">-<";
+            case StateType.Chase:
+                stateText = "!!";
                 break;
-            case ReactionType.Guard:
-                reactionText = "O-O";
+            case StateType.Patrol:
+                stateText = ">-<";
+                break;
+            case StateType.Guard:
+                stateText = "O-O";
                 break;
         }
 
-        ReactionType = reactionType;
-        _textMesh.text = reactionText;
+        StateType = stateType;
+        _textMesh.text = stateText;
+    }
+
+    public void SetNextState(StateType stateType)
+    {
+        NextState = stateType;
+    }
+
+    public void DoReset()
+    {
+        if (GetComponentInParent<Enemy>() == null)
+        {
+            Sleep();
+        }
     }
 }

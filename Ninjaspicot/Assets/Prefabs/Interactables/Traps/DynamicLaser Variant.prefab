@@ -15,6 +15,12 @@ MonoBehaviour:
   _start: {fileID: 6789800568730082266}
   _end: {fileID: 5785137555469316595}
   _horizontal: 0
+  _startAwake: 0
+  _updateTime: 10
+  _width: 1.5
+  _amplitude: 1
+  _amplitudeTurbulance: 1
+  _variation: 0.5
   _toggleTime: 1.5
 --- !u!1001 &5452807485831910649
 PrefabInstance:
@@ -119,66 +125,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.ctime1
-      value: 30804
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.ctime2
-      value: 65535
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.g
-      value: 0.36656523
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key0.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key1.b
-      value: 0.9811321
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key1.g
-      value: 0.87198526
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key1.r
-      value: 0.50445
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key2.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key2.g
-      value: 0.30826712
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.key2.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2009920932496640553, guid: 08376a775c0358c459ea978a01da8256,
-        type: 3}
-      propertyPath: m_Parameters.colorGradient.m_NumColorKeys
-      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2009920932496640556, guid: 08376a775c0358c459ea978a01da8256,
         type: 3}

@@ -31,15 +31,8 @@ public class ThrownLaser : Laser, IPoolable
         }
 
         Transform.Translate(0, _speed * Time.deltaTime, 0);
-        SetPointsPosition();
-    }
 
-    protected override void SetPointsPosition()
-    {
-        base.SetPointsPosition();
-
-        _laser.SetPosition(0, _start.position + _start.right);
-        _laser.SetPosition(_pointsAmount - 1, _end.position + _end.right);
+        base.Update();
     }
 
     public void Pool(Vector3 position, Quaternion rotation, float size = 1)

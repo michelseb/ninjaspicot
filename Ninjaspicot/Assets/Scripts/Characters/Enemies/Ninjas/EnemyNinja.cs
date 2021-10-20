@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public abstract class EnemyNinja : Enemy, INinja, IRaycastable
 {
@@ -90,5 +91,10 @@ public abstract class EnemyNinja : Enemy, INinja, IRaycastable
     public virtual bool NeedsToWalk()
     {
         return false;
+    }
+
+    protected override Action GetActionFromState(StateType stateType, object parameter = null)
+    {
+        return null;
     }
 }

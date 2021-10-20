@@ -165,4 +165,9 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     {
         _line.widthCurve = _lineWidth;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

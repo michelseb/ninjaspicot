@@ -7,6 +7,7 @@ public class PatrollingRobotBall : GuardRobotBall
 {
     [SerializeField] TargetPoint _target;
     [SerializeField] TargetPoint[] _targetPoints;
+    protected IList<TargetPoint> _initialPathTargets;
     protected IList<TargetPoint> _pathTargets;
 
     private TargetPoint _currentPathTarget;
@@ -17,6 +18,7 @@ public class PatrollingRobotBall : GuardRobotBall
     {
         base.Awake();
         _pathTargets = _targetPoints != null ? _targetPoints.Where(p => p != null && !p.IsAim).ToList() : new List<TargetPoint>();
+        _initialPathTargets = _pathTargets;
         _targetPosition = _target?.transform.position;
         InitPathTarget();
     }
@@ -54,14 +56,14 @@ public class PatrollingRobotBall : GuardRobotBall
         }
     }
 
-    protected override void StartWondering(GuardMode nextState, float wonderTime)
+    protected override void StartWondering(StateType nextState)
     {
-        if (nextState == GuardMode.Checking)
+        if (IsNextState(StateType.Check))
         {
             _initRotation = Transform.rotation;
         }
 
-        base.StartWondering(nextState, wonderTime);
+        base.StartWondering(nextState);
     }
 
     protected override void Check()
@@ -71,18 +73,13 @@ public class PatrollingRobotBall : GuardRobotBall
         if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.EraseSoundMark();
-            StartWondering(GuardMode.Returning, _returnWonderTime);
-        }
-
-        if (Hero.Instance.Dead)
-        {
-            StartWondering(GuardMode.Returning, _returnWonderTime);
+            SetState(StateType.Wonder, StateType.Return);
         }
     }
 
     protected override void StartChasing(Transform target)
     {
-        if (GuardMode == GuardMode.Guarding)
+        if (IsState(StateType.Guard))
         {
             _initRotation = Transform.rotation;
         }
@@ -99,7 +96,7 @@ public class PatrollingRobotBall : GuardRobotBall
         if (raycast)
         {
             Seeing = false;
-            StartWondering(GuardMode.Returning, _returnWonderTime);
+            SetState(StateType.Wonder, StateType.Return);
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -110,11 +107,6 @@ public class PatrollingRobotBall : GuardRobotBall
         {
             Laser.SetActive(true);
         }
-
-        if (hero.Dead)
-        {
-            StartWondering(GuardMode.Returning, _returnWonderTime);
-        }
     }
 
     protected override void Return()
@@ -123,21 +115,18 @@ public class PatrollingRobotBall : GuardRobotBall
 
         if (Quaternion.Angle(_initRotation, _sprite.rotation) < .1f)
         {
-            StartGuarding();
+            SetState(StateType.Guard);
         }
     }
 
     protected override void StartReturning()
     {
         TargetTransform = null;
-        GuardMode = GuardMode.Returning;
-        SetReaction(ReactionType.Patrol);
         Laser.SetActive(false);
         Renderer.color = ColorUtils.White;
     }
     protected override void StartGuarding()
     {
-        GuardMode = GuardMode.Guarding;
         Renderer.color = ColorUtils.White;
     }
 
@@ -200,5 +189,11 @@ public class PatrollingRobotBall : GuardRobotBall
 
         _waitAtTarget = null;
         SetNextPathTarget();
+    }
+
+    public override void DoReset()
+    {
+        base.DoReset();
+        _pathTargets = _initialPathTargets;
     }
 }

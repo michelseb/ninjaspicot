@@ -35,7 +35,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
     private void Cast()
     {
         var cast = Utils.RayCast(_transform.position, _transform.right, ignore: _enemy.Id, includeTriggers: false);
-        
+
         if (cast)
         {
             for (int i = 1; i < _pointsAmount; i++)
@@ -68,10 +68,7 @@ public class EnemyLaser : MonoBehaviour, IActivable
 
     public void Activate()
     {
-        if (_active)
-        {
-            gameObject.SetActive(true);
-        }
+        gameObject.SetActive(true);
     }
 
     public void Deactivate()

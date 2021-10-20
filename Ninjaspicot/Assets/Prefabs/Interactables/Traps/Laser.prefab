@@ -234,7 +234,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 02d22a64daa120542b4215115693e884, type: 2}
+  - {fileID: 2100000, guid: 4de36ea0be987c54d965ef5ee0f7b3bc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -260,7 +260,7 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 6
+    widthMultiplier: 4
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -278,16 +278,16 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0, g: 0.36656523, b: 1, a: 1}
-      key1: {r: 0.50445, g: 0.87198526, b: 0.9811321, a: 1}
-      key2: {r: 0, g: 0.30826712, b: 1, a: 0}
+      key0: {r: 1, g: 0, b: 0.046096325, a: 0.5882353}
+      key1: {r: 0.9528302, g: 0.7368699, b: 0.73260057, a: 0.5882353}
+      key2: {r: 1, g: 0.030305615, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 30804
+      ctime1: 30644
       ctime2: 65535
       ctime3: 0
       ctime4: 0
@@ -311,7 +311,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 1
+  m_UseWorldSpace: 0
   m_Loop: 0
 --- !u!60 &2009920932496640552
 PolygonCollider2D:
@@ -358,6 +358,11 @@ MonoBehaviour:
   _end: {fileID: 2009920931004097802}
   _horizontal: 0
   _startAwake: 0
+  _updateTime: 10
+  _width: 1.5
+  _amplitude: 1
+  _amplitudeTurbulance: 1
+  _variation: 0.5
 --- !u!82 &5419851202940907987
 AudioSource:
   m_ObjectHideFlags: 0

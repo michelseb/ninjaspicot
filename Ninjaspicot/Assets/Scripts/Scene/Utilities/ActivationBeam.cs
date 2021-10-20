@@ -53,7 +53,7 @@ public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable
         if (!collision.CompareTag("hero") && !collision.CompareTag("Enemy"))
             return;
 
-        if (collision.CompareTag("hero"))
+        if (collision.CompareTag("hero") && !Hero.Instance.Dead)
         {
             _zoneManager.SetZone(Zone);
         }

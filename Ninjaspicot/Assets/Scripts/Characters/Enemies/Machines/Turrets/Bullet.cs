@@ -60,4 +60,9 @@ public class Bullet : MonoBehaviour, IPoolable
     {
         gameObject.SetActive(true);
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

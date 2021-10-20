@@ -91,15 +91,16 @@ public class HeroJumper : Jumper
             if (chargeTrajectory.Target == null)
                 return;
 
+            //Bounce
+            _stickiness.Rigidbody.velocity = Vector2.zero;
+            _stickiness.Rigidbody.AddForce(((_stickiness.Transform.position - ((MonoBehaviour)chargeTrajectory.Target).transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
+
             chargeTrajectory.Target.Die(_transform);
             chargeTrajectory.Target = null;
             GainJumps(1);
             _timeManager.SlowDown();
             _timeManager.StartTimeRestore();
 
-            //Bounce
-            _stickiness.Rigidbody.velocity = Vector2.zero;
-            _stickiness.Rigidbody.AddForce(((_stickiness.Transform.position - ((MonoBehaviour)chargeTrajectory.Target).transform.position).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
         }
 
     }

@@ -23,4 +23,9 @@ public class DynamicCollider : Obstacle, IPoolable
         transform.position = new Vector3(position.x, position.y, -5);
         transform.rotation = rotation;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

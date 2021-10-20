@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class GuardRobotBall : RobotBall, IListener, IViewer
 {
@@ -6,12 +7,10 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     [SerializeField] protected float _checkWonderTime;
     [SerializeField] protected float _returnWonderTime;
 
-    public GuardMode GuardMode { get; protected set; }
     public Vector3 TargetPosition { get; protected set; }
     public Transform TargetTransform { get; protected set; }
 
     protected HearingPerimeter _hearingPerimeter;
-    protected GuardMode _nextState;
     protected float _wonderTime;
     protected float _wonderElapsedTime;
     protected Quaternion _initRotation;
@@ -33,8 +32,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         base.Start();
         _reactionSound = _audioManager.FindAudioByName("RobotReact");
         _initRotation = _sprite.rotation;
-        GuardMode = GuardMode.Guarding;
-        Laser.SetActive(false);
+        Laser.Deactivate();
     }
 
     protected override void Update()
@@ -44,47 +42,46 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (!Active)
             return;
 
-        HandleState(GuardMode);
+        HandleState(_state.StateType);
     }
 
-    protected virtual void HandleState(GuardMode mode)
+    protected virtual void HandleState(StateType stateType)
     {
-        switch (mode)
+        switch (stateType)
         {
-            case GuardMode.Guarding:
+            case StateType.Guard:
+            case StateType.Patrol:
                 Guard();
                 break;
 
-            case GuardMode.Wondering:
+            case StateType.Wonder:
                 Wonder();
                 break;
 
-            case GuardMode.Checking:
+            case StateType.Check:
                 Check();
                 break;
 
-            case GuardMode.Chasing:
+            case StateType.Chase:
                 Chase(TargetTransform.position);
                 break;
 
-            case GuardMode.Returning:
+            case StateType.Return:
                 Return();
                 break;
         }
     }
 
-    protected virtual void StartWondering(GuardMode nextState, float wonderTime)
+    protected virtual void StartWondering(StateType nextState)
     {
-        if (GuardMode == GuardMode.Guarding || GuardMode == GuardMode.Returning)
+        if (!IsState(StateType.Chase))
         {
             _audioManager.PlaySound(_audioSource, _reactionSound, .4f);
         }
 
-        GuardMode = GuardMode.Wondering;
-        _wonderTime = wonderTime * GetReactionFactor(_initReactionType);
-        _nextState = nextState;
+        SetNextState(nextState);
+        _wonderTime = GetReactionFactor(_initState);
         Renderer.color = ColorUtils.Red;
-        SetReaction(ReactionType.Wonder);
         _wonderElapsedTime = 0;
     }
 
@@ -92,25 +89,18 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
     {
         _wonderElapsedTime += Time.deltaTime;
 
-        if (_nextState == GuardMode.Returning && Hero.Instance.Dead && _wonderTime > 1f)
-        {
-            StartWondering(GuardMode.Returning, _returnWonderTime);
-        }
-
         if (_wonderElapsedTime >= _wonderTime)
         {
-            //_reaction?.Deactivate();
-
-            switch (_nextState)
+            switch (_state.NextState)
             {
-                case GuardMode.Checking:
-                    StartChecking();
+                case StateType.Check:
+                    SetState(StateType.Check);
                     break;
-                case GuardMode.Chasing:
-                    StartChasing(TargetTransform);
+                case StateType.Chase:
+                    SetState(StateType.Chase, TargetTransform);
                     break;
-                case GuardMode.Returning:
-                    StartReturning();
+                case StateType.Return:
+                    SetState(StateType.Return);
                     break;
             }
         }
@@ -118,10 +108,8 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     protected virtual void StartChecking()
     {
-        GuardMode = GuardMode.Checking;
+        SetNextState(StateType.Return);
         Renderer.color = ColorUtils.Red;
-        _nextState = GuardMode.Returning;
-        //Laser.SetActive(true);
     }
 
     protected virtual void Check()
@@ -148,21 +136,14 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.EraseSoundMark();
-            StartWondering(GuardMode.Returning, _returnWonderTime);
-        }
-
-        if (Hero.Instance.Dead)
-        {
-            StartWondering(GuardMode.Returning, _returnWonderTime);
+            SetState(StateType.Wonder, StateType.Return);
         }
     }
 
     protected virtual void StartChasing(Transform target)
     {
         TargetTransform = target;
-        GuardMode = GuardMode.Chasing;
         Renderer.color = ColorUtils.Red;
-        SetReaction(ReactionType.Find);
         Laser.SetActive(true);
     }
 
@@ -185,7 +166,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         if (heroNotVisible)
         {
             Seeing = false;
-            StartWondering(GuardMode.Returning, _returnWonderTime);
+            SetState(StateType.Wonder, StateType.Return);
         }
 
         _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
@@ -197,19 +178,20 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         //    Laser.SetActive(true);
         //}
 
-        if (hero.Dead)
-        {
-            Seeing = false;
-            StartWondering(GuardMode.Returning, _returnWonderTime);
-        }
+    }
+
+    protected virtual void StartLookFor()
+    {
+    }
+
+    protected virtual void LookFor()
+    {
 
     }
 
     protected virtual void StartReturning()
     {
         TargetTransform = null;
-        GuardMode = GuardMode.Returning;
-        SetReaction(ReactionType.Guard);
         Renderer.color = ColorUtils.White;
         Laser.SetActive(false);
     }
@@ -226,34 +208,39 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         }
         else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
         {
-            StartGuarding();
+            SetState(StateType.Guard);
         }
     }
 
     protected virtual void StartGuarding()
     {
-        GuardMode = GuardMode.Guarding;
         Renderer.color = ColorUtils.White;
         Laser.SetActive(false);
     }
 
     protected virtual void Guard() { }
 
+    protected virtual void StartSleeping()
+    {
+        Laser.Deactivate();
+        FieldOfView.Deactivate();
+    }
+
     public void Hear(HearingArea hearingArea)
     {
         TargetPosition = hearingArea.SourcePoint;
 
-        if (GuardMode == GuardMode.Chasing || (GuardMode == GuardMode.Wondering && _nextState == GuardMode.Checking))
+        if (IsState(StateType.Chase) || (IsState(StateType.Wonder) && IsNextState(StateType.Check)))
             return;
 
-        if (_initReactionType == ReactionType.Sleep)
+        if (_initState == StateType.Sleep)
         {
             FieldOfView.Activate();
-            StartWondering(GuardMode.Checking, _checkWonderTime);
+            SetState(StateType.Wonder, StateType.Check);
         }
-        else if (GuardMode != GuardMode.Checking && GuardMode != GuardMode.Chasing)
+        else if (!IsState(StateType.Check) && !IsState(StateType.Chase))
         {
-            StartChecking();
+            SetState(StateType.Check);
         }
     }
 
@@ -264,6 +251,10 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         var hero = Hero.Instance;
         var raycast = Utils.LineCast(Transform.position, hero.Transform.position, new int[] { Id, hero.Id });
+
+        // Visible when walking in the dark ?
+        if (!hero.Visible /*&& !hero.Stickiness.Walking*/)
+            return;
 
         if (raycast)
             return;
@@ -278,7 +269,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             TargetTransform = target;
         }
 
-        StartChasing(target);
+        SetState(StateType.Chase, target);
     }
 
     public override void Sleep()
@@ -302,17 +293,17 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         base.Die(killer, sound, volume);
     }
 
-    protected float GetReactionFactor(ReactionType reactionType)
+    protected float GetReactionFactor(StateType reactionType)
     {
         switch (reactionType)
         {
-            case ReactionType.Sleep:
-                return 3;
-            case ReactionType.Patrol:
-            case ReactionType.Guard:
-                return 1.5f;
-            case ReactionType.Wonder:
-                return 1;
+            case StateType.Sleep:
+                return 2;
+            case StateType.Patrol:
+            case StateType.Guard:
+                return 1.3f;
+            case StateType.Wonder:
+                return .5f;
             default:
                 return 1;
         }
@@ -320,9 +311,33 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
     public override void DoReset()
     {
-        GuardMode = GuardMode.Guarding;
-        StartGuarding();
+        Seeing = false;
         TargetTransform = null;
         base.DoReset();
+    }
+
+    protected override Action GetActionFromState(StateType stateType, object parameter = null)
+    {
+        switch (stateType)
+        {
+            case StateType.Sleep:
+                return StartSleeping;
+            case StateType.Wonder:
+                return () => StartWondering((StateType)parameter);
+            case StateType.Check:
+                return StartChecking;
+            case StateType.Chase:
+                return () => StartChasing((Transform)parameter);
+            case StateType.Return:
+                return StartReturning;
+            case StateType.LookFor:
+                return StartLookFor;
+            case StateType.Guard:
+            case StateType.Patrol:
+                return StartGuarding;
+
+            default:
+                return null;
+        }
     }
 }

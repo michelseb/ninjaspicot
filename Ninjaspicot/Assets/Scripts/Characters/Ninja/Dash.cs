@@ -38,4 +38,9 @@ public class Dash : MonoBehaviour, IPoolable
         gameObject.SetActive(true);
         _currentLifeTime = LIFE_TIME;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

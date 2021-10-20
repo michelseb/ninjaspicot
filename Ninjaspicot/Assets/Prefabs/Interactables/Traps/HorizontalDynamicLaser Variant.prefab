@@ -14,8 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _start: {fileID: 2119458019741101448}
   _end: {fileID: 1376706785396033441}
-  _pointsAmount: 0
   _horizontal: 1
+  _startAwake: 0
+  _updateTime: 10
+  _width: 1.5
+  _amplitude: 1
+  _amplitudeTurbulance: 1
+  _variation: 0.5
   _toggleTime: 1.5
 --- !u!1001 &648421550537155243
 PrefabInstance:

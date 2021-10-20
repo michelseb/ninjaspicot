@@ -44,6 +44,7 @@ public class Hero : Character, INinja, ITriggerable
         _uiCamera = UICamera.Instance;
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
+        Visible = true;
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)

@@ -4993,7 +4993,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightColor: 1
-  _initReactionType: 0
+  _initState: 6
   _castArea: {fileID: 6388034709768160271}
   _rotateSpeed: 130
   _moveSpeed: 20

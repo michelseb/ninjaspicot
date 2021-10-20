@@ -26,7 +26,8 @@ public class MovingLaser : Laser
         }
 
         Transform.Translate(0, _speed * Mathf.Sign(_direction) * Time.deltaTime, 0);
-        SetPointsPosition();
+
+        base.Update();
     }
 
     protected override void SetPointsPosition()

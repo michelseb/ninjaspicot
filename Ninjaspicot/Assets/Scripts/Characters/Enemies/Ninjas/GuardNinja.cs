@@ -1,25 +1,14 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
-public enum GuardMode
-{
-    Guarding,
-    Wondering,
-    Checking,
-    Chasing,
-    Returning
-}
 
 public class GuardNinja : EnemyNinja, IListener
 {
     //[SerializeField] private FollowingRobotBall _robot;
 
-    public GuardMode GuardMode { get; private set; }
     public Vector3 Target { get; private set; }
 
     private float _wonderTime;
     private Vector3 _initPos;
-    private GuardMode _nextState;
     private GuardStickiness _guardStickiness;
     private EnemyJumper _enemyJumper;
     private HearingPerimeter _hearingPerimeter;
@@ -41,41 +30,36 @@ public class GuardNinja : EnemyNinja, IListener
     {
         base.Start();
         _initPos = Transform.position;
-        GuardMode = GuardMode.Guarding;
+        SetState(_initState, GetActionFromState(_initState));
     }
 
     protected virtual void Update()
     {
-        switch (GuardMode)
+        switch (_state.StateType)
         {
-            case GuardMode.Guarding:
-                Guard();
-                break;
-
-            case GuardMode.Wondering:
+            case StateType.Wonder:
                 Wonder();
                 break;
 
-            case GuardMode.Checking:
+            case StateType.Check:
                 Check();
                 break;
 
-            case GuardMode.Chasing:
+            case StateType.Chase:
                 Chase(Target);
                 break;
 
-            case GuardMode.Returning:
+            case StateType.Return:
                 Return();
                 break;
 
+            default:
+                break;
         }
     }
 
     private void StartWondering()
     {
-        GuardMode = GuardMode.Wondering;
-        SetReaction(ReactionType.Wonder);
-
         _wonderElapsedTime = 0;
         //_robot.Activate();
     }
@@ -86,13 +70,13 @@ public class GuardNinja : EnemyNinja, IListener
 
         if (_wonderElapsedTime >= _wonderTime)
         {
-            switch (_nextState)
+            switch (_state.NextState)
             {
-                case GuardMode.Checking:
-                    StartChecking();
+                case StateType.Check:
+                    SetState(StateType.Check);
                     break;
-                case GuardMode.Returning:
-                    StartReturning();
+                case StateType.Return:
+                    SetState(StateType.Return);
                     break;
             }
         }
@@ -101,10 +85,9 @@ public class GuardNinja : EnemyNinja, IListener
     private void StartChecking()
     {
         Attacking = true;
-        GuardMode = GuardMode.Checking;
-        _nextState = GuardMode.Returning;
+        SetNextState(StateType.Return);
+
         _guardStickiness.StartWalkingTowards(Target);
-        //StartCoroutine(Check());
     }
 
     private void Check()
@@ -114,24 +97,14 @@ public class GuardNinja : EnemyNinja, IListener
             _hearingPerimeter.EraseSoundMark();
             _guardStickiness.StopWalkingTowards(false);
             _wonderTime = 5f;
-            StartWondering();
+            SetState(StateType.Wonder);
         }
     }
-
-    //private IEnumerator Check()
-    //{
-    //    while (_guardMode == GuardMode.Checking)
-    //    {
-    //        //_robot.AddFollowPosition(Transform.position);
-    //        yield return new WaitForSeconds(.3f);
-    //    }
-    //}
 
     private void StartChasing()
     {
         Attacking = true;
         _enemyJumper.Active = true;
-        GuardMode = GuardMode.Chasing;
         _guardStickiness.StartWalkingTowards(Target);
     }
 
@@ -147,7 +120,6 @@ public class GuardNinja : EnemyNinja, IListener
     {
         Attacking = false;
         _enemyJumper.Active = false;
-        GuardMode = GuardMode.Returning;
         _guardStickiness.StartWalkingTowards(_initPos);
     }
 
@@ -156,33 +128,23 @@ public class GuardNinja : EnemyNinja, IListener
         if (Vector2.Distance(Transform.position, _initPos) < 5)
         {
             _guardStickiness.StopWalkingTowards(false);
-            StartGuarding();
+            SetState(StateType.Guard, null);
         }
-    }
-
-    private void StartGuarding()
-    {
-        GuardMode = GuardMode.Guarding;
-    }
-
-    public void Guard()
-    {
-
     }
 
     public void Hear(HearingArea hearingArea)
     {
         Target = hearingArea.SourcePoint;
 
-        if (GuardMode == GuardMode.Guarding)
+        if (IsState(StateType.Guard))
         {
-            _nextState = GuardMode.Checking;
+            SetNextState(StateType.Check);
             _wonderTime = 2f;
-            StartWondering();
+            SetState(StateType.Wonder);
         }
         else
         {
-            StartChasing();
+            SetState(StateType.Chase);
         }
     }
 }

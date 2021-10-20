@@ -25,6 +25,23 @@ MonoBehaviour:
   _shootingPosition: {fileID: 5075426478492125404}
   _turretHead: {fileID: 9081224774176209433}
   _loadTime: 1
+--- !u!114 &1333911610849195888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075426478492125406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eec79f845e4cd6347bb30e5d5ddc2ad8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _size: 50
+  _viewAngle: 60
+  _detailAmount: 20
+  _customColor: 0
+  _isHorizontal: 0
 --- !u!1001 &6341155298802420213
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -501,6 +518,8 @@ PrefabInstance:
     - {fileID: 93584250774411383, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
     - {fileID: 2813462830290540690, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
     - {fileID: 5726976299849827784, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
+    - {fileID: 7184125394087156204, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
+    - {fileID: 1181513225263497784, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 55a8419f19f53774c8ae0fb5763089e2, type: 3}
 --- !u!1 &6404012257646182032 stripped
 GameObject:
@@ -511,6 +530,12 @@ GameObject:
 --- !u!224 &9081224774176209433 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2740074188311868396, guid: 55a8419f19f53774c8ae0fb5763089e2,
+    type: 3}
+  m_PrefabInstance: {fileID: 6341155298802420213}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5075426478492125406 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2193189626768179499, guid: 55a8419f19f53774c8ae0fb5763089e2,
     type: 3}
   m_PrefabInstance: {fileID: 6341155298802420213}
   m_PrefabAsset: {fileID: 0}

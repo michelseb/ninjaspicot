@@ -77,7 +77,7 @@ public class GuardStickiness : Stickiness
         if (!base.Attach(obstacle))
             return false;
 
-        if (_guard.GuardMode == GuardMode.Chasing)
+        if (_guard.IsState(StateType.Chase))
         {
             StartWalkingTowards(_guard.Target);
         }

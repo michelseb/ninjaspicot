@@ -52,4 +52,9 @@ public class HeroGhost : MonoBehaviour, IPoolable
         var color = Hero.Instance.Renderer.color;
         _renderer.color = new Color(color.r, color.g, color.b, _initAlpha);
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

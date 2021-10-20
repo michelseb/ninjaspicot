@@ -9,15 +9,20 @@ public class HidingZone : MonoBehaviour
     private void Awake()
     {
         _aimableLocation = GetComponentInChildren<AimableLocation>();
-        _aimableLocation.Active = true;
+        ActivateLocation();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        OnTriggerStay2D(collision);
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
         if (!collision.CompareTag("hero"))
             return;
 
-        _aimableLocation.Active = false;
+        DeactivateLocation();
         Hero.Hide();
     }
 
@@ -26,7 +31,23 @@ public class HidingZone : MonoBehaviour
         if (!collision.CompareTag("hero"))
             return;
 
-        _aimableLocation.Active = true;
+        ActivateLocation();
         Hero.Reveal();
+    }
+
+    private void ActivateLocation()
+    {
+        if (_aimableLocation == null)
+            return;
+
+        _aimableLocation.Active = true;
+    }
+
+    private void DeactivateLocation()
+    {
+        if (_aimableLocation == null)
+            return;
+
+        _aimableLocation.Active = false;
     }
 }

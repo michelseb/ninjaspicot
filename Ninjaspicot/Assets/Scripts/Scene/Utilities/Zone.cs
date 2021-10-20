@@ -108,6 +108,6 @@ public class Zone : MonoBehaviour, IWakeable
         _resettables.ForEach(r => r.DoReset());
         _additionalResettables.ForEach(r => { if (r.TryGetComponent(out IResettable resettable)) resettable.DoReset(); });
         var poolables = FindObjectsOfType<MonoBehaviour>().OfType<IPoolable>().ToList();
-        poolables.ForEach(p => p.Sleep());
+        poolables.ForEach(p => p.DoReset());
     }
 }

@@ -43,4 +43,9 @@ public class SimulatedSoundEffect : MonoBehaviour, IPoolable
         }
         gameObject.SetActive(false);
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

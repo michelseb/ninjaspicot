@@ -35,4 +35,9 @@ public class AimIndicator : MonoBehaviour, IPoolable
         Transform.position = position;
         Transform.localScale = Vector3.one * size;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

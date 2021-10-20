@@ -79,4 +79,9 @@ public class TouchIndicator : MonoBehaviour, IPoolable
         gameObject.SetActive(true);
         Active = true;
     }
+
+    public void DoReset()
+    {
+        Sleep();
+    }
 }

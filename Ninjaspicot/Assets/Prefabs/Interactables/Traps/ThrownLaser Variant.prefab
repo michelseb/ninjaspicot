@@ -16,6 +16,11 @@ MonoBehaviour:
   _end: {fileID: 8901945782048831355}
   _horizontal: 0
   _startAwake: 0
+  _updateTime: 10
+  _width: 1.5
+  _amplitude: 1
+  _amplitudeTurbulance: 1
+  _variation: 0.5
   _lifeTime: 20
   _speed: 6
 --- !u!1001 &4064794536200351281

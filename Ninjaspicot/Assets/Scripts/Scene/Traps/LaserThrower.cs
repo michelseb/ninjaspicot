@@ -2,9 +2,6 @@
 
 public class LaserThrower : MonoBehaviour, ISceneryWakeable, IRaycastable, IResettable
 {
-    [SerializeField] private float _spawnInterval;
-
-    private float _timeLeftBeforeSpawn;
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
@@ -21,14 +18,13 @@ public class LaserThrower : MonoBehaviour, ISceneryWakeable, IRaycastable, IRese
         _poolManager = PoolManager.Instance;
     }
 
-    protected virtual void Update()
+    protected void OnTriggerEnter2D(Collider2D collision)
+
     {
-        _timeLeftBeforeSpawn -= Time.deltaTime;
-        if (_timeLeftBeforeSpawn <= 0)
-        {
-            _poolManager.GetPoolable<ThrownLaser>(Transform.position, Quaternion.identity);
-            _timeLeftBeforeSpawn = _spawnInterval;
-        }
+        if (!collision.CompareTag("hero"))
+            return;
+
+        _poolManager.GetPoolable<ThrownLaser>(Transform.position, Quaternion.identity);
     }
 
     public void Sleep()

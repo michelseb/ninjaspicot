@@ -7,8 +7,10 @@ public class ClassicTrajectory : TrajectoryBase
 
     private AnimationCurve _focusWidth;
 
-    protected void Start()
+    protected override void Awake()
     {
+        base.Awake();
+
         _focusWidth = new AnimationCurve();
         _focusWidth.AddKey(0, 1);
         _focusWidth.AddKey(1, .1f);

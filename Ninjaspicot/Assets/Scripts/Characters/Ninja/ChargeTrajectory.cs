@@ -17,7 +17,7 @@ public class ChargeTrajectory : TrajectoryBase
     public bool Collides { get; private set; }
     private Transform _targetTransform;
     protected override float _fadeSpeed => 5;
-    private const float CHARGE_LENGTH = 60f;
+    private const float CHARGE_LENGTH = 40f;
 
     protected override void Awake()
     {
