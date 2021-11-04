@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
 
-public class AimIndicator : MonoBehaviour, IPoolable
+public class AimIndicator : Dynamic, IPoolable
 {
     private Hero _hero;
     public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
 
     public PoolableType PoolableType => PoolableType.None;
-
-    private Transform _transform;
-    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
 
     protected virtual void Awake()
     {

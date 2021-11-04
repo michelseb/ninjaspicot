@@ -1,122 +1,56 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class GuardRobotBall : RobotBall, IListener, IViewer
+public class GuardRobotBall : Robot
 {
-    [SerializeField] private float _hearingRange;
-    [SerializeField] protected float _checkWonderTime;
-    [SerializeField] protected float _returnWonderTime;
+    [SerializeField] TargetPoint _target;
+    [SerializeField] TargetPoint[] _targetPoints;
 
-    public Vector3 TargetPosition { get; protected set; }
-    public Transform TargetTransform { get; protected set; }
+    protected Coroutine _lookAt;
+   
 
-    protected HearingPerimeter _hearingPerimeter;
-    protected float _wonderTime;
-    protected float _wonderElapsedTime;
-    protected Quaternion _initRotation;
-    private Audio _reactionSound;
-    private TimeManager _timeManager;
+    protected List<TargetPoint> _initialPathTargets;
+    protected List<TargetPoint> _pathTargets;
 
-    public float Range => _hearingRange;
-    public bool Seeing { get; set; }
+    private TargetPoint _currentPathTarget;
+    private Vector3? _targetPosition;
+    private Coroutine _waitAtTarget;
 
     protected override void Awake()
     {
         base.Awake();
-        _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
-        _timeManager = TimeManager.Instance;
+
+        _pathTargets = _targetPoints != null ? _targetPoints.Where(p => p != null && !p.IsAim).ToList() : new List<TargetPoint>();
+        _initialPathTargets = _pathTargets;
+        _targetPosition = _target?.transform.position;
+        InitPathTarget();
     }
 
     protected override void Start()
     {
         base.Start();
-        _reactionSound = _audioManager.FindAudioByName("RobotReact");
-        _initRotation = _sprite.rotation;
-        Laser.Deactivate();
-    }
+        _initRotation = _head.rotation;
+        _remainingTimeBeforeCommunication = _timeBetweenCommunications;
 
-    protected override void Update()
-    {
-        base.Update();
-
-        if (!Active)
-            return;
-
-        HandleState(_state.StateType);
-    }
-
-    protected virtual void HandleState(StateType stateType)
-    {
-        switch (stateType)
+        if (_targetPosition.HasValue)
         {
-            case StateType.Guard:
-            case StateType.Patrol:
-                Guard();
-                break;
-
-            case StateType.Wonder:
-                Wonder();
-                break;
-
-            case StateType.Check:
-                Check();
-                break;
-
-            case StateType.Chase:
-                Chase(TargetTransform.position);
-                break;
-
-            case StateType.Return:
-                Return();
-                break;
+            _head.rotation = Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
+        }
+        else if (_currentPathTarget != null)
+        {
+            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), GetRotateSpeed());
         }
     }
 
-    protected virtual void StartWondering(StateType nextState)
-    {
-        if (!IsState(StateType.Chase))
-        {
-            _audioManager.PlaySound(_audioSource, _reactionSound, .4f);
-        }
+    #region Check
 
-        SetNextState(nextState);
-        _wonderTime = GetReactionFactor(_initState);
-        Renderer.color = ColorUtils.Red;
-        _wonderElapsedTime = 0;
-    }
-
-    protected virtual void Wonder()
-    {
-        _wonderElapsedTime += Time.deltaTime;
-
-        if (_wonderElapsedTime >= _wonderTime)
-        {
-            switch (_state.NextState)
-            {
-                case StateType.Check:
-                    SetState(StateType.Check);
-                    break;
-                case StateType.Chase:
-                    SetState(StateType.Chase, TargetTransform);
-                    break;
-                case StateType.Return:
-                    SetState(StateType.Return);
-                    break;
-            }
-        }
-    }
-
-    protected virtual void StartChecking()
-    {
-        SetNextState(StateType.Return);
-        Renderer.color = ColorUtils.Red;
-    }
-
-    protected virtual void Check()
+    protected override void Check()
     {
         var deltaX = TargetPosition.x - Transform.position.x;
 
-        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), Time.deltaTime * _rotateSpeed);
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), GetRotateSpeed());
 
         //var alignedWithTarget = 
 
@@ -131,23 +65,18 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
 
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * Time.deltaTime * _moveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * GetMovementSpeed());
         }
-        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
+        else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
             _hearingPerimeter.EraseSoundMark();
             SetState(StateType.Wonder, StateType.Return);
         }
     }
+    #endregion
 
-    protected virtual void StartChasing(Transform target)
-    {
-        TargetTransform = target;
-        Renderer.color = ColorUtils.Red;
-        Laser.SetActive(true);
-    }
-
-    protected virtual void Chase(Vector3 target)
+    #region Chase
+    protected override void Chase(Vector3 target)
     {
         var hero = Hero.Instance;
         var deltaX = target.x - Transform.position.x;
@@ -157,7 +86,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         var wallNear = Utils.RayCast(_rigidbody.position, direction, 6, Id);
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * Time.deltaTime * _moveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * GetMovementSpeed());
         }
 
 
@@ -169,7 +98,7 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
             SetState(StateType.Wonder, StateType.Return);
         }
 
-        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), Time.deltaTime * _rotateSpeed);
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), GetRotateSpeed());
 
         //var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
 
@@ -179,113 +108,117 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         //}
 
     }
+    #endregion
 
-    protected virtual void StartLookFor()
+    #region LookFor
+
+    protected override void LookFor()
     {
+        if (_lookAt == null)
+        {
+            _lookAt = StartCoroutine(LookAtRandom());
+        }
+        Guard();
     }
 
-    protected virtual void LookFor()
+    protected virtual IEnumerator LookAtRandom()
     {
+        float elapsedTime = 0;
+        float delay = 2;
+        var direction = UnityEngine.Random.insideUnitCircle.normalized;
 
+        while (elapsedTime < delay)
+        {
+            elapsedTime += Time.deltaTime;
+            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), GetRotateSpeed());
+            yield return null;
+        }
+
+        _lookAt = null;
     }
+    #endregion
 
-    protected virtual void StartReturning()
+    #region Communicate
+    protected override void Communicate()
     {
-        TargetTransform = null;
-        Renderer.color = ColorUtils.White;
-        Laser.SetActive(false);
-    }
+        _remainingCommunicationTime -= Time.deltaTime;
 
-    protected virtual void Return()
+        if (_remainingCommunicationTime <= 0)
+        {
+            if (Zone.DeathOccured)
+            {
+                Zone.ActivateAlarm();
+            }
+            else
+            {
+                SetState(State.NextState);
+            }
+        }
+    }
+    #endregion
+
+    #region Return
+    protected override void Return()
     {
         var deltaX = _resetPosition.x - Transform.position.x;
 
-        _sprite.rotation = Quaternion.RotateTowards(_sprite.rotation, _initRotation, Time.deltaTime * _rotateSpeed);
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, _initRotation, GetRotateSpeed());
 
         if (deltaX > 2)
         {
-            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Time.deltaTime * _moveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * GetMovementSpeed());
         }
-        else if (Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
+        else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
         {
             SetState(StateType.Guard);
         }
     }
+    #endregion
 
-    protected virtual void StartGuarding()
+    #region Guard
+    protected override void Guard() { }
+    #endregion
+
+    #region Guard
+
+    protected override void Patrol() 
     {
-        Renderer.color = ColorUtils.White;
-        Laser.SetActive(false);
-    }
-
-    protected virtual void Guard() { }
-
-    protected virtual void StartSleeping()
-    {
-        Laser.Deactivate();
-        FieldOfView.Deactivate();
-    }
-
-    public void Hear(HearingArea hearingArea)
-    {
-        TargetPosition = hearingArea.SourcePoint;
-
-        if (IsState(StateType.Chase) || (IsState(StateType.Wonder) && IsNextState(StateType.Check)))
+        if (_waitAtTarget != null)
             return;
 
-        if (_initState == StateType.Sleep)
+        if (_lookAt == null)
         {
-            FieldOfView.Activate();
-            SetState(StateType.Wonder, StateType.Check);
-        }
-        else if (!IsState(StateType.Check) && !IsState(StateType.Chase))
-        {
-            SetState(StateType.Check);
-        }
-    }
-
-    public void See(Transform target)
-    {
-        if (Seeing)
-            return;
-
-        var hero = Hero.Instance;
-        var raycast = Utils.LineCast(Transform.position, hero.Transform.position, new int[] { Id, hero.Id });
-
-        // Visible when walking in the dark ?
-        if (!hero.Visible /*&& !hero.Stickiness.Walking*/)
-            return;
-
-        if (raycast)
-            return;
-
-        Seeing = true;
-
-        // Temps de réaction
-        if (TargetTransform == null)
-        {
-            _timeManager.SlowDown();
-            _timeManager.StartTimeRestore();
-            TargetTransform = target;
+            if (_targetPosition.HasValue)
+            {
+                _head.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
+            }
+            else
+            {
+                Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), GetRotateSpeed());
+            }
         }
 
-        SetState(StateType.Chase, target);
+        if (_currentPathTarget == null)
+            return;
+
+        var direction = Utils.ToVector2(_currentPathTarget.transform.position - Transform.position);
+
+        if (_targetPosition.HasValue)
+        {
+            _rigidbody.MovePosition(_rigidbody.position + direction.normalized * GetMovementSpeed());
+        }
+        else
+        {
+            _rigidbody.MovePosition(_rigidbody.position + Utils.ToVector2(Transform.right) * GetMovementSpeed());
+        }
+
+
+        if (direction.magnitude < 1)
+        {
+            UpdateTarget(_currentPathTarget);
+        }
     }
-
-    public override void Sleep()
-    {
-        base.Sleep();
-
-        _hearingPerimeter.EraseSoundMark();
-        _hearingPerimeter.Deactivate();
-    }
-
-    public override void Wake()
-    {
-        base.Wake();
-
-        _hearingPerimeter.Activate();
-    }
+    #endregion
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
@@ -293,51 +226,80 @@ public class GuardRobotBall : RobotBall, IListener, IViewer
         base.Die(killer, sound, volume);
     }
 
-    protected float GetReactionFactor(StateType reactionType)
-    {
-        switch (reactionType)
-        {
-            case StateType.Sleep:
-                return 2;
-            case StateType.Patrol:
-            case StateType.Guard:
-                return 1.3f;
-            case StateType.Wonder:
-                return .5f;
-            default:
-                return 1;
-        }
-    }
-
     public override void DoReset()
     {
         Seeing = false;
         TargetTransform = null;
+
+        if (_lookAt != null)
+        {
+            StopCoroutine(_lookAt);
+            _lookAt = null;
+        }
+
+        _pathTargets = _initialPathTargets;
+
         base.DoReset();
     }
 
-    protected override Action GetActionFromState(StateType stateType, object parameter = null)
+    private void InitPathTarget()
     {
-        switch (stateType)
-        {
-            case StateType.Sleep:
-                return StartSleeping;
-            case StateType.Wonder:
-                return () => StartWondering((StateType)parameter);
-            case StateType.Check:
-                return StartChecking;
-            case StateType.Chase:
-                return () => StartChasing((Transform)parameter);
-            case StateType.Return:
-                return StartReturning;
-            case StateType.LookFor:
-                return StartLookFor;
-            case StateType.Guard:
-            case StateType.Patrol:
-                return StartGuarding;
+        float previousDelta = float.MaxValue;
+        TargetPoint previousTarget = null;
 
-            default:
-                return null;
+        foreach (var target in _pathTargets)
+        {
+            var magnitude = (target.transform.position - Transform.position).magnitude;
+            if (magnitude < previousDelta)
+            {
+                previousDelta = magnitude;
+                previousTarget = target;
+            }
         }
+
+        if (previousTarget == null)
+            return;
+
+        foreach (var targets in _pathTargets.ToArray())
+        {
+            if (targets == previousTarget)
+                break;
+
+            _pathTargets.RemoveAt(0);
+            _pathTargets.Add(targets);
+        }
+
+
+        _currentPathTarget = previousTarget;
+    }
+
+    private void UpdateTarget(TargetPoint targetPoint)
+    {
+        if (targetPoint.PauseAmount == 0)
+        {
+            SetNextPathTarget();
+        }
+        else
+        {
+            _waitAtTarget = StartCoroutine(WaitAtTarget(targetPoint.PauseAmount));
+        }
+    }
+
+    private void SetNextPathTarget()
+    {
+        if (_pathTargets == null || _pathTargets.Count == 0)
+            return;
+
+        _pathTargets.RemoveAt(0);
+        _pathTargets.Add(_currentPathTarget);
+        _currentPathTarget = _pathTargets[0];
+    }
+
+    private IEnumerator WaitAtTarget(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        _waitAtTarget = null;
+        SetNextPathTarget();
     }
 }

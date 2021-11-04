@@ -1,16 +1,11 @@
 ﻿using UnityEngine;
 
-public class SoundEffect : MonoBehaviour, IPoolable
+public class SoundEffect : Dynamic, IPoolable
 {
     private float _currentLifeTime;
     private const float LIFE_TIME = 1;
-    private Transform _transform;
 
     public PoolableType PoolableType => PoolableType.None;
-    private void Awake()
-    {
-        _transform = transform;
-    }
 
     private void Start()
     {
@@ -28,9 +23,9 @@ public class SoundEffect : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.localScale = Vector3.one * size;
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
+        Transform.localScale = Vector3.one * size;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
     }
 
     public void Sleep()

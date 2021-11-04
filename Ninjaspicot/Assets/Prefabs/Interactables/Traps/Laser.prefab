@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1555558402484916003}
   - component: {fileID: 1555558402484916006}
   - component: {fileID: 1555558402484916005}
+  - component: {fileID: 1149281860724753972}
   m_Layer: 0
   m_Name: start
   m_TagString: Untagged
@@ -75,6 +76,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1149281860724753972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555558402484916001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ef37f8b42d25ed449c465dab8409050, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _amplitude: 0
+  _speed: 0
+  _direction: 0
 --- !u!1 &2009920931004097803
 GameObject:
   m_ObjectHideFlags: 0
@@ -86,6 +102,7 @@ GameObject:
   - component: {fileID: 2009920931004097802}
   - component: {fileID: 2009920931004097796}
   - component: {fileID: 2009920931004097797}
+  - component: {fileID: 5463800623468492453}
   m_Layer: 0
   m_Name: end
   m_TagString: Untagged
@@ -150,6 +167,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5463800623468492453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009920931004097803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ef37f8b42d25ed449c465dab8409050, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _amplitude: 0
+  _speed: 0
+  _direction: 1
 --- !u!1 &2009920932496640556
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,8 +386,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d85f71a400e360469c593781c939728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _start: {fileID: 1555558402484916003}
-  _end: {fileID: 2009920931004097802}
+  _start: {fileID: 1149281860724753972}
+  _end: {fileID: 5463800623468492453}
   _horizontal: 0
   _startAwake: 0
   _updateTime: 10

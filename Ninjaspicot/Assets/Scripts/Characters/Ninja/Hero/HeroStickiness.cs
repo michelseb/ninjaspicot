@@ -84,7 +84,7 @@ public class HeroStickiness : Stickiness
 
             jointMotor.motorSpeed = _speedFactor;
             hinge.motor = jointMotor;
-            hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
+            hinge.anchor = Transform.InverseTransformPoint(GetContactPosition());
 
             yield return null;
         }

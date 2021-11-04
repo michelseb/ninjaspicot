@@ -2,14 +2,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Joystick : MonoBehaviour, IPoolable
+public class Joystick : Dynamic, IPoolable
 {
     public bool Active { get; private set; }
     public float Horizontal { get { return _snapX ? SnapFloat(_input.x, AxisOptions.Horizontal) : _input.x; } }
     public float Vertical { get { return _snapY ? SnapFloat(_input.y, AxisOptions.Vertical) : _input.y; } }
     public Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
-
-    private Transform _transform;
 
     public float HandleRange
     {
@@ -59,7 +57,6 @@ public class Joystick : MonoBehaviour, IPoolable
         _handleImage = _handle.GetComponent<Image>();
         _initColor = _image.color;
         _alpha = _image.color.a;
-        _transform = transform;
     }
 
     protected virtual void Start()
@@ -231,8 +228,8 @@ public class Joystick : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
         _appear = StartCoroutine(Appear());
     }
 

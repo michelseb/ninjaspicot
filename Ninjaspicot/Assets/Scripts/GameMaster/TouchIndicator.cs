@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class TouchIndicator : MonoBehaviour, IPoolable
+public class TouchIndicator : Dynamic, IPoolable
 {
     [SerializeField] private PoolableType _poolableType;
     public bool Active { get; private set; }
@@ -11,11 +11,9 @@ public class TouchIndicator : MonoBehaviour, IPoolable
     private Coroutine _appear;
     private const float APPEAR_SPEED = 4f;
     private const float FADE_SPEED = 1.5f;
-    private Transform _transform;
 
     private void Awake()
     {
-        _transform = transform;
         _renderer = GetComponent<SpriteRenderer>();
     }
 
@@ -63,8 +61,8 @@ public class TouchIndicator : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
         _appear = StartCoroutine(Appear());
     }
 

@@ -1,62 +1,28 @@
 ﻿using UnityEngine;
 
-public class Bullet : MonoBehaviour, IPoolable
+public class Bullet : Dynamic, IPoolable
 {
-    public float Speed { get; set; }
+    public PoolableType PoolableType => PoolableType.None;
 
-    public PoolableType PoolableType => PoolableType.Bullet;
+    private LineRenderer _lineRenderer;
+    public LineRenderer LineRenderer { get { if (_lineRenderer == null) _lineRenderer = GetComponent<LineRenderer>(); return _lineRenderer; } }
 
-    private float _currentLifeTime;
-    private const float LIFE_TIME = 5;
-    private Transform _transform;
+    private ParticleSystem _particleSystem;
+    public ParticleSystem ParticleSystem { get { if (_particleSystem == null) _particleSystem = GetComponent<ParticleSystem>(); return _particleSystem; } }
 
-    private void Awake()
-    {
-        _transform = transform;
-    }
-
-    private void Start()
-    {
-        _currentLifeTime = LIFE_TIME;
-    }
-
-    private void Update()
-    {
-        _transform.Translate(0, Speed * Time.deltaTime, 0);
-        _currentLifeTime -= Time.deltaTime;
-        if (_currentLifeTime <= 0)
-        {
-            Sleep();
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Wall") || collision.CompareTag("DynamicWall"))
-        {
-            Sleep();
-        }
-        if (collision.CompareTag("hero"))
-        {
-            Hero.Instance.Die(transform);
-            Sleep();
-        }
-
-    }
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
-        _currentLifeTime = LIFE_TIME;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
     }
 
-    public void Wake()
+    public void Sleep()
     {
         gameObject.SetActive(false);
     }
 
-    public void Sleep()
+    public void Wake()
     {
         gameObject.SetActive(true);
     }

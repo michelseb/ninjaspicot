@@ -2,13 +2,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class Character : MonoBehaviour, IRaycastable, IKillable
+public abstract class Character : Dynamic, IRaycastable, IKillable
 {
     [SerializeField] protected CustomColor _lightColor;
+    [SerializeField] protected bool _startAwake;
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-    private SpriteRenderer _renderer;
-    public SpriteRenderer Renderer
+    protected SpriteRenderer _renderer;
+    public virtual SpriteRenderer Renderer
     {
         get
         {
@@ -45,9 +46,6 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
 
     public Image Image { get; private set; }
 
-    private Transform _transform;
-    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
-
     public bool Dead { get; set; }
 
     protected CharacterLight _characterLight;
@@ -60,6 +58,7 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
     {
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
+        _poolManager = PoolManager.Instance;
         _characterLight = GetComponentInChildren<CharacterLight>();
         _cameraBehaviour = CameraBehaviour.Instance;
         Image = GetComponent<Image>();
@@ -67,7 +66,6 @@ public abstract class Character : MonoBehaviour, IRaycastable, IKillable
 
     protected virtual void Start()
     {
-        _poolManager = PoolManager.Instance;
         _characterLight?.SetColor(ColorUtils.GetColor(_lightColor));
     }
 

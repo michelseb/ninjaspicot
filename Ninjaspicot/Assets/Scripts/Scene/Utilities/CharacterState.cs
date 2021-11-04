@@ -10,10 +10,11 @@ public enum StateType
     Return = 4,
     Patrol = 5,
     Guard = 6,
-    LookFor = 7
+    LookFor = 7,
+    Communicate = 8
 }
 
-public class CharacterState : MonoBehaviour, IPoolable
+public class CharacterState : Dynamic, IPoolable
 {
     [SerializeField] private Transform _text;
 
@@ -21,9 +22,7 @@ public class CharacterState : MonoBehaviour, IPoolable
 
     public StateType StateType { get; private set; }
     public StateType NextState { get; private set; }
-    private Transform _transform;
     private TextMeshPro _textMesh;
-    public Transform Transform { get { if (_transform == null) _transform = transform; return _transform; } }
 
     private void Awake()
     {

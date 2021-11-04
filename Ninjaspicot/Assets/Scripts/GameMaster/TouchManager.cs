@@ -36,7 +36,7 @@ public class TouchManager : MonoBehaviour
 
     private Hero _hero;
     private Stickiness _stickiness;
-    private HeroJumper _jumper;
+    private Jumper _jumper;
     private DynamicInteraction _dynamicInteraction;
     private PoolManager _poolManager;
     private Camera _uiCamera;
@@ -58,7 +58,7 @@ public class TouchManager : MonoBehaviour
         _uiCamera = UICamera.Instance.Camera;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
-        _jumper = _hero?.Jumper as HeroJumper;
+        _jumper = _hero?.Jumper;
         _dynamicInteraction = _hero?.DynamicInteraction;
     }
 
@@ -278,7 +278,7 @@ public class TouchManager : MonoBehaviour
                 return false;
 
             _stickiness = _hero.Stickiness;
-            _jumper = _hero.Jumper as HeroJumper;
+            _jumper = _hero.Jumper;
             _dynamicInteraction = _hero.DynamicInteraction;
         }
 

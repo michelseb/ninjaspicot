@@ -15,10 +15,10 @@ GameObject:
   - component: {fileID: 1841701222820660752}
   - component: {fileID: 3934065171067104200}
   - component: {fileID: 6793037721863660851}
-  - component: {fileID: 8631102188215572813}
   - component: {fileID: 9131827216875105256}
   - component: {fileID: -2423949984176087067}
   - component: {fileID: 8982027021254741701}
+  - component: {fileID: 2190823321023425}
   m_Layer: 8
   m_Name: Rice Ninja
   m_TagString: hero
@@ -214,6 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightColor: 3
+  _startAwake: 0
   _ghostSpacing: 0.1
 --- !u!114 &6793037721863660851
 MonoBehaviour:
@@ -227,21 +228,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57415deada7118a4ba18d49900802c9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8631102188215572813
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1461450235665576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c28c3003f12c9d42a9aee61864a1046, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxJumps: 1
-  _strength: 65
-  JumpMode: 0
 --- !u!114 &9131827216875105256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,6 +469,21 @@ MonoBehaviour:
   - {x: 0.07953479, y: -0.10043103, z: 0}
   - {x: 0.0598567, y: 0.09653527, z: 0}
   - {x: -0.08343573, y: 0.091295406, z: 0}
+--- !u!114 &2190823321023425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461450235665576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb4b19e1e9960294684af6e95360b6de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxJumps: 1
+  _strength: 65
+  JumpMode: 0
 --- !u!1 &1795478475975656
 GameObject:
   m_ObjectHideFlags: 0

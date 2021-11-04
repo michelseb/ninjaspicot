@@ -10,7 +10,7 @@ public class Aim : FieldOfView
         if (!Active)
             return;
 
-        var dist = Vector3.Distance(Hero.Instance.transform.position, _transform.position);
+        var dist = Vector3.Distance(Hero.Instance.Transform.position, Transform.position);
         TargetInRange = dist < _size;
         if (!TargetInRange && TargetInView)
         {
@@ -63,7 +63,7 @@ public class Aim : FieldOfView
         if (target == null || !TargetInView)
             return false;
 
-        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
+        var hit = Utils.LineCast(Transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }
@@ -73,7 +73,7 @@ public class Aim : FieldOfView
         if (target == null || !TargetInRange)
             return false;
 
-        var hit = Utils.LineCast(_transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
+        var hit = Utils.LineCast(Transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }

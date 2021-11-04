@@ -1,19 +1,18 @@
 ﻿using UnityEngine;
 
-public class AimableLocation : MonoBehaviour, IFocusable, ISceneryWakeable
+public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
 {
     private Hero _hero;
     public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
     public bool IsSilent => true;
-
-    private Transform _transform;
-    public Transform Transform { get { if (_transform == null) _transform = transform; return _transform; } }
 
     public bool Active { get; set; }
     public bool Taken => !Active;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+
+    public bool FocusedByNormalJump => true;
 
     protected Animator _animator;
     protected SpriteRenderer _renderer;

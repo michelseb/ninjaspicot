@@ -13,6 +13,8 @@ public class Generator : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastab
     public bool IsSilent => false;
     public bool Taken => false;
 
+    public bool FocusedByNormalJump => false;
+
     private Lamp _light;
 
     private void Awake()

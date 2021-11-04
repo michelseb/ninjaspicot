@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class FieldOfView : MonoBehaviour, IActivable
+public class FieldOfView : Dynamic, IActivable
 {
     [SerializeField] protected float _size;
     [SerializeField] protected float _viewAngle;
@@ -21,7 +21,6 @@ public class FieldOfView : MonoBehaviour, IActivable
     protected PolygonCollider2D _collider;
     protected MeshRenderer _renderer;
     protected Color _color;
-    protected Transform _transform;
     private Vertex[] _vertices;
     private ContactFilter2D _contactFilter;
     private bool _isVisible;
@@ -39,11 +38,10 @@ public class FieldOfView : MonoBehaviour, IActivable
 
     protected virtual void Awake()
     {
-        _transform = transform;
         _renderer = GetComponent<MeshRenderer>();
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
-        _parent = _transform.parent?.GetComponent<IRaycastable>();
+        _parent = Transform.parent?.GetComponent<IRaycastable>();
 
         if (_customColor != CustomColor.None)
         {
@@ -111,7 +109,7 @@ public class FieldOfView : MonoBehaviour, IActivable
     {
         var mesh = new Mesh();
 
-        var initRotation = _transform.rotation;
+        var initRotation = Transform.rotation;
 
         _vertices = new Vertex[pointCount + 1];
         var uvs = new Vector2[pointCount + 1];
@@ -169,7 +167,7 @@ public class FieldOfView : MonoBehaviour, IActivable
     private bool UpdateVertices(float size, int pointCount)
     {
         var updated = false;
-        var direction = (_angleAxis * _transform.up).normalized;
+        var direction = (_angleAxis * Transform.up).normalized;
 
         for (int i = 1; i <= pointCount; i++)
         {
@@ -181,11 +179,11 @@ public class FieldOfView : MonoBehaviour, IActivable
             //Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
 
             var results = new RaycastHit2D[1];
-            var hits = Physics2D.Raycast(_transform.position, direction, _contactFilter, results, size);
+            var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size);
             if (hits > 0)
             {
                 _vertices[i].Modified = true;
-                _vertices[i].ModifiedPos = _transform.InverseTransformPoint(results[0].point);
+                _vertices[i].ModifiedPos = Transform.InverseTransformPoint(results[0].point);
                 updated = true;
             }
             else if (_vertices[i].Modified)

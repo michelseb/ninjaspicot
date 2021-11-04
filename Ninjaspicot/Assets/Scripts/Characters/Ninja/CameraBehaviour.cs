@@ -17,7 +17,7 @@ public enum CameraMode
 }
 
 
-public class CameraBehaviour : MonoBehaviour
+public class CameraBehaviour : Dynamic
 {
     [SerializeField]
     private int _beginZoom;
@@ -28,7 +28,6 @@ public class CameraBehaviour : MonoBehaviour
     private Hero _hero;
     private Transform _heroTransform;
     private Stickiness _heroStickiness;
-    private Transform _transform;
     private Vector3 _centerPos;
     private Vector3 _velocity;
     private Vector3 _normalOffset;
@@ -45,8 +44,7 @@ public class CameraBehaviour : MonoBehaviour
     private void Awake()
     {
         MainCamera = GetComponent<Camera>();
-        _transform = transform;
-        ParentTransform = _transform.parent.transform;
+        ParentTransform = Transform.parent.transform;
 
         Screen.orientation = ScreenOrientation.LandscapeLeft;
 
@@ -205,7 +203,7 @@ public class CameraBehaviour : MonoBehaviour
 
     private IEnumerator Shake(float duration, float strength)
     {
-        var pos = _transform.localPosition;
+        var pos = Transform.localPosition;
 
         float ellapsed = 0;
 
@@ -214,12 +212,12 @@ public class CameraBehaviour : MonoBehaviour
             float x = Random.Range(-1f, 1f) * strength;
             float y = Random.Range(-1f, 1f) * strength;
 
-            _transform.localPosition = new Vector3(x, y, pos.z);
+            Transform.localPosition = new Vector3(x, y, pos.z);
 
             ellapsed += Time.deltaTime;
             yield return null;
         }
 
-        _transform.localPosition = pos;
+        Transform.localPosition = pos;
     }
 }

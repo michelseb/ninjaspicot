@@ -8,7 +8,7 @@ public enum AccessGrant
     No = 2
 }
 
-public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable
+public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable, IWakeable
 {
     [SerializeField] protected GameObject _activableObject;
     private int _collidingAmount;
@@ -56,6 +56,7 @@ public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable
         if (collision.CompareTag("hero") && !Hero.Instance.Dead)
         {
             _zoneManager.SetZone(Zone);
+            Sleep();
         }
 
         _collidingAmount++;
@@ -152,5 +153,13 @@ public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable
         _accessGrant = AccessGrant.No;
         SetActiveColor(AccessGrant.No);
         _activable.Deactivate();
+    }
+
+    public void Sleep()
+    {
+    }
+
+    public void Wake()
+    {
     }
 }

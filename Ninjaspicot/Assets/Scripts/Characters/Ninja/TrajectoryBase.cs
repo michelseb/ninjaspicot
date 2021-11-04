@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class TrajectoryBase : MonoBehaviour, IPoolable
+public abstract class TrajectoryBase : Dynamic, IPoolable
 {
     public bool Used { get; protected set; }
     public bool Active { get; protected set; }
@@ -12,7 +12,6 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     public abstract JumpMode JumpMode { get; }
 
     protected LineRenderer _line;
-    protected Transform _transform;
     protected TimeManager _timeManager;
     protected PoolManager _poolManager;
     protected Jumper _jumper;
@@ -28,7 +27,6 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
     public PoolableType PoolableType => PoolableType.None;
     protected virtual void Awake()
     {
-        _transform = transform;
         _timeManager = TimeManager.Instance;
         _poolManager = PoolManager.Instance;
         _line = GetComponent<LineRenderer>();
@@ -93,7 +91,7 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     public virtual void ReUse(Vector3 position)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
+        Transform.position = new Vector3(position.x, position.y, -5);
         Appear();
     }
 
@@ -116,8 +114,8 @@ public abstract class TrajectoryBase : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
         Appear();
     }
 

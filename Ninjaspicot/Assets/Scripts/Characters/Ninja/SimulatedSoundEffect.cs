@@ -1,11 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class SimulatedSoundEffect : MonoBehaviour, IPoolable
+public class SimulatedSoundEffect : Dynamic, IPoolable
 {
-    private Transform _transform;
-    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
-
     private SpriteRenderer _renderer;
 
     public PoolableType PoolableType => PoolableType.None;

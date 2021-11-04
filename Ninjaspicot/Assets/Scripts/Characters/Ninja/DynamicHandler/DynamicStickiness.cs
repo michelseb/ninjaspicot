@@ -61,7 +61,7 @@ public class DynamicStickiness : Stickiness
 
             jointMotor.motorSpeed = speedFactor;
             hinge.motor = jointMotor;
-            hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
+            hinge.anchor = Transform.InverseTransformPoint(GetContactPosition());
 
             yield return null;
         }

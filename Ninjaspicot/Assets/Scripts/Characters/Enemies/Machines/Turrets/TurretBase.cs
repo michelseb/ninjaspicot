@@ -8,11 +8,8 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     public enum Mode { Scan, LookFor, Aim, Wonder };
 
     [SerializeField] protected float _viewAngle;
-    [SerializeField] protected float _rotationSpeed;
     [SerializeField] protected bool _clockWise;
     [SerializeField] protected float _initRotation;
-    [SerializeField] protected float _aimSpeed;
-    [SerializeField] protected float _searchSpeed;
     [SerializeField] protected float _wonderTime;
     [SerializeField] protected Transform _shootingPosition;
     [SerializeField] protected Transform _turretHead;
@@ -39,7 +36,6 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
         base.Awake();
         _aim = GetComponentInChildren<Aim>();
         _image = _turretHead.GetComponent<Image>();
-        _aimSpeed = .5f;
     }
 
     protected override void Start()
@@ -83,19 +79,18 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 
     public virtual void Aim(IKillable target)
     {
-        var speed = _aim.TargetInView ? _aimSpeed : _searchSpeed;
-        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - _turretHead.position), speed);
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - _turretHead.position), GetRotateSpeed());
     }
 
     public virtual void LookFor()
     {
-        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _turretHead.position), _searchSpeed);
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _turretHead.position), GetRotateSpeed());
     }
 
     protected virtual void Scan()
     {
         var dir = _clockWise ? 1 : -1;
-        _turretHead.Rotate(0, 0, _rotationSpeed * Time.deltaTime * dir);
+        _turretHead.Rotate(0, 0, _rotateSpeed * Time.deltaTime * dir);
 
         if (dir * (_turretHead.rotation.eulerAngles.z - _initRotation) > _viewAngle)
         {
@@ -203,7 +198,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
         throw new NotImplementedException();
     }
 
-    protected override Action GetActionFromState(StateType stateType, object parameter = null)
+    protected override Action GetActionFromState(StateType stateType, StateType? nextState = null)
     {
         return null;
     }

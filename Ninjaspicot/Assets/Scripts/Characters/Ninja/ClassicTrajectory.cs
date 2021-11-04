@@ -67,7 +67,7 @@ public class ClassicTrajectory : TrajectoryBase
         if (!hit.collider.TryGetComponent(out IFocusable focusable))
             return false;
 
-        if (focusable.Taken)
+        if (focusable.Taken || !focusable.FocusedByNormalJump)
             return false;
 
 

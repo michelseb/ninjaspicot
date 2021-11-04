@@ -22,11 +22,15 @@ public class Zone : MonoBehaviour, IWakeable
     // Hack for door that is in the next zone
     [SerializeField] private List<GameObject> _additionalResettables;
     protected List<IResettable> _resettables;
+    protected List<Enemy> _enemies;
     protected ZoneManager _zoneManager;
     protected Animator _animator;
     protected CheckPoint _checkpoint;
     protected SpawnManager _spawnManager;
+    protected Ambiant _ambiant;
     public ZoneManager ZoneManager { get { if (Utils.IsNull(_zoneManager)) _zoneManager = ZoneManager.Instance; return _zoneManager; } }
+
+    public bool DeathOccured => _enemies?.Any(e => e.Dead) ?? false;
 
     private long _id;
     public long Id { get { if (_id == 0) _id = GetInstanceID(); return _id; } }
@@ -35,12 +39,14 @@ public class Zone : MonoBehaviour, IWakeable
     {
         _animator = GetComponent<Animator>();
         _spawnManager = SpawnManager.Instance;
+        _ambiant = GetComponentInChildren<Ambiant>();
     }
 
     protected virtual void Start()
     {
         _wakeables = GetComponentsInChildren<ISceneryWakeable>().ToList();
         _resettables = GetComponentsInChildren<IResettable>().ToList();
+        _enemies = GetComponentsInChildren<Enemy>().ToList();
         ZoneManager.AddZone(this);
         _checkpoint = GetComponentInChildren<CheckPoint>();
     }
@@ -97,6 +103,13 @@ public class Zone : MonoBehaviour, IWakeable
             item.Sleep();
         }
     }
+
+    public void ActivateAlarm()
+    {
+        _ambiant.SetColor(CustomColor.DarkRed, 1.5f);
+        _enemies.ForEach(e => e.SetState(StateType.LookFor));
+    }
+
 
     protected virtual void SetSpawn()
     {

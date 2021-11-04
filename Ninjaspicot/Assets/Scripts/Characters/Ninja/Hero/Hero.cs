@@ -10,8 +10,8 @@ public class Hero : Character, INinja, ITriggerable
     public bool Detected { get; private set; }
     public bool Visible { get; private set; }
 
-    private HeroJumper _jumper;
-    public Jumper Jumper { get { if (Utils.IsNull(_jumper)) _jumper = GetComponent<HeroJumper>(); return _jumper; } }
+    private Jumper _jumper;
+    public Jumper Jumper { get { if (Utils.IsNull(_jumper)) _jumper = GetComponent<Jumper>(); return _jumper; } }
 
     private HeroStickiness _stickiness;
     public Stickiness Stickiness { get { if (Utils.IsNull(_stickiness)) _stickiness = GetComponent<HeroStickiness>(); return _stickiness; } }

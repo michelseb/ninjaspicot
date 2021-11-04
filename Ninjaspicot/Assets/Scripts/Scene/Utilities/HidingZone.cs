@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
 
-public class HidingZone : MonoBehaviour
+public class HidingZone : MonoBehaviour, IFocusable
 {
-    private AimableLocation _aimableLocation;
     private Hero _hero;
     public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
 
+    public bool IsSilent => true;
+
+    public bool Active { get; set; }
+    public bool Taken => !Active;
+
+    public bool FocusedByNormalJump => true;
+
     private void Awake()
     {
-        _aimableLocation = GetComponentInChildren<AimableLocation>();
         ActivateLocation();
     }
 
@@ -37,17 +42,11 @@ public class HidingZone : MonoBehaviour
 
     private void ActivateLocation()
     {
-        if (_aimableLocation == null)
-            return;
-
-        _aimableLocation.Active = true;
+        Active = true;
     }
 
     private void DeactivateLocation()
     {
-        if (_aimableLocation == null)
-            return;
-
-        _aimableLocation.Active = false;
+        Active = false;
     }
 }

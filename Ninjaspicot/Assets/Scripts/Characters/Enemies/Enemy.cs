@@ -6,8 +6,22 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
 {
     [SerializeField] protected StateType _initState;
     [SerializeField] protected Collider2D _castArea;
+    [SerializeField] protected float _rotateSpeed;
+    [SerializeField] protected float _moveSpeed;
 
     protected CharacterState _state;
+    public CharacterState State
+    {
+        get
+        {
+            if (Utils.IsNull(_state))
+            {
+                SetState(_initState);
+            }
+            return _state;
+        }
+    }
+
     public bool Attacking { get; protected set; }
     public bool Active { get; protected set; }
 
@@ -15,8 +29,10 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     #region IFocusable
-    public bool IsSilent => false;
-    public bool Taken => true;
+    public bool IsSilent => true;
+    public bool Taken => false;
+
+    public bool FocusedByNormalJump => false;
     #endregion
 
     protected Animator _animator;
@@ -28,12 +44,12 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     {
         base.Awake();
         _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        Active = _startAwake;
     }
 
     protected override void Start()
     {
         base.Start();
-        SetState(_initState);
         _resetPosition = Transform.position;
         _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
     }
@@ -93,7 +109,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         _animator.SetTrigger("Sleep");
 
         _characterLight.Sleep();
-        if (!Utils.IsNull(_state)) _state?.Sleep();
+        State.Sleep();
     }
 
     public virtual void Wake()
@@ -114,12 +130,13 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         //}
 
         _animator.SetTrigger("Wake");
+        SetState(_initState);
 
         _characterLight.Wake();
-        if (!Utils.IsNull(_state)) _state.Wake();
+        State.Wake();
     }
 
-    public void SetState(StateType stateType, object parameter = null)
+    public void SetState(StateType stateType, StateType? nextState = null)
     {
         if (Utils.IsNull(_state))
         {
@@ -133,33 +150,30 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         _state.SetState(stateType);
 
         // Launch related action
-        GetActionFromState(stateType, parameter)?.Invoke();
+        GetActionFromState(stateType, nextState)?.Invoke();
     }
 
     public void SetNextState(StateType stateType)
     {
-        if (Utils.IsNull(_state))
-            return;
-
-        _state.SetNextState(stateType);
+        State.SetNextState(stateType);
     }
 
     public bool IsState(StateType stateType)
     {
-        return _state.StateType == stateType;
+        return State.StateType == stateType;
     }
 
     public bool IsNextState(StateType stateType)
     {
-        return _state.NextState == stateType;
+        return State.NextState == stateType;
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1)
     {
         if (!Utils.IsNull(_state))
         {
-            _state.Transform.parent = null;
-            _state.Sleep();
+            Destroy(_state.gameObject);
+            _state = null;
         }
 
         if (!Utils.IsNull(_castArea))
@@ -191,9 +205,58 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
             Image.transform.rotation = _resetRotation;
         }
 
+        if (!Utils.IsNull(_animator)) _animator.Rebind();
+        if (!Utils.IsNull(_animator)) _animator.Update(0);
+
         Dead = false;
         Wake();
     }
 
-    protected abstract Action GetActionFromState(StateType stateType, object parameter = null);
+    protected float GetRotateSpeed()
+    {
+        return _rotateSpeed * Time.deltaTime * GetRotationSpeedFactor(State.StateType);
+    }
+
+    protected float GetMovementSpeed()
+    {
+        return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType);
+    }
+
+    protected float GetMovementSpeedFactor(StateType stateType)
+    {
+        switch (stateType)
+        {
+            case StateType.Patrol:
+            case StateType.Guard:
+            case StateType.Return:
+                return 1f;
+            case StateType.Check:
+                return 1.5f;
+            case StateType.Chase:
+            case StateType.LookFor:
+                return 1.8f;
+            default:
+                return 0;
+        }
+    }
+
+    protected float GetRotationSpeedFactor(StateType stateType)
+    {
+        switch (stateType)
+        {
+            case StateType.Patrol:
+            case StateType.Guard:
+            case StateType.Return:
+                return 1f;
+            case StateType.Check:
+                return 1.5f;
+            case StateType.Chase:
+            case StateType.LookFor:
+                return 2f;
+            default:
+                return 0;
+        }
+    }
+
+    protected abstract Action GetActionFromState(StateType stateType, StateType? nextState = null);
 }

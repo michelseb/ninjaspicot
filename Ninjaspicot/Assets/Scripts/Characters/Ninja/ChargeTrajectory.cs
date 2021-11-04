@@ -63,7 +63,10 @@ public class ChargeTrajectory : TrajectoryBase
                 hit = StepClearWall(linePosition, chargePos - linePosition, CHARGE_LENGTH);
                 SetAudioSimulator(_line.GetPosition(1), 5);
                 DeactivateAim();
-                chargePos = hit.point;
+                if (hit)
+                {
+                    chargePos = hit.point;
+                }
             }
         }
 

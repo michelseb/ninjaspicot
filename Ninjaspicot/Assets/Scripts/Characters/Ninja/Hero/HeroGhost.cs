@@ -1,19 +1,17 @@
 ﻿using UnityEngine;
 
-public class HeroGhost : MonoBehaviour, IPoolable
+public class HeroGhost : Dynamic, IPoolable
 {
     [SerializeField] private float _disappearingSpeed;
     [SerializeField] private float _initAlpha;
     [SerializeField] private Color _endColor;
 
     private SpriteRenderer _renderer;
-    private Transform _transform;
     public PoolableType PoolableType => PoolableType.None;
     private Vector3 _initSize;
 
     private void Awake()
     {
-        _transform = transform;
         _renderer = GetComponent<SpriteRenderer>();
     }
 
@@ -34,16 +32,16 @@ public class HeroGhost : MonoBehaviour, IPoolable
 
     public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = position;
-        _transform.rotation = rotation;
-        _initSize = _transform.localScale;
-        _transform.localScale = new Vector3(_transform.localScale.x * size, _transform.localScale.y * size);
+        Transform.position = position;
+        Transform.rotation = rotation;
+        _initSize = Transform.localScale;
+        Transform.localScale = new Vector3(_initSize.x * size, _initSize.y * size);
     }
 
     public void Sleep()
     {
         gameObject.SetActive(false);
-        _transform.localScale = _initSize;
+        Transform.localScale = _initSize;
     }
 
     public void Wake()

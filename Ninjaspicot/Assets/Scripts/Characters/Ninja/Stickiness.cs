@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Stickiness : MonoBehaviour, IDynamic
+public class Stickiness : Dynamic, IDynamic
 {
     [SerializeField] protected float _speed;
     protected Rigidbody2D _rigidbody;
@@ -14,7 +14,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     public bool CanWalk { get; set; }
     public bool Walking => _walkOnWalls != null;
     public float CurrentSpeed { get; set; }
-    public Transform Transform => _transform;
     public Transform ContactPoint { get; private set; }
     public Rigidbody2D Rigidbody { get { if (_rigidbody == null) _rigidbody = GetComponent<Rigidbody2D>(); return _rigidbody; } }
     public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
@@ -28,7 +27,6 @@ public class Stickiness : MonoBehaviour, IDynamic
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     protected Jumper _jumper;
-    protected Transform _transform;
     private float _velocityBeforePhysicsUpdate;
     private float _detachTime;
     private Vector2 _detachPos;
@@ -39,14 +37,13 @@ public class Stickiness : MonoBehaviour, IDynamic
             return;
 
         Active = true;
-        _transform = transform;
         WallJoint = GetComponent<HingeJoint2D>();
         _jumper = GetComponent<Jumper>();
         _rigidbody = _rigidbody ?? GetComponent<Rigidbody2D>();
         _collider = _collider ?? GetComponent<Collider2D>();
         ContactPoint = new GameObject("ContactPoint").transform;
-        ContactPoint.position = _transform.position;
-        ContactPoint.SetParent(_transform);
+        ContactPoint.position = Transform.position;
+        ContactPoint.SetParent(Transform);
         _previousContactPoint = ContactPoint.position;
     }
 
@@ -87,7 +84,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         if (dynamic != null && !dynamic.DynamicActive)
             return false;
 
-        var anchorPos = _transform.InverseTransformPoint(GetContactPosition());
+        var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
         var deltaTime = Time.time - _detachTime;
         var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
 
@@ -205,7 +202,7 @@ public class Stickiness : MonoBehaviour, IDynamic
         {
             jointMotor.motorSpeed = CurrentSpeed;
             hinge.motor = jointMotor;
-            hinge.anchor = _transform.InverseTransformPoint(GetContactPosition());
+            hinge.anchor = Transform.InverseTransformPoint(GetContactPosition());
 
             yield return null;
         }

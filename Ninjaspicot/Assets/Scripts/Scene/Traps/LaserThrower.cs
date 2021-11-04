@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
 
-public class LaserThrower : MonoBehaviour, ISceneryWakeable, IRaycastable, IResettable
+public class LaserThrower : Dynamic, ISceneryWakeable, IRaycastable, IResettable
 {
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     private PoolManager _poolManager;
-
-    private Transform _transform;
-    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }

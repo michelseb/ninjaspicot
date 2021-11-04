@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, IResettable
+public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IResettable
 {
 
-    [SerializeField] protected RectTransform _start;
-    [SerializeField] protected RectTransform _end;
+    [SerializeField] protected LaserEnd _start;
+    [SerializeField] protected LaserEnd _end;
     [SerializeField] protected bool _horizontal;
     [SerializeField] protected bool _startAwake;
     [SerializeField] protected int _updateTime;
@@ -17,26 +17,27 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
     protected PolygonCollider2D _collider;
     protected bool _active;
     protected int _pointsAmount;
+    protected RectTransform _startTransform, _endTransform;
     protected Vector3 _startPosition, _endPosition;
     private AudioManager _audioManager;
     private Zone _zone;
     private Audio _electrocutionSound;
-    private bool _broken;
+    protected bool _broken;
+    protected bool _isDynamic;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     private int _id;
     public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
-    private Transform _transform;
-    public Transform Transform { get { if (Utils.IsNull(_transform)) _transform = transform; return _transform; } }
-
     private Vector3[] _laserPositions;
 
     protected virtual void Awake()
     {
+        _startTransform = (RectTransform)_start.Transform;
+        _endTransform = (RectTransform)_end.Transform;
         _laser = GetComponent<LineRenderer>();
         _collider = GetComponent<PolygonCollider2D>();
-        _pointsAmount = (int)((_end.position - _start.position).magnitude / 2);
+        _pointsAmount = (int)((_endTransform.position - _startTransform.position).magnitude / 2);
         _laserPositions = new Vector3[_pointsAmount];
         _audioManager = AudioManager.Instance;
         if (_startAwake)
@@ -49,10 +50,11 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
     {
         _laser.positionCount = _pointsAmount;
         _electrocutionSound = _audioManager.FindAudioByName("Electrocution");
-        _startPosition = _start.localPosition;
-        _endPosition = _end.localPosition;
+        _startPosition = _startTransform.localPosition;
+        _endPosition = _endTransform.localPosition;
+        _isDynamic = _start.IsDynamic || _end.IsDynamic;
 
-        SetCollider();
+        UpdateCollider();
         InitPointsPosition();
         SetPointsPosition();
     }
@@ -62,12 +64,21 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
         if (!_active)
             return;
 
+        if (_isDynamic)
+        {
+            _startPosition = _startTransform.localPosition;
+            _endPosition = _endTransform.localPosition;
+
+            UpdateCollider();
+        }
+
         if (Time.frameCount % _updateTime == 0)
         {
             SetPointsPosition();
         }
 
         MovePoints();
+
     }
 
     protected virtual void MovePoints()
@@ -82,8 +93,8 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
 
     protected virtual void InitPointsPosition()
     {
-        _laser.SetPosition(0, _startPosition + _start.right);
-        _laser.SetPosition(_pointsAmount - 1, _endPosition + _end.right);
+        _laser.SetPosition(0, _startPosition + _startTransform.right);
+        _laser.SetPosition(_pointsAmount - 1, _endPosition + _endTransform.right);
 
         for (int i = 1; i < _pointsAmount - 1; i++)
         {
@@ -94,12 +105,20 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
 
     protected virtual void SetPointsPosition()
     {
+        if (_isDynamic)
+        {
+            _laser.SetPosition(0, _startPosition + _startTransform.right);
+            _laser.SetPosition(_pointsAmount - 1, _endPosition + _endTransform.right);
+        }
+
         var delta = Random.Range(-_width, _width); // -1 or 1 * width
+        var direction = (_endPosition - _startPosition).normalized;
+        var normal = new Vector3(direction.y, -direction.x);
 
         for (int i = 1; i < _pointsAmount - 1; i++)
         {
             var mid = _startPosition + ((_endPosition - _startPosition) * (i + 1) / _pointsAmount);
-            _laserPositions[i] = mid + Vector3.up * delta;
+            _laserPositions[i] = mid + normal * delta;
             delta *= Random.Range(-_amplitude - _amplitudeTurbulance, -_amplitude + _amplitudeTurbulance);
             delta += Random.Range(-_variation, _variation);
             delta = Mathf.Clamp(delta, -_width, _width);
@@ -114,12 +133,12 @@ public class Laser : MonoBehaviour, ISceneryWakeable, IActivable, IRaycastable, 
         }
     }
 
-    protected virtual void SetCollider()
+    protected virtual void UpdateCollider()
     {
         var startCorners = new Vector3[4];
         var endCorners = new Vector3[4];
-        _start.GetWorldCorners(startCorners);
-        _end.GetWorldCorners(endCorners);
+        _startTransform.GetWorldCorners(startCorners);
+        _endTransform.GetWorldCorners(endCorners);
 
         if (_horizontal)
         {

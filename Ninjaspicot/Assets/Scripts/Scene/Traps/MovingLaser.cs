@@ -34,7 +34,7 @@ public class MovingLaser : Laser
     {
         base.SetPointsPosition();
 
-        _laser.SetPosition(0, _start.position + _start.right);
-        _laser.SetPosition(_pointsAmount - 1, _end.position + _end.right);
+        _laser.SetPosition(0, _startTransform.position + _startTransform.right);
+        _laser.SetPosition(_pointsAmount - 1, _endTransform.position + _endTransform.right);
     }
 }
