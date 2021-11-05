@@ -46,31 +46,6 @@ public class SpiderBot : Robot
         _targetY = _body.position.y;
     }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        CheckGround();
-        CheckWall();
-        _body.Translate(_body.right * _moveSpeed * Time.deltaTime);
-
-        if (_moveSpeed != 0)
-        {
-            _moveDirection = Mathf.Sign(_moveSpeed);
-        }
-
-        var targetPos = new Vector3(_body.position.x, _targetY);
-
-        if (!_robotLegs.Any(x => x.Grounded))
-        {
-            targetPos += Vector3.down;
-        }
-
-        _body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
-        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * _moveDirection), GetRotateSpeed());
-
-    }
-
     private void CheckGround()
     {
         var hit = Utils.RayCast(_body.position, new Vector2(_moveDirection, -1), 8, includeTriggers: false);
@@ -100,10 +75,11 @@ public class SpiderBot : Robot
     private IEnumerator Pause(float speed)
     {
         _moveSpeed = 0;
+        _robotLegs.ForEach(leg => leg.ResetCurrentTarget());
+
         yield return new WaitForSeconds(3);
 
         Flip(speed);
-        _robotLegs.ForEach(leg => leg.ResetCurrentTarget());
         _pause = null;
     }
 
@@ -185,6 +161,25 @@ public class SpiderBot : Robot
     #region Guard
     protected override void Patrol()
     {
+        CheckGround();
+        CheckWall();
+        _body.Translate(_body.right * _moveSpeed * Time.deltaTime);
+
+        if (_moveSpeed != 0)
+        {
+            _moveDirection = Mathf.Sign(_moveSpeed);
+        }
+
+        var targetPos = new Vector3(_body.position.x, _targetY);
+
+        if (!_robotLegs.Any(x => x.Grounded))
+        {
+            targetPos += Vector3.down;
+        }
+
+        _body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * _moveDirection), GetRotateSpeed());
+
     }
     #endregion
 

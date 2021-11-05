@@ -38,6 +38,7 @@ public class RobotLeg : Dynamic
     public void ResetCurrentTarget()
     {
         _currentTarget = _legTarget.Transform.position + Vector3.right * _liftTiming;
+        Transform.position = _currentTarget;
     }
 
     public void LaunchMove()
