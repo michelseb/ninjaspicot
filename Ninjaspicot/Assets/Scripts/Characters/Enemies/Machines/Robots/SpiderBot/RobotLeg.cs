@@ -4,10 +4,10 @@ using UnityEngine;
 public class RobotLeg : Dynamic
 {
     [SerializeField] private LegTarget _legTarget;
-    [SerializeField] private float _liftTiming;
+    [SerializeField] private int _index;
 
     private Vector2 _currentTarget;
-    private const float REPLACEMENT_DISTANCE_THRESHOLD = 1.5f;
+    private const float REPLACEMENT_DISTANCE_THRESHOLD = 2f;
     private Coroutine _moveLeg;
     private SpiderBot _spiderBot;
     public bool Grounded => _moveLeg == null;
@@ -20,7 +20,7 @@ public class RobotLeg : Dynamic
     private void Start()
     {
         _legTarget.CheckGround();
-        ResetCurrentTarget();
+        InitTarget();
     }
     private void Update()
     {
@@ -29,16 +29,24 @@ public class RobotLeg : Dynamic
 
     private void UpdateTarget()
     {
-        if (_moveLeg != null || Mathf.Abs(_currentTarget.x - _legTarget.Transform.position.x) < REPLACEMENT_DISTANCE_THRESHOLD)
+        if (_moveLeg != null || Vector3.Distance(_currentTarget, _legTarget.Transform.position) < REPLACEMENT_DISTANCE_THRESHOLD || _index != _spiderBot.MovingLegsIndex)
             return;
 
         LaunchMove();
     }
 
-    public void ResetCurrentTarget()
+    public void InitTarget()
     {
-        _currentTarget = _legTarget.Transform.position + Vector3.right * _liftTiming;
-        Transform.position = _currentTarget;
+        //_legTarget.Transform.position += Vector3.right * (_liftTiming /*+ _spiderBot.LegsSpeed / 100*/);
+        _currentTarget = _legTarget.Transform.position;
+        //Transform.position = _currentTarget;
+    }
+
+    public void FlipTarget()
+    {
+        var targetPos = _legTarget.Transform.position;
+        var legPos = Transform.position;
+        _legTarget.Transform.position = -targetPos + 2 * legPos;
     }
 
     public void LaunchMove()
@@ -57,7 +65,7 @@ public class RobotLeg : Dynamic
             yield return null;
         }
 
-        _currentTarget = _legTarget.Transform.position + _spiderBot.LegsStabilizationFactor * Transform.right * Mathf.Sign(_spiderBot.Speed);
+        _currentTarget = _legTarget.Transform.position; //+ _spiderBot.LegsStabilizationFactor * Transform.right * Mathf.Sign(_spiderBot.Speed);
 
         while (Vector2.Distance(_currentTarget, Transform.position) > .5f)
         {
@@ -65,7 +73,8 @@ public class RobotLeg : Dynamic
             yield return null;
         }
 
+        //Transform.position = _currentTarget;
         _moveLeg = null;
-
+        _spiderBot.ChangeMovingLegs(1 - _index);
     }
 }

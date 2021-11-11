@@ -106,7 +106,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
 
         //Collider.enabled = false;
 
-        _animator.SetTrigger("Sleep");
+        if (!Utils.IsNull(_animator)) _animator.SetTrigger("Sleep");
 
         _characterLight.Sleep();
         State.Sleep();
@@ -129,7 +129,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         //    Image.enabled = true;
         //}
 
-        _animator.SetTrigger("Wake");
+        if (!Utils.IsNull(_animator)) _animator.SetTrigger("Wake");
         SetState(_initState);
 
         _characterLight.Wake();

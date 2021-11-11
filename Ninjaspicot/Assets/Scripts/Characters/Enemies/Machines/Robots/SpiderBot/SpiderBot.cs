@@ -9,6 +9,8 @@ public class SpiderBot : Robot
     [SerializeField] private float _legsSpeed;
     [SerializeField] private float _legsStabilizationFactor;
 
+    public int MovingLegsIndex = 0;
+
 
     public override SpriteRenderer Renderer
     {
@@ -25,11 +27,11 @@ public class SpiderBot : Robot
 
     protected Coroutine _lookAt;
 
-    public float Speed => _moveSpeed;
+    //public float Speed => _moveSpeed;
     public float LegsSpeed => _legsSpeed;
     public float LegsStabilizationFactor => _legsStabilizationFactor;
     private float _targetY;
-    private Coroutine _pause;
+    //private Coroutine _pause;
     private float _moveDirection;
 
     private List<RobotLeg> _robotLegs;
@@ -56,10 +58,14 @@ public class SpiderBot : Robot
         {
             _targetY = hit.point.y + 2f;
         }
-        else if (_pause == null)
+        else
         {
-            _pause = StartCoroutine(Pause(_moveSpeed));
+            Flip(_moveSpeed);
         }
+        //else if (_pause == null)
+        //{
+        //    _pause = StartCoroutine(Pause(_moveSpeed));
+        //}
     }
 
     private void CheckWall()
@@ -72,21 +78,22 @@ public class SpiderBot : Robot
         }
     }
 
-    private IEnumerator Pause(float speed)
-    {
-        _moveSpeed = 0;
-        _robotLegs.ForEach(leg => leg.ResetCurrentTarget());
+    //private IEnumerator Pause(float speed)
+    //{
+    //    _moveSpeed = 0;
+    //    _robotLegs.ForEach(leg => leg.ResetCurrentTarget());
 
-        yield return new WaitForSeconds(3);
+    //    yield return new WaitForSeconds(3);
 
-        Flip(speed);
-        _pause = null;
-    }
+    //    Flip(speed);
+    //    _pause = null;
+    //}
 
     private void Flip(float speed)
     {
         _moveSpeed = -speed;
         _moveDirection = Mathf.Sign(_moveSpeed);
+        //_robotLegs.ForEach(l => l.FlipTarget());
     }
 
     #region Check
@@ -177,7 +184,7 @@ public class SpiderBot : Robot
             targetPos += Vector3.down;
         }
 
-        _body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
+        //_body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
         _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * _moveDirection), GetRotateSpeed());
 
     }
@@ -201,5 +208,10 @@ public class SpiderBot : Robot
         }
 
         base.DoReset();
+    }
+
+    public void ChangeMovingLegs(int index)
+    {
+        MovingLegsIndex = index;
     }
 }
