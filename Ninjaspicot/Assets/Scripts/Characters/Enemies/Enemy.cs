@@ -9,6 +9,11 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     [SerializeField] protected float _rotateSpeed;
     [SerializeField] protected float _moveSpeed;
 
+    public float MoveDirection { get; set; }
+
+    public float MoveSpeed => GetMovementSpeed();
+    public float RotateSpeed => GetRotateSpeed();
+
     protected CharacterState _state;
     public CharacterState State
     {
@@ -50,6 +55,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     protected override void Start()
     {
         base.Start();
+        MoveDirection = Mathf.Sign(MoveSpeed);
         _resetPosition = Transform.position;
         _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
     }
@@ -212,14 +218,19 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         Wake();
     }
 
-    protected float GetRotateSpeed()
+    protected virtual float GetRotateSpeed()
     {
         return _rotateSpeed * Time.deltaTime * GetRotationSpeedFactor(State.StateType);
     }
 
-    protected float GetMovementSpeed()
+    protected virtual float GetMovementSpeed()
     {
-        return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType);
+        return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType) * MoveDirection;
+    }
+
+    protected virtual void Flip()
+    {
+        MoveDirection *= -1;
     }
 
     protected float GetMovementSpeedFactor(StateType stateType)

@@ -6,11 +6,10 @@ using UnityEngine;
 public class SpiderBot : Robot
 {
     [SerializeField] private Transform _body;
-    [SerializeField] private float _legsSpeed;
-    [SerializeField] private float _legsStabilizationFactor;
-
+    
+    private float _legsSpeed;
     public int MovingLegsIndex = 0;
-
+    public override Transform Transform => _body;
 
     public override SpriteRenderer Renderer
     {
@@ -27,12 +26,8 @@ public class SpiderBot : Robot
 
     protected Coroutine _lookAt;
 
-    //public float Speed => _moveSpeed;
     public float LegsSpeed => _legsSpeed;
-    public float LegsStabilizationFactor => _legsStabilizationFactor;
     private float _targetY;
-    //private Coroutine _pause;
-    private float _moveDirection;
 
     private List<RobotLeg> _robotLegs;
 
@@ -48,9 +43,23 @@ public class SpiderBot : Robot
         _targetY = _body.position.y;
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        UpdateLegsSpeed();
+    }
+
+    private void UpdateLegsSpeed()
+    {
+        if (MoveSpeed == 0)
+            return;
+
+        _legsSpeed = Mathf.Abs(MoveSpeed) * 8;
+    }
+
     private void CheckGround()
     {
-        var hit = Utils.RayCast(_body.position, new Vector2(_moveDirection, -1), 8, includeTriggers: false);
+        var hit = Utils.RayCast(_body.position, new Vector2(MoveDirection, -1), 8, includeTriggers: false);
 
 
 
@@ -60,40 +69,18 @@ public class SpiderBot : Robot
         }
         else
         {
-            Flip(_moveSpeed);
+            Flip();
         }
-        //else if (_pause == null)
-        //{
-        //    _pause = StartCoroutine(Pause(_moveSpeed));
-        //}
     }
 
     private void CheckWall()
     {
-        var hit = Utils.RayCast(_body.position, Vector3.right * _moveSpeed, 5, includeTriggers: false);
+        var hit = Utils.RayCast(_body.position, Vector3.right * MoveSpeed, 5, includeTriggers: false);
 
         if (hit.collider != null)
         {
-            Flip(_moveSpeed);
+            Flip();
         }
-    }
-
-    //private IEnumerator Pause(float speed)
-    //{
-    //    _moveSpeed = 0;
-    //    _robotLegs.ForEach(leg => leg.ResetCurrentTarget());
-
-    //    yield return new WaitForSeconds(3);
-
-    //    Flip(speed);
-    //    _pause = null;
-    //}
-
-    private void Flip(float speed)
-    {
-        _moveSpeed = -speed;
-        _moveDirection = Mathf.Sign(_moveSpeed);
-        //_robotLegs.ForEach(l => l.FlipTarget());
     }
 
     #region Check
@@ -128,7 +115,7 @@ public class SpiderBot : Robot
         while (elapsedTime < delay)
         {
             elapsedTime += Time.deltaTime;
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), GetRotateSpeed());
+            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), RotateSpeed);
             yield return null;
         }
 
@@ -170,12 +157,7 @@ public class SpiderBot : Robot
     {
         CheckGround();
         CheckWall();
-        _body.Translate(_body.right * _moveSpeed * Time.deltaTime);
-
-        if (_moveSpeed != 0)
-        {
-            _moveDirection = Mathf.Sign(_moveSpeed);
-        }
+        _body.Translate(_body.right * MoveSpeed * Time.deltaTime);
 
         var targetPos = new Vector3(_body.position.x, _targetY);
 
@@ -185,7 +167,7 @@ public class SpiderBot : Robot
         }
 
         //_body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
-        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * _moveDirection), GetRotateSpeed());
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * MoveDirection), RotateSpeed);
 
     }
     #endregion

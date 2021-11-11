@@ -79,12 +79,12 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 
     public virtual void Aim(IKillable target)
     {
-        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - _turretHead.position), GetRotateSpeed());
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, target.Transform.position - _turretHead.position), RotateSpeed);
     }
 
     public virtual void LookFor()
     {
-        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _turretHead.position), GetRotateSpeed());
+        _turretHead.rotation = Quaternion.RotateTowards(_turretHead.rotation, Quaternion.LookRotation(Vector3.forward, _targetLocation - _turretHead.position), RotateSpeed);
     }
 
     protected virtual void Scan()

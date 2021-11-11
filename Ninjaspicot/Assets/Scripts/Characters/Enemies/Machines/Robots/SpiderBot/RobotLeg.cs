@@ -10,6 +10,7 @@ public class RobotLeg : Dynamic
     private const float REPLACEMENT_DISTANCE_THRESHOLD = 2f;
     private Coroutine _moveLeg;
     private SpiderBot _spiderBot;
+    public float Speed => _spiderBot.MoveSpeed;
     public bool Grounded => _moveLeg == null;
 
     private void Awake()
@@ -75,6 +76,9 @@ public class RobotLeg : Dynamic
 
         //Transform.position = _currentTarget;
         _moveLeg = null;
+
+        yield return new WaitForSeconds(Speed / 100);
+
         _spiderBot.ChangeMovingLegs(1 - _index);
     }
 }

@@ -40,7 +40,7 @@ public class GuardRobotBall : Robot
         }
         else if (_currentPathTarget != null)
         {
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), GetRotateSpeed());
+            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), RotateSpeed);
         }
     }
 
@@ -50,7 +50,7 @@ public class GuardRobotBall : Robot
     {
         var deltaX = TargetPosition.x - Transform.position.x;
 
-        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), GetRotateSpeed());
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), RotateSpeed);
 
         //var alignedWithTarget = 
 
@@ -65,7 +65,7 @@ public class GuardRobotBall : Robot
 
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * GetMovementSpeed());
+            _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
         }
         else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
@@ -86,7 +86,7 @@ public class GuardRobotBall : Robot
         var wallNear = Utils.RayCast(_rigidbody.position, direction, 6, Id);
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * GetMovementSpeed());
+            _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
         }
 
 
@@ -98,7 +98,7 @@ public class GuardRobotBall : Robot
             SetState(StateType.Wonder, StateType.Return);
         }
 
-        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), GetRotateSpeed());
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), RotateSpeed);
 
         //var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
 
@@ -130,7 +130,7 @@ public class GuardRobotBall : Robot
         while (elapsedTime < delay)
         {
             elapsedTime += Time.deltaTime;
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), GetRotateSpeed());
+            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), RotateSpeed);
             yield return null;
         }
 
@@ -162,11 +162,11 @@ public class GuardRobotBall : Robot
     {
         var deltaX = _resetPosition.x - Transform.position.x;
 
-        _head.rotation = Quaternion.RotateTowards(_head.rotation, _initRotation, GetRotateSpeed());
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, _initRotation, RotateSpeed);
 
         if (deltaX > 2)
         {
-            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * GetMovementSpeed());
+            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * MoveSpeed);
         }
         else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
         {
@@ -194,7 +194,7 @@ public class GuardRobotBall : Robot
             }
             else
             {
-                Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), GetRotateSpeed());
+                Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), RotateSpeed);
             }
         }
 
@@ -205,11 +205,11 @@ public class GuardRobotBall : Robot
 
         if (_targetPosition.HasValue)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction.normalized * GetMovementSpeed());
+            _rigidbody.MovePosition(_rigidbody.position + direction.normalized * MoveSpeed);
         }
         else
         {
-            _rigidbody.MovePosition(_rigidbody.position + Utils.ToVector2(Transform.right) * GetMovementSpeed());
+            _rigidbody.MovePosition(_rigidbody.position + Utils.ToVector2(Transform.right) * MoveSpeed);
         }
 
 

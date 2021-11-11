@@ -588,6 +588,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e7107f9ca212a46acf712a66bd5167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _robotLeg: {fileID: 6451305631827958995}
 --- !u!1 &6451305631349021570
 GameObject:
   m_ObjectHideFlags: 0
@@ -700,6 +701,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e7107f9ca212a46acf712a66bd5167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _robotLeg: {fileID: 6451305632717100056}
 --- !u!1 &6451305631521877852
 GameObject:
   m_ObjectHideFlags: 0
@@ -928,7 +930,7 @@ MonoBehaviour:
   _initState: 5
   _castArea: {fileID: 6909560911363664720}
   _rotateSpeed: 90
-  _moveSpeed: 6
+  _moveSpeed: 200
   _head: {fileID: 2222234644949283292}
   _hearingRange: 60
   _checkWonderTime: 1
@@ -936,8 +938,6 @@ MonoBehaviour:
   _timeBetweenCommunications: 20
   _communicationTime: 3
   _body: {fileID: 6451305632618726178}
-  _legsSpeed: 25
-  _legsStabilizationFactor: 2
   MovingLegsIndex: 0
 --- !u!1 &6451305631827958997
 GameObject:
@@ -1392,6 +1392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e7107f9ca212a46acf712a66bd5167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _robotLeg: {fileID: 6451305631650901229}
 --- !u!1 &6451305632918824827
 GameObject:
   m_ObjectHideFlags: 0
@@ -1510,6 +1511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6e7107f9ca212a46acf712a66bd5167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _robotLeg: {fileID: 6451305633030890119}
 --- !u!1 &6451305633081793730
 GameObject:
   m_ObjectHideFlags: 0
