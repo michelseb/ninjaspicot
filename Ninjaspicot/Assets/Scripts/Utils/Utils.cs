@@ -1,44 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public static class Utils
 {
+    public const int FRAME_INTERVAL = 2;
+    public const int EXPENSIVE_FRAME_INTERVAL = 3;
+
     public static RaycastHit2D BoxCast(Vector2 origine, Vector2 size, float angle, Vector2 direction, float distance, int ignore = 0, bool display = false, bool includeTriggers = false, int layer = ~0)
     {
         RaycastHit2D[] hits = BoxCastAll(origine, size, angle, direction, distance, ignore, includeTriggers, layer);
 
+        if (hits.Length == 0)
+            return new RaycastHit2D();
+
         //Setting up the points to draw the cast
-        Vector2 p1, p2, p3, p4, p5, p6, p7, p8;
-        float w = size.x * 0.5f;
-        float h = size.y * 0.5f;
-        p1 = new Vector2(-w, h);
-        p2 = new Vector2(w, h);
-        p3 = new Vector2(w, -h);
-        p4 = new Vector2(-w, -h);
-
-        Quaternion q = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1));
-        p1 = q * p1;
-        p2 = q * p2;
-        p3 = q * p3;
-        p4 = q * p4;
-
-        p1 += origine;
-        p2 += origine;
-        p3 += origine;
-        p4 += origine;
-
-        Vector2 realDistance = direction.normalized * distance;
-        p5 = p1 + realDistance;
-        p6 = p2 + realDistance;
-        p7 = p3 + realDistance;
-        p8 = p4 + realDistance;
-
         //Drawing the cast
         if (display)
         {
+            Vector2 p1, p2, p3, p4, p5, p6, p7, p8;
+            float w = size.x * 0.5f;
+            float h = size.y * 0.5f;
+            p1 = new Vector2(-w, h);
+            p2 = new Vector2(w, h);
+            p3 = new Vector2(w, -h);
+            p4 = new Vector2(-w, -h);
+
+            Quaternion q = Quaternion.AngleAxis(angle, new Vector3(0, 0, 1));
+            p1 = q * p1;
+            p2 = q * p2;
+            p3 = q * p3;
+            p4 = q * p4;
+
+            p1 += origine;
+            p2 += origine;
+            p3 += origine;
+            p4 += origine;
+
+            Vector2 realDistance = direction.normalized * distance;
+            p5 = p1 + realDistance;
+            p6 = p2 + realDistance;
+            p7 = p3 + realDistance;
+            p8 = p4 + realDistance;
+
+
             Color castColor = hits.Count(x => !x.collider.isTrigger) > 0 ? Color.red : Color.green;
             Debug.DrawLine(p1, p2, castColor);
             Debug.DrawLine(p2, p3, castColor);
@@ -56,25 +62,7 @@ public static class Utils
             Debug.DrawLine(p4, p8, Color.grey);
         }
 
-
-        RaycastHit2D hit = new RaycastHit2D();
-        if (hits.Length > 0)
-        {
-            var dist = float.PositiveInfinity;
-            foreach (var actualHit in hits)
-            {
-                var newDist = Vector3.Distance(origine, actualHit.collider.transform.position);
-                if (newDist < dist)
-                {
-                    hit = actualHit;
-                    dist = newDist;
-                }
-            }
-            Debug.DrawLine(hit.point, hit.point + hit.normal.normalized * 0.2f, Color.yellow);
-            return hit;
-        }
-
-        return hit;
+        return hits[0];
     }
 
 
@@ -95,27 +83,18 @@ public static class Utils
     {
         RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
 
-        RaycastHit2D hit = new RaycastHit2D();
-        if (hits.Length > 0)
-        {
-            var dist = float.PositiveInfinity;
-            foreach (var actualHit in hits)
-            {
-                var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
-                if (newDist < dist)
-                {
-                    hit = actualHit;
-                    dist = newDist;
-                }
-            }
-        }
+        if (hits.Length == 0)
+            return new RaycastHit2D();
 
-        return hit;
+        return hits[0];
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "")
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "")
     {
         RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers);
+
+        if (hits.Length == 0)
+            return new RaycastHit2D();
 
         if (!string.IsNullOrEmpty(target))
         {
@@ -125,46 +104,24 @@ public static class Utils
                 return wrongHit;
         }
 
-        RaycastHit2D hit = new RaycastHit2D();
-        if (hits.Length > 0)
-        {
-            var dist = float.PositiveInfinity;
-            foreach (var actualHit in hits)
-            {
-                var newDist = Vector3.Distance(origin, actualHit.collider.transform.position);
-                if (newDist < dist)
-                {
-                    hit = actualHit;
-                    dist = newDist;
-                }
-            }
-        }
-
-        return hit;
+        return hits[0];
     }
 
     public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
     {
-        RaycastHit2D[] hits;
-
-        if (distance > 0)
-        {
-            hits = Physics2D.RaycastAll(origin, direction, distance);
-        }
-        else
-        {
-            hits = Physics2D.RaycastAll(origin, direction);
-        }
+        var hits = distance > 0 ?
+            Physics2D.RaycastAll(origin, direction, distance) :
+            Physics2D.RaycastAll(origin, direction);
 
         var actualHits = new List<RaycastHit2D>();
 
         foreach (var hit in hits)
         {
-            var raycastable = hit.collider.GetComponent<IRaycastable>();
 
-            if (raycastable == null ||
-                raycastable.Id == ignore ||
-                (!includeTriggers && hit.collider.isTrigger))
+            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
+                continue;
+
+            if (raycastable.Id == ignore || (!includeTriggers && hit.collider.isTrigger))
                 continue;
 
             actualHits.Add(hit);
@@ -173,7 +130,7 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false)
     {
         RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination);
 
@@ -181,26 +138,17 @@ public static class Utils
 
         foreach (var hit in hits)
         {
-            var raycastable = hit.collider.GetComponent<IRaycastable>();
+            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
+                continue;
 
-            if (raycastable == null ||
-                raycastable.Id == ignore ||
-                (!includeTriggers && hit.collider.isTrigger))
+            if (ignore != null && ignore.Any(i => i == raycastable.Id) ||
+                (!includeTriggers && hit && hit.collider.isTrigger))
                 continue;
 
             actualHits.Add(hit);
         }
 
         return actualHits.ToArray();
-    }
-
-    public static RaycastHit2D[] TypeAtPos(Vector3 pos)
-    {
-        if (EventSystem.current.IsPointerOverGameObject()) return null;
-        var rayCasts = Physics2D.RaycastAll(pos, Vector2.zero);
-        if (!rayCasts.Any(x => x))
-            return null;
-        return rayCasts;
     }
 
     public static bool CoinFlip(float pound = .5f)
@@ -219,31 +167,6 @@ public static class Utils
         rectTransform.localPosition -= deltaPosition;
     }
 
-    public static T CopyComponent<T>(T original, GameObject destination) where T : Component
-    {
-        Type type = original.GetType();
-        var dst = destination.GetComponent(type) as T;
-        if (!dst) dst = destination.AddComponent(type) as T;
-
-        var fields = type.GetFields();
-
-        foreach (var field in fields)
-        {
-            if (field.IsStatic) continue;
-            field.SetValue(dst, field.GetValue(original));
-        }
-
-        var props = type.GetProperties();
-
-        foreach (var prop in props)
-        {
-            if (!prop.CanWrite || !prop.CanWrite || prop.Name == "name") continue;
-            prop.SetValue(dst, prop.GetValue(original, null), null);
-        }
-
-        return dst;
-    }
-
     public static Vector3 GetVectorFromAngle(float angle)
     {
         float angleRad = angle * (Mathf.PI / 180f);
@@ -252,11 +175,33 @@ public static class Utils
 
     public static float GetAngleFromVector(Vector3 dir)
     {
-        dir = dir.normalized;
-
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         if (angle < 0) angle += 360;
 
         return angle;
+    }
+
+    public static bool IsNull(object obj)
+    {
+        return obj == null || obj.Equals(null) || obj == "null";
+    }
+
+    public static Vector2 ToVector2(Vector3 vector)
+    {
+        return new Vector2(vector.x, vector.y);
+    }
+
+    public static List<T> FindObjectsOfTypeInScene<T>(string scene)
+    {
+        return SceneManager.GetSceneByName(scene)
+            .GetRootGameObjects()
+            .Select(go => go.GetComponentInChildren<T>())
+            .Where(x => !IsNull(x))
+            .ToList();
+
+        //return Object.FindObjectsOfType<MonoBehaviour>()
+        //    .Where(go => sceneObjectsIds.Contains(go.GetInstanceID()))
+        //    .OfType<T>()
+        //    .ToList();
     }
 }

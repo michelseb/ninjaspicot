@@ -13,11 +13,12 @@ public enum PoolableType
     Shelf,
     Rice,
     IndicationRock,
-    Plate
+    Plate,
+    Shovel
 }
 
-public interface IPoolable : IActivable
+public interface IPoolable : IWakeable, IResettable
 {
     PoolableType PoolableType { get; }
-    void Pool(Vector3 position, Quaternion rotation);
+    void Pool(Vector3 position, Quaternion rotation, float size = 1);
 }

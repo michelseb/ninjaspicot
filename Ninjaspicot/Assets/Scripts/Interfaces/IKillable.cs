@@ -3,6 +3,8 @@ using UnityEngine;
 
 public interface IKillable
 {
-    void Die(Transform killer);
+    bool Dead { get; }
+    void Die(Transform killer = null, Audio sound = null, float volume = 1f);
     IEnumerator Dying();
+    Transform Transform { get; }
 }

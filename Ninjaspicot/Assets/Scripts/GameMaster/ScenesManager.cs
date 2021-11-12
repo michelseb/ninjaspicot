@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,7 +13,9 @@ public class SceneInfos
     public string Name;
     public Sprite Img;
     public bool Loaded;
-    public Color FontColor;
+    public CustomColor FontColor;
+    public CustomColor GlobalLightColor;
+    public CustomColor FrontLightColor;
 }
 
 
@@ -20,9 +23,15 @@ public class ScenesManager : MonoBehaviour
 {
     [SerializeField] private SceneInfos[] _scenes;
     [SerializeField] private int _startScene;
+    [SerializeField] private int _startCheckPoint;
+    [SerializeField] private AudioClip[] _sceneAudios;
+
+    public Coroutine SceneLoad { get; private set; }
+    public SceneInfos CurrentScene { get; private set; }
 
     private SpawnManager _spawnManager;
-    public Coroutine SceneLoad { get; private set; }
+    private AudioSource _audioSource;
+    private Coroutine _volumeDown;
 
     private static ScenesManager _instance;
     public static ScenesManager Instance { get { if (_instance == null) _instance = FindObjectOfType<ScenesManager>(); return _instance; } }
@@ -32,28 +41,73 @@ public class ScenesManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         _spawnManager = SpawnManager.Instance;
-        LoadLobby();
+        _audioSource = GetComponent<AudioSource>();
+
+        if (_startScene < 2)
+        {
+            LoadLobby();
+        }
+        else
+        {
+            LoadSceneById(_startScene);
+        }
+    }
+
+    private void Start()
+    {
+        _spawnManager.InitActiveSceneSpawns(_startCheckPoint);
     }
 
     public void LoadLobby()
     {
         var lobby = FindSceneByName("Lobby");
         SceneManager.LoadScene(lobby.Name);
+        SwitchAudio(1);
         lobby.Loaded = true;
+
+        // Wake lobby wakeables
+        Utils.FindObjectsOfTypeInScene<ISceneryWakeable>("Lobby").ForEach(w => w.Wake());
+    }
+
+    public void LoadSceneById(int sceneId)
+    {
+        SceneManager.LoadScene(sceneId);
+        SwitchAudio(sceneId);
+    }
+
+    private void SwitchAudio(int sceneId)
+    {
+        if (_sceneAudios.Length >= sceneId)
+        {
+            _audioSource.Stop();
+            _audioSource.clip = _sceneAudios[sceneId];
+            _audioSource.volume = 1;
+            _audioSource.Play();
+        }
+    }
+    private IEnumerator VolumeDown()
+    {
+        while (_audioSource.volume > 0)
+        {
+            _audioSource.volume -= Time.deltaTime;
+            yield return null;
+        }
+
+        _volumeDown = null;
     }
 
     private IEnumerator LoadAdditionalZone(int portalId)
     {
-        var id = int.Parse(portalId.ToString().Substring(0, 2));
-        var scene = FindSceneById(id);
+        var scene = GetSceneByPortalId(portalId);
 
         if (scene == null || scene.Loaded)
             yield break;
 
+        _volumeDown = StartCoroutine(VolumeDown());
         var operation = SceneManager.LoadSceneAsync(scene.Name, LoadSceneMode.Additive);
         operation.allowSceneActivation = false;
 
-        while (operation.progress < .9f)
+        while (operation.progress < .9f || _volumeDown != null)
             yield return null;
 
         operation.allowSceneActivation = true;
@@ -62,7 +116,6 @@ public class ScenesManager : MonoBehaviour
             yield return null;
 
         EnableScene(scene);
-        scene.Loaded = true;
         SceneLoad = null;
     }
 
@@ -74,6 +127,9 @@ public class ScenesManager : MonoBehaviour
             SceneManager.MoveGameObjectToScene(Hero.Instance.gameObject, sceneToLoad);
             SceneManager.SetActiveScene(sceneToLoad);
             _spawnManager.InitActiveSceneSpawns();
+            CurrentScene = sceneInfos;
+            SwitchAudio(sceneToLoad.buildIndex);
+            sceneInfos.Loaded = true;
         }
     }
 
@@ -81,7 +137,7 @@ public class ScenesManager : MonoBehaviour
     {
         if (SceneLoad != null)
             return;
-        
+
         SceneLoad = StartCoroutine(LoadAdditionalZone(portalId));
     }
 
@@ -107,9 +163,10 @@ public class ScenesManager : MonoBehaviour
         return _scenes.FirstOrDefault(s => s.Name == name);
     }
 
-    public void MoveObjectToCurrentScene(GameObject obj)
+    private SceneInfos GetSceneByPortalId(int portalId)
     {
-        SceneManager.MoveGameObjectToScene(obj, SceneManager.GetActiveScene());
+        var id = int.Parse(portalId.ToString().Substring(0, 2));
+        return FindSceneById(id);
     }
 
 }

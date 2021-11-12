@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class TouchIndicator : MonoBehaviour, IPoolable
+public class TouchIndicator : Dynamic, IPoolable
 {
     [SerializeField] private PoolableType _poolableType;
     public bool Active { get; private set; }
@@ -11,11 +11,9 @@ public class TouchIndicator : MonoBehaviour, IPoolable
     private Coroutine _appear;
     private const float APPEAR_SPEED = 4f;
     private const float FADE_SPEED = 1.5f;
-    private Transform _transform;
 
     private void Awake()
     {
-        _transform = transform;
         _renderer = GetComponent<SpriteRenderer>();
     }
 
@@ -45,7 +43,7 @@ public class TouchIndicator : MonoBehaviour, IPoolable
             _renderer.color = col;
             yield return null;
         }
-        Deactivate();
+        Sleep();
     }
 
     private IEnumerator Appear()
@@ -61,22 +59,27 @@ public class TouchIndicator : MonoBehaviour, IPoolable
         _appear = null;
     }
 
-    public void Pool(Vector3 position, Quaternion rotation)
+    public void Pool(Vector3 position, Quaternion rotation, float size)
     {
-        _transform.position = new Vector3(position.x, position.y, -5);
-        _transform.rotation = rotation;
+        Transform.position = new Vector3(position.x, position.y, -5);
+        Transform.rotation = rotation;
         _appear = StartCoroutine(Appear());
     }
 
-    public void Deactivate()
+    public void Sleep()
     {
         Active = false;
         gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Wake()
     {
         gameObject.SetActive(true);
         Active = true;
+    }
+
+    public void DoReset()
+    {
+        Sleep();
     }
 }

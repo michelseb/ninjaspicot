@@ -14,47 +14,69 @@ public class PoolManager : MonoBehaviour
     public static PoolManager Instance { get { if (_instance == null) _instance = FindObjectOfType<PoolManager>(); return _instance; } }
 
     //Returns first deactivated poolable of chosen type. If none, instanciate one
-    public T GetPoolable<T>(Vector3 position, Quaternion rotation, PoolableType type = PoolableType.None, Transform parent = null, bool defaultParent = true) where T : IPoolable
+    public T GetPoolable<T>(Vector3 position, Quaternion rotation, float size = 1f, PoolableType type = PoolableType.None, Transform parent = null, bool defaultParent = true) where T : IPoolable
     {
-        var poolable = (T)Poolables.Where(x => type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
+        T poolable = default(T);
 
-        if (poolable == null)
+        foreach (var p in Poolables.ToArray())
         {
-            GameObject poolableModel = null;
-
-            foreach (var model in _poolableModels)
+            if (Utils.IsNull(p))
             {
-                var pool = model.GetComponent<IPoolable>();
-                if (pool == null)
-                    continue;
-
-                if (pool is T && (type == PoolableType.None || pool.PoolableType == type))
-                {
-                    poolableModel = model;
-                    break;
-                }
+                Poolables.Remove(p);
+                continue;
             }
 
-            if (poolableModel == null)
-                return default;
+            if (type != PoolableType.None && p.PoolableType != type)
+                continue;
 
-            if (defaultParent)
+            if (p is T && !((MonoBehaviour)p).gameObject.activeSelf)
             {
-                poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
+                poolable = (T)p;
+                break;
             }
-            else
-            {
-                var poolableObject = Instantiate(poolableModel);
-                poolableObject.transform.SetParent(parent, true);
-
-                poolable = poolableObject.GetComponent<T>();
-            }
-
-            Poolables.Add(poolable);
         }
 
-        poolable.Activate();
-        poolable.Pool(position, rotation);
+        //var poolable = (T)Poolables.Where(type == PoolableType.None || x.PoolableType == type).FirstOrDefault(p => p is T && !((MonoBehaviour)p).gameObject.activeSelf);
+
+        if (poolable != null)
+            return SelectPoolable(poolable, position, rotation, size);
+
+        // Create poolable if doesn't exist
+        GameObject poolableModel = null;
+
+        foreach (var model in _poolableModels)
+        {
+            if (model.TryGetComponent(out IPoolable pool) && pool is T && (type == PoolableType.None || pool.PoolableType == type))
+            {
+                poolableModel = model;
+                break;
+            }
+        }
+
+        if (poolableModel == null)
+            return default;
+
+        if (defaultParent)
+        {
+            poolable = Instantiate(poolableModel, _poolableParent).GetComponent<T>();
+        }
+        else
+        {
+            var poolableObject = Instantiate(poolableModel);
+            poolableObject.transform.SetParent(parent, true);
+
+            poolable = poolableObject.GetComponent<T>();
+        }
+
+        Poolables.Add(poolable);
+
+        return SelectPoolable(poolable, position, rotation, size);
+    }
+
+    public T SelectPoolable<T>(T poolable, Vector3 position, Quaternion rotation, float size = 1f) where T : IPoolable
+    {
+        poolable.Wake();
+        poolable.Pool(position, rotation, size);
 
         return poolable;
     }

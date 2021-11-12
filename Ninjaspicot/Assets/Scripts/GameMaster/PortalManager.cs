@@ -19,11 +19,22 @@ public class PortalManager : MonoBehaviour
 
     public bool Connecting { get; private set; }
     public Coroutine Connection { get; private set; }
+    public List<Portal> Portals { get { if (_portals == null) _portals = new List<Portal>(); return _portals; } }
 
 
     private List<Portal> _portals;
     private ScenesManager _scenesManager;
-    public List<Portal> Portals { get { if (_portals == null) _portals = new List<Portal>(); return _portals; } }
+    private CameraBehaviour _cameraBehaviour;
+    private UICamera _uiCamera;
+    private AudioSource _audioSource;
+    private AudioManager _audioManager;
+    private Audio _enterClip;
+    private Audio _exitClip;
+    private ZoneManager _zoneManager;
+
+
+    public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
+    public const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
 
     private static PortalManager _instance;
     public static PortalManager Instance { get { if (_instance == null) _instance = FindObjectOfType<PortalManager>(); return _instance; } }
@@ -32,6 +43,17 @@ public class PortalManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         _scenesManager = ScenesManager.Instance;
+        _cameraBehaviour = CameraBehaviour.Instance;
+        _uiCamera = UICamera.Instance;
+        _audioSource = GetComponent<AudioSource>();
+        _audioManager = AudioManager.Instance;
+        _zoneManager = ZoneManager.Instance;
+    }
+
+    private void Start()
+    {
+        _enterClip = _audioManager.FindAudioByName("EnterPortal");
+        _exitClip = _audioManager.FindAudioByName("ExitPortal");
     }
 
     private int? GetExitIndexByEntranceId(int entranceId)
@@ -39,28 +61,26 @@ public class PortalManager : MonoBehaviour
         return _doorEntranceExitPairs.FirstOrDefault(d => d.EntranceId == entranceId)?.ExitId;
     }
 
+    public bool ConnectionExists(Portal portal)
+    {
+        return GetExitIndexByEntranceId(portal.Id) != null;
+    }
+
     public Portal GetPortalById(int portalId)
     {
         return Portals.FirstOrDefault(t => t.Id == portalId);
     }
 
-    private IEnumerator CreateConnection(Portal entrance)
+    private IEnumerator CreateConnection(Portal entrance, int exitId)
     {
         Connecting = true;
-        var otherId = GetExitIndexByEntranceId(entrance.Id);
 
-        if (otherId == null)
-        {
-            TerminateConnection();
-            yield break;
-        }
-
-        _scenesManager.LaunchZoneLoad((int)otherId);
+        _scenesManager.LaunchZoneLoad(exitId);
 
         while (_scenesManager.SceneLoad != null)
             yield return null;
 
-        var exit = GetPortalById((int)otherId);
+        var exit = GetPortalById(exitId);
 
         if (exit == null)
         {
@@ -81,7 +101,12 @@ public class PortalManager : MonoBehaviour
         if (Connection != null)
             return;
 
-        Connection = StartCoroutine(CreateConnection(entrance));
+        var otherId = GetExitIndexByEntranceId(entrance.Id);
+
+        if (otherId == null)
+            return;
+
+        Connection = StartCoroutine(CreateConnection(entrance, otherId.Value));
     }
 
     public void ClosePreviousZone(int entranceId)
@@ -90,7 +115,6 @@ public class PortalManager : MonoBehaviour
 
         RemoveZonePortalsFromList(zoneId);
         _scenesManager.UnloadZone(zoneId);
-        TerminateConnection();
     }
 
     public void TerminateConnection()
@@ -109,5 +133,34 @@ public class PortalManager : MonoBehaviour
     private void RemoveZonePortalsFromList(int zoneId)
     {
         Portals.Where(p => p.Id.ToString().Substring(0, 2) == zoneId.ToString()).ToList().ForEach(x => Portals.Remove(x));
+    }
+
+    public IEnumerator Teleport(Portal entrance, Portal exit)
+    {
+        _zoneManager.SetZone(exit.Zone);
+
+        yield return new WaitForSecondsRealtime(1);
+
+        _audioManager.PlaySound(_audioSource, _exitClip, .3f);
+        var rb = Hero.Instance.Stickiness.Rigidbody;
+        rb.position = exit.transform.position - exit.transform.right * 4;
+        _cameraBehaviour.MoveTo(Hero.Instance.Stickiness.Rigidbody.position);
+        _uiCamera.CameraAppear();
+        entrance.Deactivate();
+        ClosePreviousZone(entrance.Id);
+
+        yield return new WaitForSecondsRealtime(2);
+
+        Hero.Instance.StartAppear();
+        rb.isKinematic = false;
+        rb.velocity = exit.transform.right * EJECT_SPEED;
+        Hero.Instance.SetCapeActivation(true);
+        exit.Deactivate();
+        TerminateConnection();
+    }
+
+    public void StartPortalSound()
+    {
+        _audioManager.PlaySound(_audioSource, _enterClip, .3f);
     }
 }

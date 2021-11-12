@@ -46,14 +46,8 @@ namespace DigitalRuby.LightningBolt
         [Tooltip("The game object where the lightning will emit from. If null, StartPosition is used.")]
         public Transform StartObject;
 
-        [Tooltip("The start position where the lightning will emit from. This is in world space if StartObject is null, otherwise this is offset from StartObject position.")]
-        public Vector3 StartPosition;
-
         [Tooltip("The game object where the lightning will end at. If null, EndPosition is used.")]
         public Transform EndObject;
-
-        [Tooltip("The end position where the lightning will end at. This is in world space if EndObject is null, otherwise this is offset from EndObject position.")]
-        public Vector3 EndPosition;
 
         [Range(0, 8)]
         [Tooltip("How manu generations? Higher numbers create more line segments.")]
@@ -67,9 +61,6 @@ namespace DigitalRuby.LightningBolt
         [Range(0.0f, 1.0f)]
         [Tooltip("How chaotic should the lightning be? (0-1)")]
         public float ChaosFactor = 0.15f;
-
-        [Tooltip("In manual mode, the trigger method must be called to create a bolt")]
-        public bool ManualMode;
 
         [Range(1, 64)]
         [Tooltip("The number of rows in the texture. Used for animation.")]
@@ -97,13 +88,12 @@ namespace DigitalRuby.LightningBolt
         private Vector2[] _offsets;
         private int _animationOffsetIndex;
         private int _animationPingPongDirection = 1;
-        private bool _orthographic;
         private Transform _transform;
+        private bool _isVisible;
 
         private void Awake()
         {
             _transform = transform;
-            _orthographic = (Camera.main != null && Camera.main.orthographic);
             _lineRenderer = GetComponent<LineRenderer>();
             _collider = GetComponent<BoxCollider2D>();
             _lineRenderer.positionCount = 0;
@@ -114,31 +104,25 @@ namespace DigitalRuby.LightningBolt
 
             if (distX < distY)
             {
-                _collider.size = new Vector2(5, distY);
-                
-                _collider.offset = StartObject.localPosition + new Vector3(0, distY / 2);
+                _collider.size = new Vector2(2, distY);
+                var pos = StartObject.position.y < EndObject.position.y ? StartObject.localPosition : EndObject.localPosition;
+
+                _collider.offset = pos + new Vector3(0, distY / 2);
             }
             else
             {
-                _collider.size = new Vector2(distX, 5);
-                _collider.offset = StartObject.localPosition + new Vector3(distX / 2, 0);
+                _collider.size = new Vector2(distX, 2);
+                var pos = StartObject.position.x < EndObject.position.x ? StartObject.localPosition : EndObject.localPosition;
+
+                _collider.offset = pos + new Vector3(distX / 2, 0);
             }
         }
 
         private void Update()
         {
-            _orthographic = (Camera.main != null && Camera.main.orthographic);
-            if (timer <= 0.0f)
+            if (_isVisible && timer <= 0.0f)
             {
-                if (ManualMode)
-                {
-                    timer = Duration;
-                    _lineRenderer.positionCount = 0;
-                }
-                else
-                {
-                    Trigger();
-                }
+                Trigger();
             }
             timer -= Time.deltaTime;
         }
@@ -147,68 +131,19 @@ namespace DigitalRuby.LightningBolt
         {
             if (collision.CompareTag("hero"))
             {
-                Hero.Instance.Die(_transform);
+                Hero.Instance.Die();
             }
         }
 
-        private void GetPerpendicularVector(ref Vector3 directionNormalized, out Vector3 side)
-        {
-            if (directionNormalized == Vector3.zero)
-            {
-                side = Vector3.right;
-            }
-            else
-            {
-                // use cross product to find any perpendicular vector around directionNormalized:
-                // 0 = x * px + y * py + z * pz
-                // => pz = -(x * px + y * py) / z
-                // for computational stability use the component farthest from 0 to divide by
-                float x = directionNormalized.x;
-                float y = directionNormalized.y;
-                float z = directionNormalized.z;
-                float px, py, pz;
-                float ax = Mathf.Abs(x), ay = Mathf.Abs(y), az = Mathf.Abs(z);
-                if (ax >= ay && ay >= az)
-                {
-                    // x is the max, so we can pick (py, pz) arbitrarily at (1, 1):
-                    py = 1.0f;
-                    pz = 1.0f;
-                    px = -(y * py + z * pz) / x;
-                }
-                else if (ay >= az)
-                {
-                    // y is the max, so we can pick (px, pz) arbitrarily at (1, 1):
-                    px = 1.0f;
-                    pz = 1.0f;
-                    py = -(x * px + z * pz) / y;
-                }
-                else
-                {
-                    // z is the max, so we can pick (px, py) arbitrarily at (1, 1):
-                    px = 1.0f;
-                    py = 1.0f;
-                    pz = -(x * px + y * py) / z;
-                }
-                side = new Vector3(px, py, pz).normalized;
-            }
-        }
-
-        private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, int totalGenerations, float offsetAmount)
+        private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, float offsetAmount)
         {
             if (generation < 0 || generation > 8)
-            {
                 return;
-            }
-            else if (_orthographic)
-            {
-                start.z = end.z = Mathf.Min(start.z, end.z);
-            }
 
             _segments.Add(new KeyValuePair<Vector3, Vector3>(start, end));
+
             if (generation == 0)
-            {
                 return;
-            }
 
             Vector3 randomVector;
             if (offsetAmount <= 0.0f)
@@ -244,28 +179,10 @@ namespace DigitalRuby.LightningBolt
 
         public void RandomVector(ref Vector3 start, ref Vector3 end, float offsetAmount, out Vector3 result)
         {
-            if (_orthographic)
-            {
-                Vector3 directionNormalized = (end - start).normalized;
-                Vector3 side = new Vector3(-directionNormalized.y, directionNormalized.x, directionNormalized.z);
-                float distance = ((float)RandomGenerator.NextDouble() * offsetAmount * 2.0f) - offsetAmount;
-                result = side * distance;
-            }
-            else
-            {
-                Vector3 directionNormalized = (end - start).normalized;
-                Vector3 side;
-                GetPerpendicularVector(ref directionNormalized, out side);
-
-                // generate random distance
-                float distance = (((float)RandomGenerator.NextDouble() + 0.1f) * offsetAmount);
-
-                // get random rotation angle to rotate around the current direction
-                float rotationAngle = ((float)RandomGenerator.NextDouble() * 360.0f);
-
-                // rotate around the direction and then offset by the perpendicular vector
-                result = Quaternion.AngleAxis(rotationAngle, directionNormalized) * side * distance;
-            }
+            Vector3 directionNormalized = (end - start).normalized;
+            Vector3 side = new Vector3(-directionNormalized.y, directionNormalized.x, directionNormalized.z);
+            float distance = ((float)RandomGenerator.NextDouble() * offsetAmount * 2.0f) - offsetAmount;
+            result = side * distance;
         }
 
         private void SelectOffsetFromAnimationMode()
@@ -343,26 +260,10 @@ namespace DigitalRuby.LightningBolt
         /// </summary>
         public void Trigger()
         {
-            Vector3 start, end;
             timer = Duration + Mathf.Min(0.0f, timer);
-            if (StartObject == null)
-            {
-                start = StartPosition;
-            }
-            else
-            {
-                start = StartObject.position + StartPosition;
-            }
-            if (EndObject == null)
-            {
-                end = EndPosition;
-            }
-            else
-            {
-                end = EndObject.position + EndPosition;
-            }
+
             _startIndex = 0;
-            GenerateLightningBolt(start, end, Generations, Generations, 0.0f);
+            GenerateLightningBolt(StartObject.position, EndObject.position, Generations, 0.0f);
             UpdateLineRenderer();
         }
 
@@ -381,6 +282,16 @@ namespace DigitalRuby.LightningBolt
                     _offsets[x + (y * Columns)] = new Vector2((float)x / Columns, (float)y / Rows);
                 }
             }
+        }
+
+        private void OnBecameVisible()
+        {
+            _isVisible = true;
+        }
+
+        private void OnBecameInvisible()
+        {
+            _isVisible = false;
         }
     }
 }

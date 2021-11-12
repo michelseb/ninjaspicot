@@ -1,72 +1,65 @@
 ﻿using System.Linq;
-using TMPro;
 using UnityEngine;
 
-public enum TouchArea
+public enum TouchType
 {
-    Left = 0,
-    Right = 1
+    Left,
+    Right
 }
 
 public class TouchManager : MonoBehaviour
 {
     [SerializeField] private bool _mobileTouch;
+    [SerializeField] private Joystick _joystick1;
+    [SerializeField] private Joystick _joystick2;
 
-    public bool Touching => Input.touchCount > 0 || Input.GetButton("Fire1") || Input.GetButton("Fire2");
-    public bool DoubleTouching => Input.touchCount > 1 || (Input.GetButton("Fire1") && Input.GetButton("Fire2"));
-    public bool Moving => GetMoving();
-    public bool Dragging => Dragging1 || Dragging2;
-    public bool Dragging1 { get; private set; }
-    public bool Dragging2 { get; private set; }
-    public Vector3 Touch1Origin { get; private set; }
-    public Vector3 Touch2Origin { get; private set; }
-    public Vector3 RawTouch1Origin { get; private set; }
-    public Vector3 RawTouch2Origin { get; private set; }
-    public Vector3 Touch1Drag { get; private set; }
-    public Vector3 Touch2Drag { get; private set; }
-    public bool TouchLifted => FingerLifted();
-    public TouchArea TouchArea => RawTouch1Origin.x < Screen.width / 2 ? TouchArea.Left : TouchArea.Right;
-
-    private int _index0, _index1; // Touch indexes;
-    private int _touchCount;
-    private bool _touchInitialized;
-    private bool _touch2Initialized;
-    private TouchIndicator _touch1Indicator;
-    private TouchIndicator _touch2Indicator;
-    private LineRenderer _touchLine;
-    private Camera _camera;
-    private CameraBehaviour _cameraBehaviour;
-    private PoolManager _poolManager;
-    private TimeManager _timeManager;
+    public bool WalkTouching => IsTouching(TouchType.Left);
+    public bool JumpTouching => IsTouching(TouchType.Right);
+    public bool WalkBegin => WalkTouching && !_walkInitialized;
+    public bool WalkEnd => !WalkTouching && _walkInitialized;
+    public bool Touching => WalkTouching || JumpTouching;
+    private bool _walkDragging;
+    public bool WalkDragging => _walkDragging || (_joystick1 != null && _joystick1.Direction.magnitude > .2f);
+    public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
+    public bool JumpStart => JumpTouching && !_jumpInitialized;
+    public bool JumpEnd => !JumpTouching && _jumpInitialized;
+    public bool DoubleTouching => JumpTouching && WalkTouching;
+    public bool Dashing => JumpDragging && DoubleTouching;
+    public bool Running => WalkDragging && DoubleTouching;
+    public bool RunStart => Running && !_runInitialized;
+    public bool DashStart => Dashing && !_dashInitialized;
+    private Vector3? LeftTouch => GetTouch(TouchType.Left);
+    private Vector3? RightTouch => GetTouch(TouchType.Right);
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
 
     private Hero _hero;
     private Stickiness _stickiness;
-    private HeroJumper _jumper;
+    private Jumper _jumper;
     private DynamicInteraction _dynamicInteraction;
-
-    private const float DRAG_THRESHOLD = 150;
+    private PoolManager _poolManager;
+    private Camera _uiCamera;
+    private Transform _canvasTransform;
+    private bool _walkInitialized;
+    private bool _jumpInitialized;
+    private bool _jumpDragInitialized;
+    private bool _runInitialized;
+    private bool _dashInitialized;
 
     private void Awake()
     {
-        _cameraBehaviour = CameraBehaviour.Instance;
-        _camera = _cameraBehaviour.Camera;
-        _touchLine = GetComponent<LineRenderer>();
         _poolManager = PoolManager.Instance;
-        _timeManager = TimeManager.Instance;
     }
 
     private void Start()
     {
-        _touchLine.positionCount = 0;
-        _touchLine.useWorldSpace = true;
+        _canvasTransform = UICamera.Instance.Canvas.transform;
+        _uiCamera = UICamera.Instance.Camera;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
-        _jumper = _hero?.Jumper as HeroJumper;
+        _jumper = _hero?.Jumper;
         _dynamicInteraction = _hero?.DynamicInteraction;
-        InitTouchIndexes();
     }
 
     private void Update()
@@ -74,303 +67,204 @@ public class TouchManager : MonoBehaviour
         if (!HeroSpawned())
             return;
 
-        _stickiness = _dynamicInteraction.Interacting ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance?.Stickiness;
+        _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance.Stickiness;
 
-        if (Touching)
+        HandleWalkTouchInitEvent();
+        HandleJumpTouchInitEvent();
+        if (!HandleJumpTouchEvent())
         {
-            if (!_touchInitialized)
-            {
-                InitTouchIndexes();
-
-                RawTouch1Origin = GetRawTouch(_index0);
-
-                ReinitDrag1();
-                Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
-                _touch1Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch1Origin, Quaternion.identity, PoolableType.Touch1, _cameraBehaviour.Transform, false);
-                _touchInitialized = true;
-            }
-            else
-            {
-                var drag = GetDrag(_index0);
-                Touch1Drag = drag ?? Touch1Drag;
-                Dragging1 = IsDragging1(true);
-                if (Dragging1)
-                {
-                    _jumper.SetJumpPositions(RawTouch1Origin, Touch1Drag);
-                }
-            }
-
+            HandleWalkTouchEvent();
         }
-
-        if (DoubleTouching)
-        {
-            if (!_touch2Initialized)
-            {
-                RawTouch2Origin = GetRawTouch(_index1);
-
-                ReinitDrag2();
-                Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
-                _touch2Indicator = _poolManager.GetPoolable<TouchIndicator>(Touch2Origin, Quaternion.identity, PoolableType.Touch2, _cameraBehaviour.Transform, false);
-
-                //Hero effects
-                _stickiness.CurrentSpeed *= 2;
-                _hero.StartDisplayGhosts();
-
-                _touch2Initialized = true;
-            }
-            else
-            {
-                var drag = GetDrag(_index1);
-                Touch2Drag = drag ?? Touch2Drag;
-                Dragging2 = IsDragging2(true);
-                if (Dragging2)
-                {
-                    _jumper.SetJumpPositions(RawTouch2Origin, Touch2Drag);
-                }
-            }
-
-        }
-
-        if (!DoubleTouching && _touch2Initialized)
-        {
-            // Cancel hero effects
-            _stickiness.ReinitSpeed();
-            _hero.StopDisplayGhosts();
-            _touch2Indicator.StartFading();
-
-            //Touch2 becomes touch1           
-            if (Touching)
-            {
-                var touch = Input.touches.FirstOrDefault(t => t.fingerId == _index0);
-                if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
-                {
-                    if (_jumper.NeedsJump1)
-                    {
-                        _jumper.SetJumpPositions(RawTouch1Origin, Touch1Drag);
-                    }
-                    else if (_jumper.NeedsJump2)
-                    {
-                        _jumper.SetJumpPositions(RawTouch2Origin, Touch2Drag);
-                    }
-                    SwitchTouchIndexes();
-                    var tempDrag = Touch1Drag;
-                    var tempTouch = RawTouch1Origin;
-                    RawTouch1Origin = RawTouch2Origin;
-                    Touch1Drag = Touch2Drag;
-                    RawTouch2Origin = tempTouch;
-                    Touch2Drag = tempDrag;
-                    Dragging1 = IsDragging1(false);
-
-                    _jumper.NeedsJump1 = _jumper.NeedsJump1 || _jumper.NeedsJump2;
-
-
-                    Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
-                    _touch1Indicator.transform.position = Touch1Origin;
-                }
-            }
-
-            Dragging2 = false;
-            _touch2Initialized = false;
-        }
-
-        if (!Touching && _touchInitialized)
-        {
-            _touch1Indicator.StartFading();
-            Dragging1 = false;
-            _touchInitialized = false;
-        }
+        HandleWalkTouchEndEvent();
+        HandleJumpTouchEndEvent();
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         if (!HeroSpawned())
             return;
 
-        if (Touching)
+        if (!JumpDragging && !Dashing && _jumper.TrajectoryInUse())
         {
-            _stickiness.NinjaDir = TouchArea == TouchArea.Left ? Dir.Left : Dir.Right;
-
-            if (_jumper.CanJump())
-            {
-                if (Moving)
-                {
-                    if (DoubleTouching)
-                    {
-                        var trajectory = _jumper.SetTrajectory<ChargeTrajectory>();
-                        trajectory.SetJumper(_jumper);
-                        _jumper.JumpMode = JumpMode.Charge;
-                    }
-                    else
-                    {
-                        _jumper.SetTrajectory<ClassicTrajectory>();
-                        _jumper.JumpMode = JumpMode.Classic;
-                    }
-
-                    _jumper.Trajectory.DrawTrajectory(_hero.transform.position, _jumper.TrajectoryDestination, _jumper.TrajectoryOrigin);
-                }
-            }
-            else if (_jumper.TrajectoryInUse())
-            {
-                _jumper.ReinitJump();
-            }
-
-            if (_jumper.ReadyToJump())
-            {
-                _stickiness.StopWalking(false);
-            }
-            else if (!Dragging && _stickiness.Attached && _stickiness.CanWalk)
-            {
-                _stickiness.StartWalking();
-            }
-        }
-        else
-        {
-            if (_stickiness.Attached)
-            {
-                _stickiness.Rigidbody.velocity = new Vector2(0, 0);
-            }
+            _jumper.CancelJump();
+            _jumpDragInitialized = false;
+            _dashInitialized = false;
         }
     }
 
-
-    private void LateUpdate()
+    private bool HandleWalkTouchInitEvent()
     {
-        if (TouchLifted || Input.GetButtonUp("Fire1") || Input.GetButtonUp("Fire2"))
+        if (!WalkBegin)
+            return false;
+
+        var touchPos = _uiCamera.ScreenToWorldPoint(LeftTouch.Value);
+        _joystick1 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch1, _canvasTransform, false);
+        _joystick1.OnPointerDown();
+        _walkInitialized = true;
+
+        return true;
+    }
+
+    private bool HandleWalkTouchEvent()
+    {
+        if (!WalkTouching)
+            return false;
+
+        // If already dragging
+        if (!WalkBegin)
         {
-            if (_jumper.ReadyToJump())
-            {
-                if (_jumper.TrajectoryInUse() && !_jumper.Trajectory.IsClear(transform.position, 2))//Add ninja to new layer
-                {
-                    _jumper.Trajectory.StartFading();
-                    _timeManager.SetNormalTime();
-                }
-                else
-                {
-                    _stickiness.StopWalking(false);
+            _joystick1.Drag(LeftTouch.Value, true);
+        }
 
-                    switch (_jumper.JumpMode)
-                    {
-                        case JumpMode.Classic:
-                            _jumper.Jump();
-                            break;
-                        case JumpMode.Charge:
-                            _jumper.Charge();
-                            break;
-                    }
+        return HandleWalkEvent();
+    }
 
-                    ReinitDrags();
-                }
-            }
+    private bool HandleWalkEvent()
+    {
+        if (!WalkDragging)
+            return false;
+
+        _walkDragging = true;
+
+        if (!_stickiness.Attached || !_stickiness.CanWalk)
+            return false;
+
+        HandleRunStartEvent();
+
+        _stickiness.StartWalking();
+
+        return true;
+    }
+
+    private void HandleRunStartEvent()
+    {
+        if (!RunStart)
+            return;
+
+        _stickiness.StartRunning();
+        _hero.StartDisplayGhosts();
+
+        _runInitialized = true;
+    }
+
+    private bool HandleWalkTouchEndEvent()
+    {
+        if (!WalkEnd)
+            return false;
+
+        _joystick1.StartFading();
+        _stickiness.StopWalking(true);
+        _joystick1.OnPointerUp();
+        _stickiness.ReinitSpeed();
+        _hero.StopDisplayGhosts();
+        _runInitialized = false;
+        _walkDragging = false;
+        _walkInitialized = false;
+
+        return true;
+    }
+
+    private bool HandleJumpTouchInitEvent()
+    {
+        if (!JumpStart)
+            return false;
+
+        var touchPos = _uiCamera.ScreenToWorldPoint(RightTouch.Value);
+        _joystick2 = _poolManager.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, PoolableType.Touch2, _canvasTransform, false);
+        _joystick2.OnPointerDown();
+        _jumpInitialized = true;
+
+        return true;
+    }
+
+    private bool HandleJumpTouchEvent()
+    {
+        if (!JumpTouching)
+            return false;
+
+        // If already jump touching
+        if (!JumpStart)
+        {
+            _joystick2.Drag(RightTouch.Value);
+        }
+
+        return HandleJumpEvent();
+    }
+
+    private bool HandleJumpEvent()
+    {
+        if (!JumpDragging)
+            return false;
+
+        if (!_jumper.CanJump())
+        {
+            if (_jumper.TrajectoryInUse()) _jumper.CancelJump();
+            return false;
+        }
+
+        if (DashStart)
+        {
+            HandleTrajectoryInit<ChargeTrajectory>();
+            _jumpDragInitialized = false;
+            _dashInitialized = true;
+        }
+        else if (!Dashing && !_jumpDragInitialized)
+        {
+            HandleTrajectoryInit<ClassicTrajectory>();
+            _dashInitialized = false;
+            _jumpDragInitialized = true;
+        }
+
+        _jumper.Trajectory.DrawTrajectory(_hero.Transform.position, _joystick2.Direction);
+
+        return true;
+    }
+
+    private bool HandleJumpTouchEndEvent()
+    {
+        if (!JumpEnd)
+            return false;
+
+        DoJump();
+
+        _joystick2.StartFading();
+        _joystick2.OnPointerUp();
+        _stickiness.ReinitSpeed();
+        _hero.StopDisplayGhosts();
+        _jumpInitialized = false;
+        _jumpDragInitialized = false;
+        _dashInitialized = false;
+
+        return true;
+    }
+
+    private void DoJump()
+    {
+        if (!_jumper.ReadyToJump())
+            return;
+
+        _stickiness.StopWalking(false);
+
+        switch (_jumper.JumpMode)
+        {
+            case JumpMode.Classic:
+                _jumper.NormalJump(-_joystick2.Direction);
+                break;
+            case JumpMode.Charge:
+                _jumper.Charge(-_joystick2.Direction);
+                break;
+            case JumpMode.Direct:
+                _jumper.LaunchDirectJump(_jumper.AimTarget);
+                break;
         }
     }
 
-    private bool IsDragging1(bool setJump)
+    private void HandleTrajectoryInit<T>() where T : TrajectoryBase
     {
-        var dragging = Touching && Vector2.Distance(RawTouch1Origin, Touch1Drag) > DRAG_THRESHOLD;
-        if (setJump)
-        {
-            _jumper.NeedsJump1 = dragging;
-        }
-
-        return dragging;
-    }
-
-    private bool IsDragging2(bool setJump)
-    {
-        var dragging = DoubleTouching && Vector2.Distance(RawTouch2Origin, Touch2Drag) > DRAG_THRESHOLD;
-        if (setJump)
-        {
-            _jumper.NeedsJump2 = dragging;
-        }
-
-        return dragging;
-    }
-
-    public void ReinitDrag1()
-    {
-        Touch1Drag = RawTouch1Origin;
-        Dragging1 = false;
-    }
-
-    public void ReinitDrag2()
-    {
-        Touch2Drag = RawTouch2Origin;
-        Dragging2 = false;
-    }
-
-    public void ReinitDrags()
-    {
-        ReinitDrag1();
-        ReinitDrag2();
-    }
-
-    public void UpdateTouchOrigins()
-    {
-        if (_touch1Indicator != null && _touch1Indicator.Active)
-        {
-            Touch1Origin = _camera.ScreenToWorldPoint(RawTouch1Origin);
-            _touch1Indicator.transform.position = Touch1Origin;
-        }
-        if (_touch2Indicator != null && _touch2Indicator.Active)
-        {
-            Touch2Origin = _camera.ScreenToWorldPoint(RawTouch2Origin);
-            _touch2Indicator.transform.position = Touch2Origin;
-        }
-    }
-
-    private Vector3 GetRawTouch(int index)
-    {
-        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
-            return Input.mousePosition;
-
-        return Input.touches.FirstOrDefault(t => t.fingerId == index).position;
-    }
-
-    private Vector3? GetDrag(int index)
-    {
-        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
-            return Input.mousePosition;
-
-        var touch = Input.touches.FirstOrDefault(t => t.fingerId == index);
-
-        if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended || touch.position == Vector2.zero)
-            return null;
-
-        return touch.position;
-    }
-
-    private bool GetMoving()
-    {
-        if (Application.platform == RuntimePlatform.WindowsEditor && !_mobileTouch)
-            return Dragging;
-
-        return Input.touches.Any(touch => touch.phase == TouchPhase.Moved);
-    }
-
-    private bool FingerLifted()
-    {
-        bool fingerLifted = false;
-        var touchCount = Input.touchCount;
-
-        if (touchCount < _touchCount)
-        {
-            fingerLifted = true;
-        }
-
-        _touchCount = touchCount;
-
-        return fingerLifted;
-    }
-
-    private void InitTouchIndexes()
-    {
-        _index0 = 0;
-        _index1 = 1;
-    }
-    private void SwitchTouchIndexes()
-    {
-        _index0 = 1 - _index0;
-        _index1 = 1 - _index0;
+        var trajectory = _jumper.SetTrajectory<T>();
+        _joystick2.ChangeColor(trajectory.Color);
+        trajectory.SetJumper(_jumper);
+        _jumper.JumpMode = trajectory.JumpMode;
     }
 
     private bool HeroSpawned()
@@ -379,13 +273,58 @@ public class TouchManager : MonoBehaviour
         if (_hero == null)
         {
             _hero = Hero.Instance;
-            _jumper = _hero?.Jumper as HeroJumper;
-            _stickiness = _hero?.Stickiness;
-            _dynamicInteraction = _hero?.DynamicInteraction;
+
             if (_hero == null)
                 return false;
+
+            _stickiness = _hero.Stickiness;
+            _jumper = _hero.Jumper;
+            _dynamicInteraction = _hero.DynamicInteraction;
         }
 
         return true;
+    }
+
+    public Vector3 GetWalkDirection()
+    {
+        return _joystick1.Direction;
+    }
+
+    private Vector3? GetTouch(TouchType touchType)
+    {
+        if (!_mobileTouch && Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            if (IsTouching(touchType))
+                return Input.mousePosition;
+
+            return null;
+        }
+
+        var touches = Input.touches;
+        if (touches.Count() == 0)
+            return null;
+
+        foreach (var touch in touches)
+        {
+            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Ended)
+                continue;
+
+            if (touchType == TouchType.Left && touch.position.x <= Screen.width / 2 || touchType == TouchType.Right && touch.position.x > Screen.width / 2)
+                return touch.position;
+        }
+
+        return null;
+    }
+
+    private bool IsTouching(TouchType touchType)
+    {
+        if (!_mobileTouch && Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            return touchType == TouchType.Left ? Input.GetButton("Fire1") : Input.GetButton("Fire2");
+        }
+        else
+        {
+            return touchType == TouchType.Left ? LeftTouch != null : RightTouch != null;
+        }
     }
 }

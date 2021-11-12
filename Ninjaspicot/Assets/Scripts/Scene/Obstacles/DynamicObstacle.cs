@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class DynamicObstacle : Obstacle, IDynamic, IActivable
+public class DynamicObstacle : Obstacle, IDynamic
 {
     [SerializeField] private PoolableType _poolableType;
     [SerializeField] protected float _customSpeed;
@@ -20,58 +19,31 @@ public class DynamicObstacle : Obstacle, IDynamic, IActivable
 
     protected override void OnCollisionEnter2D(Collision2D collision)
     {
-        base.OnCollisionEnter2D(collision);
-
         if (!DynamicActive || !collision.collider.CompareTag("hero"))
             return;
 
-        var stickiness = collision.collider.GetComponent<Stickiness>();
-
-        if (stickiness == null)
+        if (!collision.collider.TryGetComponent(out Stickiness stickiness) || stickiness.Attached)
             return;
+
+        base.OnCollisionEnter2D(collision);
 
         stickiness.SetContactPosition(collision.contacts[collision.contacts.Length - 1].point);
 
-        var dynamicInteraction = collision.collider.GetComponent<DynamicInteraction>();
-
-        if (!dynamicInteraction.Active || dynamicInteraction.Interacting)
-            return;
-
-        if (GetComponent<EnemyNinja>() != null)
+         if (!collision.collider.TryGetComponent(out DynamicInteraction dynamicInteraction) || !dynamicInteraction.Active || dynamicInteraction.Interacting)
             return;
 
         dynamicInteraction.StartInteraction(this);
     }
 
-    public void LaunchQuickDeactivate()
-    {
-        StartCoroutine(QuickDeactivate());
-    }
-
-    private IEnumerator QuickDeactivate()
-    {
-        Deactivate();
-        yield return new WaitForSeconds(.5f);
-        Activate();
-    }
-
-    public void Activate()
+    public override void Activate()
     {
         DynamicActive = true;
-        var heroCollider = Hero.Instance?.Stickiness?.Collider;
-        if (heroCollider != null)
-        {
-            Physics2D.IgnoreCollision(_collider, heroCollider, false);
-        }
+        base.Activate();
     }
 
-    public void Deactivate()
+    public override void Deactivate()
     {
         DynamicActive = false;
-        var heroCollider = Hero.Instance?.Stickiness?.Collider;
-        if (heroCollider != null)
-        {
-            Physics2D.IgnoreCollision(_collider, heroCollider);
-        }
+        base.Deactivate();
     }
 }

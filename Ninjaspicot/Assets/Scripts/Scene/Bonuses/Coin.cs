@@ -12,13 +12,11 @@ public class Coin : Bonus
         _characterManager = CharacterManager.Instance;
     }
 
-    protected override void OnTriggerEnter2D(Collider2D collision)
+    public override void Take()
     {
-        if (collision.CompareTag("hero"))
-        {
-            _characterManager.Gain(_value);
-        }
+        _characterManager.Gain(_value);
+        _audioManager.PlaySound(_audioSource, "Coin");
 
-        base.OnTriggerEnter2D(collision);
+        base.Take();
     }
 }

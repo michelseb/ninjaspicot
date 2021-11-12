@@ -9,14 +9,14 @@ TagManager:
   - Trigger
   - Turret
   - GrabableWall
-  - Moving
   - Enemy
   - Bullet
   - hero
-  - Spawn
   - Dynamic
   - DynamicWall
-  - TutorialWall
+  - Sound
+  - Bonus
+  - Interactive
   layers:
   - Default
   - TransparentFX
@@ -24,8 +24,6 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
   - Hero
   - Obstacle
   - Bullet
@@ -33,9 +31,11 @@ TagManager:
   - Teleporter
   - Enemy
   - DynamicObstacle
-  - PoppingObstacle
   - DynamicCollider
-  - 
+  - Sound
+  - Interactive
+  - Zone
+  - View
   - 
   - 
   - 
@@ -59,4 +59,7 @@ TagManager:
     locked: 0
   - name: Foreground
     uniqueID: 3656796725
+    locked: 0
+  - name: OutOfFlow
+    uniqueID: 50198309
     locked: 0

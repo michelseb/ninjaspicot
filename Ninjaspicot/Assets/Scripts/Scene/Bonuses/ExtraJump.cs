@@ -1,15 +1,23 @@
-﻿using UnityEngine;
-
-public class ExtraJump : Bonus
+﻿public class ExtraJump : Bonus, IResettable
 {
-    protected override void OnTriggerEnter2D(Collider2D collision)
+    public virtual void DoReset()
     {
-        var jumpManager = collision.GetComponent<Jumper>();
-        if (jumpManager != null)
+        if (_temporaryDeactivate != null)
         {
-            jumpManager.GainJumps(1);
+            StopCoroutine(_temporaryDeactivate);
         }
 
-        base.OnTriggerEnter2D(collision);
+        Activate();
+        //_animator.Rebind();
+        //_animator.Update(0);
+        //_animator.Play(_animator.GetCurrentAnimatorStateInfo(0).fullPathHash);
+    }
+
+    public override void Take()
+    {
+        _hero.Jumper.GainJumps(1);
+        _audioManager.PlaySound(_audioSource, "ExtraJump", .5f);
+
+        base.Take();
     }
 }

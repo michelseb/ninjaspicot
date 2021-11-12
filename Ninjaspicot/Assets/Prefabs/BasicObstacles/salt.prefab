@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 212824826086625252}
   - component: {fileID: 60737385495964764}
   - component: {fileID: 114548308164462768}
-  - component: {fileID: 50849623031120028}
   m_Layer: 9
   m_Name: salt
   m_TagString: Wall
@@ -109,16 +108,18 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.34947857, y: 0.874322}
-      - {x: 0.2144252, y: 0.9646344}
-      - {x: 0.011167253, y: 0.98981035}
-      - {x: -0.18885148, y: 0.974739}
-      - {x: -0.38484406, y: 0.8945301}
+    - - {x: 0.36722454, y: 0.90626305}
+      - {x: 0.28272355, y: 0.9580241}
+      - {x: 0.110610954, y: 0.9869864}
+      - {x: -0.119918816, y: 0.98870844}
+      - {x: -0.32045636, y: 0.9496056}
+      - {x: -0.39916337, y: 0.8989366}
       - {x: -0.40000042, y: -0.85937494}
-      - {x: -0.2147391, y: -0.9494781}
-      - {x: 0.12958416, y: -0.9545298}
+      - {x: -0.3321446, y: -0.9125442}
+      - {x: -0.18525694, y: -0.9670039}
+      - {x: 0.13313292, y: -0.97582346}
       - {x: 0.3197915, y: -0.9046347}
-      - {x: 0.36473736, y: -0.85463494}
+      - {x: 0.37467083, y: -0.8744986}
 --- !u!114 &114548308164462768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,24 +132,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66753898321d0a34a838299dfdf60307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!50 &50849623031120028
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1983499050522482}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
