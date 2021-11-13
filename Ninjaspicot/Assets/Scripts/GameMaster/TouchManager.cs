@@ -196,21 +196,15 @@ public class TouchManager : MonoBehaviour
         if (!JumpDragging)
             return false;
 
-        if (!_jumper.CanJump())
+        if (!_jumper.CanInitJump())
         {
             if (_jumper.TrajectoryInUse()) _jumper.CancelJump();
             return false;
         }
 
-        if (DashStart)
+        if (!_jumpDragInitialized)
         {
-            HandleTrajectoryInit<ChargeTrajectory>();
-            _jumpDragInitialized = false;
-            _dashInitialized = true;
-        }
-        else if (!Dashing && !_jumpDragInitialized)
-        {
-            HandleTrajectoryInit<ClassicTrajectory>();
+            HandleTrajectoryInit();
             _dashInitialized = false;
             _jumpDragInitialized = true;
         }
@@ -245,26 +239,21 @@ public class TouchManager : MonoBehaviour
 
         _stickiness.StopWalking(false);
 
-        switch (_jumper.JumpMode)
+        if (_jumper.Trajectory.Target != null)
         {
-            case JumpMode.Classic:
-                _jumper.NormalJump(-_joystick2.Direction);
-                break;
-            case JumpMode.Charge:
-                _jumper.Charge(-_joystick2.Direction);
-                break;
-            case JumpMode.Direct:
-                _jumper.LaunchDirectJump(_jumper.AimTarget);
-                break;
+            _jumper.Charge(-_joystick2.Direction);
+        }
+        else
+        {
+            _jumper.LaunchJump(_jumper.AimPosition);
         }
     }
 
-    private void HandleTrajectoryInit<T>() where T : TrajectoryBase
+    private void HandleTrajectoryInit()
     {
-        var trajectory = _jumper.SetTrajectory<T>();
+        var trajectory = _jumper.SetTrajectory();
         _joystick2.ChangeColor(trajectory.Color);
         trajectory.SetJumper(_jumper);
-        _jumper.JumpMode = trajectory.JumpMode;
     }
 
     private bool HeroSpawned()

@@ -5568,7 +5568,6 @@ MonoBehaviour:
   - {fileID: 8378157898518293004, guid: c8f243b37e6755a46bf45b793e83cb86, type: 3}
   - {fileID: 9040868208357890174, guid: a9aea617b3047a14c8a9c61a5aa7d9f1, type: 3}
   - {fileID: 3958402980913166440, guid: cd48a3f4a131ecc41980f3357a8383d5, type: 3}
-  - {fileID: 4971978839858147142, guid: 1a7e7bb8342113848920998acba938d9, type: 3}
   - {fileID: 5300732467323034326, guid: b38285446aa231b4bbeebe4d755707c8, type: 3}
   - {fileID: 2843356803364272668, guid: c8377d01e5500cf4c9c6d450c4eba3e4, type: 3}
   - {fileID: 5257107163935485547, guid: fe0c7f692c0de134d92b9c0d35af9284, type: 3}
@@ -6159,7 +6158,7 @@ LightingSettings:
   m_PVREnvironmentReferencePointCount: 2048
   m_LightProbeSampleCountMultiplier: 4
   m_PVRBounces: 2
-  m_PVRMinBounces: 1
+  m_PVRMinBounces: 2
   m_PVREnvironmentMIS: 0
   m_PVRFilteringMode: 2
   m_PVRDenoiserTypeDirect: 0

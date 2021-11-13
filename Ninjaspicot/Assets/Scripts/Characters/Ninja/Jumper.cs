@@ -1,25 +1,14 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public enum JumpMode
-{
-    Classic,
-    Charge,
-    Direct
-}
-
 public class Jumper : Dynamic
 {
     [SerializeField] private int _maxJumps;
     [SerializeField] protected float _strength;
 
     public bool Active { get; set; }
-    public TrajectoryBase Trajectory { get; protected set; }
-    public Vector3 TrajectoryOrigin { get; set; }
-    public Vector3 TrajectoryDestination { get; set; }
-    public Vector2 ChargeDestination { get; set; }
-    public Vector3 AimTarget { get; set; }
-    public JumpMode JumpMode { get; set; }
+    public Trajectory Trajectory { get; protected set; }
+    public Vector2 AimPosition { get; set; }
     protected int _jumps;
 
     protected IDynamic _dynamicEntity;
@@ -28,8 +17,7 @@ public class Jumper : Dynamic
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
-    protected Audio _normalJumpSound;
-    protected Audio _chargeJumpSound;
+    protected Audio _jumpSound;
     protected Audio _impactSound;
     protected DynamicInteraction _dynamicInteraction;
     protected TimeManager _timeManager;
@@ -57,61 +45,13 @@ public class Jumper : Dynamic
         GainAllJumps();
 
         _audioManager = AudioManager.Instance;
-        _normalJumpSound = _audioManager.FindAudioByName("Jump");
-        _chargeJumpSound = _audioManager.FindAudioByName("Dash");
+        _jumpSound = _audioManager.FindAudioByName("Jump");
         _impactSound = _audioManager.FindAudioByName("Impact");
 
         Active = true;
     }
 
-    public virtual void CalculatedJump(Vector2 velocity)
-    {
-        _stickiness.Detach();
-        _stickiness.StopWalking(false);
-        LoseJump();
-        _dynamicEntity.Rigidbody.velocity = velocity;
-
-        _poolManager.GetPoolable<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
-
-        if (TrajectoryInUse())
-        {
-            CommitJump();
-        }
-    }
-
-    public virtual void NormalJump(Vector2 direction)
-    {
-        if (_dynamicInteraction.Interacting)
-        {
-            _dynamicInteraction.StopInteraction(true);
-        }
-
-        if (GetJumps() <= 0)
-        {
-            _timeManager.SetNormalTime();
-        }
-        _cameraBehaviour.DoShake(.3f, .1f);
-
-        _stickiness.Detach();
-
-        direction = direction.normalized;
-
-        LoseJump();
-        _dynamicEntity.Rigidbody.velocity = Vector2.zero;
-        _dynamicEntity.Rigidbody.AddForce(direction * _strength, ForceMode2D.Impulse);
-
-        _poolManager.GetPoolable<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
-
-        if (TrajectoryInUse())
-        {
-            CommitJump();
-        }
-
-        Trajectory = null;
-    }
-
-
-    public virtual void LaunchDirectJump(Vector3 target)
+    public virtual void LaunchJump(Vector3 target)
     {
         if (_directJump != null) StopCoroutine(_directJump);
         _directJump = StartCoroutine(DirectJump(target));
@@ -147,19 +87,18 @@ public class Jumper : Dynamic
     {
         var initialPos = _dynamicEntity.Rigidbody.position;
         var pos = initialPos;
-        var dir = (ChargeDestination - pos).normalized;
+        var dir = (AimPosition - pos).normalized;
         pos += dir;
 
-        while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
+        while (Vector3.Dot(pos - initialPos, AimPosition - pos) > 0)
         {
-            _poolManager.GetPoolable<HeroGhost>(pos, Quaternion.AngleAxis(Utils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((ChargeDestination - pos).magnitude / 15, 1));
+            _poolManager.GetPoolable<HeroGhost>(pos, Quaternion.AngleAxis(Utils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((AimPosition - pos).magnitude / 15, 1));
             pos += dir * 10;
         }
 
         direction = direction.normalized;
-        _dynamicEntity.Rigidbody.position = ChargeDestination - (direction * 7);
+        _dynamicEntity.Rigidbody.position = AimPosition - (direction * 7);
 
-        NormalJump(direction);
         _cameraBehaviour.DoShake(.3f, .5f);
     }
 
@@ -168,41 +107,30 @@ public class Jumper : Dynamic
         if (Trajectory == null || !Trajectory.Active)
             return;
 
-        if (Trajectory is ChargeTrajectory chargeTrajectory)
-        {
-            _audioManager.PlaySound(_audioSource, _chargeJumpSound, .3f);
+        _audioManager.PlaySound(_audioSource, _jumpSound);
 
-            if (chargeTrajectory.Collides && (chargeTrajectory.Focusable == null || !chargeTrajectory.Focusable.IsSilent))
-            {
-                _audioManager.PlaySound(_audioSource, _impactSound);
-                _poolManager.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
-            }
-        }
-        else
+        if (Trajectory.Collides && (Trajectory.Focusable == null || !Trajectory.Focusable.IsSilent))
         {
-            _audioManager.PlaySound(_audioSource, _normalJumpSound);
+            _audioManager.PlaySound(_audioSource, _impactSound);
+            //_poolManager.GetPoolable<SoundEffect>(AimPosition, Quaternion.identity, 5);
         }
 
         Trajectory.StartFading();
 
-        if (Trajectory is ChargeTrajectory c)
-        {
-            c.Bonuses.ForEach(x => x.Take());
-            c.Interactives.ForEach(x => x.Activate());
+        Trajectory.Bonuses.ForEach(x => x.Take());
+        Trajectory.Interactives.ForEach(x => x.Activate());
 
-            if (c.Target == null)
-                return;
+        if (Trajectory.Target == null)
+            return;
 
-            //Bounce
-            Bounce(c.Target.Transform.position);
+        //Bounce
+        Bounce(Trajectory.Target.Transform.position);
 
-            c.Target.Die(Transform);
-            c.Target = null;
-            GainJumps(1);
-            _timeManager.SlowDown();
-            _timeManager.StartTimeRestore();
-
-        }
+        Trajectory.Target.Die(Transform);
+        Trajectory.Target = null;
+        GainJumps(1);
+        _timeManager.SlowDown();
+        _timeManager.StartTimeRestore();
     }
 
     public virtual void CancelJump()
@@ -214,21 +142,15 @@ public class Jumper : Dynamic
         _timeManager.SetNormalTime();
     }
 
-    public void SetJumpPositions(Vector3 origin, Vector3 destination)
+    protected Trajectory GetTrajectory()
     {
-        TrajectoryOrigin = origin;
-        TrajectoryDestination = destination;
-    }
-
-    protected TrajectoryBase GetTrajectory<T>() where T : TrajectoryBase
-    {
-        if (TrajectoryInUse() && !(Trajectory is T))
+        if (TrajectoryInUse())
         {
             Trajectory.StartFading();
         }
 
-        if (Trajectory == null || !Trajectory.Active || !(Trajectory is T))
-            return _poolManager.GetPoolable<T>(transform.position, Quaternion.identity);
+        if (Trajectory == null || !Trajectory.Active)
+            return _poolManager.GetPoolable<Trajectory>(transform.position, Quaternion.identity);
 
         Trajectory.ReUse(Transform.position);
         return Trajectory;
@@ -285,16 +207,17 @@ public class Jumper : Dynamic
         _jumps = _maxJumps;
     }
 
-    public virtual bool CanJump()
+    public virtual bool CanInitJump()
     {
         if (CompareTag("Dynamic"))
-            return Hero.Instance.Jumper.CanJump();
+            return Hero.Instance.Jumper.CanInitJump();
 
         if (!Active || GetJumps() <= 0)
             return false;
 
-        return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Hero.Instance.Id,
-        layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")));
+        return true;
+        //return !Utils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Hero.Instance.Id,
+        //layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")));
     }
 
     public virtual bool ReadyToJump()
@@ -302,17 +225,17 @@ public class Jumper : Dynamic
         if (CompareTag("Dynamic"))
             return Hero.Instance.Jumper.ReadyToJump();
 
-        return CanJump() && TrajectoryInUse();
+        return CanInitJump() && TrajectoryInUse() && Trajectory.Aiming;
     }
 
-    public T SetTrajectory<T>() where T : TrajectoryBase
+    public Trajectory SetTrajectory()
     {
-        if (TrajectoryInUse() && Trajectory is T trajectory)
-            return trajectory;
+        if (TrajectoryInUse())
+            return Trajectory;
 
-        Trajectory = GetTrajectory<T>();
+        Trajectory = GetTrajectory();
         Trajectory.Strength = _strength;
-        return (T)Trajectory;
+        return Trajectory;
     }
 
     public bool TrajectoryInUse()
