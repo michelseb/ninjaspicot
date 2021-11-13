@@ -18,9 +18,8 @@ public class TouchManager : MonoBehaviour
     public bool WalkBegin => WalkTouching && !_walkInitialized;
     public bool WalkEnd => !WalkTouching && _walkInitialized;
     public bool Touching => WalkTouching || JumpTouching;
-    private bool _walkDragging;
-    public bool WalkDragging => _walkDragging || (_joystick1 != null && _joystick1.Direction.magnitude > .2f);
-    public bool JumpDragging => _joystick2 != null && _joystick2.Direction.magnitude > .2f;
+    public bool WalkDragging => _walkDragInitialized || (_joystick1 != null && _joystick1.Direction.magnitude > .2f);
+    public bool JumpDragging => _jumpDragInitialized || (_joystick2 != null && _joystick2.Direction.magnitude > .2f);
     public bool JumpStart => JumpTouching && !_jumpInitialized;
     public bool JumpEnd => !JumpTouching && _jumpInitialized;
     public bool DoubleTouching => JumpTouching && WalkTouching;
@@ -42,10 +41,12 @@ public class TouchManager : MonoBehaviour
     private Camera _uiCamera;
     private Transform _canvasTransform;
     private bool _walkInitialized;
+    private bool _walkDragInitialized;
     private bool _jumpInitialized;
     private bool _jumpDragInitialized;
     private bool _runInitialized;
     private bool _dashInitialized;
+    private bool _doubleTapInitialized;
 
     private void Awake()
     {
@@ -69,12 +70,15 @@ public class TouchManager : MonoBehaviour
 
         _stickiness = (_dynamicInteraction != null && _dynamicInteraction.Interacting) ? _dynamicInteraction.CloneHeroStickiness : Hero.Instance.Stickiness;
 
+        HandleDoubleTapInitEvent();
         HandleWalkTouchInitEvent();
         HandleJumpTouchInitEvent();
         if (!HandleJumpTouchEvent())
         {
             HandleWalkTouchEvent();
         }
+        HandleDoubleTapEvent();
+        HandleDoubleTapEndEvent();
         HandleWalkTouchEndEvent();
         HandleJumpTouchEndEvent();
     }
@@ -124,7 +128,7 @@ public class TouchManager : MonoBehaviour
         if (!WalkDragging)
             return false;
 
-        _walkDragging = true;
+        _walkDragInitialized = true;
 
         if (!_stickiness.Attached || !_stickiness.CanWalk)
             return false;
@@ -158,7 +162,7 @@ public class TouchManager : MonoBehaviour
         _stickiness.ReinitSpeed();
         _hero.StopDisplayGhosts();
         _runInitialized = false;
-        _walkDragging = false;
+        _walkDragInitialized = false;
         _walkInitialized = false;
 
         return true;
@@ -232,6 +236,41 @@ public class TouchManager : MonoBehaviour
         return true;
     }
 
+    private bool HandleDoubleTapInitEvent()
+    {
+        if (!DoubleTouching)
+            return false;
+
+        _doubleTapInitialized = true;
+
+        return true;
+    }
+
+    private bool HandleDoubleTapEvent()
+    {
+        if (!_doubleTapInitialized)
+            return false;
+
+        _doubleTapInitialized = _doubleTapInitialized && !_jumpDragInitialized && !_walkDragInitialized;
+
+        return true;
+    }
+
+    private bool HandleDoubleTapEndEvent()
+    {
+        if (!_doubleTapInitialized || WalkTouching || JumpTouching)
+            return false;
+
+        DoRelease();
+
+        HandleJumpTouchEndEvent();
+        HandleWalkTouchEndEvent();
+
+        _doubleTapInitialized = false;
+
+        return true;
+    }
+
     private void DoJump()
     {
         if (!_jumper.ReadyToJump())
@@ -247,6 +286,13 @@ public class TouchManager : MonoBehaviour
         {
             _jumper.LaunchJump(_jumper.AimPosition);
         }
+    }
+
+    private void DoRelease()
+    {
+        _stickiness.StopWalking(false);
+        _stickiness.Detach();
+        _stickiness.Rigidbody.AddForce(Quaternion.Euler(0, 0, 90) * _stickiness.CollisionNormal * 500);
     }
 
     private void HandleTrajectoryInit()
