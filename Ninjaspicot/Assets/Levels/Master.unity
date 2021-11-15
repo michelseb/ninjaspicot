@@ -5714,6 +5714,10 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 1c97f6867bdb6174ead261323a731f33, type: 3}
   - Name: DoorOpen
     Clip: {fileID: 8300000, guid: ddedab5fefdb4d34295bcdd89bf8bfac, type: 3}
+  - Name: GrapplingThrow
+    Clip: {fileID: 8300000, guid: a1f7c36fc4f60194db0f7fa54ddb18f4, type: 3}
+  - Name: GrapplingHit
+    Clip: {fileID: 8300000, guid: 1c8e9b2ca42fe6d40bf4ca5a0e602960, type: 3}
 --- !u!82 &780851366
 AudioSource:
   m_ObjectHideFlags: 0

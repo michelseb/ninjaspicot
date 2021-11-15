@@ -35,7 +35,6 @@ public class Trajectory : Dynamic, IPoolable
     protected virtual float _fadeSpeed => .5f;
     protected const int MAX_VERTEX = 300; //50
     protected const float LENGTH = .01f;
-    private const float CHARGE_LENGTH = 40f;
 
     public PoolableType PoolableType => PoolableType.None;
     protected virtual void Awake()
@@ -48,6 +47,13 @@ public class Trajectory : Dynamic, IPoolable
         Color = CustomColor.Blue;
     }
 
+    protected virtual void Update()
+    {
+        var color = Aiming ? ColorUtils.Red : ColorUtils.Grey;
+        _line.startColor = color;
+        _line.endColor = color;
+    }
+
     protected virtual void OnEnable()
     {
         Active = true;
@@ -57,8 +63,8 @@ public class Trajectory : Dynamic, IPoolable
     {
         _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
 
-        var targetPosition = linePosition - direction.normalized * CHARGE_LENGTH;
-        var chargeHit = StepClear(linePosition, targetPosition - linePosition, CHARGE_LENGTH);
+        var targetPosition = linePosition - direction.normalized * Jumper.CHARGE_LENGTH;
+        var chargeHit = StepClear(linePosition, targetPosition - linePosition, Jumper.CHARGE_LENGTH);
 
         HandleTrajectoryHit(chargeHit, linePosition, ref targetPosition);
 
@@ -88,7 +94,7 @@ public class Trajectory : Dynamic, IPoolable
 
             if (!HandleFocusableCast(hit, ref chargePos))
             {
-                hit = StepClearWall(linePosition, chargePos - linePosition, CHARGE_LENGTH);
+                hit = StepClearWall(linePosition, chargePos - linePosition, Jumper.CHARGE_LENGTH);
                 SetAudioSimulator(_line.GetPosition(1), 5);
                 DeactivateAim();
                 if (hit)
@@ -198,7 +204,7 @@ public class Trajectory : Dynamic, IPoolable
     protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {
         // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-        return Physics2D.CircleCast(origin, .8f, direction, distance,
+        return Physics2D.CircleCast(origin, .7f, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) | 
                     (1 << LayerMask.NameToLayer("DynamicObstacle")) | 
                     (1 << LayerMask.NameToLayer("Enemy")) |
@@ -209,7 +215,7 @@ public class Trajectory : Dynamic, IPoolable
     protected virtual RaycastHit2D StepClearWall(Vector3 origin, Vector3 direction, float distance)
     {
         // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-        return Physics2D.CircleCast(origin, .8f, direction, distance,
+        return Physics2D.CircleCast(origin, .7f, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) |
                     (1 << LayerMask.NameToLayer("DynamicObstacle")));
     }
@@ -219,27 +225,12 @@ public class Trajectory : Dynamic, IPoolable
         _jumper = jumper;
     }
 
-    public virtual void StartFading()
+    public virtual void Disable()
     {
         Used = false;
-        StartCoroutine(FadeAway());
-        DeactivateAim();
-    }
-
-    protected virtual IEnumerator FadeAway()
-    {
-        //_audioSimulator?.Sleep();
-        //_audioSimulator = null;
-
+        //StartCoroutine(FadeAway());
         _timeManager.SetNormalTime();
-        Color col = _line.material.color;
-        while (col.a > 0)
-        {
-            col = _line.material.color;
-            col.a -= Time.deltaTime * _fadeSpeed;
-            _line.material.color = col;
-            yield return null;
-        }
+        DeactivateAim();
         Active = false;
         Sleep();
     }

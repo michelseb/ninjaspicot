@@ -1,21 +1,9 @@
 ﻿using UnityEngine;
 
-public class HidingZone : MonoBehaviour, IFocusable
+public class HidingZone : MonoBehaviour
 {
     private Hero _hero;
     public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
-
-    public bool IsSilent => true;
-
-    public bool Active { get; set; }
-    public bool Taken => !Active;
-
-    public bool FocusedByNormalJump => true;
-
-    private void Awake()
-    {
-        ActivateLocation();
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -27,7 +15,6 @@ public class HidingZone : MonoBehaviour, IFocusable
         if (!collision.CompareTag("hero"))
             return;
 
-        DeactivateLocation();
         Hero.Hide();
     }
 
@@ -36,17 +23,6 @@ public class HidingZone : MonoBehaviour, IFocusable
         if (!collision.CompareTag("hero"))
             return;
 
-        ActivateLocation();
         Hero.Reveal();
-    }
-
-    private void ActivateLocation()
-    {
-        Active = true;
-    }
-
-    private void DeactivateLocation()
-    {
-        Active = false;
     }
 }

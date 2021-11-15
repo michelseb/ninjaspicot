@@ -47,7 +47,7 @@ public class HeroGhost : Dynamic, IPoolable
     public void Wake()
     {
         gameObject.SetActive(true);
-        var color = Hero.Instance.Renderer.color;
+        var color = Hero.Instance.Image.color;
         _renderer.color = new Color(color.r, color.g, color.b, _initAlpha);
     }
 

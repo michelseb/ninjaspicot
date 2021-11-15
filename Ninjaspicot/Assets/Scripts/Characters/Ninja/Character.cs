@@ -44,7 +44,23 @@ public abstract class Character : Dynamic, IRaycastable, IKillable
         }
     }
 
-    public Image Image { get; private set; }
+    private Image _image;
+    public virtual Image Image
+    {
+        get
+        {
+            if (Utils.IsNull(_image))
+            {
+                _image = GetComponent<Image>();
+                if (Utils.IsNull(_image))
+                {
+                    _image = GetComponentInChildren<Image>();
+                }
+            }
+
+            return _image;
+        }
+    }
 
     public bool Dead { get; set; }
 
@@ -61,7 +77,6 @@ public abstract class Character : Dynamic, IRaycastable, IKillable
         _poolManager = PoolManager.Instance;
         _characterLight = GetComponentInChildren<CharacterLight>();
         _cameraBehaviour = CameraBehaviour.Instance;
-        Image = GetComponent<Image>();
     }
 
     protected virtual void Start()

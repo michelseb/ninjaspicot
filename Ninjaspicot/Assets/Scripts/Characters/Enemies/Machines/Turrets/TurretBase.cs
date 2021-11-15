@@ -27,15 +27,17 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
     public bool Seeing { get; set; }
 
     protected Aim _aim;
-    protected Image _image;
     protected Vector3 _targetLocation;
     protected Coroutine _wait;
+
+    private Image _turretHeadImage;
+    public override Image Image => _turretHeadImage;
 
     protected override void Awake()
     {
         base.Awake();
         _aim = GetComponentInChildren<Aim>();
-        _image = _turretHead.GetComponent<Image>();
+        _turretHeadImage = _turretHead.GetComponent<Image>();
     }
 
     protected override void Start()
@@ -50,7 +52,7 @@ public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
 
     protected virtual void Update()
     {
-        _image.color = Active ? ColorUtils.Red : ColorUtils.White;
+        Image.color = Active ? ColorUtils.Red : ColorUtils.White;
 
         if (!Active)
             return;

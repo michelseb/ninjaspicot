@@ -16,6 +16,11 @@ public class Hero : Character, INinja, ITriggerable
     private HeroStickiness _stickiness;
     public Stickiness Stickiness { get { if (Utils.IsNull(_stickiness)) _stickiness = GetComponent<HeroStickiness>(); return _stickiness; } }
 
+    private GameObject _grapplingGunObject;
+    private GrapplingGun _gun;
+    
+    public Rigidbody2D Rigidbody => Stickiness.Rigidbody;
+
     private Cloth _cape;
     private TimeManager _timeManager;
     private SpawnManager _spawnManager;
@@ -42,6 +47,8 @@ public class Hero : Character, INinja, ITriggerable
         _touchManager = TouchManager.Instance;
         _zoneManager = ZoneManager.Instance;
         _uiCamera = UICamera.Instance;
+        _gun = GetComponentInChildren<GrapplingGun>(true);
+        _grapplingGunObject = _gun.gameObject;
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
         Visible = true;
@@ -68,7 +75,7 @@ public class Hero : Character, INinja, ITriggerable
         
         SetAllBehavioursActivation(false, false);
         StopDisplayGhosts();
-        Renderer.color = ColorUtils.Red;
+        Image.color = ColorUtils.Red;
         _timeManager.StartSlowDownProgressive(.3f);
 
         if (DynamicInteraction.Interacting)
@@ -190,12 +197,12 @@ public class Hero : Character, INinja, ITriggerable
 
     private IEnumerator FadeAway()
     {
-        Color col = Renderer.color;
+        Color col = Image.color;
         while (col.a > 0)
         {
-            col = Renderer.color;
+            col = Image.color;
             col.a -= Time.deltaTime * FADE_SPEED;
-            Renderer.color = col;
+            Image.color = col;
             yield return null;
         }
         Stickiness.Rigidbody.velocity = Vector2.zero;
@@ -205,12 +212,12 @@ public class Hero : Character, INinja, ITriggerable
 
     private IEnumerator Appear()
     {
-        Color col = Renderer.color;
+        Color col = Image.color;
         while (col.a < 1)
         {
-            col = Renderer.color;
+            col = Image.color;
             col.a += Time.deltaTime * FADE_SPEED;
-            Renderer.color = col;
+            Image.color = col;
             yield return null;
         }
     }
@@ -273,5 +280,26 @@ public class Hero : Character, INinja, ITriggerable
     public virtual void Reveal()
     {
         Visible = true;
+    }
+
+    public virtual void ActivateGrappling(Vector2 target)
+    {
+        _grapplingGunObject.SetActive(true);
+        _gun.StartThrow(target);
+    }
+
+    public virtual void DeactivateGrappling()
+    {
+        _grapplingGunObject.SetActive(false);
+    }
+
+    public virtual void ActivateCollider()
+    {
+        Collider.enabled = true;
+    }
+
+    public virtual void DeactivateCollider()
+    {
+        Collider.enabled = false;
     }
 }

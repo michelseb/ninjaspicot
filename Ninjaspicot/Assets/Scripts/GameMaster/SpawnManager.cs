@@ -50,7 +50,7 @@ public class SpawnManager : MonoBehaviour
         hero.Stickiness.Rigidbody.isKinematic = false;
         hero.Stickiness.CurrentAttachment = null;
         hero.Dead = false;
-        hero.Renderer.color = Color.white;
+        hero.Image.color = Color.white;
         _timeManager.SetNormalTime();
         _cameraBehaviour.Zoom(ZoomType.Init);
 

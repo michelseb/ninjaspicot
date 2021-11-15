@@ -205,12 +205,12 @@ public abstract class Robot : Enemy, IListener, IViewer
     }
 
     protected abstract void Guard();
-    protected abstract void Patrol(); 
-    protected abstract void Check(); 
-    protected abstract void Chase(Vector3 targetPosition); 
-    protected abstract void Return(); 
-    protected abstract void LookFor(); 
-    protected abstract void Communicate(); 
+    protected abstract void Patrol();
+    protected abstract void Check();
+    protected abstract void Chase(Vector3 targetPosition);
+    protected abstract void Return();
+    protected abstract void LookFor();
+    protected abstract void Communicate();
 
     public override void Sleep()
     {
@@ -241,7 +241,7 @@ public abstract class Robot : Enemy, IListener, IViewer
         if (Dead)
             return;
 
-        if (killer != null)
+        if (killer != null && !Utils.IsNull(_rigidbody))
         {
             _rigidbody.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
         }
@@ -252,8 +252,11 @@ public abstract class Robot : Enemy, IListener, IViewer
     public override void DoReset()
     {
         StopAllCoroutines();
-        _rigidbody.velocity = Vector2.zero;
-        _rigidbody.angularVelocity = 0;
+        if (!Utils.IsNull(_rigidbody))
+        {
+            _rigidbody.velocity = Vector2.zero;
+            _rigidbody.angularVelocity = 0;
+        }
         Laser.SetActive(false);
         base.DoReset();
     }

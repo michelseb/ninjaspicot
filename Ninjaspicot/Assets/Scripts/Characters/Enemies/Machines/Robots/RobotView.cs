@@ -2,12 +2,12 @@
 
 public class RobotView : FieldOfView
 {
-    private GuardRobotBall _robot;
+    private Robot _robot;
 
     protected override void Awake()
     {
         base.Awake();
-        _robot = GetComponentInParent<GuardRobotBall>();
+        _robot = GetComponentInParent<Robot>();
     }
 
     protected override void OnTriggerEnter2D(Collider2D collider)

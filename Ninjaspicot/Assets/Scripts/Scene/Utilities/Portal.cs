@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Portal : MonoBehaviour, IActivable, IFocusable
 {
@@ -21,7 +22,7 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
 
     public Hero Hero;
     public LayerMask TeleportedLayer;
-    public SpriteRenderer TeleportedRenderer;
+    public Image TeleportedRenderer;
     public SpriteMaskInteraction SpriteMaskInteraction;
     private UICamera _uiCamera;
     private PortalManager _portalManager;
@@ -137,12 +138,12 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
         }
 
         Other.Hero = Hero;
-        TeleportedRenderer = Hero.GetComponent<SpriteRenderer>();
+        TeleportedRenderer = Hero.GetComponent<Image>();
         Other.TeleportedLayer = TeleportedLayer;
-        SpriteMaskInteraction = TeleportedRenderer.maskInteraction;
+        //SpriteMaskInteraction = TeleportedRenderer.maskInteraction;
         Other.SpriteMaskInteraction = SpriteMaskInteraction;
 
-        TeleportedRenderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+        //TeleportedRenderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
 
         foreach (var renderer in Hero.GetComponentsInChildren<SpriteRenderer>())
         {
@@ -190,7 +191,7 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
 
         if (TeleportedRenderer != null)
         {
-            TeleportedRenderer.maskInteraction = SpriteMaskInteraction;
+            //TeleportedRenderer.maskInteraction = SpriteMaskInteraction;
             foreach (var renderer in Hero.GetComponentsInChildren<SpriteRenderer>())
             {
                 renderer.maskInteraction = SpriteMaskInteraction;

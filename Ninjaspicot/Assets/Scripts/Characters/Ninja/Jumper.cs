@@ -22,9 +22,13 @@ public class Jumper : Dynamic
     protected DynamicInteraction _dynamicInteraction;
     protected TimeManager _timeManager;
     protected CameraBehaviour _cameraBehaviour;
+    protected Hero _hero;
 
     protected Coroutine _directJump;
     protected float _initGravity;
+
+    public const float CHARGE_LENGTH = 60f;
+
     protected virtual void Awake()
     {
         _dynamicEntity = GetComponent<IDynamic>();
@@ -35,6 +39,7 @@ public class Jumper : Dynamic
         _poolManager = PoolManager.Instance;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
+        _hero = Hero.Instance;
         _initGravity = _dynamicEntity.Rigidbody.gravityScale;
     }
 
@@ -53,8 +58,11 @@ public class Jumper : Dynamic
 
     public virtual void LaunchJump(Vector3 target)
     {
-        if (_directJump != null) StopCoroutine(_directJump);
-        _directJump = StartCoroutine(DirectJump(target));
+        //if (_directJump != null) StopCoroutine(_directJump);
+        //_directJump = StartCoroutine(DirectJump(target));
+
+        _hero.ActivateGrappling(target);
+
     }
 
     public virtual IEnumerator DirectJump(Vector3 target)
@@ -79,7 +87,7 @@ public class Jumper : Dynamic
             yield return null;
         }
 
-        _dynamicEntity.Rigidbody.gravityScale = _initGravity;
+        ReinitGravity();
         _directJump = null;
     }
 
@@ -115,7 +123,7 @@ public class Jumper : Dynamic
             //_poolManager.GetPoolable<SoundEffect>(AimPosition, Quaternion.identity, 5);
         }
 
-        Trajectory.StartFading();
+        Trajectory.Disable();
 
         Trajectory.Bonuses.ForEach(x => x.Take());
         Trajectory.Interactives.ForEach(x => x.Activate());
@@ -138,15 +146,20 @@ public class Jumper : Dynamic
         if (Trajectory == null || !Trajectory.Active)
             return;
 
-        Trajectory.StartFading();
+        Trajectory.Disable();
         _timeManager.SetNormalTime();
+    }
+
+    public void ReinitGravity()
+    {
+        _dynamicEntity.Rigidbody.gravityScale = _initGravity;
     }
 
     protected Trajectory GetTrajectory()
     {
         if (TrajectoryInUse())
         {
-            Trajectory.StartFading();
+            Trajectory.Disable();
         }
 
         if (Trajectory == null || !Trajectory.Active)
