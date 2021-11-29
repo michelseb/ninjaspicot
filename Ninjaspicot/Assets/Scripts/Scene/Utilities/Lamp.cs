@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettable
+public class Lamp : Dynamic, ISceneryWakeable, IBreakable, IResettable
 {
     public Animator Animator { get; private set; }
 
@@ -14,10 +14,10 @@ public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettab
     public bool StayOn { get; set; }
     public bool IsSilent => false;
     public bool Taken => false;
-    public bool FocusedByNormalJump => false;
 
-    protected bool _broken;
+    public bool Broken { get; set; }
 
+    public bool Charge => true;
 
     protected virtual void Awake()
     {
@@ -26,7 +26,7 @@ public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettab
 
     public virtual void Wake()
     {
-        if (_broken)
+        if (Broken)
             return;
 
         Animator.SetTrigger("TurnOn");
@@ -45,18 +45,28 @@ public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettab
         Light.color = color;
     }
 
-    public void Activate()
-    {
-        _broken = true;
-        Hero.Instance.Jumper.Bounce(Transform.position);
-        Sleep();
-    }
-
-    public void Deactivate() { }
-
     public void DoReset()
     {
-        _broken = false;
+        Animator.enabled = true;
+        Light.enabled = true;
+        Broken = false;
         Wake();
+    }
+
+    public bool Break(Transform killer = null, Audio sound = null, float volume = 1)
+    {
+        if (Broken)
+            return false;
+
+        Animator.enabled = false;
+        Light.enabled = false;
+        Hero.Instance.GrapplingGun.Bounce(Transform.position);
+
+        return true;
+    }
+
+    public void GoTo()
+    {
+        Break();
     }
 }

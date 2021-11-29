@@ -7,10 +7,10 @@ public class RobotLeg : Dynamic
     [SerializeField] private int _index;
 
     private Vector2 _currentTarget;
-    private const float REPLACEMENT_DISTANCE_THRESHOLD = 2f;
+    private const float REPLACEMENT_DISTANCE_THRESHOLD = 8f;
     private Coroutine _moveLeg;
     private SpiderBot _spiderBot;
-    public float Speed => _spiderBot.MoveSpeed;
+    public float Speed => _spiderBot.Velocity;
     public bool Grounded => _moveLeg == null;
 
     private void Awake()

@@ -2,16 +2,15 @@
 using System.Collections;
 using UnityEngine;
 
-public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettable
+public abstract class Enemy : Character, ISceneryWakeable, IResettable
 {
     [SerializeField] protected StateType _initState;
-    [SerializeField] protected Collider2D _castArea;
     [SerializeField] protected float _rotateSpeed;
     [SerializeField] protected float _moveSpeed;
 
     public float MoveDirection { get; set; }
 
-    public float MoveSpeed => GetMovementSpeed();
+    public float Velocity => GetMovement();
     public float RotateSpeed => GetRotateSpeed();
 
     protected CharacterState _state;
@@ -28,17 +27,21 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     }
 
     public bool Attacking { get; protected set; }
+    public Transform TargetTransform { get; protected set; }
+    public Vector3 TargetPosition { get; protected set; }
+
+    public override Transform Transform
+    {
+        get 
+        {
+            if (Utils.IsNull(_transform)) _transform = Renderer?.transform ?? Image.transform; return _transform;
+        }
+    }
+
     public bool Active { get; protected set; }
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-    #region IFocusable
-    public bool IsSilent => true;
-    public bool Taken => false;
-
-    public bool FocusedByNormalJump => false;
-    #endregion
 
     protected Animator _animator;
 
@@ -49,15 +52,19 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
     {
         base.Awake();
         _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
-        Active = _startAwake;
     }
 
     protected override void Start()
     {
         base.Start();
-        MoveDirection = Mathf.Sign(MoveSpeed);
+        MoveDirection = Mathf.Sign(Velocity);
         _resetPosition = Transform.position;
         _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
+
+        if (_startAwake)
+        {
+            Wake();
+        }
     }
 
     public override IEnumerator Dying()
@@ -182,11 +189,6 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
             _state = null;
         }
 
-        if (!Utils.IsNull(_castArea))
-        {
-            _castArea.enabled = false;
-        }
-
         if (!Utils.IsNull(Collider))
         {
             Collider.enabled = false;
@@ -223,9 +225,14 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         return _rotateSpeed * Time.deltaTime * GetRotationSpeedFactor(State.StateType);
     }
 
-    protected virtual float GetMovementSpeed()
+    protected virtual float GetMovement()
     {
         return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType) * MoveDirection;
+    }
+
+    protected virtual float GetMovementSpeed()
+    {
+        return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType);
     }
 
     protected virtual void Flip()
@@ -233,7 +240,7 @@ public abstract class Enemy : Character, ISceneryWakeable, IFocusable, IResettab
         MoveDirection *= -1;
     }
 
-    protected float GetMovementSpeedFactor(StateType stateType)
+    protected virtual float GetMovementSpeedFactor(StateType stateType)
     {
         switch (stateType)
         {

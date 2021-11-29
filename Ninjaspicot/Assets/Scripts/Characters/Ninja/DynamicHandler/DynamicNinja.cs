@@ -3,12 +3,10 @@
 public class DynamicNinja : MonoBehaviour
 {
     private INinja _linkedNinja;
-    public Jumper JumpManager { get; private set; }
     public DynamicStickiness Stickiness { get; private set; }
 
     protected virtual void Awake()
     {
-        JumpManager = GetComponent<Jumper>();
         Stickiness = GetComponent<DynamicStickiness>();
     }
 

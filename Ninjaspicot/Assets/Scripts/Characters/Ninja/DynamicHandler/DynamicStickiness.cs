@@ -20,17 +20,6 @@ public class DynamicStickiness : Stickiness
         CurrentSpeed = _hero.Stickiness.CurrentSpeed;
     }
 
-
-    public override bool ReactToObstacle(Obstacle obstacle, Vector3 contactPoint)
-    {
-        if (!Active || obstacle == CurrentAttachment)
-            return false;
-
-        _hero.Jumper.GainAllJumps();
-
-        return base.ReactToObstacle(obstacle, contactPoint);
-    }
-
     protected override IEnumerator WalkOnWalls(HingeJoint2D hinge)
     {
         if (hinge == null)

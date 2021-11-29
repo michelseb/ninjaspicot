@@ -1,32 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Trajectory : Dynamic, IPoolable
 {
     public bool Used { get; protected set; }
     public bool Active { get; protected set; }
-    public float Strength { get; set; }
-    public IFocusable Focusable { get; protected set; }
 
     public CustomColor Color { get; set; }
-    public IKillable Target { get; set; }
-    private List<Bonus> _bonuses;
-    public List<Bonus> Bonuses { get { if (_bonuses == null) _bonuses = new List<Bonus>(); return _bonuses; } }
+    public IFocusable Target { get; set; }
 
-    private List<IActivable> _interactives;
-    public List<IActivable> Interactives { get { if (_interactives == null) _interactives = new List<IActivable>(); return _interactives; } }
-
-    public bool Collides { get; private set; }
     public bool Aiming => _aimIndicator != null;
-    private Transform _targetTransform;
-    
 
     protected LineRenderer _line;
     protected TimeManager _timeManager;
     protected PoolManager _poolManager;
-    protected Jumper _jumper;
+    protected GrapplingGun _grapplingGun;
     protected AimIndicator _aimIndicator;
     //protected SimulatedSoundEffect _audioSimulator;
 
@@ -41,6 +28,7 @@ public class Trajectory : Dynamic, IPoolable
     {
         _timeManager = TimeManager.Instance;
         _poolManager = PoolManager.Instance;
+        _grapplingGun = Hero.Instance.GrapplingGun;
         _line = GetComponent<LineRenderer>();
         _lineWidth = _line.widthCurve;
         _line.positionCount = 2;
@@ -63,19 +51,12 @@ public class Trajectory : Dynamic, IPoolable
     {
         _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
 
-        var targetPosition = linePosition - direction.normalized * Jumper.CHARGE_LENGTH;
-        var chargeHit = StepClear(linePosition, targetPosition - linePosition, Jumper.CHARGE_LENGTH);
+        var targetPosition = linePosition - direction.normalized * GrapplingGun.CHARGE_LENGTH;
+        var chargeHit = StepClear(linePosition, targetPosition - linePosition, GrapplingGun.CHARGE_LENGTH);
 
         HandleTrajectoryHit(chargeHit, linePosition, ref targetPosition);
 
-        if (_jumper != null)
-        {
-            _jumper.AimPosition = targetPosition;
-        }
-
         _line.SetPosition(1, targetPosition);
-
-        Interact(linePosition, targetPosition);
     }
 
     private bool HandleTrajectoryHit(RaycastHit2D hit, Vector2 linePosition, ref Vector2 chargePos)
@@ -84,129 +65,55 @@ public class Trajectory : Dynamic, IPoolable
         {
             DeactivateAim();
             Target = null;
-            Collides = false;
             return false;
         }
 
-        if (!HandleEnemyCast(hit, ref chargePos))
+        if (!HandleFocusableCast(hit, ref chargePos))
         {
-            Target = null;
-
-            if (!HandleFocusableCast(hit, ref chargePos))
+            hit = StepClearWall(linePosition, chargePos - linePosition, GrapplingGun.CHARGE_LENGTH);
+            SetAudioSimulator(_line.GetPosition(1), 5);
+            DeactivateAim();
+            if (hit)
             {
-                hit = StepClearWall(linePosition, chargePos - linePosition, Jumper.CHARGE_LENGTH);
-                SetAudioSimulator(_line.GetPosition(1), 5);
-                DeactivateAim();
-                if (hit)
-                {
-                    chargePos = hit.point;
-                }
+                chargePos = hit.point;
             }
         }
-
-        Collides = true;
 
         return true;
     }
 
     private bool HandleFocusableCast(RaycastHit2D hit, ref Vector2 chargePos)
     {
-        if (!hit.collider.CompareTag("Interactive"))
+        if (!hit.collider.CompareTag("Interactive") && !hit.collider.CompareTag("Enemy"))
             return false;
 
         if (!hit.collider.TryGetComponent(out IFocusable focusable))
-            return false;
+        {
+            focusable = hit.collider.GetComponentInParent<IFocusable>();
+
+            if (focusable == null)
+                return false;
+        }
 
         if (focusable.Taken)
             return false;
 
-        if (focusable is MonoBehaviour focusableObject)
-        {
-            chargePos = focusableObject.transform.position;
-            ActivateAim(focusable, chargePos);
-            //_aimIndicator.Transform.position = chargePos;
-            if (!focusable.IsSilent) SetAudioSimulator(_line.GetPosition(1), 5);
-        }
+        Target = focusable;
+        chargePos = focusable.Transform.position;
+        ActivateAim(focusable, chargePos);
+        _aimIndicator.Transform.position = chargePos;
+
+        if (!focusable.IsSilent) SetAudioSimulator(_line.GetPosition(1), 5);
 
         return true;
-    }
-
-    private bool HandleEnemyCast(RaycastHit2D hit, ref Vector2 chargePos)
-    {
-        if (!hit.collider.CompareTag("Enemy"))
-            return false;
-
-        var hitTransform = hit.collider.transform;
-        chargePos = hitTransform.position;
-
-        // if other enemy
-        if (Target != null && Target is MonoBehaviour target && Vector2.Distance(chargePos, Utils.ToVector2(target.transform.position)) > 1f)
-        {
-            DeactivateAim();
-            Target = null;
-        }
-
-        if (Target == null)
-        {
-            if (hit.collider.TryGetComponent(out Enemy enemy))
-            {
-                Target = enemy;
-                _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
-                var pos = _targetTransform?.position ?? chargePos;
-
-                ActivateAim(enemy, pos);
-            }
-            else
-            {
-                Target = hit.collider.GetComponentInParent<Enemy>();
-                enemy = Target as Enemy;
-                _targetTransform = enemy?.Renderer?.transform ?? enemy?.Image?.transform;
-                var pos = _targetTransform?.position ?? chargePos;
-
-                ActivateAim(enemy, pos);
-            }
-        }
-
-        if (_aimIndicator != null)
-        {
-            _aimIndicator.Transform.position = _targetTransform.position;
-        }
-
-        return true;
-    }
-
-    private void Interact(Vector2 lineOrigin, Vector2 chargePos)
-    {
-        Interactives.Clear();
-        Bonuses.Clear();
-
-        var interactableDetect = Utils.LineCastAll(lineOrigin, chargePos, includeTriggers: true);
-        var interactives = interactableDetect.Where(i => i.transform.CompareTag("Interactive")).ToArray();
-
-        foreach (var interactive in interactives)
-        {
-            if (interactive.transform.TryGetComponent(out IActivable activable))
-            {
-                Interactives.Add(activable);
-            }
-        }
-
-        var bonuses = interactableDetect.Where(b => b.transform.CompareTag("Bonus")).ToArray();
-        foreach (var item in bonuses)
-        {
-            if (item.transform.TryGetComponent(out Bonus bonus))
-            {
-                Bonuses.Add(bonus);
-            }
-        }
     }
 
     protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
     {
         // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
         return Physics2D.CircleCast(origin, .7f, direction, distance,
-                    (1 << LayerMask.NameToLayer("Obstacle")) | 
-                    (1 << LayerMask.NameToLayer("DynamicObstacle")) | 
+                    (1 << LayerMask.NameToLayer("Obstacle")) |
+                    (1 << LayerMask.NameToLayer("DynamicObstacle")) |
                     (1 << LayerMask.NameToLayer("Enemy")) |
                     (1 << LayerMask.NameToLayer("Interactive")) |
                     (1 << LayerMask.NameToLayer("Teleporter")));
@@ -218,11 +125,6 @@ public class Trajectory : Dynamic, IPoolable
         return Physics2D.CircleCast(origin, .7f, direction, distance,
                     (1 << LayerMask.NameToLayer("Obstacle")) |
                     (1 << LayerMask.NameToLayer("DynamicObstacle")));
-    }
-
-    public void SetJumper(Jumper jumper)
-    {
-        _jumper = jumper;
     }
 
     public virtual void Disable()
@@ -291,7 +193,6 @@ public class Trajectory : Dynamic, IPoolable
         if (_aimIndicator != null)
             return;
 
-        Focusable = focusable;
         _aimIndicator = _poolManager.GetPoolable<AimIndicator>(position, Quaternion.identity);
     }
 
@@ -302,7 +203,6 @@ public class Trajectory : Dynamic, IPoolable
 
         _aimIndicator.Sleep();
         _aimIndicator = null;
-        Focusable = null;
     }
 
     protected virtual void ResetWidths()

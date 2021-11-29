@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 784466143731815585}
   - component: {fileID: 2042113117447970818}
   - component: {fileID: 1311049323928019493}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: beam
   m_TagString: Interactive
   m_Icon: {fileID: 0}

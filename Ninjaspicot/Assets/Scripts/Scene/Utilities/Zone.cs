@@ -118,9 +118,9 @@ public class Zone : MonoBehaviour, IWakeable
 
     public void ResetItems()
     {
-        _resettables.ForEach(r => r.DoReset());
+        _resettables.Where(x => !Utils.IsNull(x)).ToList().ForEach(r => r.DoReset());
         _additionalResettables.ForEach(r => { if (r.TryGetComponent(out IResettable resettable)) resettable.DoReset(); });
         var poolables = FindObjectsOfType<MonoBehaviour>().OfType<IPoolable>().ToList();
-        poolables.ForEach(p => p.DoReset());
+        poolables.Where(x => !Utils.IsNull(x)).ToList().ForEach(p => p.DoReset());
     }
 }

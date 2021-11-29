@@ -32,7 +32,7 @@ public class GuardRobotBall : Robot
     {
         base.Start();
         _initRotation = _head.rotation;
-        _remainingTimeBeforeCommunication = _timeBetweenCommunications;
+        //_remainingTimeBeforeCommunication = _timeBetweenCommunications;
 
         if (_targetPosition.HasValue)
         {
@@ -65,7 +65,7 @@ public class GuardRobotBall : Robot
 
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * Velocity);
         }
         else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
         {
@@ -86,7 +86,7 @@ public class GuardRobotBall : Robot
         var wallNear = Utils.RayCast(_rigidbody.position, direction, 6, Id);
         if (Mathf.Abs(deltaX) > 2 && !wallNear)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction * Velocity);
         }
 
 
@@ -138,24 +138,24 @@ public class GuardRobotBall : Robot
     }
     #endregion
 
-    #region Communicate
-    protected override void Communicate()
-    {
-        _remainingCommunicationTime -= Time.deltaTime;
+    //#region Communicate
+    //protected override void Communicate()
+    //{
+    //    _remainingCommunicationTime -= Time.deltaTime;
 
-        if (_remainingCommunicationTime <= 0)
-        {
-            if (Zone.DeathOccured)
-            {
-                Zone.ActivateAlarm();
-            }
-            else
-            {
-                SetState(State.NextState);
-            }
-        }
-    }
-    #endregion
+    //    if (_remainingCommunicationTime <= 0)
+    //    {
+    //        if (Zone.DeathOccured)
+    //        {
+    //            Zone.ActivateAlarm();
+    //        }
+    //        else
+    //        {
+    //            SetState(State.NextState);
+    //        }
+    //    }
+    //}
+    //#endregion
 
     #region Return
     protected override void Return()
@@ -166,7 +166,7 @@ public class GuardRobotBall : Robot
 
         if (deltaX > 2)
         {
-            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * MoveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * Velocity);
         }
         else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
         {
@@ -205,11 +205,11 @@ public class GuardRobotBall : Robot
 
         if (_targetPosition.HasValue)
         {
-            _rigidbody.MovePosition(_rigidbody.position + direction.normalized * MoveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + direction.normalized * Velocity);
         }
         else
         {
-            _rigidbody.MovePosition(_rigidbody.position + Utils.ToVector2(Transform.right) * MoveSpeed);
+            _rigidbody.MovePosition(_rigidbody.position + Utils.ToVector2(Transform.right) * Velocity);
         }
 
 

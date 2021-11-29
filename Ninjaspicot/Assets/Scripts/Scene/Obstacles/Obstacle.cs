@@ -58,7 +58,7 @@ public class Obstacle : MonoBehaviour, IRaycastable, IActivable
     private IEnumerator QuickDeactivate()
     {
         Deactivate();
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(1f);
         Activate();
     }
 }

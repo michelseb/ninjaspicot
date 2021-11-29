@@ -17,8 +17,9 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
     public Portal Other { get; private set; }
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
+    public Transform Transform => transform;
 
-    public bool FocusedByNormalJump => true;
+    public bool Charge => false;
 
     public Hero Hero;
     public LayerMask TeleportedLayer;
@@ -167,6 +168,7 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
     {
         _animator.SetTrigger("Wake");
 
+        Hero.DeactivateGrappling();
         Hero.Stickiness.Rigidbody.velocity = Vector2.zero;
         Hero.Stickiness.Rigidbody.isKinematic = true;
         Taken = true;
@@ -201,5 +203,9 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
         Hero.gameObject.layer = TeleportedLayer;
         Exit = false;
         Taken = false;
+    }
+
+    public void GoTo()
+    {
     }
 }

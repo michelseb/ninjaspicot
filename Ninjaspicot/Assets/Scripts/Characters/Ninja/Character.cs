@@ -63,6 +63,8 @@ public abstract class Character : Dynamic, IRaycastable, IKillable
     }
 
     public bool Dead { get; set; }
+    public bool IsSilent => true;
+    public bool Taken => false;
 
     protected CharacterLight _characterLight;
     protected CameraBehaviour _cameraBehaviour;

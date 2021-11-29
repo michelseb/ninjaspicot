@@ -10,14 +10,11 @@ public class Hero : Character, INinja, ITriggerable
     public bool Detected { get; private set; }
     public bool Visible { get; private set; }
 
-    private Jumper _jumper;
-    public Jumper Jumper { get { if (Utils.IsNull(_jumper)) _jumper = GetComponent<Jumper>(); return _jumper; } }
-
     private HeroStickiness _stickiness;
     public Stickiness Stickiness { get { if (Utils.IsNull(_stickiness)) _stickiness = GetComponent<HeroStickiness>(); return _stickiness; } }
 
-    private GameObject _grapplingGunObject;
-    private GrapplingGun _gun;
+    private GrapplingGun _grapplingGun;
+    public GrapplingGun GrapplingGun { get { if (Utils.IsNull(_grapplingGun)) _grapplingGun = GetComponent<GrapplingGun>(); return _grapplingGun; } }
     
     public Rigidbody2D Rigidbody => Stickiness.Rigidbody;
 
@@ -47,8 +44,7 @@ public class Hero : Character, INinja, ITriggerable
         _touchManager = TouchManager.Instance;
         _zoneManager = ZoneManager.Instance;
         _uiCamera = UICamera.Instance;
-        _gun = GetComponentInChildren<GrapplingGun>(true);
-        _grapplingGunObject = _gun.gameObject;
+        _grapplingGun = GetComponentInChildren<GrapplingGun>(true);
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
         Visible = true;
@@ -61,7 +57,7 @@ public class Hero : Character, INinja, ITriggerable
 
         Dead = true;
         Stickiness.Detach();
-        Jumper?.CancelJump();
+        _grapplingGun?.Cancel();
         
         if (killer != null)
         {
@@ -147,12 +143,12 @@ public class Hero : Character, INinja, ITriggerable
         }
     }
 
-    public void StartDisplayGhosts()
+    public void StartDisplayGhosts(bool silent, float? spacing = null)
     {
         if (_displayGhosts != null)
             return;
 
-        _displayGhosts = StartCoroutine(DisplayGhosts(_ghostSpacing));
+        _displayGhosts = StartCoroutine(DisplayGhosts(silent, spacing ?? _ghostSpacing));
     }
 
     public void StopDisplayGhosts()
@@ -164,13 +160,13 @@ public class Hero : Character, INinja, ITriggerable
         _displayGhosts = null;
     }
 
-    private IEnumerator DisplayGhosts(float delay)
+    private IEnumerator DisplayGhosts(bool silent, float delay)
     {
         int iteration = 0;
         while (true)
         {
             _poolManager.GetPoolable<HeroGhost>(Transform.position, Transform.rotation);
-            if (iteration % GHOST_SOUND_FREQUENCY == 0)
+            if (!silent && iteration % GHOST_SOUND_FREQUENCY == 0)
             {
                 _poolManager.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
             }
@@ -230,11 +226,11 @@ public class Hero : Character, INinja, ITriggerable
         }
     }
 
-    public void SetJumpingActivation(bool active)
+    public void SetGrapplingActivation(bool active)
     {
-        if (!Utils.IsNull(Jumper))
+        if (!Utils.IsNull(_grapplingGun))
         {
-            Jumper.Active = active;
+            _grapplingGun.Active = active;
         }
     }
 
@@ -261,7 +257,7 @@ public class Hero : Character, INinja, ITriggerable
 
     public virtual void SetAllBehavioursActivation(bool active, bool grounded)
     {
-        SetJumpingActivation(active);
+        SetGrapplingActivation(active);
         SetStickinessActivation(active);
         SetWalkingActivation(active, grounded);
         SetInteractionActivation(active);
@@ -282,24 +278,31 @@ public class Hero : Character, INinja, ITriggerable
         Visible = true;
     }
 
-    public virtual void ActivateGrappling(Vector2 target)
+    public virtual void ActivateGrappling()
     {
-        _grapplingGunObject.SetActive(true);
-        _gun.StartThrow(target);
+        _grapplingGun.Show();
+    }
+
+    public virtual void ThrowGrappling(IFocusable target)
+    {
+        if (target == null)
+            return;
+
+        _grapplingGun.StartThrow(target);
     }
 
     public virtual void DeactivateGrappling()
     {
-        _grapplingGunObject.SetActive(false);
+        _grapplingGun.Hide();
     }
 
-    public virtual void ActivateCollider()
-    {
-        Collider.enabled = true;
-    }
+    //public virtual void ActivateCollider()
+    //{
+    //    Collider.enabled = true;
+    //}
 
-    public virtual void DeactivateCollider()
-    {
-        Collider.enabled = false;
-    }
+    //public virtual void DeactivateCollider()
+    //{
+    //    Collider.enabled = false;
+    //}
 }

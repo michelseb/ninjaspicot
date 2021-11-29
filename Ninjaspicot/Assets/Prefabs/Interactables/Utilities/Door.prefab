@@ -5032,7 +5032,7 @@ GameObject:
   - component: {fileID: 782512360753408940}
   - component: {fileID: 6380720651915026048}
   - component: {fileID: 4923878409255220526}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: DoorWall
   m_TagString: Wall
   m_Icon: {fileID: 0}
@@ -5355,7 +5355,7 @@ GameObject:
   - component: {fileID: 253460550537846235}
   - component: {fileID: 2569575455098868204}
   - component: {fileID: 4314302688343071496}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: DoorWall (1)
   m_TagString: Wall
   m_Icon: {fileID: 0}

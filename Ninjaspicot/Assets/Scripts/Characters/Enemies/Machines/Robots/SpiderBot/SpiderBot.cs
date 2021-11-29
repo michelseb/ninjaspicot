@@ -6,9 +6,12 @@ using UnityEngine;
 public class SpiderBot : Robot
 {
     [SerializeField] private Transform _body;
-    
+
     private float _legsSpeed;
     public int MovingLegsIndex = 0;
+    //private float _legsInitAverageY;
+    //private float _legsAverageY;
+
     public override Transform Transform => _body;
 
     public override SpriteRenderer Renderer
@@ -27,7 +30,6 @@ public class SpiderBot : Robot
     protected Coroutine _lookAt;
 
     public float LegsSpeed => _legsSpeed;
-    private float _targetY;
 
     private List<RobotLeg> _robotLegs;
 
@@ -37,37 +39,35 @@ public class SpiderBot : Robot
         _robotLegs = GetComponentsInChildren<RobotLeg>().ToList();
     }
 
-    protected override void Start()
-    {
-        base.Start();
-        _targetY = _body.position.y;
-    }
+    //protected override void Start()
+    //{
+    //    base.Start();
+    //    //_legsInitAverageY = GetLegsAverageY(_robotLegs);
+    //}
 
     protected override void Update()
     {
         base.Update();
         UpdateLegsSpeed();
+        //_legsAverageY = GetLegsAverageY(_robotLegs);
+        //Transform.position += Vector3.up * (_legsAverageY - _legsInitAverageY);
+        //Transform.rotation = Quaternion.Euler(0, 0, _legsAverageY - _legsInitAverageY);
     }
 
     private void UpdateLegsSpeed()
     {
-        if (MoveSpeed == 0)
+        if (Velocity == 0)
             return;
 
-        _legsSpeed = Mathf.Abs(MoveSpeed) * 8;
+        _legsSpeed = Mathf.Abs(Velocity) * 10;
     }
 
     private void CheckGround()
     {
-        var hit = Utils.RayCast(_body.position, new Vector2(MoveDirection, -1), 8, includeTriggers: false);
+        var hit = Utils.RayCast(_body.position, new Vector2(MoveDirection, -2 * Mathf.Abs(MoveDirection)), 16, includeTriggers: false);
 
 
-
-        if (hit.collider != null)
-        {
-            _targetY = hit.point.y + 2f;
-        }
-        else
+        if (hit.collider == null)
         {
             Flip();
         }
@@ -75,7 +75,7 @@ public class SpiderBot : Robot
 
     private void CheckWall()
     {
-        var hit = Utils.RayCast(_body.position, Vector3.right * MoveSpeed, 5, includeTriggers: false);
+        var hit = Utils.RayCast(_body.position, Vector3.right * Velocity, 15, includeTriggers: false);
 
         if (hit.collider != null)
         {
@@ -86,12 +86,37 @@ public class SpiderBot : Robot
     #region Check
     protected override void Check()
     {
+        var deltaX = TargetPosition.x - Transform.position.x;
+        var direction = Mathf.Sign(deltaX);
+
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), RotateSpeed);
+
+        var wallNear = Utils.RayCast(_rigidbody.position, Vector3.right * direction, 6, Id);
+
+        if (Mathf.Abs(deltaX) > 2 && !wallNear)
+        {
+            _body.Translate(Vector3.right * direction * GetMovementSpeed() * Time.deltaTime);
+        }
+        else if (Vector2.Dot(Utils.ToVector2(_head.right), Utils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
+        {
+            _hearingPerimeter.EraseSoundMark();
+            SetState(StateType.Wonder, StateType.Return);
+        }
     }
     #endregion
 
     #region Chase
     protected override void Chase(Vector3 target)
     {
+        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, Hero.Instance.Transform.position - Transform.position), RotateSpeed);
+
+        var heroNotVisible = Utils.LineCast(Transform.position, target, new int[] { Id, Hero.Instance.Id });
+
+        if (heroNotVisible)
+        {
+            Seeing = false;
+            SetState(StateType.Wonder, StateType.Return);
+        }
     }
     #endregion
 
@@ -123,24 +148,24 @@ public class SpiderBot : Robot
     }
     #endregion
 
-    #region Communicate
-    protected override void Communicate()
-    {
-        _remainingCommunicationTime -= Time.deltaTime;
+    //#region Communicate
+    //protected override void Communicate()
+    //{
+    //    _remainingCommunicationTime -= Time.deltaTime;
 
-        if (_remainingCommunicationTime <= 0)
-        {
-            if (!Utils.IsNull(Zone) && Zone.DeathOccured)
-            {
-                Zone.ActivateAlarm();
-            }
-            else
-            {
-                SetState(State.NextState);
-            }
-        }
-    }
-    #endregion
+    //    if (_remainingCommunicationTime <= 0)
+    //    {
+    //        if (!Utils.IsNull(Zone) && Zone.DeathOccured)
+    //        {
+    //            Zone.ActivateAlarm();
+    //        }
+    //        else
+    //        {
+    //            SetState(State.NextState);
+    //        }
+    //    }
+    //}
+    //#endregion
 
     #region Return
     protected override void Return()
@@ -157,18 +182,9 @@ public class SpiderBot : Robot
     {
         CheckGround();
         CheckWall();
-        _body.Translate(_body.right * MoveSpeed * Time.deltaTime);
+        _body.Translate(_body.right * Velocity * Time.deltaTime);
 
-        var targetPos = new Vector3(_body.position.x, _targetY);
-
-        if (!_robotLegs.Any(x => x.Grounded))
-        {
-            targetPos += Vector3.down;
-        }
-
-        //_body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
         _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * MoveDirection), RotateSpeed);
-
     }
     #endregion
 
@@ -195,5 +211,28 @@ public class SpiderBot : Robot
     public void ChangeMovingLegs(int index)
     {
         MovingLegsIndex = index;
+    }
+
+    //private float GetLegsAverageY(List<RobotLeg> legs)
+    //{
+    //    return legs.Average(leg => Transform.InverseTransformPoint(leg.Transform.position).y);
+    //}
+
+    protected override float GetMovementSpeedFactor(StateType stateType)
+    {
+        switch (stateType)
+        {
+            case StateType.Patrol:
+            case StateType.Guard:
+            case StateType.Return:
+                return 1f;
+            case StateType.Check:
+                return 3f;
+            case StateType.Chase:
+            case StateType.LookFor:
+                return 5f;
+            default:
+                return 0;
+        }
     }
 }

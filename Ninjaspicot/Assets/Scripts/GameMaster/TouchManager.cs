@@ -29,13 +29,14 @@ public class TouchManager : MonoBehaviour
     public bool DashStart => Dashing && !_dashInitialized;
     private Vector3? LeftTouch => GetTouch(TouchType.Left);
     private Vector3? RightTouch => GetTouch(TouchType.Right);
+    public Vector3? JumpDirection => _joystick2?.Direction;
 
     private static TouchManager _instance;
     public static TouchManager Instance { get { if (_instance == null) _instance = FindObjectOfType<TouchManager>(); return _instance; } }
 
     private Hero _hero;
     private Stickiness _stickiness;
-    private Jumper _jumper;
+    private GrapplingGun _grapplingGun;
     private DynamicInteraction _dynamicInteraction;
     private PoolManager _poolManager;
     private Camera _uiCamera;
@@ -59,7 +60,7 @@ public class TouchManager : MonoBehaviour
         _uiCamera = UICamera.Instance.Camera;
         _hero = Hero.Instance;
         _stickiness = _hero?.Stickiness;
-        _jumper = _hero?.Jumper;
+        _grapplingGun = _hero?.GrapplingGun;
         _dynamicInteraction = _hero?.DynamicInteraction;
     }
 
@@ -73,10 +74,15 @@ public class TouchManager : MonoBehaviour
         HandleDoubleTapInitEvent();
         HandleWalkTouchInitEvent();
         HandleJumpTouchInitEvent();
+    }
+
+    private void FixedUpdate()
+    {
         if (!HandleJumpTouchEvent())
         {
             HandleWalkTouchEvent();
         }
+
         HandleDoubleTapEvent();
         HandleDoubleTapEndEvent();
         HandleWalkTouchEndEvent();
@@ -88,9 +94,9 @@ public class TouchManager : MonoBehaviour
         if (!HeroSpawned())
             return;
 
-        if (!JumpDragging && !Dashing && _jumper.TrajectoryInUse())
+        if (!JumpDragging && !Dashing && _grapplingGun.TrajectoryInUse())
         {
-            _jumper.CancelJump();
+            _grapplingGun.Cancel();
             _jumpDragInitialized = false;
             _dashInitialized = false;
         }
@@ -146,7 +152,7 @@ public class TouchManager : MonoBehaviour
             return;
 
         _stickiness.StartRunning();
-        _hero.StartDisplayGhosts();
+        _hero.StartDisplayGhosts(false);
 
         _runInitialized = true;
     }
@@ -200,20 +206,21 @@ public class TouchManager : MonoBehaviour
         if (!JumpDragging)
             return false;
 
-        if (!_jumper.CanInitJump())
+        if (!_grapplingGun.CanInit())
         {
-            if (_jumper.TrajectoryInUse()) _jumper.CancelJump();
+            if (_grapplingGun.TrajectoryInUse()) _grapplingGun.Cancel();
             return false;
         }
 
         if (!_jumpDragInitialized)
         {
+            _hero.ActivateGrappling();
             HandleTrajectoryInit();
             _dashInitialized = false;
             _jumpDragInitialized = true;
         }
 
-        _jumper.Trajectory.DrawTrajectory(_hero.Transform.position, _joystick2.Direction);
+        _grapplingGun.Trajectory.DrawTrajectory(_hero.GrapplingGun.ShootOrigin, _joystick2.Direction);
 
         return true;
     }
@@ -223,7 +230,7 @@ public class TouchManager : MonoBehaviour
         if (!JumpEnd)
             return false;
 
-        DoJump();
+        UseGrappling();
 
         _joystick2.StartFading();
         _joystick2.OnPointerUp();
@@ -271,35 +278,30 @@ public class TouchManager : MonoBehaviour
         return true;
     }
 
-    private void DoJump()
+    private void UseGrappling()
     {
-        if (!_jumper.ReadyToJump())
+        if (!_grapplingGun.IsReady())
             return;
 
         _stickiness.StopWalking(false);
-
-        if (_jumper.Trajectory.Target != null)
-        {
-            _jumper.Charge(-_joystick2.Direction);
-        }
-        else
-        {
-            _jumper.LaunchJump(_jumper.AimPosition);
-        }
+        _hero.ThrowGrappling(_grapplingGun.Focusable);
     }
 
     private void DoRelease()
     {
+        if (Utils.IsNull(_stickiness.CurrentAttachment) || Vector3.Dot(Quaternion.Euler(0, 0, 90f) * _stickiness.CollisionNormal, Vector3.up) > .5f)
+            return;
+
         _stickiness.StopWalking(false);
+        _stickiness.CurrentAttachment?.LaunchQuickDeactivate();
         _stickiness.Detach();
         _stickiness.Rigidbody.AddForce(Quaternion.Euler(0, 0, 90) * _stickiness.CollisionNormal * 500);
     }
 
     private void HandleTrajectoryInit()
     {
-        var trajectory = _jumper.SetTrajectory();
+        var trajectory = _grapplingGun.SetTrajectory();
         _joystick2.ChangeColor(trajectory.Color);
-        trajectory.SetJumper(_jumper);
     }
 
     private bool HeroSpawned()
@@ -313,7 +315,7 @@ public class TouchManager : MonoBehaviour
                 return false;
 
             _stickiness = _hero.Stickiness;
-            _jumper = _hero.Jumper;
+            _grapplingGun = _hero.GrapplingGun;
             _dynamicInteraction = _hero.DynamicInteraction;
         }
 

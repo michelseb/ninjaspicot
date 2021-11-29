@@ -26,9 +26,8 @@ public class Stickiness : Dynamic, IDynamic
     protected float _speedFactor;
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
-    protected Jumper _jumper;
     private float _velocityBeforePhysicsUpdate;
-    private float _detachTime;
+    //private float _detachTime;
     private Vector2 _detachPos;
 
     public virtual void Awake()
@@ -38,7 +37,6 @@ public class Stickiness : Dynamic, IDynamic
 
         Active = true;
         WallJoint = GetComponent<HingeJoint2D>();
-        _jumper = GetComponent<Jumper>();
         _rigidbody = _rigidbody ?? GetComponent<Rigidbody2D>();
         _collider = _collider ?? GetComponent<Collider2D>();
         ContactPoint = new GameObject("ContactPoint").transform;
@@ -85,13 +83,14 @@ public class Stickiness : Dynamic, IDynamic
             return false;
 
         var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
-        var deltaTime = Time.time - _detachTime;
+        //var deltaTime = Time.time - _detachTime;
         var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
 
         // Threshold to attach
-        if (deltaTime < .05f && deltaPos < .6f)
+        if (deltaPos < 1f)
             return false;
 
+        _detachPos = anchorPos;
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
         WallJoint.anchor = anchorPos;
@@ -110,7 +109,7 @@ public class Stickiness : Dynamic, IDynamic
         if (!Attached)
             return;
 
-        _detachTime = Time.time;
+        //_detachTime = Time.time;
         _detachPos = WallJoint.anchor;
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;

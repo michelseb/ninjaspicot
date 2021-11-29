@@ -79,9 +79,9 @@ public static class Utils
         return actualHits;
     }
 
-    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, int layer = ~0)
     {
-        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
+        RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers, layer);
 
         if (hits.Length == 0)
             return new RaycastHit2D();
@@ -89,9 +89,9 @@ public static class Utils
         return hits[0];
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "")
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "", int layer = ~0)
     {
-        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers);
+        RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers, layer);
 
         if (hits.Length == 0)
             return new RaycastHit2D();
@@ -107,11 +107,11 @@ public static class Utils
         return hits[0];
     }
 
-    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+    public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, int layer = ~0)
     {
         var hits = distance > 0 ?
-            Physics2D.RaycastAll(origin, direction, distance) :
-            Physics2D.RaycastAll(origin, direction);
+            Physics2D.RaycastAll(origin, direction, distance, layer) :
+            Physics2D.RaycastAll(origin, direction, float.MaxValue, layer);
 
         var actualHits = new List<RaycastHit2D>();
 
@@ -130,14 +130,52 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
     {
-        RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination);
+        RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination, layer);
 
         var actualHits = new List<RaycastHit2D>();
 
         foreach (var hit in hits)
         {
+            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
+                continue;
+
+            if (ignore != null && ignore.Any(i => i == raycastable.Id) ||
+                (!includeTriggers && hit && hit.collider.isTrigger))
+                continue;
+
+            actualHits.Add(hit);
+        }
+
+        return actualHits.ToArray();
+    }
+
+    public static RaycastHit2D CircleCast(Vector2 origin, float radius, Vector2 destination, float distance, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
+    {
+        RaycastHit2D[] hits = CircleCastAll(origin, radius, destination, distance, ignore, includeTriggers, layer);
+
+        if (hits.Length == 0)
+            return new RaycastHit2D();
+
+        return hits[0];
+    }
+
+
+    public static RaycastHit2D[] CircleCastAll(Vector2 origin, float radius, Vector2 destination, float distance, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
+    {
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(origin, radius, destination, distance, layer);
+
+        var actualHits = new List<RaycastHit2D>();
+
+        foreach (var hit in hits)
+        {
+            if (includeTriggers && ignore == null)
+            {
+                actualHits.Add(hit);
+                continue;
+            }
+
             if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
                 continue;
 

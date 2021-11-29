@@ -13,13 +13,11 @@ public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
-    public bool FocusedByNormalJump => true;
+    public virtual bool Charge => false;
 
     protected Animator _animator;
     protected SpriteRenderer _renderer;
     protected Collider2D _collider;
-
-    public const float MIN_DIST_TO_ACTIVATE = 10f;
 
     protected virtual void Awake()
     {
@@ -58,10 +56,10 @@ public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
         var heroPos = Hero.Rigidbody.position;
         var direction = (Utils.ToVector2(Transform.position) - heroPos).normalized;
         var dist = Vector3.Distance(heroPos, Transform.position);
-        if (dist < MIN_DIST_TO_ACTIVATE || dist > Jumper.CHARGE_LENGTH)
+        if (dist < GrapplingGun.MIN_DIST_TO_ACTIVATE || dist > GrapplingGun.CHARGE_LENGTH)
             return false;
 
-        var boxRay = Utils.BoxCast(heroPos + direction * MIN_DIST_TO_ACTIVATE, Vector2.one * 5, 0, direction, dist - 2 * MIN_DIST_TO_ACTIVATE, Hero.Id, true, false);
+        var boxRay = Utils.BoxCast(heroPos + direction * GrapplingGun.MIN_DIST_TO_ACTIVATE, Vector2.one * 5, 0, direction, dist - 2 * GrapplingGun.MIN_DIST_TO_ACTIVATE, Hero.Id, true, false);
         if (boxRay)
             return false;
 
@@ -71,5 +69,9 @@ public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
             return false;
 
         return true;
+    }
+
+    public virtual void GoTo()
+    {
     }
 }

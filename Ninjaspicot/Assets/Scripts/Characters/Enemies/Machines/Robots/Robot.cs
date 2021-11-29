@@ -7,16 +7,15 @@ public abstract class Robot : Enemy, IListener, IViewer
     [SerializeField] protected float _hearingRange;
     [SerializeField] protected float _checkWonderTime;
     [SerializeField] protected float _returnWonderTime;
-    [SerializeField] protected float _timeBetweenCommunications;
-    [SerializeField] protected float _communicationTime;
+    //[SerializeField] protected float _timeBetweenCommunications;
+    //[SerializeField] protected float _communicationTime;
 
     protected HearingPerimeter _hearingPerimeter;
     protected Rigidbody2D _rigidbody;
-    protected TimeManager _timeManager;
     protected Audio _reactionSound;
     protected Quaternion _initRotation;
-    protected float _remainingTimeBeforeCommunication;
-    protected float _remainingCommunicationTime;
+    //protected float _remainingTimeBeforeCommunication;
+    //protected float _remainingCommunicationTime;
     protected float _wonderTime;
     protected float _wonderElapsedTime;
 
@@ -24,18 +23,16 @@ public abstract class Robot : Enemy, IListener, IViewer
     public FieldOfView FieldOfView { get { if (Utils.IsNull(_fieldOfView)) _fieldOfView = GetComponentInChildren<FieldOfView>(); return _fieldOfView; } }
     protected RobotLaser _laser;
     public RobotLaser Laser { get { if (Utils.IsNull(_laser)) _laser = GetComponentInChildren<RobotLaser>(); return _laser; } }
-    public Transform TargetTransform { get; protected set; }
-    public Vector3 TargetPosition { get; protected set; }
+    
 
     public float Range => _hearingRange;
     public bool Seeing { get; set; }
 
     protected override void Awake()
     {
-        base.Awake();
         _rigidbody = GetComponent<Rigidbody2D>();
         _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
-        _timeManager = TimeManager.Instance;
+        base.Awake();
     }
 
     protected override void Start()
@@ -56,22 +53,22 @@ public abstract class Robot : Enemy, IListener, IViewer
         Renderer.flipY = rot > 90 && rot < 270;
 
         HandleState(State.StateType);
-        HandleCommunications();
+        //HandleCommunications();
     }
 
     #region Handlers
-    protected virtual void HandleCommunications()
-    {
-        if (!IsState(StateType.Patrol) && !IsState(StateType.Guard))
-            return;
+    //protected virtual void HandleCommunications()
+    //{
+    //    if (!IsState(StateType.Patrol) && !IsState(StateType.Guard))
+    //        return;
 
-        _remainingTimeBeforeCommunication -= Time.deltaTime;
+    //    _remainingTimeBeforeCommunication -= Time.deltaTime;
 
-        if (_remainingTimeBeforeCommunication <= 0)
-        {
-            SetState(StateType.Communicate, State.StateType);
-        }
-    }
+    //    if (_remainingTimeBeforeCommunication <= 0)
+    //    {
+    //        SetState(StateType.Communicate, State.StateType);
+    //    }
+    //}
 
     protected virtual void HandleState(StateType stateType)
     {
@@ -104,9 +101,9 @@ public abstract class Robot : Enemy, IListener, IViewer
                 LookFor();
                 break;
 
-            case StateType.Communicate:
-                Communicate();
-                break;
+            //case StateType.Communicate:
+            //    Communicate();
+            //    break;
         }
     }
     #endregion
@@ -153,7 +150,7 @@ public abstract class Robot : Enemy, IListener, IViewer
 
         TargetTransform = Hero.Instance.Transform;
         Renderer.color = ColorUtils.Red;
-        Laser.SetActive(true);
+        Laser.Activate();
         FieldOfView.Activate();
     }
 
@@ -167,29 +164,29 @@ public abstract class Robot : Enemy, IListener, IViewer
     {
         TargetTransform = null;
         Renderer.color = ColorUtils.White;
-        Laser.SetActive(false);
+        Laser.Deactivate();
         FieldOfView.Activate();
     }
 
-    protected virtual void StartCommunicate(StateType nextState)
-    {
-        FieldOfView.Deactivate();
-        _remainingTimeBeforeCommunication = _timeBetweenCommunications;
-        _remainingCommunicationTime = _communicationTime;
-        SetNextState(nextState);
-    }
+    //protected virtual void StartCommunicate(StateType nextState)
+    //{
+    //    FieldOfView.Deactivate();
+    //    _remainingTimeBeforeCommunication = _timeBetweenCommunications;
+    //    _remainingCommunicationTime = _communicationTime;
+    //    SetNextState(nextState);
+    //}
 
     protected virtual void StartGuarding()
     {
         Renderer.color = ColorUtils.White;
-        Laser.SetActive(false);
+        Laser.Deactivate();
         FieldOfView.Activate();
     }
 
     protected virtual void StartPatrolling()
     {
         Renderer.color = ColorUtils.White;
-        Laser.SetActive(false);
+        Laser.Activate();
         FieldOfView.Activate();
     }
 
@@ -210,7 +207,7 @@ public abstract class Robot : Enemy, IListener, IViewer
     protected abstract void Chase(Vector3 targetPosition);
     protected abstract void Return();
     protected abstract void LookFor();
-    protected abstract void Communicate();
+    //protected abstract void Communicate();
 
     public override void Sleep()
     {
@@ -218,7 +215,6 @@ public abstract class Robot : Enemy, IListener, IViewer
 
         FieldOfView.Deactivate();
         Laser?.Deactivate();
-        _castArea.enabled = false;
         _hearingPerimeter.EraseSoundMark();
         _hearingPerimeter.Deactivate();
     }
@@ -227,7 +223,6 @@ public abstract class Robot : Enemy, IListener, IViewer
     {
         base.Wake();
 
-        _castArea.enabled = true;
         _hearingPerimeter.Activate();
 
         if (_initState != StateType.Sleep)
@@ -257,7 +252,7 @@ public abstract class Robot : Enemy, IListener, IViewer
             _rigidbody.velocity = Vector2.zero;
             _rigidbody.angularVelocity = 0;
         }
-        Laser.SetActive(false);
+        Laser.Deactivate();
         base.DoReset();
     }
 
@@ -304,8 +299,8 @@ public abstract class Robot : Enemy, IListener, IViewer
             case StateType.Patrol:
                 return StartGuarding;
 
-            case StateType.Communicate:
-                return () => StartCommunicate(nextState.Value);
+            //case StateType.Communicate:
+            //    return () => StartCommunicate(nextState.Value);
 
             default:
                 return null;
@@ -344,13 +339,7 @@ public abstract class Robot : Enemy, IListener, IViewer
 
         Seeing = true;
 
-        // Temps de réaction
-        if (TargetTransform == null)
-        {
-            _timeManager.SlowDown();
-            _timeManager.StartTimeRestore();
-            TargetTransform = target;
-        }
+        TargetTransform = TargetTransform ?? target;
 
         SetState(StateType.Chase);
     }

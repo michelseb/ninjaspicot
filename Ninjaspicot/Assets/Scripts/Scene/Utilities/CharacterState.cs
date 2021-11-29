@@ -10,8 +10,8 @@ public enum StateType
     Return = 4,
     Patrol = 5,
     Guard = 6,
-    LookFor = 7,
-    Communicate = 8
+    LookFor = 7
+    //Communicate = 8
 }
 
 public class CharacterState : Dynamic, IPoolable

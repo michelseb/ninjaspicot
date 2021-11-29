@@ -37,24 +37,6 @@ public class HeroStickiness : Stickiness
         }
     }
 
-    public override bool ReactToObstacle(Obstacle obstacle, Vector3 position)
-    {
-        if (base.ReactToObstacle(obstacle, position))
-        {
-            _jumper.GainAllJumps();
-
-            //Sound effect
-            //var intensity = (int)ImpactVelocity / 50;
-            //_audioSource.PlayOneShot(_impact, intensity);
-            //var soundEffect = _poolManager.GetPoolable<SoundEffect>(position, Quaternion.identity, intensity);
-            //soundEffect.SetComposite(CurrentAttachment.Collider);
-
-            return true;
-        }
-
-        return false;
-    }
-
     protected override IEnumerator WalkOnWalls(HingeJoint2D hinge)
     {
         if (hinge == null)

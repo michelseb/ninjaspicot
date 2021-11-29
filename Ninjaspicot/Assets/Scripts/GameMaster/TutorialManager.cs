@@ -100,7 +100,7 @@ public class TutorialManager : MonoBehaviour
         if (_instructions.Count == 1)
         {
             _initialDistanceToInstruction = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude);
-            _hero.SetJumpingActivation(true);
+            _hero.SetGrapplingActivation(true);
             _hero.SetWalkingActivation(true, false);
             _clickText.SetActive(false);
         }
@@ -232,7 +232,7 @@ public class TutorialManager : MonoBehaviour
             return;
 
         _containerImage.color = Color.white;
-        _hero.SetJumpingActivation(false);
+        _hero.SetGrapplingActivation(false);
         _hero.SetWalkingActivation(false, false);
         _instructionsContainer.SetActive(true);
         _clickText.SetActive(true);

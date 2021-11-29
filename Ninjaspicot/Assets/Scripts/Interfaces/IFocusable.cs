@@ -1,6 +1,10 @@
-﻿public interface IFocusable
+﻿using UnityEngine;
+
+public interface IFocusable
 {
     bool IsSilent { get; }
     bool Taken { get; }
-    bool FocusedByNormalJump { get; }
+    Transform Transform { get; }
+    void GoTo();
+    bool Charge { get; }
 }
