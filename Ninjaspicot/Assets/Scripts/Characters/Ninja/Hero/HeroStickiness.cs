@@ -80,9 +80,9 @@ public class HeroStickiness : Stickiness
         callback(false);
     }
 
-    public override bool Attach(Obstacle obstacle)
+    public override bool Attach(Obstacle obstacle, bool isLanding)
     {
-        if (!base.Attach(obstacle))
+        if (!base.Attach(obstacle, isLanding))
             return false;
 
         if (!_touchManager.Touching)

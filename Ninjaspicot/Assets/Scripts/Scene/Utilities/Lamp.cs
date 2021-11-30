@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class Lamp : Dynamic, ISceneryWakeable, IBreakable, IResettable
+public class Lamp : Dynamic, ISceneryWakeable, IResettable
 {
-    public Animator Animator { get; private set; }
+    private Animator _animator;
+    public Animator Animator { get { if (Utils.IsNull(_animator)) _animator = gameObject.GetComponent<Animator>(); return _animator; } }
 
     protected Light2D _light;
     public Light2D Light { get { if (Utils.IsNull(_light)) _light = gameObject.GetComponent<Light2D>(); return _light; } }
@@ -13,16 +14,11 @@ public class Lamp : Dynamic, ISceneryWakeable, IBreakable, IResettable
 
     public bool StayOn { get; set; }
     public bool IsSilent => false;
-    public bool Taken => false;
+    public bool Taken => Broken;
 
     public bool Broken { get; set; }
 
     public bool Charge => true;
-
-    protected virtual void Awake()
-    {
-        Animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
-    }
 
     public virtual void Wake()
     {
@@ -61,6 +57,7 @@ public class Lamp : Dynamic, ISceneryWakeable, IBreakable, IResettable
         Animator.enabled = false;
         Light.enabled = false;
         Hero.Instance.GrapplingGun.Bounce(Transform.position);
+        Broken = true;
 
         return true;
     }
@@ -69,4 +66,20 @@ public class Lamp : Dynamic, ISceneryWakeable, IBreakable, IResettable
     {
         Break();
     }
+
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    if (Broken || !collision.CompareTag("hero"))
+    //        return;
+
+    //    VisibilityManager.AddRevelator();
+    //}
+
+    //private void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if (Broken || !collision.CompareTag("hero"))
+    //        return;
+
+    //    VisibilityManager.RemoveRevelator();
+    //}
 }

@@ -2,12 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class Character : Dynamic, IRaycastable, IKillable
+public abstract class Character : Dynamic, IKillable
 {
     [SerializeField] protected CustomColor _lightColor;
     [SerializeField] protected bool _startAwake;
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
     protected SpriteRenderer _renderer;
     public virtual SpriteRenderer Renderer
     {

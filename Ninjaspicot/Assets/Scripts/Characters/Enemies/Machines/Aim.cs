@@ -63,7 +63,7 @@ public class Aim : FieldOfView
         if (target == null || !TargetInView)
             return false;
 
-        var hit = Utils.LineCast(Transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
+        var hit = Utils.LineCast(Transform.position, target.Transform.position, ignoreId, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }
@@ -73,7 +73,7 @@ public class Aim : FieldOfView
         if (target == null || !TargetInRange)
             return false;
 
-        var hit = Utils.LineCast(Transform.position, target.Transform.position, new int[] { ignoreId }, false, target.Transform.tag);
+        var hit = Utils.LineCast(Transform.position, target.Transform.position, ignoreId, false, target.Transform.tag);
 
         return hit && hit.transform.CompareTag(target.Transform.tag);
     }

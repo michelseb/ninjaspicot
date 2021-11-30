@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public interface IViewer : IRaycastable
+public interface IViewer
 {
     void See(Transform target);
     bool Seeing { get; set; }

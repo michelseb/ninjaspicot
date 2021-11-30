@@ -328,7 +328,7 @@ public abstract class Robot : Enemy, IListener, IViewer
             return;
 
         var hero = Hero.Instance;
-        var raycast = Utils.LineCast(Transform.position, hero.Transform.position, new int[] { Id, hero.Id });
+        var raycast = Utils.LineCast(Transform.position, hero.Transform.position, hero.GetInstanceID());
 
         // Visible when walking in the dark ?
         if (!hero.Visible /*&& !hero.Stickiness.Walking*/)

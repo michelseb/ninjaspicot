@@ -22,6 +22,50 @@ MonoBehaviour:
   _amplitudeTurbulance: 1
   _variation: 0.5
   _toggleTime: 1.5
+--- !u!1001 &56616259274574417
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5785137555469316595}
+    m_Modifications:
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2312792933253698629, guid: d87e93de0da4df442828d79026eaeba7,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d87e93de0da4df442828d79026eaeba7, type: 3}
 --- !u!1001 &5452807485831910649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -292,6 +336,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ef37f8b42d25ed449c465dab8409050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &5785137555469316595 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2009920931004097802, guid: 08376a775c0358c459ea978a01da8256,
+    type: 3}
+  m_PrefabInstance: {fileID: 5452807485831910649}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &35767333653815900 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5463800623468492453, guid: 08376a775c0358c459ea978a01da8256,

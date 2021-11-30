@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Hero : Character, INinja, ITriggerable
 {
@@ -8,14 +9,14 @@ public class Hero : Character, INinja, ITriggerable
     public DynamicInteraction DynamicInteraction { get; private set; }
     public int LastTrigger { get; private set; }
     public bool Detected { get; private set; }
-    public bool Visible { get; private set; }
+    public bool Visible => Stickiness.Walking || !Stickiness.Attached || GrapplingGun.Using || _visibilityManager.Visible;
 
     private HeroStickiness _stickiness;
     public Stickiness Stickiness { get { if (Utils.IsNull(_stickiness)) _stickiness = GetComponent<HeroStickiness>(); return _stickiness; } }
 
     private GrapplingGun _grapplingGun;
     public GrapplingGun GrapplingGun { get { if (Utils.IsNull(_grapplingGun)) _grapplingGun = GetComponent<GrapplingGun>(); return _grapplingGun; } }
-    
+
     public Rigidbody2D Rigidbody => Stickiness.Rigidbody;
 
     private Cloth _cape;
@@ -23,12 +24,14 @@ public class Hero : Character, INinja, ITriggerable
     private SpawnManager _spawnManager;
     private TouchManager _touchManager;
     private ZoneManager _zoneManager;
+    private VisibilityManager _visibilityManager;
     private Coroutine _displayGhosts;
     private Coroutine _fade;
     private Coroutine _trigger;
     private static Hero _instance;
     private UICamera _uiCamera;
     private AudioSource _mainAudioSource;
+
     public static Hero Instance { get { if (_instance == null) _instance = FindObjectOfType<Hero>(); return _instance; } }
 
     private const int GHOST_SOUND_FREQUENCY = 3;
@@ -43,11 +46,27 @@ public class Hero : Character, INinja, ITriggerable
         _cameraBehaviour = CameraBehaviour.Instance;
         _touchManager = TouchManager.Instance;
         _zoneManager = ZoneManager.Instance;
+        _visibilityManager = VisibilityManager.Instance;
         _uiCamera = UICamera.Instance;
         _grapplingGun = GetComponentInChildren<GrapplingGun>(true);
         _cape = GetComponentInChildren<Cloth>();
         DynamicInteraction = GetComponent<DynamicInteraction>() ?? GetComponentInChildren<DynamicInteraction>();
-        Visible = true;
+    }
+
+    protected virtual void Update()
+    {
+        Image.color = GetHeroColor();
+    }
+
+    private Color GetHeroColor()
+    {
+        if (Dead)
+            return ColorUtils.Red;
+
+        if (Visible)
+            return ColorUtils.White;
+
+        return ColorUtils.Grey;
     }
 
     public override void Die(Transform killer = null, Audio sound = null, float volume = 1f)
@@ -58,7 +77,7 @@ public class Hero : Character, INinja, ITriggerable
         Dead = true;
         Stickiness.Detach();
         _grapplingGun?.Cancel();
-        
+
         if (killer != null)
         {
             Stickiness.Rigidbody.AddForce((Transform.position - killer.position).normalized * 10000);
@@ -68,7 +87,7 @@ public class Hero : Character, INinja, ITriggerable
         {
             _audioManager.PlaySound(_audioSource, sound, volume);
         }
-        
+
         SetAllBehavioursActivation(false, false);
         StopDisplayGhosts();
         Image.color = ColorUtils.Red;
@@ -266,16 +285,6 @@ public class Hero : Character, INinja, ITriggerable
     public virtual bool NeedsToWalk()
     {
         return _touchManager.WalkDragging;
-    }
-
-    public virtual void Hide()
-    {
-        Visible = false;
-    }
-
-    public virtual void Reveal()
-    {
-        Visible = true;
     }
 
     public virtual void ActivateGrappling()

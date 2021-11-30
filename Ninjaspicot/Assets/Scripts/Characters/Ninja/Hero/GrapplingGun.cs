@@ -9,6 +9,7 @@ public class GrapplingGun : Dynamic
     [SerializeField] private float _bodyMaxSpeed;
     [SerializeField] private Transform _shootOrigin;
     public bool Active { get; set; }
+    public bool Using => _throwing != null || _pulling != null;
     public Trajectory Trajectory { get; protected set; }
     public Vector3 ShootOrigin => _shootOrigin.position;
 
@@ -147,11 +148,16 @@ public class GrapplingGun : Dynamic
 
         if (target.Charge)
         {
-            _cameraBehaviour.DoShake(.3f, .5f);
+            _cameraBehaviour.DoShake(.2f, .5f);
             _hero.StopDisplayGhosts();
             Bounce(target.Transform.position);
             _timeManager.SlowDown();
             _timeManager.StartTimeRestore();
+        }
+
+        if (!target.IsSilent)
+        {
+            _poolManager.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
         }
 
         target.GoTo();
@@ -192,7 +198,8 @@ public class GrapplingGun : Dynamic
     public void Bounce(Vector3 targetPosition)
     {
         _rigidbody.velocity = Vector2.zero;
-        _rigidbody.AddForce(((Transform.position - targetPosition).normalized + Vector3.up * 2) * 30, ForceMode2D.Impulse);
+        ReinitGravity();
+        _rigidbody.AddForce(((Transform.position - targetPosition).normalized + Vector3.up) * 20, ForceMode2D.Impulse);
     }
 
     public virtual bool CanInit()

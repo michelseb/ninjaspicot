@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public abstract class Bonus : MonoBehaviour, IActivable, ISceneryWakeable, IRaycastable
+public abstract class Bonus : Dynamic, IActivable, ISceneryWakeable
 {
     [SerializeField] protected bool _respawn;
     [SerializeField] protected float _respawnTime;
@@ -18,9 +18,6 @@ public abstract class Bonus : MonoBehaviour, IActivable, ISceneryWakeable, IRayc
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected virtual void Awake()
     {

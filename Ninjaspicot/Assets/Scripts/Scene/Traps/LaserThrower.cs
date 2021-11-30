@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 
-public class LaserThrower : Dynamic, ISceneryWakeable, IRaycastable, IResettable
+public class LaserThrower : Dynamic, ISceneryWakeable, IResettable
 {
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-
     private PoolManager _poolManager;
 
     private Zone _zone;

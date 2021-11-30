@@ -54,13 +54,13 @@ public class DynamicLaser : Laser
     {
         _collider.enabled = false;
         yield return new WaitForSecondsRealtime(.1f);
-        _activationIndicator.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        _activationIndicator.ForEach(x => x.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear));
         _laser.enabled = false;
     }
 
     private IEnumerator TurnOn()
     {
-        _activationIndicator.Play();
+        _activationIndicator.ForEach(x => x.Play());
         yield return new WaitForSecondsRealtime(.6f);
         _laser.enabled = true;
         _collider.enabled = true;

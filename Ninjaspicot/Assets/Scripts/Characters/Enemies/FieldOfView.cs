@@ -17,7 +17,6 @@ public class FieldOfView : Dynamic, IActivable
 
     protected Mesh _mesh;
     protected MeshFilter _filter;
-    protected IRaycastable _parent;
     protected PolygonCollider2D _collider;
     protected MeshRenderer _renderer;
     protected Color _color;
@@ -41,7 +40,6 @@ public class FieldOfView : Dynamic, IActivable
         _renderer = GetComponent<MeshRenderer>();
         _filter = GetComponent<MeshFilter>();
         _collider = GetComponent<PolygonCollider2D>();
-        _parent = Transform.parent?.GetComponent<IRaycastable>();
 
         if (_customColor != CustomColor.None)
         {

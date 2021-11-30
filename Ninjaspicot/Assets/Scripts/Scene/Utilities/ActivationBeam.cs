@@ -8,7 +8,7 @@ public enum AccessGrant
     No = 2
 }
 
-public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable, IWakeable
+public class ActivationBeam : Dynamic, IActivable, IWakeable
 {
     [SerializeField] protected GameObject _activableObject;
     private int _collidingAmount;
@@ -23,9 +23,6 @@ public class ActivationBeam : MonoBehaviour, IActivable, IRaycastable, IWakeable
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     protected virtual void Awake()
     {

@@ -1,19 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Obstacle : MonoBehaviour, IRaycastable, IActivable
+public class Obstacle : Dynamic, IActivable
 {
-    protected int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-
     private Collider2D _collider;
     public Collider2D Collider => _collider;
-    public Transform Transform { get; private set; }
 
     protected virtual void Awake()
     {
-        Transform = transform;
-
         if (!TryGetComponent(out _collider))
         {
             _collider = GetComponentInChildren<Collider2D>() ?? GetComponentInParent<Collider2D>();

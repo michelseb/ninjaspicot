@@ -90,7 +90,7 @@ public class GuardRobotBall : Robot
         }
 
 
-        var heroNotVisible = Utils.LineCast(Transform.position, target, new int[] { Id, hero.Id });
+        var heroNotVisible = Utils.LineCast(Transform.position, target, hero.GetInstanceID());
 
         if (heroNotVisible)
         {

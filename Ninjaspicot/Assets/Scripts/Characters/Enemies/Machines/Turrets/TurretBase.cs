@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class TurretBase : Enemy, IActivable, IRaycastable, IViewer
+public abstract class TurretBase : Enemy, IActivable, IViewer
 {
     public enum Mode { Scan, LookFor, Aim, Wonder };
 

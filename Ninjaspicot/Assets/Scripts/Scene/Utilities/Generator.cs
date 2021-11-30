@@ -1,19 +1,14 @@
 ﻿using UnityEngine;
 
-public class Generator : MonoBehaviour, ISceneryWakeable, IRaycastable, IResettable, IBreakable
+public class Generator : Dynamic, ISceneryWakeable, IResettable, IBreakable
 {
     [SerializeField] protected Laser[] _lasers;
     
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
-
     public bool IsSilent => false;
     public bool Taken => false;
-
-    public Transform Transform => transform;
 
     public bool Broken { get; set; }
 

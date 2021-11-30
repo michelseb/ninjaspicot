@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IResettable
+public class Laser : Dynamic, ISceneryWakeable, IActivable, IResettable
 {
 
     [SerializeField] protected LaserEnd _start;
@@ -26,11 +26,8 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
     private Audio _electrocutionSound;
     protected bool _broken;
     protected bool _isDynamic;
-    protected ParticleSystem _activationIndicator;
+    protected List<ParticleSystem> _activationIndicator;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-    private int _id;
-    public int Id { get { if (_id == 0) _id = gameObject.GetInstanceID(); return _id; } }
 
     private Vector3[] _laserPositions;
 
@@ -43,7 +40,7 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
         _pointsAmount = (int)((_endTransform.position - _startTransform.position).magnitude / 2);
         _laserPositions = new Vector3[_pointsAmount];
         _audioManager = AudioManager.Instance;
-        _activationIndicator = GetComponentInChildren<ParticleSystem>();
+        _activationIndicator = GetComponentsInChildren<ParticleSystem>().ToList();
         if (_startAwake)
         {
             Wake();
@@ -68,9 +65,8 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
         if (!_active)
             return;
 
-        var hit = CollisionPoint();
         _startPosition = _startTransform.localPosition;
-        _endPosition = hit ? _endTransform.InverseTransformPoint(hit.point) : _endTransform.localPosition;
+        _endPosition = _endTransform.localPosition;
 
         UpdateCollider();
 
@@ -104,11 +100,6 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
             var pos = _startPosition + ((_endPosition - _startPosition) * (i + 1) / _pointsAmount);
             _laser.SetPosition(i, pos);
         }
-    }
-
-    protected RaycastHit2D CollisionPoint()
-    {
-        return Utils.LineCast(_startTransform.position, _endTransform.position);
     }
 
     protected virtual void SetPointsPosition()
@@ -175,7 +166,7 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
         _collider.enabled = false;
         _laser.enabled = false;
         _active = false;
-        _activationIndicator.Stop();
+        _activationIndicator.ForEach(x => x.Stop());
     }
 
     public virtual void Wake()
@@ -186,7 +177,7 @@ public class Laser : Dynamic, ISceneryWakeable, IActivable, IRaycastable, IReset
         _collider.enabled = true;
         _laser.enabled = true;
         _active = true;
-        _activationIndicator.Play();
+        _activationIndicator.ForEach(x => x.Play());
     }
 
     public virtual void Activate()

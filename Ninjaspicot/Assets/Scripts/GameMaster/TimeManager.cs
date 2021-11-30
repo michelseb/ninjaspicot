@@ -21,7 +21,7 @@ public class TimeManager : MonoBehaviour, IActivable
 
     private float _globalAudioSourceInitVolume;
 
-    private const float INCREASE_INTERPOLATION = .5f;
+    private const float INCREASE_INTERPOLATION = 1f;
     private const float DECREASE_INTERPOLATION = .8f;
     private const float TIME_SLOW = .01f;
     private const float VOLUME_SLOWDOWN = .05f;
@@ -64,7 +64,7 @@ public class TimeManager : MonoBehaviour, IActivable
 
     private IEnumerator RestoreTime()
     {
-        yield return new WaitForSecondsRealtime(.2f);
+        yield return new WaitForSecondsRealtime(.1f);
 
         while (Time.timeScale < 1)
         {

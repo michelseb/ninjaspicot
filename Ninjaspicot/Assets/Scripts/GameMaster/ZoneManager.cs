@@ -5,6 +5,7 @@ public class ZoneManager : MonoBehaviour
 {
     public List<Zone> Zones { get { if (_zones == null) _zones = new List<Zone>(); return _zones; } }
     public Zone CurrentZone { get; private set; }
+    public long CurrentZoneId => _currentZoneId;
 
     private List<Zone> _zones;
     private long _currentZoneId;
@@ -23,8 +24,6 @@ public class ZoneManager : MonoBehaviour
     {
         if (zone.Id == _currentZoneId)
             return;
-
-        _currentZoneId = zone.Id;
 
         if (CurrentZone)
         {
@@ -47,6 +46,7 @@ public class ZoneManager : MonoBehaviour
         }
 
         CurrentZone = zone;
+        _currentZoneId = zone.Id;
         CurrentZone.Open();
 
         UpdateCurrentZoneCameraBehavior();

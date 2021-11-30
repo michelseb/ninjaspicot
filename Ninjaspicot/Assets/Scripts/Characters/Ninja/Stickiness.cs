@@ -27,7 +27,7 @@ public class Stickiness : Dynamic, IDynamic
     protected Vector3 _previousContactPoint;
     protected Coroutine _walkOnWalls;
     private float _velocityBeforePhysicsUpdate;
-    //private float _detachTime;
+    private float _detachTime;
     private Vector2 _detachPos;
 
     public virtual void Awake()
@@ -72,7 +72,7 @@ public class Stickiness : Dynamic, IDynamic
         CollisionNormal = Quaternion.Euler(0, 0, -90) * contact.normal;
     }
 
-    public virtual bool Attach(Obstacle obstacle)
+    public virtual bool Attach(Obstacle obstacle, bool isLanding)
     {
         if (Attached)
             return false;
@@ -82,15 +82,15 @@ public class Stickiness : Dynamic, IDynamic
         if (dynamic != null && !dynamic.DynamicActive)
             return false;
 
-        var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
-        //var deltaTime = Time.time - _detachTime;
-        var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
+        var contactPos = GetContactPosition();
+        var deltaTime = Time.time - _detachTime;
 
-        // Threshold to attach
-        if (deltaPos < 1f)
+        if (isLanding && (_detachPos - new Vector2(contactPos.x, contactPos.y)).magnitude < 4f && deltaTime < 1f)
             return false;
 
-        _detachPos = anchorPos;
+        _detachPos = contactPos;
+
+        var anchorPos = Transform.InverseTransformPoint(contactPos);
         WallJoint.enabled = true;
         WallJoint.useMotor = false;
         WallJoint.anchor = anchorPos;
@@ -109,8 +109,8 @@ public class Stickiness : Dynamic, IDynamic
         if (!Attached)
             return;
 
-        //_detachTime = Time.time;
-        _detachPos = WallJoint.anchor;
+        _detachTime = Time.time;
+        _detachPos = GetContactPosition();
         Rigidbody.gravityScale = 1;
         WallJoint.enabled = false;
         CurrentAttachment = null;
@@ -122,9 +122,11 @@ public class Stickiness : Dynamic, IDynamic
         if (!Active || obstacle == CurrentAttachment)
             return false;
 
+        bool isLanding = !Attached;
+
         Detach();
 
-        if (!Attach(obstacle))
+        if (!Attach(obstacle, isLanding))
             return false;
 
         CurrentAttachment = obstacle;

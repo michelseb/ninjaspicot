@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
+public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable, IActivable
 {
     private Hero _hero;
     public Hero Hero { get { if (_hero == null) _hero = Hero.Instance; return _hero; } }
@@ -8,30 +8,54 @@ public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
     public bool IsSilent => true;
 
     public bool Active { get; set; }
-    public bool Taken => !IsAvailable();
+    private bool _taken;
+    public virtual bool Taken => !IsAvailable();
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
     public virtual bool Charge => false;
 
-    protected Animator _animator;
     protected SpriteRenderer _renderer;
     protected Collider2D _collider;
+    protected Lamp _lamp;
 
     protected virtual void Awake()
     {
-        _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         _renderer = GetComponent<SpriteRenderer>();
         _collider = GetComponent<Collider2D>();
+        _lamp = GetComponentInChildren<Lamp>();
+        Deactivate();
     }
 
     protected virtual void Update()
     {
-        _renderer.color = Taken ? ColorUtils.Black : ColorUtils.Yellow;
-        _collider.enabled = !Taken;
+        if (_taken != Taken)
+        {
+            if (Taken)
+            {
+                Deactivate();
+            }
+            else
+            {
+                Activate();
+            }
+
+            _taken = Taken;
+        }
     }
 
+    public void Activate()
+    {
+        _renderer.color = ColorUtils.Yellow;
+        _lamp.Wake();
+    }
+
+    public void Deactivate()
+    {
+        _renderer.color = ColorUtils.Black;
+        _lamp.Sleep();
+    }
 
     public void Sleep()
     {
@@ -59,16 +83,11 @@ public class AimableLocation : Dynamic, IFocusable, ISceneryWakeable
         if (dist < GrapplingGun.MIN_DIST_TO_ACTIVATE || dist > GrapplingGun.CHARGE_LENGTH)
             return false;
 
-        var boxRay = Utils.BoxCast(heroPos + direction * GrapplingGun.MIN_DIST_TO_ACTIVATE, Vector2.one * 5, 0, direction, dist - 2 * GrapplingGun.MIN_DIST_TO_ACTIVATE, Hero.Id, true, false);
-        if (boxRay)
+        var circleRay = Utils.CircleCast(heroPos + direction * GrapplingGun.MIN_DIST_TO_ACTIVATE, 2, direction, dist - 2 * GrapplingGun.MIN_DIST_TO_ACTIVATE, Hero.Id, false);
+        if (circleRay)
             return false;
 
-        var lineRay = Utils.LineCast(heroPos, Transform.position, new int[] { _hero.Id });
-
-        if (lineRay)
-            return false;
-
-        return true;
+        return (Utils.LineCast(Transform.position, heroPos).transform.GetInstanceID() == _hero.Id);
     }
 
     public virtual void GoTo()

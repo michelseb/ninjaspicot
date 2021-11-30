@@ -110,7 +110,7 @@ public class SpiderBot : Robot
     {
         _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, Hero.Instance.Transform.position - Transform.position), RotateSpeed);
 
-        var heroNotVisible = Utils.LineCast(Transform.position, target, new int[] { Id, Hero.Instance.Id });
+        var heroNotVisible = Utils.LineCast(Transform.position, target, Hero.Instance.Id);
 
         if (heroNotVisible)
         {

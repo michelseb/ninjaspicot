@@ -89,7 +89,7 @@ public static class Utils
         return hits[0];
     }
 
-    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, string target = "", int layer = ~0)
+    public static RaycastHit2D LineCast(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, string target = "", int layer = ~0)
     {
         RaycastHit2D[] hits = LineCastAll(origin, destination, ignore, includeTriggers, layer);
 
@@ -117,11 +117,13 @@ public static class Utils
 
         foreach (var hit in hits)
         {
-
-            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
+            if (ignore == 0 && includeTriggers)
+            {
+                actualHits.Add(hit);
                 continue;
+            }
 
-            if (raycastable.Id == ignore || (!includeTriggers && hit.collider.isTrigger))
+            if (ignore == hit.transform.GetInstanceID() || (!includeTriggers && hit.collider.isTrigger))
                 continue;
 
             actualHits.Add(hit);
@@ -130,7 +132,7 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
+    public static RaycastHit2D[] LineCastAll(Vector2 origin, Vector2 destination, int ignore = 0, bool includeTriggers = false, int layer = ~0)
     {
         RaycastHit2D[] hits = Physics2D.LinecastAll(origin, destination, layer);
 
@@ -138,10 +140,13 @@ public static class Utils
 
         foreach (var hit in hits)
         {
-            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
+            if (ignore == 0 && includeTriggers)
+            {
+                actualHits.Add(hit);
                 continue;
+            }
 
-            if (ignore != null && ignore.Any(i => i == raycastable.Id) ||
+            if (ignore == hit.transform.GetInstanceID() ||
                 (!includeTriggers && hit && hit.collider.isTrigger))
                 continue;
 
@@ -151,9 +156,9 @@ public static class Utils
         return actualHits.ToArray();
     }
 
-    public static RaycastHit2D CircleCast(Vector2 origin, float radius, Vector2 destination, float distance, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
+    public static RaycastHit2D CircleCast(Vector2 origin, float radius, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false, int layer = ~0)
     {
-        RaycastHit2D[] hits = CircleCastAll(origin, radius, destination, distance, ignore, includeTriggers, layer);
+        RaycastHit2D[] hits = CircleCastAll(origin, radius, direction, distance, ignore, includeTriggers, layer);
 
         if (hits.Length == 0)
             return new RaycastHit2D();
@@ -162,24 +167,21 @@ public static class Utils
     }
 
 
-    public static RaycastHit2D[] CircleCastAll(Vector2 origin, float radius, Vector2 destination, float distance, int[] ignore = null, bool includeTriggers = false, int layer = ~0)
+    public static RaycastHit2D[] CircleCastAll(Vector2 origin, float radius, Vector2 direction, float distance, int ignore = 0, bool includeTriggers = false, int layer = ~0)
     {
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(origin, radius, destination, distance, layer);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(origin, radius, direction, distance, layer);
 
         var actualHits = new List<RaycastHit2D>();
 
         foreach (var hit in hits)
         {
-            if (includeTriggers && ignore == null)
+            if (ignore == 0 && includeTriggers)
             {
                 actualHits.Add(hit);
                 continue;
             }
 
-            if (!hit.collider.TryGetComponent(out IRaycastable raycastable))
-                continue;
-
-            if (ignore != null && ignore.Any(i => i == raycastable.Id) ||
+            if (ignore == hit.transform.GetInstanceID() ||
                 (!includeTriggers && hit && hit.collider.isTrigger))
                 continue;
 

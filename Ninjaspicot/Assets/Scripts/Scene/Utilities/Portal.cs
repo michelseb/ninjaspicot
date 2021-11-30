@@ -3,13 +3,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Portal : MonoBehaviour, IActivable, IFocusable
+public class Portal : Dynamic, IActivable, IFocusable
 {
     [SerializeField] private SpriteRenderer _imgInside;
-    [SerializeField] private int _id;
+    [SerializeField] private int _portalId;
     [SerializeField] private TextMeshProUGUI _title;
 
-    public int Id => _id;
+    public override int Id => _portalId;
     public bool Exit { get; set; }
     public bool Entrance { get; set; }
     public bool IsSilent => true;
@@ -17,7 +17,6 @@ public class Portal : MonoBehaviour, IActivable, IFocusable
     public Portal Other { get; private set; }
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-    public Transform Transform => transform;
 
     public bool Charge => false;
 
