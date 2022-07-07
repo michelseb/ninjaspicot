@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
+
 
 public class ActivationButton : MonoBehaviour, ISceneryWakeable
 {
@@ -14,7 +14,7 @@ public class ActivationButton : MonoBehaviour, ISceneryWakeable
     protected AudioManager _audioManager;
     protected IActivable _activable;
     protected SpriteRenderer _renderer;
-    protected Light2D _light;
+    protected UnityEngine.Rendering.Universal.Light2D _light;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
@@ -23,7 +23,7 @@ public class ActivationButton : MonoBehaviour, ISceneryWakeable
     {
         _audioManager = AudioManager.Instance;
         _audioSource = GetComponent<AudioSource>();
-        _light = GetComponent<Light2D>();
+        _light = GetComponent<UnityEngine.Rendering.Universal.Light2D>();
         _renderer = GetComponent<SpriteRenderer>();
         if (!_renderer) 
         {

@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
+
 
 public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettable
 {
     public Animator Animator { get; private set; }
 
-    protected Light2D _light;
-    public Light2D Light { get { if (Utils.IsNull(_light)) _light = gameObject.GetComponent<Light2D>(); return _light; } }
+    protected UnityEngine.Rendering.Universal.Light2D _light;
+    public UnityEngine.Rendering.Universal.Light2D Light { get { if (Utils.IsNull(_light)) _light = gameObject.GetComponent<UnityEngine.Rendering.Universal.Light2D>(); return _light; } }
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }

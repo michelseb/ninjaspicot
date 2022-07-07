@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
+
 using UnityEngine.UI;
 
 public class Mine : MonoBehaviour, IActivable, ISceneryWakeable
@@ -9,7 +9,7 @@ public class Mine : MonoBehaviour, IActivable, ISceneryWakeable
     protected PoolManager _poolManager;
     protected AudioSource _audioSource;
     protected AudioManager _audioManager;
-    protected Light2D _light;
+    protected UnityEngine.Rendering.Universal.Light2D _light;
 
     private Zone _zone;
     public Zone Zone { get { if (Utils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
@@ -21,7 +21,7 @@ public class Mine : MonoBehaviour, IActivable, ISceneryWakeable
         _initialColor = _renderer.color;
         _audioSource = GetComponent<AudioSource>();
         _audioManager = AudioManager.Instance;
-        _light = GetComponent<Light2D>();
+        _light = GetComponent<UnityEngine.Rendering.Universal.Light2D>();
     }
 
     protected void OnTriggerEnter2D(Collider2D collider)

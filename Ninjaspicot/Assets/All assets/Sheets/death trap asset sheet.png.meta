@@ -138,6 +138,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -148,7 +149,7 @@ TextureImporter:
     serializedVersion: 2
     filterMode: 0
     aniso: 1
-    mipBias: -100
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -169,6 +170,8 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
@@ -998,6 +1001,45 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Spikes: 2160948748613884670
+      WoodenSpikes01: -2479615447504402491
+      Chain01: 9063309129100470303
+      WoodenSpikes04: 5778521319000198238
+      RopeMedium: -632514546528222623
+      SkullDecoRed: 2431332968282582451
+      SkullLarge: 456117211064905978
+      FloorTile01: -3957099063395814597
+      FloorTilleBlackSkull: 8789966295853031308
+      WoodenSwingBase: 8504380184942139882
+      CannonBall: -6904215040071366006
+      WoodenConector: -1822428086603964771
+      MaceRed: 2747713198920722561
+      SkullDecoBlack: 7463284147226817773
+      Chain02: -1908118830493422253
+      CannonBarrel: 8193792764292979959
+      WoodenSpikes02: -8124706615479672075
+      WoodenSpikes03: -3504470977897274362
+      SawBase: -6068584270617021639
+      RopeSmall: -6796027618181921070
+      Chain03: 3950095107486512808
+      FloorTileSquare: 1415754202311050417
+      ChainLink: 1022807057320075967
+      MaceBlack: -2211236013474135625
+      FloorTilleRedSkull: -3168033761558031744
+      RopeLarge: -3481291243706905559
+      SawBloody: 2899114194929477999
+      Swing02: 7777946582219308557
+      CannonWheelBack: -860020704994670451
+      Swing01Bloody: -2527621135759914716
+      MetalicSwingRoot: 8923023952551630215
+      Chain04: 6308089987502242498
+      SawClean: -8003346854188952629
+      CannonBalls: -3372628981263526927
+      Swing02Bloody: 2779881214940103730
+      Swing01: 3112992731687410906
+      CannonWheelFront: 1973562401019718802
+      CannonRoot: 6084355521004319360
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
