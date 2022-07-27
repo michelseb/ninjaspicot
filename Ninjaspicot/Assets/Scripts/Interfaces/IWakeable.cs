@@ -1,6 +1,9 @@
-﻿// Interface to make objects sleep outside of zones
-public interface IWakeable
+﻿namespace ZepLink.RiceNinja.Interfaces
 {
-    void Sleep();
-    void Wake();
+    // Interface to make objects sleep outside of zones
+    public interface IWakeable
+    {
+        void Sleep();
+        void Wake();
+    }
 }

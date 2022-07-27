@@ -1,10 +1,14 @@
 ﻿using System.Collections;
+using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
 
-public interface ITriggerable
+namespace ZepLink.RiceNinja.Interfaces
 {
-    bool Triggered { get; }
-    int LastTrigger { get; }
-    void StartTrigger(EventTrigger trigger);
-    IEnumerator Trigger(EventTrigger trigger);
-    bool IsTriggeredBy(int triggerId);
+    public interface ITriggerable
+    {
+        bool Triggered { get; }
+        int LastTrigger { get; }
+        void StartTrigger(EventTrigger trigger);
+        IEnumerator Trigger(EventTrigger trigger);
+        bool IsTriggeredBy(int triggerId);
+    }
 }

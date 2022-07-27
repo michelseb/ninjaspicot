@@ -1,5 +1,10 @@
-﻿public interface IActivable
+﻿using ZepLink.RiceNinja.Dynamics.Interfaces;
+
+namespace ZepLink.RiceNinja.Interfaces
 {
-    void Activate();
-    void Deactivate();
+    public interface IActivable
+    {
+        void Activate(IActivator activator = default);
+        void Deactivate(IActivator activator = default);
+    }
 }

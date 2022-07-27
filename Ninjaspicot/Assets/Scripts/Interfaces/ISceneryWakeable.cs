@@ -1,5 +1,10 @@
-﻿// Interface to make objects sleep outside of zones
-public interface ISceneryWakeable : IWakeable
+﻿using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
+
+namespace ZepLink.RiceNinja.Interfaces
 {
-    Zone Zone { get; }
+    // Interface to make objects sleep outside of zones
+    public interface ISceneryWakeable : IWakeable
+    {
+        Zone Zone { get; }
+    }
 }

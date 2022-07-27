@@ -5,8 +5,9 @@
 // Source code may NOT be redistributed or sold.
 // 
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace DigitalRuby.LightningBolt
 {
@@ -129,9 +130,9 @@ namespace DigitalRuby.LightningBolt
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.CompareTag("hero"))
+            if (collision.TryGetComponent(out IKillable killable))
             {
-                Hero.Instance.Die();
+                killable.Die();
             }
         }
 

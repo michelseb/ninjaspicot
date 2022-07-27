@@ -1,4 +1,7 @@
-﻿public interface IResettable
+﻿namespace ZepLink.RiceNinja.Interfaces
 {
-    void DoReset();
+    public interface IResettable
+    {
+        void DoReset();
+    }
 }
