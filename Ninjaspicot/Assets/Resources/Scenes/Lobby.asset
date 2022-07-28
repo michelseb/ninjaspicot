@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b8aa21aff4574244bae65efd362a7fa, type: 3}
+  m_Name: Lobby
+  m_EditorClassIdentifier: 
+  _name: Lobby
+  _audio: {fileID: 8300000, guid: b771dc66ed0226d469923a5ba4865bbf, type: 3}
+  _index: 0
+  _image: {fileID: 0}
+  _fontColor: 0
+  _globalLightColor: 0
+  _frontLightColor: 0

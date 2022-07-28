@@ -20,7 +20,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     public class TutorialService : CollectionService<Tutorial>, ITutorialService
     {
         [SerializeField] private List<Tutorial> _tutorials;
-        [SerializeField] private GameObject _instructionsContainer;
         [SerializeField] private TextMeshProUGUI _instructionText;
         [SerializeField] private GameObject _clickText;
         [SerializeField] private List<GameObject> _itemsToAppear;
@@ -53,8 +52,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             base.Init(parent);
 
             _hero = UnityEngine.Object.FindObjectOfType<Hero>();
-            _containerImage = _instructionsContainer.GetComponent<Image>();
+            
+            _containerImage = ServiceObject.AddComponent<Image>();
             _canvas = ServiceObject.AddComponent<Canvas>();
+
             _canvas.worldCamera = _cameraService.MainCamera.Camera;
         }
 
@@ -78,7 +79,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
             else
             {
-                var dist = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude) + .01f;
+                var dist = Mathf.Sqrt((_hero.transform.position - _containerImage.transform.position).magnitude) + .01f;
                 _containerImage.color = new Color(1, 1, 1, _initialDistanceToInstruction / dist);
                 if (CheckComplete(ref _tutorialIndex, ref _actionDuration))
                 {
@@ -111,7 +112,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             if (_instructions.Count == 1)
             {
-                _initialDistanceToInstruction = Mathf.Sqrt((_hero.transform.position - _instructionsContainer.transform.position).magnitude);
+                _initialDistanceToInstruction = Mathf.Sqrt((_hero.transform.position - _containerImage.transform.position).magnitude);
                 _hero.SetJumpingActivation(true);
                 _hero.SetWalkingActivation(true, false);
                 _clickText.SetActive(false);
@@ -246,7 +247,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _containerImage.color = Color.white;
             _hero.SetJumpingActivation(false);
             _hero.SetWalkingActivation(false, false);
-            _instructionsContainer.SetActive(true);
+            _containerImage.gameObject.SetActive(true);
             _clickText.SetActive(true);
             _actionDuration = _tutorials[tutorialId].Duration;
             _instructions = new Queue<string>(_tutorials[tutorialId].Instructions);

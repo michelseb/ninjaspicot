@@ -13,10 +13,10 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Portals
     public class Portal : Dynamic, IFocusable, IAudio
     {
         [SerializeField] private SpriteRenderer _imgInside;
-        [SerializeField] private int _id;
+        [SerializeField] private int _index;
         [SerializeField] private TextMeshProUGUI _title;
 
-        public override int Id => _id;
+        public override int Id => _index;
         public bool Exit { get; set; }
         public bool Entrance { get; set; }
         public bool IsSilent => true;

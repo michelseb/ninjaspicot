@@ -33,7 +33,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         private float _screenRatio;
         private float _initialCamSize;
 
-        private void Awake()
+        private void Start()
         {
             _coroutineService = ServiceFinder.Get<ICoroutineService>();
 
@@ -41,10 +41,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
 
             _screenRatio = (float)Screen.height / Screen.width * .5f;
             _initialCamSize = 200f * _screenRatio;
-        }
 
-        private void Start()
-        {
             _velocity = Vector3.zero;
             InstantZoom(_beginZoom);
             //SetFollowMode(_tracker);

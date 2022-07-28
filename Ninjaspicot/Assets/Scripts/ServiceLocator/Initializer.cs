@@ -24,10 +24,12 @@ namespace ZepLink.RiceNinja.ServiceLocator
             var spawnService = sl.Register<ISpawnService>(new SpawnService(timeService, cameraService));
             var touchService = sl.Register<ITouchService>(new TouchService(poolService, cameraService));
             var zoneService = sl.Register<IZoneService>(new ZoneService(cameraService));
-            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService));
-            sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService, audioService));
             sl.Register<ITutorialService>(new TutorialService(touchService, cameraService, coroutineService));
             sl.Register<IParallaxService>(new ParallaxService(cameraService));
+            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService));
+            sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService, audioService));
+
+            scenesService.InitialLoad();
         }
     }
 }

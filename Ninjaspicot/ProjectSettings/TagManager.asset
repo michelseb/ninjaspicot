@@ -17,6 +17,7 @@ TagManager:
   - Sound
   - Bonus
   - Interactive
+  - UICamera
   layers:
   - Default
   - TransparentFX

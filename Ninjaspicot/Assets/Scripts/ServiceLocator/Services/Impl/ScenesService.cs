@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZepLink.RiceNinja.Interfaces;
@@ -7,14 +8,19 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class ScenesService : CoroutineService<SceneInfos>, IScenesService
+    public class ScenesService : ScriptableObjectService<SceneInfos>, ICoroutineService, IScenesService
     {
-        [SerializeField] private int _startScene;
         [SerializeField] private int _startCheckPoint;
         [SerializeField] private AudioClip[] _sceneAudios;
 
         public bool IsSceneLoading { get; private set; }
         public SceneInfos CurrentScene { get; private set; }
+
+        public override string ObjectsPath => "Scenes";
+
+        public IDictionary<string, Coroutine> RunningRoutines { get; } = new Dictionary<string, Coroutine>();
+
+        public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
 
         private Coroutine _volumeDown;
         private ISpawnService _spawnService;
@@ -30,15 +36,18 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         {
             base.Init(parent);
 
-            _spawnService = ServiceFinder.Instance.Get<ISpawnService>();
+            CoroutineServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
+        }
 
-            if (_startScene < 2)
+        public void InitialLoad(int sceneIndex = 0)
+        {
+            if (sceneIndex < 2)
             {
                 LoadLobby();
             }
             else
             {
-                LoadById(_startScene);
+                LoadById(sceneIndex, true);
             }
 
             _spawnService.InitActiveSceneSpawns(_startCheckPoint);
@@ -47,18 +56,25 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         public void LoadLobby()
         {
             var lobby = FindByName("Lobby");
-            SceneManager.LoadScene(lobby.Name);
-            SwitchAudio(1);
-            lobby.Loaded = true;
+            LoadByName(lobby.name, false);
+            SwitchAudio(0);
+            lobby.Load();
 
             // Wake lobby wakeables
             BaseUtils.FindObjectsOfTypeInScene<ISceneryWakeable>("Lobby").ForEach(w => w.Wake());
         }
 
-        public void LoadById(int sceneId)
+        public void LoadByName(string sceneName, bool unloadPrevious)
         {
-            SceneManager.LoadScene(sceneId);
-            SwitchAudio(sceneId);
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            CurrentScene = FindByName(sceneName);
+            SwitchAudio(CurrentScene.Id);
+        }
+
+        public void LoadById(int sceneId, bool unloadPrevious)
+        {
+            var scene = FindById(sceneId);
+            LoadByName(scene.Name, unloadPrevious);
         }
 
         private void SwitchAudio(int sceneId)
@@ -102,7 +118,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 _spawnService.InitActiveSceneSpawns();
                 CurrentScene = sceneInfos;
                 SwitchAudio(sceneToLoad.buildIndex);
-                sceneInfos.Loaded = true;
+                sceneInfos.Load();
             }
         }
 
@@ -123,7 +139,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 return;
 
             SceneManager.UnloadSceneAsync(scene.Name);
-            scene.Loaded = false;
+            scene.Unload();
         }
 
         private SceneInfos GetSceneByPortalId(int portalId)

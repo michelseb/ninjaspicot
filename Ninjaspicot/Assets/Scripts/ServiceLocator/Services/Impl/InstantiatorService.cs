@@ -13,6 +13,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         protected Dictionary<int, T> _models = new Dictionary<int, T>();
         protected Transform _parent;
+        protected Transform _instancesParent;
 
         public override void Init(Transform parent)
         {
@@ -30,10 +31,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _models = models.Select((model, index) => new { Index = index, Value = model.GetComponent<T>() }).ToDictionary(t => t.Index, t => t.Value);
 
             parentName = ModelPath.Split('/').Last();
-            _parent = GameObject.Find(parentName)?.transform;
+            _parent = GameObject.Find(parentName)?.transform ?? new GameObject(parentName).transform;
 
             if (_parent == null)
                 Debug.LogError($"No transform name matching instantiator parent for service {GetType()}");
+
+            _instancesParent = GameObject.Find("Instances")?.transform ?? new GameObject("Instances").transform;
+            _parent.SetParent(_instancesParent);
         }
 
         public virtual T Create(T model, Vector3 position, Quaternion rotation, Transform parent = default)

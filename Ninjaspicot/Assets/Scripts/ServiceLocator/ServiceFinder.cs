@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 
@@ -25,8 +24,8 @@ namespace ZepLink.RiceNinja.ServiceLocator
 
             if (!_services.ContainsKey(key))
             {
-                Debug.LogError($"{key} not register with {GetType().Name}");
-                throw new InvalidOperationException();
+                Debug.LogError($"Service {key} was not registered and cannot be used");
+                return default(T);
             }
 
             return (T)_services[key];

@@ -10,7 +10,6 @@ namespace ZepLink.RiceNinja.Manageables
 
         public virtual string Name => "Manageable";
 
-        private ServiceFinder _serviceFinder;
-        public ServiceFinder ServiceFinder { get { if (_serviceFinder == null) _serviceFinder = ServiceFinder.Instance; return _serviceFinder; } }
+        public ServiceFinder ServiceFinder => ServiceFinder.Instance;
     }
 }

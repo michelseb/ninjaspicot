@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -20,6 +21,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void Add(T instance)
         {
+            if (BaseUtils.IsNull(instance))
+            {
+                Debug.LogError($"trying to add null instance of {GetType()} to collection");
+                return;
+            }
+
             if (InstancesDictionary.ContainsKey(instance.Id))
             {
                 Debug.LogError($"trying to add already existing instance of {GetType()} to collection");

@@ -13,10 +13,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     public class CameraService : CollectionService<ICamera>, ICameraService
     {
         private MainCamera _mainCamera;
-        public MainCamera MainCamera { get { if (BaseUtils.IsNull(_mainCamera)) _mainCamera = Object.FindObjectOfType<MainCamera>(); return _mainCamera; } }
+        public MainCamera MainCamera { get { if (BaseUtils.IsNull(_mainCamera)) _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<MainCamera>(); return _mainCamera; } }
 
         private UICamera _uiCamera;
-        public UICamera UiCamera { get { if (BaseUtils.IsNull(_uiCamera)) _uiCamera = Object.FindObjectOfType<UICamera>(); return _uiCamera; } }
+        public UICamera UiCamera { get { if (BaseUtils.IsNull(_uiCamera)) _uiCamera = GameObject.FindGameObjectWithTag("UICamera").GetComponent<UICamera>(); return _uiCamera; } }
 
         public override void Init(Transform parent)
         {
