@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Portals;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -13,22 +14,20 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public bool Connecting { get; private set; }
 
-        private List<Portal> _portals;
-        private ICameraService _cameraService;
-        private IZoneService _zoneService;
-        private IScenesService _scenesService;
-        private IAudioService _audioService;
+        private readonly ICameraService _cameraService;
+        private readonly IZoneService _zoneService;
+        private readonly IScenesService _scenesService;
+
 
 
         public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
-        public const float EJECT_SPEED = 100; //How strongly transferred hero is ejected
+        public const float EJECT_SPEED = 100; //How strongly transferred entity is ejected
 
-        public PortalService(ICameraService cameraService, IZoneService zoneService, IScenesService scenesService, IAudioService audioService)
+        public PortalService(ICameraService cameraService, IZoneService zoneService, IScenesService scenesService)
         {
             _cameraService = cameraService;
             _zoneService = zoneService;
             _scenesService = scenesService;
-            _audioService = audioService;
         }
 
         private int? GetExitIndexByEntranceId(int entranceId)

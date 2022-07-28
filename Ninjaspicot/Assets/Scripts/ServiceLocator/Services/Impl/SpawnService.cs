@@ -4,14 +4,15 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Cameras;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
     public class SpawnService : CollectionService<CheckPoint>, ISpawnService
     {
+        private readonly ITimeService _timeService;
+        private readonly ICameraService _cameraService;
         private Vector3 _spawnPosition;
-        private ITimeService _timeService;
-        private ICameraService _cameraService;
 
         public override IList<CheckPoint> Collection => InstancesDictionary.Select(d => d.Value).OrderBy(x => x.Order).ToArray();
 

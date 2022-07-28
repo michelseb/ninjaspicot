@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Scenery.Utilities;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
     public class ParallaxService : CollectionService<ParallaxObject>, IParallaxService
     {
-        private ICameraService _cameraService;
+        private readonly ICameraService _cameraService;
 
         private Vector3 _previousCameraPosition;
 

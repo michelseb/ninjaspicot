@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
 using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -33,9 +34,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private Image _containerImage;
 
         private Hero _hero;
-        private ITouchService _touchService;
-        private ICameraService _cameraService;
-        private ICoroutineService _coroutineService;
+
+        private readonly ITouchService _touchService;
+        private readonly ICameraService _cameraService;
+        private readonly ICoroutineService _coroutineService;
 
         private bool _started;
         private Canvas _canvas;

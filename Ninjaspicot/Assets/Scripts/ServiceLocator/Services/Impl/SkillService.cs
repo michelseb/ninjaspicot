@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {

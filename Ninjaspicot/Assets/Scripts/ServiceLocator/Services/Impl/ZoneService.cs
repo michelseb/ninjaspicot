@@ -1,4 +1,5 @@
 ﻿using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
@@ -9,7 +10,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         private long _currentZoneId;
 
-        private ICameraService _cameraService;
+        private readonly ICameraService _cameraService;
 
         public ZoneService(ICameraService cameraService)
         {

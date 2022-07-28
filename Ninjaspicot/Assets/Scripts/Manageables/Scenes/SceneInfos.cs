@@ -10,6 +10,7 @@ namespace ZepLink.RiceNinja.Manageables.Scenes
         [SerializeField] private string _name;
         [SerializeField] private AudioClip _audio;
         [SerializeField] private int _index;
+        [SerializeField] private Texture2D _map;
         [SerializeField] private Sprite _image;
         [SerializeField] private CustomColor _fontColor;
         [SerializeField] private CustomColor _globalLightColor;
@@ -18,6 +19,7 @@ namespace ZepLink.RiceNinja.Manageables.Scenes
         public string Name => _name;
         public AudioClip Audio => _audio;
         public int Id => _index;
+        public Texture2D Map => _map;
         public Sprite Img => _image;
         public CustomColor FontColor => _fontColor;
         public CustomColor GlobalLightColor => _globalLightColor;

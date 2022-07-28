@@ -1,4 +1,5 @@
 ﻿using ZepLink.RiceNinja.Dynamics.Effects.Lights;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {

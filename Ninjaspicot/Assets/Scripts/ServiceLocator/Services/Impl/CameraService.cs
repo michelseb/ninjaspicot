@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Cameras;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl

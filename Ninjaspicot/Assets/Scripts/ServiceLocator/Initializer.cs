@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Manageables;
 using ZepLink.RiceNinja.ServiceLocator.Services;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services.Impl;
 
 namespace ZepLink.RiceNinja.ServiceLocator
@@ -15,7 +16,6 @@ namespace ZepLink.RiceNinja.ServiceLocator
             sl.Register<ICharacterService>(new CharacterService());
             sl.Register<ILightService>(new LightService());
             sl.Register<ISkillService>(new SkillService());
-            sl.Register<ITileService>(new TileService());
             var audioService = sl.Register<IAudioService>(new AudioService());
             var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<Manageable>());
             var poolService = sl.Register<IPoolService>(new PoolService());
@@ -24,10 +24,12 @@ namespace ZepLink.RiceNinja.ServiceLocator
             var spawnService = sl.Register<ISpawnService>(new SpawnService(timeService, cameraService));
             var touchService = sl.Register<ITouchService>(new TouchService(poolService, cameraService));
             var zoneService = sl.Register<IZoneService>(new ZoneService(cameraService));
+            var tileBrushService = sl.Register<ITileBrushService>(new TileBrushService());
+            var tileService = sl.Register<ITileService>(new TileService(tileBrushService));
             sl.Register<ITutorialService>(new TutorialService(touchService, cameraService, coroutineService));
             sl.Register<IParallaxService>(new ParallaxService(cameraService));
-            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService));
-            sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService, audioService));
+            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, tileService));
+            sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService));
 
             scenesService.InitialLoad();
         }

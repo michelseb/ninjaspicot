@@ -10,7 +10,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     {
         public float TimeScale => Time.timeScale;
 
-        private IAudioService _audioService;
+        private readonly IAudioService _audioService;
+
         private AudioFile _slowDown;
         private bool _active;
 

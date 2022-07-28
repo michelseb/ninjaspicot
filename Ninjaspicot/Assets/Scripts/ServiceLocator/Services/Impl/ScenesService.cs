@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Scenes;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
@@ -22,14 +24,15 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
 
-        private Coroutine _volumeDown;
-        private ISpawnService _spawnService;
-        private IAudioService _audioService;
+        private readonly ISpawnService _spawnService;
+        private readonly IAudioService _audioService;
+        private readonly ITileService _tileService;
 
-        public ScenesService(ISpawnService spawnService, IAudioService audioService)
+        public ScenesService(ISpawnService spawnService, IAudioService audioService, ITileService tileService)
         {
             _spawnService = spawnService;
             _audioService = audioService;
+            _tileService = tileService;
         }
 
         public override void Init(Transform parent)
@@ -69,6 +72,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
             CurrentScene = FindByName(sceneName);
             SwitchAudio(CurrentScene.Id);
+            _tileService.Generate(CurrentScene.Map, BrushType.RiceMap);
         }
 
         public void LoadById(int sceneId, bool unloadPrevious)
@@ -96,7 +100,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             var operation = SceneManager.LoadSceneAsync(scene.Name, LoadSceneMode.Additive);
             operation.allowSceneActivation = false;
 
-            while (operation.progress < .9f || _volumeDown != null)
+            while (operation.progress < .9f)
                 yield return null;
 
             operation.allowSceneActivation = true;
