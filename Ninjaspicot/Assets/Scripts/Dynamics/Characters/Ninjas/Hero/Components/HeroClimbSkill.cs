@@ -25,8 +25,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
             _touchService = ServiceFinder.Get<ITouchService>();
             _audioService = ServiceFinder.Get<IAudioService>();
             _audioSource = GetComponent<AudioSource>();
-            _walkAudio = _audioService.FindAudioByName("Whoosh3");
-            _runAudio = _audioService.FindAudioByName("Whoosh2");
+            _walkAudio = _audioService.FindByName("Whoosh3");
+            _runAudio = _audioService.FindByName("Whoosh2");
         }
 
         public override void Start()

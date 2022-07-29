@@ -55,7 +55,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Lasers
         protected virtual void Start()
         {
             _laser.positionCount = _pointsAmount;
-            _electrocutionSound = _audioService.FindAudioByName("Electrocution");
+            _electrocutionSound = _audioService.FindByName("Electrocution");
             _startPosition = _startTransform.localPosition;
             _endPosition = _endTransform.localPosition;
             _isDynamic = _start.IsDynamic || _end.IsDynamic;

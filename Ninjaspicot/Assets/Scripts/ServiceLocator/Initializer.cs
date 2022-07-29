@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using ZepLink.RiceNinja.Manageables;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -17,7 +18,7 @@ namespace ZepLink.RiceNinja.ServiceLocator
             sl.Register<ILightService>(new LightService());
             sl.Register<ISkillService>(new SkillService());
             var audioService = sl.Register<IAudioService>(new AudioService());
-            var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<int, IntManageable>());
+            var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<Guid, GuidManageable>());
             var poolService = sl.Register<IPoolService>(new PoolService());
             var cameraService = sl.Register<ICameraService>(new CameraService());
             var timeService = sl.Register<ITimeService>(new TimeService(audioService));

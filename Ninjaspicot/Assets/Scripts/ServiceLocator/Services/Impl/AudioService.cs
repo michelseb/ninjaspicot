@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class AudioService : CoroutineService<int, AudioFile>, IAudioService
+    public class AudioService : CoroutineService<Guid, AudioFile>, IAudioService
     {
         private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
         private AudioSource _globalAudioSource;

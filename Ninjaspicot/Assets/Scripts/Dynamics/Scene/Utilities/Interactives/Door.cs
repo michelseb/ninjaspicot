@@ -28,8 +28,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 
         private void Start()
         {
-            _bang = _audioService.FindAudioByName("DoorBang");
-            _open = _audioService.FindAudioByName("DoorOpen");
+            _bang = _audioService.FindByName("DoorBang");
+            _open = _audioService.FindByName("DoorOpen");
             if (_startOpened)
             {
                 Activate(null);

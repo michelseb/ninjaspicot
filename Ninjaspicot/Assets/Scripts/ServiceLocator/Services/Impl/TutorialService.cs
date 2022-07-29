@@ -12,13 +12,13 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
     [Serializable]
-    public class Tutorial : IntManageable
+    public class Tutorial : GuidManageable
     {
         public string[] Instructions;
         public float Duration;
     }
 
-    public class TutorialService : CollectionService<int, Tutorial>, ITutorialService
+    public class TutorialService : CollectionService<Guid, Tutorial>, ITutorialService
     {
         [SerializeField] private List<Tutorial> _tutorials;
         [SerializeField] private TextMeshProUGUI _instructionText;

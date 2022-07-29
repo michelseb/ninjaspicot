@@ -34,7 +34,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected abstract string _soundName { get; }
         protected abstract float _soundIntensity { get; }
         private AudioFile _sound;
-        public AudioFile JumpSound { get { if (BaseUtils.IsNull(_sound)) _sound = _audioService.FindAudioByName(_soundName); return _sound; } }
+        public AudioFile JumpSound { get { if (BaseUtils.IsNull(_sound)) _sound = _audioService.FindByName(_soundName); return _sound; } }
 
         private AudioSource _audioSource;
         public AudioSource AudioSource { get { if (_audioSource == null) _audioSource = GetComponent<AudioSource>(); return _audioSource; } }
@@ -66,7 +66,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             SetMaxJumps(_maxJumps);
             GainAllJumps();
            
-            _impactSound = _audioService.FindAudioByName("Impact");
+            _impactSound = _audioService.FindByName("Impact");
 
             Active = true;
         }

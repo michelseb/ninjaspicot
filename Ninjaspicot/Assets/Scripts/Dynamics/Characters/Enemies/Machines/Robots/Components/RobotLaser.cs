@@ -29,7 +29,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
 
         protected virtual void Start()
         {
-            _electrocutionSound = _audioService.FindAudioByName("Electrocution");
+            _electrocutionSound = _audioService.FindByName("Electrocution");
         }
 
         protected void Update()

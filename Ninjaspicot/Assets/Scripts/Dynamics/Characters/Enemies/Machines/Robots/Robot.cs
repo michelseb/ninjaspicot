@@ -52,7 +52,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         protected override void Start()
         {
             base.Start();
-            _reactionSound = _audioService.FindAudioByName("RobotReact");
+            _reactionSound = _audioService.FindByName("RobotReact");
             _initRotation = _head.rotation;
 
             Laser.Deactivate(null);

@@ -57,8 +57,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Portals
             _animator = GetComponent<Animator>();
             _titleVisible = true;
 
-            _enterClip = _audioService.FindAudioByName("EnterPortal");
-            _exitClip = _audioService.FindAudioByName("ExitPortal");
+            _enterClip = _audioService.FindByName("EnterPortal");
+            _exitClip = _audioService.FindByName("ExitPortal");
         }
 
         protected void Update()

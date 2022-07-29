@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ZepLink.RiceNinja.Manageables.Audios
 {
     [Serializable]
-    public class AudioFile : IntManageable
+    public class AudioFile : GuidManageable
     {
         [SerializeField] private string _name;
 

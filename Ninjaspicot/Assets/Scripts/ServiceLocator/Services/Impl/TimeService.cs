@@ -31,7 +31,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void Init(Transform parent)
         {
-            _slowDown = _audioService.FindAudioByName("SlowDown");
+            _slowDown = _audioService.FindByName("SlowDown");
             
             ServiceObject = new GameObject(nameof(TimeService));
             ServiceObject.transform.SetParent(parent);

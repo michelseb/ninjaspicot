@@ -69,7 +69,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         private void SetTile(Vector3Int coords, Color color)
         {
-            var brush = _tileBrushService.FindByColor(color);
+            var brush = _tileBrushService.FindById(color);
 
             if (brush == null)
                 return;

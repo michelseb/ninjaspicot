@@ -1,17 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using ZepLink.RiceNinja.Manageables.Audios;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IAudioService : ICollectionService<int, AudioFile>
+    public interface IAudioService : ICollectionService<Guid, AudioFile>
     {
-        /// <summary>
-        /// Get audio file by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        AudioFile FindAudioByName(string name);
-
         /// <summary>
         /// Get audioSource by id
         /// </summary>

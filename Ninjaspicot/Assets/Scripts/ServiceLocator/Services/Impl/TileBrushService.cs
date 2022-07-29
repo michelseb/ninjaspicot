@@ -22,13 +22,5 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             return result;
         }
-
-        public TileBrush FindByColor(Color color)
-        {
-            if (!InstancesDictionary.ContainsKey(color))
-                return default;
-
-            return InstancesDictionary[color];
-        }
     }
 }

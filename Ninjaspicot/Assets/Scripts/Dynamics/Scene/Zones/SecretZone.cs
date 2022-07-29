@@ -15,6 +15,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         protected override void Awake()
         {
             base.Awake();
+
             _audioSource = GetComponent<AudioSource>();
             _audioService = ServiceFinder.Get<IAudioService>();
         }
@@ -22,7 +23,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         protected override void Start()
         {
             base.Start();
-            _discoverSound = _audioService.FindAudioByName("Discover");
+
+            _discoverSound = _audioService.FindByName("Discover");
         }
 
         protected virtual void OnTriggerEnter2D(Collider2D collision)
