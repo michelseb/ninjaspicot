@@ -2,7 +2,7 @@
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IParallaxService : ICollectionService<ParallaxObject>
+    public interface IParallaxService : ICollectionService<int, ParallaxObject>
     {
 
     }

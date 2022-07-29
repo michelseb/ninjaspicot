@@ -2,7 +2,7 @@
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ICameraService : ICollectionService<ICamera>
+    public interface ICameraService : ICollectionService<int, ICamera>
     {   
         /// <summary>
         /// Main game camera

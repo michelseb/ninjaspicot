@@ -2,12 +2,12 @@
 
 namespace ZepLink.RiceNinja.Manageables
 {
-    public interface IManageable
+    public interface IManageable<T>
     {
         /// <summary>
         /// Manageable id
         /// </summary>
-        int Id { get; }
+        T Id { get; }
 
         /// <summary>
         /// Manageable name

@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.Dynamics.Characters.Components;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ISkillService : IInstantiatorService<ISkill>
+    public interface ISkillService : IInstantiatorService<int, ISkill>
     {
         /// <summary>
         /// Adds a skill to an instance

@@ -7,11 +7,11 @@ using ZepLink.RiceNinja.Manageables;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
-    public abstract class InstantiatorService<T> : CollectionService<T>, IInstantiatorService<T> where T : class, IManageable
+    public abstract class InstantiatorService<T, U> : CollectionService<T, U>, IInstantiatorService<T, U> where U : class, IManageable<T>
     {
         protected abstract string ModelPath { get; }
 
-        protected Dictionary<int, T> _models = new Dictionary<int, T>();
+        protected Dictionary<T, U> _models = new Dictionary<T, U>();
         protected Transform _parent;
         protected Transform _instancesParent;
 
@@ -27,8 +27,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
                 return;
             }
 
-            var models = Resources.LoadAll(ModelPath).Cast<GameObject>().ToArray();
-            _models = models.Select((model, index) => new { Index = index, Value = model.GetComponent<T>() }).ToDictionary(t => t.Index, t => t.Value);
+            var models = Resources.LoadAll(ModelPath).Cast<U>().ToArray();
+            _models = models.ToDictionary(t => t.Id, t => t);
 
             parentName = ModelPath.Split('/').Last();
             _parent = GameObject.Find(parentName)?.transform ?? new GameObject(parentName).transform;
@@ -40,66 +40,64 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             _parent.SetParent(_instancesParent);
         }
 
-        public virtual T Create(T model, Vector3 position, Quaternion rotation, Transform parent = default)
+        public virtual U Create(U model, Vector3 position, Quaternion rotation, Transform parent = default)
         {
-            if (EqualityComparer<T>.Default.Equals(model, default(T)) || model is not Dynamic dynamic)
-                return default(T);
+            if (EqualityComparer<U>.Default.Equals(model, default(U)) || model is not Dynamic dynamic)
+                return default(U);
 
             var instance = UnityEngine.Object.Instantiate(dynamic, position, rotation, parent ?? _parent);
 
-            var component = instance.GetComponent<T>();
+            var component = instance.GetComponent<U>();
             Add(component);
 
             return component;
         }
 
-        public T Create(T model, Vector3 position, Transform parent = default)
+        public U Create(U model, Vector3 position, Transform parent = default)
         {
             return Create(model, position, Quaternion.identity, parent);
         }
 
-        public T Create(T model, Transform _parent = default)
+        public U Create(U model, Transform _parent = default)
         {
             return Create(model, Vector3.zero, _parent);
         }
 
-        public T Equip(Type componentType, Transform instance)
+        public U Equip(Type componentType, Transform instance)
         {
-            if (componentType is not T)
+            if (componentType is not U)
             {
                 Debug.LogError($"Service {GetType()} could not add component of type {componentType.Name}");
-                return default(T);
+                return default(U);
             }
 
             if (instance.gameObject.TryGetComponent(componentType, out Component component))
             {
                 Debug.LogError($"Service {GetType()} trying to add already existing component {componentType.Name} to instance {instance.name}");
-                return component as T;
+                return component as U;
             }
 
-            var result = instance.gameObject.AddComponent(componentType) as T;
+            var result = instance.gameObject.AddComponent(componentType) as U;
             Add(result);
 
             return result;
         }
 
-        public T GetModelByName(string name)
+        public U GetModelByName(string name)
         {
             return _models.Values.FirstOrDefault(x => x.Name == name);
         }
 
-        public T GetRandomInstance()
+        public U GetRandomInstance()
         {
             var id = InstancesDictionary.Keys.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
 
             return FindById(id);
         }
 
-        public T GetRandomModel()
+        public U GetRandomModel()
         {
-            var index = UnityEngine.Random.Range(0, _models.Count);
-
-            return _models[index];
+            return _models.Values.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
         }
     }
 }

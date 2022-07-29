@@ -3,7 +3,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class LightService : InstantiatorService<LightEffect>, ILightService
+    public class LightService : InstantiatorService<int, LightEffect>, ILightService
     {
         protected override string ModelPath => "Lights";
 

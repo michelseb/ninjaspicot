@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.Manageables;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
-    public abstract class ScriptableObjectService<T> : CollectionService<T>, IScriptableObjectService<T> where T : ScriptableObject, IManageable
+    public abstract class ScriptableObjectService<T, U> : CollectionService<T, U>, IScriptableObjectService<T, U> where U : ScriptableObject, IManageable<T>
     {
         public abstract string ObjectsPath { get; }
 
@@ -18,8 +18,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
                 return;
             }
 
-            var scriptables = Resources.LoadAll(ObjectsPath).Cast<T>().ToList();
-            scriptables.ForEach(s => Add(s));
+            Resources
+                .LoadAll(ObjectsPath)
+                .Cast<U>()
+                .ToList()
+                .ForEach(s => Add(s));
         }
     }
 }

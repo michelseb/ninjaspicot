@@ -5,7 +5,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class PoolService : InstantiatorService<IPoolable>, IPoolService
+    public class PoolService : InstantiatorService<int, IPoolable>, IPoolService
     {
         protected override string ModelPath => "Poolables";
 

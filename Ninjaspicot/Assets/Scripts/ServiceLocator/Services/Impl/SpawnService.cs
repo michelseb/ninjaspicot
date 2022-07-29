@@ -8,7 +8,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class SpawnService : CollectionService<CheckPoint>, ISpawnService
+    public class SpawnService : CollectionService<int, CheckPoint>, ISpawnService
     {
         private readonly ITimeService _timeService;
         private readonly ICameraService _cameraService;

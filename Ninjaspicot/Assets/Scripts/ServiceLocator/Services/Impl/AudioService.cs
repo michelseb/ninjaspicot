@@ -7,7 +7,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class AudioService : CoroutineService<AudioFile>, IAudioService
+    public class AudioService : CoroutineService<int, AudioFile>, IAudioService
     {
         private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
         private AudioSource _globalAudioSource;

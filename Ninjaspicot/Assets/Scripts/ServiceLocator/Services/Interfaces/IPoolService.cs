@@ -6,9 +6,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
     public interface IPoolService : IGameService
     {
         /// <summary>
-        /// Get poolable of type T at position with given rotation, size and parent
+        /// Get poolable of type U at position with given rotation, size and parent
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="size"></param>
@@ -21,6 +22,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// Pool poolable at position with rotation and size
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
         /// <param name="poolable"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>

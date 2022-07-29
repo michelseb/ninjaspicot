@@ -3,7 +3,7 @@ using ZepLink.RiceNinja.Manageables.Audios;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IAudioService : ICollectionService<AudioFile>
+    public interface IAudioService : ICollectionService<int, AudioFile>
     {
         /// <summary>
         /// Get audio file by name

@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class ZoneService : CollectionService<Zone>, IZoneService
+    public class ZoneService : CollectionService<int, Zone>, IZoneService
     {
         public Zone CurrentZone { get; private set; }
 

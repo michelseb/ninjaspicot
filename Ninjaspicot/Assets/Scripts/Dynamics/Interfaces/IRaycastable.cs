@@ -1,7 +1,6 @@
 ﻿namespace ZepLink.RiceNinja.Dynamics.Interfaces
 {
-    public interface IRaycastable
+    public interface IRaycastable : IDynamic
     {
-        int Id { get; }
     }
 }

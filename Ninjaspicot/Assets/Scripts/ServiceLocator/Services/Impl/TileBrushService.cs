@@ -6,7 +6,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class TileBrushService : ScriptableObjectService<TileBrush>, ITileBrushService
+    public class TileBrushService : ScriptableObjectService<Color, TileBrush>, ITileBrushService
     {
         public override string ObjectsPath => "Brushes";
 
@@ -21,6 +21,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
 
             return result;
+        }
+
+        public TileBrush FindByColor(Color color)
+        {
+            if (!InstancesDictionary.ContainsKey(color))
+                return default;
+
+            return InstancesDictionary[color];
         }
     }
 }

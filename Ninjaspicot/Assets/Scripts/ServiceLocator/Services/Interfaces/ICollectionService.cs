@@ -3,38 +3,38 @@ using ZepLink.RiceNinja.Manageables;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ICollectionService<T> : IGameService where T : IManageable
+    public interface ICollectionService<T, U> : IGameService where U : IManageable<T>
     {   
         /// <summary>
         /// References stored by id (GUID) in a dictionary
         /// </summary>
-        IDictionary<int, T> InstancesDictionary { get; }
+        IDictionary<T, U> InstancesDictionary { get; }
 
         /// <summary>
         /// List of instances of T
         /// </summary>
-        IList<T> Collection { get; }
+        IList<U> Collection { get; }
 
         /// <summary>
         /// Add instance to collection
         /// </summary>
         /// <param name="instance"></param>
-        void Add(T instance);
+        void Add(U instance);
         
         /// <summary>
         /// Remove instance from collection by id
         /// </summary>
         /// <param name="id"></param>
-        void Remove(int id);
+        void Remove(T id);
 
         /// <summary>
         /// Get object with given id
         /// </summary>
-        T FindById(int id);
+        U FindById(T id);
 
         /// <summary>
         /// Get object with given name
         /// </summary>
-        T FindByName(string name);
+        U FindByName(string name);
     }
 }

@@ -4,45 +4,45 @@ using ZepLink.RiceNinja.Manageables;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IInstantiatorService<T> : ICollectionService<T> where T : IManageable
+    public interface IInstantiatorService<T, U> : ICollectionService<T, U> where U : IManageable<T>
     {
         /// <summary>
         /// Returns a random non-instantiated model from the list of assets of given type
         /// </summary>
-        T GetRandomModel();
+        U GetRandomModel();
 
         /// <summary>
         /// Returns model with given name
         /// </summary>
         /// <param name="name"></param>
-        T GetModelByName(string name);
+        U GetModelByName(string name);
 
         /// <summary>
         /// Returns a random instantiated object of given type
         /// </summary>
-        T GetRandomInstance();
+        U GetRandomInstance();
 
         /// <summary>
         /// Instantiates an object from given model and stores it into _instances
         /// </summary>
-        T Create(T model, Vector3 position, Quaternion rotation, Transform parent = default);
+        U Create(U model, Vector3 position, Quaternion rotation, Transform parent = default);
 
         /// <summary>
         /// Instantiates an object from given model at position and identity rotation and stores it into _instances
         /// </summary>
-        T Create(T model, Vector3 position, Transform parent = default);
+        U Create(U model, Vector3 position, Transform parent = default);
 
         /// <summary>
         /// Instantiates an object from given model and stores it into _instances
         /// </summary>
-        T Create(T model, Transform parent = default);
+        U Create(U model, Transform parent = default);
 
         /// <summary>
-        /// Equips instance with component of type T
+        /// Equips instance with component of type U
         /// </summary>
         /// <param name="componentType"></param>
         /// <param name="instance"></param>
         /// <returns></returns>
-        T Equip(Type componentType, Transform instance);
+        U Equip(Type componentType, Transform instance);
     }
 }

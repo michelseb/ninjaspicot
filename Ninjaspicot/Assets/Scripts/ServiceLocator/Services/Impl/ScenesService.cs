@@ -10,7 +10,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class ScenesService : ScriptableObjectService<SceneInfos>, ICoroutineService, IScenesService
+    public class ScenesService : ScriptableObjectService<int, SceneInfos>, ICoroutineService, IScenesService
     {
         [SerializeField] private int _startCheckPoint;
         [SerializeField] private AudioClip[] _sceneAudios;

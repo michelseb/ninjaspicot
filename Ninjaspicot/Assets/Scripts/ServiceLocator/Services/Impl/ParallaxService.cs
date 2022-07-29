@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class ParallaxService : CollectionService<ParallaxObject>, IParallaxService
+    public class ParallaxService : CollectionService<int, ParallaxObject>, IParallaxService
     {
         private readonly ICameraService _cameraService;
 

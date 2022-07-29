@@ -1,10 +1,12 @@
 ﻿using ZepLink.RiceNinja.ServiceLocator;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Manageables
 {
-    public abstract class Manageable<T> : IManageable<T>
+    public abstract class IntManageable : Manageable<int>
     {
-        public abstract T Id { get; }
+        private int _id;
+        public override int Id { get { if (_id == default) _id = BaseUtils.GetRandomInt(); return _id; } }
 
         public virtual string Name => "Manageable";
 

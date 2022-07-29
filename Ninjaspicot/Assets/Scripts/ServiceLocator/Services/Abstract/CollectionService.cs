@@ -6,10 +6,10 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
-    public abstract class CollectionService<T> : ICollectionService<T> where T : IManageable
+    public abstract class CollectionService<T, U> : ICollectionService<T, U> where U : IManageable<T>
     {
-        public IDictionary<int, T> InstancesDictionary { get; } = new Dictionary<int, T>();
-        public virtual IList<T> Collection => InstancesDictionary.Values.ToList();
+        public IDictionary<T, U> InstancesDictionary { get; } = new Dictionary<T, U>();
+        public virtual IList<U> Collection => InstancesDictionary.Values.ToList();
 
         public virtual GameObject ServiceObject { get; protected set; }
 
@@ -19,7 +19,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             ServiceObject.transform.SetParent(parent);
         }
 
-        public void Add(T instance)
+        public void Add(U instance)
         {
             if (BaseUtils.IsNull(instance))
             {
@@ -36,7 +36,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             InstancesDictionary.Add(instance.Id, instance);
         }
 
-        public void Remove(int id)
+        public void Remove(T id)
         {
             if (!InstancesDictionary.ContainsKey(id))
             {
@@ -47,7 +47,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             InstancesDictionary.Remove(id);
         }
 
-        public T FindById(int id)
+        public U FindById(T id)
         {
             if (!InstancesDictionary.ContainsKey(id))
             {
@@ -58,7 +58,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             return InstancesDictionary[id];
         }
 
-        public T FindByName(string name)
+        public U FindByName(string name)
         {
             return Collection.FirstOrDefault(x => x.Name == name);
         }

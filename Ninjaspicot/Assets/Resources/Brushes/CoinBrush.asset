@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: beadd9fed2523584999ebabda3e575ad, type: 3}
-  m_Name: Rice brush
+  m_Name: CoinBrush
   m_EditorClassIdentifier: 
-  _name: RiceBrush
-  _tile: {fileID: 11400000, guid: 8a5f80153a362f945ac201585a95f5c1, type: 2}
+  _name: CoinBrush
+  _tile: {fileID: 11400000, guid: 494d8880ff6509d4d86917903118c0d0, type: 2}
   _type: 0
-  _color: {r: 0, g: 0, b: 0, a: 1}
+  _color: {r: 1, g: 1, b: 0, a: 1}

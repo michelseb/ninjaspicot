@@ -8,7 +8,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class PortalService : CoroutineService<Portal>, IPortalService
+    public class PortalService : CoroutineService<int, Portal>, IPortalService
     {
         private IDictionary<int, int> _doorEntranceExitPairs = new Dictionary<int, int>();
 

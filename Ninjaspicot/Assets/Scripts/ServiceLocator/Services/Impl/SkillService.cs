@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class SkillService : InstantiatorService<ISkill>, ISkillService
+    public class SkillService : InstantiatorService<int, ISkill>, ISkillService
     {
         protected override string ModelPath => "Skills";
 
