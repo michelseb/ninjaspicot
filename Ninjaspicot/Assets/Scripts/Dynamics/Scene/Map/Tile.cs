@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Abstract;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
 {

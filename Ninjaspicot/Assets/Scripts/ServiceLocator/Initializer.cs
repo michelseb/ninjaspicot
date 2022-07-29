@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services.Impl;

@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Characters;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies;
 using ZepLink.RiceNinja.Dynamics.Interfaces;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Map

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Effects

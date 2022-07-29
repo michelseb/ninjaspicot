@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZepLink.RiceNinja.Manageables
+namespace ZepLink.RiceNinja.Manageables.Abstract
 {
     public abstract class ColorManageable : Manageable<Color>
     {

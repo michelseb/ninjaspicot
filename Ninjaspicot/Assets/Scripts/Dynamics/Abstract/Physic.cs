@@ -3,7 +3,7 @@ using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 using ZepLink.RiceNinja.Utils;
 
-namespace ZepLink.RiceNinja.Dynamics
+namespace ZepLink.RiceNinja.Dynamics.Abstract
 {
     public abstract class Physic : Dynamic, IPhysic
     {

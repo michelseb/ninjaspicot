@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZepLink.RiceNinja.Manageables
+namespace ZepLink.RiceNinja.Manageables.Abstract
 {
     public abstract class GuidManageable : Manageable<Guid>
     {

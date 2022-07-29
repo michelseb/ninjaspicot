@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using ZepLink.RiceNinja.Manageables.Abstract;
 
 namespace ZepLink.RiceNinja.Manageables.Audios
 {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Interfaces
 {

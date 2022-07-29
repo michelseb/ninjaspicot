@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Interfaces;

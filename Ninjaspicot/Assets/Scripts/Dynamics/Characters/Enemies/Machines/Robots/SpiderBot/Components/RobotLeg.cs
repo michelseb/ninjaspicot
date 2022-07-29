@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Components
 {

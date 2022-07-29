@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract

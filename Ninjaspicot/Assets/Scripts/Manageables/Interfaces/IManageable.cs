@@ -1,6 +1,6 @@
 ﻿using ZepLink.RiceNinja.ServiceLocator;
 
-namespace ZepLink.RiceNinja.Manageables
+namespace ZepLink.RiceNinja.Manageables.Interfaces
 {
     public interface IManageable<T>
     {

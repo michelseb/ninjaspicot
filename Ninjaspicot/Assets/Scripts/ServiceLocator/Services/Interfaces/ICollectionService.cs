@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Characters;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies;
 using ZepLink.RiceNinja.Dynamics.Effects.Lights;

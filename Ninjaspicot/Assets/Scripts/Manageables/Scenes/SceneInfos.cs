@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator;
 using ZepLink.RiceNinja.Utils;
 

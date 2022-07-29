@@ -1,6 +1,7 @@
-﻿using ZepLink.RiceNinja.ServiceLocator;
+﻿using ZepLink.RiceNinja.Manageables.Interfaces;
+using ZepLink.RiceNinja.ServiceLocator;
 
-namespace ZepLink.RiceNinja.Manageables
+namespace ZepLink.RiceNinja.Manageables.Abstract
 {
     public abstract class Manageable<T> : IManageable<T>
     {

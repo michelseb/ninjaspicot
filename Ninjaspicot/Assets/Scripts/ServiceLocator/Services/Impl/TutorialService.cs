@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
 using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Manageables.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl

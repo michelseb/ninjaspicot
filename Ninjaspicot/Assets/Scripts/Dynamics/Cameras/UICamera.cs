@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Abstract;
 
 namespace ZepLink.RiceNinja.Dynamics.Cameras
 {

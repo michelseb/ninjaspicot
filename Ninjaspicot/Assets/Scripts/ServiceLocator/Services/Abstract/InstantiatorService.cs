@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics;
-using ZepLink.RiceNinja.Manageables;
+using ZepLink.RiceNinja.Dynamics.Abstract;
+using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
