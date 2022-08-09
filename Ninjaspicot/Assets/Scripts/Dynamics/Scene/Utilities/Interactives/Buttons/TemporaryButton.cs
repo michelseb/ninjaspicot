@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives.Buttons
+namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class TemporaryButton : ActivationButton
     {

@@ -3,6 +3,7 @@ using ZepLink.RiceNinja.Dynamics.Characters.Components;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Effects.Sounds;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
@@ -21,7 +22,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
             while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
             {
-                _poolService.GetPoolable<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((ChargeDestination - pos).magnitude / 15, 1));
+                PoolHelper.PoolAt<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((ChargeDestination - pos).magnitude / 15, 1));
                 pos += dir * 10;
             }
 
@@ -43,7 +44,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (Trajectory.Collides && (Trajectory.Focusable == null || !Trajectory.Focusable.IsSilent))
             {
                 _audioService.PlaySound(AudioSource, _impactSound);
-                _poolService.GetPoolable<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
+                PoolHelper.PoolAt<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
             }
 
             if (Owner is IPicker picker)

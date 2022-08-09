@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Characters.Components;
+using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 using ZepLink.RiceNinja.Dynamics.Effects;
-using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
@@ -18,12 +18,11 @@ public enum JumpMode
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {
-    public abstract class JumpSkill<T> : Physic, ISkill, IAudio where T : Trajectory
+    public abstract class JumpSkill<T> : SkillBase, IAudio where T : Trajectory, new()
     {
         [SerializeField] protected int _maxJumps;
         [SerializeField] protected float _strength;
 
-        public bool Active { get; private set; }
         public T Trajectory { get; protected set; }
         public Vector3 TrajectoryOrigin { get; set; }
         public Vector3 TrajectoryDestination { get; set; }
@@ -31,6 +30,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public Vector3 AimTarget { get; set; }
         public virtual bool Ready => CanJump() && TrajectoryInUse;
         public virtual bool TrajectoryInUse => Trajectory != null && Trajectory.Used;
+        public Transform Parent => Owner.Transform;
 
         protected abstract string _soundName { get; }
         protected abstract float _soundIntensity { get; }
@@ -40,12 +40,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         private AudioSource _audioSource;
         public AudioSource AudioSource { get { if (_audioSource == null) _audioSource = GetComponent<AudioSource>(); return _audioSource; } }
 
-        public ISkilled Owner { get; }
-
         protected int _jumps;
         protected AudioFile _impactSound;
         protected ICameraService _cameraService;
-        protected IPoolService _poolService;
         protected IAudioService _audioService;
         protected ITimeService _timeService;
 
@@ -55,7 +52,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             _cameraService = ServiceFinder.Get<ICameraService>();
             _timeService = ServiceFinder.Get<ITimeService>();
-            _poolService = ServiceFinder.Get<IPoolService>();
             _audioService = ServiceFinder.Get<IAudioService>();
 
             _audioSource = GetComponent<AudioSource>();
@@ -76,7 +72,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             LoseJump();
 
-            _poolService.GetPoolable<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
+            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
 
             if (TrajectoryInUse)
             {
@@ -100,7 +96,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.velocity = Vector2.zero;
             Rigidbody.AddForce(direction * _strength, ForceMode2D.Impulse);
 
-            _poolService.GetPoolable<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
+            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
             if (TrajectoryInUse)
             {
@@ -127,7 +123,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.AddForce(direction * _strength * 3, ForceMode2D.Impulse);
             Rigidbody.gravityScale = 0;
 
-            _poolService.GetPoolable<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
+            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
             if (TrajectoryInUse)
             {
@@ -175,7 +171,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             }
 
             if (Trajectory == null || !Trajectory.Active || !(Trajectory is T))
-                return _poolService.GetPoolable<T>(transform.position, Quaternion.identity);
+                return PoolHelper.PoolAt<T>(transform.position, Quaternion.identity);
 
             Trajectory.ReUse(Transform.position);
             return Trajectory;
@@ -263,11 +259,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             SetTrajectory();
 
             Trajectory.DrawTrajectory(Transform.position, direction);
-        }
-
-        public void SetActive(bool active)
-        {
-            Active = active;
         }
 
         public override void LandOn(Obstacle obstacle, Vector3 contactPoint)

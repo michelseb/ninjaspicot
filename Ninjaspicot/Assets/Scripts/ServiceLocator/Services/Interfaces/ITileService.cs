@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Scenery.Map;
+using UnityEngine.Tilemaps;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
     public interface ITileService : IGameService
     {
         /// <summary>
-        /// Scan texture2D and converts into level with given brush
+        /// Game tilemap
         /// </summary>
-        /// <param name="map"></param>
-        /// <param name="brushType"></param>
-        void Generate(Texture2D map, BrushType brushType);
+        Tilemap Tilemap { get; }
+
+        /// <summary>
+        /// Sets tile on tilemap
+        /// </summary>
+        /// <param name="tile"></param>
+        void SetTile(Vector3Int coords, TileBase tile);
     }
 }

@@ -57,14 +57,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters
 
         protected CharacterLight _characterLight;
         protected AudioSource _audioSource;
-        protected IPoolService _poolService;
         protected ICameraService _cameraService;
         protected IAudioService _audioService;
 
         protected virtual void Awake()
         {
             _audioService = ServiceFinder.Get<IAudioService>();
-            _poolService = ServiceFinder.Get<IPoolService>();
             _cameraService = ServiceFinder.Get<ICameraService>();
             _audioSource = GetComponent<AudioSource>();
             _characterLight = GetComponentInChildren<CharacterLight>();

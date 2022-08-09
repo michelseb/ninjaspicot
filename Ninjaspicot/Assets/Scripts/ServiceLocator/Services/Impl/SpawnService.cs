@@ -1,20 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Cameras;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
-using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class SpawnService : CollectionService<int, CheckPoint>, ISpawnService
+    public class SpawnService : PoolService<CheckPoint>, ISpawnService
     {
         private readonly ITimeService _timeService;
         private readonly ICameraService _cameraService;
         private Vector3 _spawnPosition;
-
-        public override IList<CheckPoint> Collection => InstancesDictionary.Select(d => d.Value).OrderBy(x => x.Order).ToArray();
 
         public SpawnService(ITimeService timeService, ICameraService cameraService)
         {
@@ -36,14 +33,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             throw new System.NotImplementedException();
         }
 
-        public void InitActiveSceneSpawns(int checkPoint = 0)
+        public void InitActiveSceneSpawns()
         {
-            SetLatestSpawn(Collection.FirstOrDefault(x => x.Order == checkPoint) ?? Collection[0]);
+            SetLatestSpawn(Collection.FirstOrDefault(x => x is StartingPoint) ?? Collection.FirstOrDefault());
         }
 
         public void SetLatestSpawn(CheckPoint checkPoint)
         {
-            if (checkPoint.Attained)
+            if (BaseUtils.IsNull(checkPoint) || checkPoint.Attained)
                 return;
 
             _spawnPosition = new Vector3(checkPoint.transform.position.x, checkPoint.transform.position.y, -5);

@@ -1,41 +1,54 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
-using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class PoolService : InstantiatorService<int, IPoolable>, IPoolService
+    public class PoolService<T> : InstanceService<T>, IPoolService<T> where T : IPoolable
     {
-        protected override string ModelPath => "Poolables";
+        public override string Name => $"PoolService_{typeof(T).Name}";
+        protected override string ModelPath => $"Poolables/{GetType().Name}";
 
-        //Returns first deactivated poolable of chosen type. If none, instanciate one
-        public T GetPoolable<T>(Vector3 position, Quaternion rotation, float size = 1f, Transform parent = null, bool defaultParent = true) where T : IPoolable
+        public T PoolAt(Vector3 position, Quaternion rotation, float size)
         {
-            var poolable = Collection.FirstOrDefault(p =>
-                p is T &&
-                !((MonoBehaviour)p).gameObject.activeSelf);
+            var poolable = GetPoolable();
 
-            if (poolable != null)
-                return Pool((T)poolable, position, rotation, size);
-
-            // Create poolable if doesn't exist
-            var poolableModel = _models.Values.FirstOrDefault();
-
-            if (poolableModel == null)
+            if (poolable == null)
                 return default;
 
-            poolable = Create(poolableModel, parent ?? _parent);
-
-            return Pool((T)poolable, position, rotation, size);
-        }
-
-        public T Pool<T>(T poolable, Vector3 position, Quaternion rotation, float size = 1f) where T : IPoolable
-        {
             poolable.Wake();
             poolable.Pool(position, rotation, size);
 
             return poolable;
+        }
+
+        public T PoolAt(Vector3 position, Quaternion rotation)
+        {
+            return PoolAt(position, rotation, 1);
+        }
+
+        public T PoolAt(Vector3 position)
+        {
+            return PoolAt(position, Quaternion.identity, 1);
+        }
+
+        private T GetPoolable()
+        {
+            var poolable = Collection.FirstOrDefault(p => p is MonoBehaviour mono && !mono.gameObject.activeSelf);
+
+            if (poolable != null)
+                return poolable;
+
+            // Create poolable if doesn't exist
+            var poolableModel = _models.Values.FirstOrDefault(x => x is T);
+
+            if (poolableModel == null)
+                return default;
+
+            var service = ServiceFinder.Instance.GetCollectionFor<T>();
+
+            return (T)service.Create(poolableModel);
         }
     }
 }

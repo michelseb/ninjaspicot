@@ -5,7 +5,7 @@ using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
-namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives.Buttons
+namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class ActivationButton : Dynamic, ISceneryWakeable
     {

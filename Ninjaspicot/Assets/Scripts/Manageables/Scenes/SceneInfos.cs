@@ -5,7 +5,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Manageables.Scenes
 {
-    [CreateAssetMenu(fileName = "Scene", menuName = "Scenes/Scene")]
+    [CreateAssetMenu(fileName = "Scene", menuName = "Zeplink/Scene")]
     public class SceneInfos : ScriptableObject, IManageable<int>
     {
         [SerializeField] private string _name;

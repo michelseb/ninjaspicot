@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Abstract;
-using ZepLink.RiceNinja.Dynamics.Characters.Components;
+using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {
-    public class ClimbSkill : Physic, ISkill
+    public class ClimbSkill : SkillBase
     {
         [SerializeField] protected float _speed;
 
@@ -16,7 +15,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public HingeJoint2D WallJoint { get; set; }
         public Obstacle CurrentAttachment { get; set; }
         public bool Attached { get; private set; }
-        public bool Active { get; private set; }
         public bool CanWalk { get; set; }
         public bool Walking => _walkOnWalls != null;
         public float CurrentSpeed { get; set; }
@@ -25,7 +23,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public Vector3 CollisionNormal { get; private set; }
         public float ImpactVelocity { get; private set; }
         public bool Running { get; protected set; }
-        public ISkilled Owner { get; }
+        public Transform Parent => Owner.Transform;
 
         protected float _speedFactor;
         protected Vector3 _previousContactPoint;
@@ -204,11 +202,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Detach();
         }
 
-        public void SetActive(bool active)
-        {
-            Active = active;
-        }
-
         public override void LandOn(Obstacle obstacle, Vector3 contactPoint)
         {
             if (!Active || obstacle == CurrentAttachment)
@@ -222,6 +215,14 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             CurrentAttachment = obstacle;
             CurrentAttachment = obstacle;
             SetContactPosition(contactPoint);
+        }
+
+        public void Pool(Vector3 position, Quaternion rotation, float size = 1)
+        {
+        }
+
+        public void DoReset()
+        {
         }
     }
 }

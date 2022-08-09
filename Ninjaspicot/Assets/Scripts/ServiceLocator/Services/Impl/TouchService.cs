@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Inputs;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -12,13 +14,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         Right
     }
 
-    public class TouchService : ITouchService
+    public class TouchService : GameService, ITouchService
     {
         [SerializeField] private bool _mobileTouch;
         [SerializeField] private Joystick _joystick1;
         [SerializeField] private Joystick _joystick2;
 
-        public virtual GameObject ServiceObject { get; protected set; }
         public MonoBehaviour ServiceBehaviour { get; private set; }
 
         public bool LeftSideTouching => IsTouching(TouchType.Left);
@@ -38,26 +39,22 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private Vector3? _leftTouch => GetTouch(TouchType.Left);
         private Vector3? _rightTouch => GetTouch(TouchType.Right);
 
-        private IPoolService _poolService;
         private ICameraService _cameraService;
 
         private bool _leftTouchInitialized;
         private bool _rightTouchInitialized;
         private bool _leftSideDragging;
 
-        public TouchService(IPoolService poolService, ICameraService cameraService)
+        public TouchService(ICameraService cameraService)
         {
-            _poolService = poolService;
             _cameraService = cameraService;
         }
 
-        public void Init(Transform parent)
+        public override void Init(Transform parent)
         {
-            ServiceObject = new GameObject(nameof(CharacterService));
-            ServiceObject.transform.SetParent(parent);
+            base.Init(parent);
 
             ServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
-
             ServiceBehaviour.StartCoroutine(HandleEvents());
         }
 
@@ -88,7 +85,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnLeftSideTouchInit();
 
             var touchPos = uiCamera.ScreenToWorldPoint(_leftTouch.Value);
-            _joystick1 = _poolService.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, uiCamera.Canvas.transform, false);
+            _joystick1 = PoolHelper.PoolAt<Joystick>(touchPos);
             _joystick1.OnPointerDown();
             _leftTouchInitialized = true;
 
@@ -155,7 +152,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnRightSideTouchInit();
 
             var touchPos = uiCamera.ScreenToWorldPoint(_rightTouch.Value);
-            _joystick2 = _poolService.GetPoolable<Joystick>(touchPos, Quaternion.identity, 1, uiCamera.Canvas.transform, false);
+            _joystick2 = PoolHelper.PoolAt<Joystick>(touchPos);
             _joystick2.OnPointerDown();
             _rightTouchInitialized = true;
 

@@ -24,17 +24,17 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
             _initIntensity = _light.intensity;
         }
 
-        public void Wake()
+        public override void Wake()
         {
             _animator.SetTrigger("Wake");
         }
 
-        public void Sleep()
+        public override void Sleep()
         {
             _animator.SetTrigger("Sleep");
         }
 
-        public void DoReset()
+        public override void DoReset()
         {
             _light.color = _initColor;
             _light.intensity = _initIntensity;

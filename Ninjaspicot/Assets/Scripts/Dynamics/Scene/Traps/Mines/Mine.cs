@@ -6,6 +6,7 @@ using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
@@ -16,7 +17,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Mines
     {
         protected Image _renderer;
         protected Color _initialColor;
-        protected IPoolService _poolService;
         protected AudioSource _audioSource;
         protected IAudioService _audioService;
         protected Light2D _light;
@@ -26,7 +26,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Mines
 
         protected virtual void Awake()
         {
-            _poolService = ServiceFinder.Get<IPoolService>();
             _audioService = ServiceFinder.Get<IAudioService>();
             _renderer = GetComponent<Image>();
             _initialColor = _renderer.color;
@@ -38,7 +37,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Mines
         {
             if (!collider.CompareTag("hero") || !collider.TryGetComponent(out Hero hero) || hero.Dead)
                 return;
-            _poolService.GetPoolable<Explosion>(transform.position, transform.rotation);
+
+            PoolHelper.PoolAt<Explosion>(transform.position, transform.rotation);
             _audioService.PlaySound(_audioSource, "Explode");
             hero.Die(transform);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
 using ZepLink.RiceNinja.Manageables.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -17,19 +18,20 @@ namespace ZepLink.RiceNinja.ServiceLocator
             sl.Register<ICharacterService>(new CharacterService());
             sl.Register<ILightService>(new LightService());
             sl.Register<ISkillService>(new SkillService());
+            //var poolService = sl.Register<IPoolService>(new PoolService());
             var audioService = sl.Register<IAudioService>(new AudioService());
             var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<Guid, GuidManageable>());
-            var poolService = sl.Register<IPoolService>(new PoolService());
             var cameraService = sl.Register<ICameraService>(new CameraService());
             var timeService = sl.Register<ITimeService>(new TimeService(audioService));
             var spawnService = sl.Register<ISpawnService>(new SpawnService(timeService, cameraService));
-            var touchService = sl.Register<ITouchService>(new TouchService(poolService, cameraService));
+            var touchService = sl.Register<ITouchService>(new TouchService(cameraService));
             var zoneService = sl.Register<IZoneService>(new ZoneService(cameraService));
-            var tileBrushService = sl.Register<ITileBrushService>(new TileBrushService());
-            var tileService = sl.Register<ITileService>(new TileService(tileBrushService));
+            var brushService = sl.Register<IBrushService>(new BrushService());
+            var tileService = sl.Register<ITileService>(new TileService());
+            var mapService = sl.Register<IMapService>(new MapService(brushService, tileService));
             sl.Register<ITutorialService>(new TutorialService(touchService, cameraService, coroutineService));
             sl.Register<IParallaxService>(new ParallaxService(cameraService));
-            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, tileService));
+            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, mapService));
             sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService));
 
             scenesService.InitialLoad();

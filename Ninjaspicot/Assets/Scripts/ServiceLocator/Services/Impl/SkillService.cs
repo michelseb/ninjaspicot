@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Characters.Components;
-using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
+using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class SkillService : InstantiatorService<int, ISkill>, ISkillService
+    public class SkillService : ComponentService, ISkillService
     {
-        protected override string ModelPath => "Skills";
-
-        public T EquipSkill<T>(Transform instance) where T : class, ISkill
+        public T EquipSkill<T>(Transform instance) where T : SkillBase, new()
         {
-            return Equip(typeof(T), instance) as T;
+            return Equip<T>(instance);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives.Buttons
+﻿namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class PermanentButton : ActivationButton
     {

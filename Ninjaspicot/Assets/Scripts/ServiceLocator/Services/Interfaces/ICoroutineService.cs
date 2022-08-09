@@ -7,11 +7,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
     public interface ICoroutineService : IGameService
     {
         /// <summary>
-        /// Object used for holding components and 
-        /// </summary>
-        GameObject ServiceObject { get; }
-
-        /// <summary>
         /// Coroutines that are currently running
         /// </summary>
         IDictionary<string, Coroutine> RunningRoutines { get; }

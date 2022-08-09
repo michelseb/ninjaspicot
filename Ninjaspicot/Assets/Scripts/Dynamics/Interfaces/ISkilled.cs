@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ZepLink.RiceNinja.Dynamics.Characters.Components;
+using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 
 namespace ZepLink.RiceNinja.Dynamics.Interfaces
 {

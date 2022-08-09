@@ -1,33 +1,33 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IPoolService : IGameService
+    public interface IPoolService<T> : IInstanceService<T> where T : IPoolable
     {
-        /// <summary>
-        /// Get poolable of type U at position with given rotation, size and parent
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="U"></typeparam>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <param name="size"></param>
-        /// <param name="parent"></param>
-        /// <param name="defaultParent"></param>
-        /// <returns></returns>
-        T GetPoolable<T>(Vector3 position, Quaternion rotation, float size = 1f, Transform parent = null, bool defaultParent = true) where T : IPoolable;
-
         /// <summary>
         /// Pool poolable at position with rotation and size
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="U"></typeparam>
-        /// <param name="poolable"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        T Pool<T>(T poolable, Vector3 position, Quaternion rotation, float size = 1f) where T : IPoolable;
+        T PoolAt(Vector3 position, Quaternion rotation, float size);
+
+        /// <summary>
+        /// Pool poolable at position and rotation
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        T PoolAt(Vector3 position, Quaternion rotation);
+
+        /// <summary>
+        /// Pool poolable at position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        T PoolAt(Vector3 position);
     }
 }

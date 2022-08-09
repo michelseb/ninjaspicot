@@ -2,6 +2,7 @@
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Turrets.Components;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Turrets
@@ -85,7 +86,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Turrets
 
         private IEnumerator Shoot(float time)
         {
-            var bullet = _poolService.GetPoolable<Bullet>(_turretHead.position, _turretHead.rotation);
+            var bullet = PoolHelper.PoolAt<Bullet>(_turretHead.position, _turretHead.rotation);
             var ray = CastUtils.RayCast(_turretHead.position, _turretHead.up, AimField.Size * 2, ignore: Id, includeTriggers: false);
             var line = bullet.LineRenderer;
             line.positionCount = 2;

@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
-using ZepLink.RiceNinja.Manageables;
 using ZepLink.RiceNinja.Manageables.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
@@ -58,6 +57,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             
             _containerImage = ServiceObject.AddComponent<Image>();
             _canvas = ServiceObject.AddComponent<Canvas>();
+            _containerImage.enabled = false;
 
             _canvas.worldCamera = _cameraService.MainCamera.Camera;
         }

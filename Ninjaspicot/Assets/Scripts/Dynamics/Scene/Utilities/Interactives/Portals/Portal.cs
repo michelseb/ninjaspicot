@@ -9,7 +9,7 @@ using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
-namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Portals
+namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class Portal : Dynamic, IFocusable, IAudio
     {

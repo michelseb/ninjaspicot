@@ -2,6 +2,7 @@
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Effects.Sounds;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
@@ -14,12 +15,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Hearing
         public SoundMark SoundMark { get; private set; }
 
         protected IListener _listener;
-        protected IPoolService _poolManager;
         protected bool _isActive;
 
         protected virtual void Awake()
         {
-            _poolManager = ServiceFinder.Get<IPoolService>();
             _listener = GetComponent<IListener>() ?? GetComponentInChildren<IListener>() ?? GetComponentInParent<IListener>();
         }
 
@@ -39,7 +38,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Hearing
             });
 
             EraseSoundMark();
-            SoundMark = _poolManager.GetPoolable<SoundMark>(collider.transform.position, Quaternion.identity);
+            SoundMark = PoolHelper.PoolAt<SoundMark>(collider.transform.position, Quaternion.identity);
         }
 
         public void Activate(IActivator activator = default)

@@ -1,17 +1,10 @@
-﻿using UnityEngine;
+﻿using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class CharacterService : ICharacterService
+    public class CharacterService : GameService, ICharacterService
     {
-        public virtual GameObject ServiceObject { get; protected set; }
-
         public int Money { get; private set; }
-        public void Init(Transform parent) 
-        {
-            ServiceObject = new GameObject(nameof(CharacterService));
-            ServiceObject.transform.SetParent(parent);
-        }
 
         public void Gain(int value)
         {

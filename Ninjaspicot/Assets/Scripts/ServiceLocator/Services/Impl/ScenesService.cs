@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Scenes;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -12,9 +11,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
     public class ScenesService : ScriptableObjectService<int, SceneInfos>, ICoroutineService, IScenesService
     {
-        [SerializeField] private int _startCheckPoint;
-        [SerializeField] private AudioClip[] _sceneAudios;
-
         public bool IsSceneLoading { get; private set; }
         public SceneInfos CurrentScene { get; private set; }
 
@@ -26,13 +22,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         private readonly ISpawnService _spawnService;
         private readonly IAudioService _audioService;
-        private readonly ITileService _tileService;
+        private readonly IMapService _mapService;
 
-        public ScenesService(ISpawnService spawnService, IAudioService audioService, ITileService tileService)
+        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService)
         {
             _spawnService = spawnService;
             _audioService = audioService;
-            _tileService = tileService;
+            _mapService = mapService;
         }
 
         public override void Init(Transform parent)
@@ -53,7 +49,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 LoadById(sceneIndex, true);
             }
 
-            _spawnService.InitActiveSceneSpawns(_startCheckPoint);
+            _spawnService.InitActiveSceneSpawns();
         }
 
         public void LoadLobby()
@@ -72,7 +68,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
             CurrentScene = FindByName(sceneName);
             SwitchAudio(CurrentScene.Id);
-            _tileService.Generate(CurrentScene.Map, BrushType.RiceMap);
+            _mapService.Generate(CurrentScene.Map);
         }
 
         public void LoadById(int sceneId, bool unloadPrevious)

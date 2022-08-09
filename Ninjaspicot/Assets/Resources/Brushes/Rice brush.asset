@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beadd9fed2523584999ebabda3e575ad, type: 3}
+  m_Script: {fileID: 11500000, guid: 009c8a03462423c4b9b1923607798764, type: 3}
   m_Name: Rice brush
   m_EditorClassIdentifier: 
-  _name: RiceBrush
-  _tile: {fileID: 11400000, guid: 8a5f80153a362f945ac201585a95f5c1, type: 2}
+  _name: Brush
+  _instanciableObject: {fileID: 11400000, guid: 1ecb3c8b9664cd9459d627dc21dfb7b8,
+    type: 2}
   _type: 0
   _color: {r: 0, g: 0, b: 0, a: 1}

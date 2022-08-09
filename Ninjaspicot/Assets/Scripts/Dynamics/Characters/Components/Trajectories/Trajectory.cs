@@ -4,6 +4,7 @@ using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Effects.Sounds;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
@@ -24,7 +25,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         protected SimulatedSoundEffect _audioSimulator;
         protected AnimationCurve _lineWidth;
 
-        protected IPoolService _poolService;
         protected ICoroutineService _coroutineService;
 
         protected virtual float _fadeSpeed => .5f;
@@ -33,7 +33,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
 
         protected virtual void Awake()
         {
-            _poolService = ServiceFinder.Get<IPoolService>();
             _coroutineService = ServiceFinder.Get<ICoroutineService>();
 
             _line = GetComponent<LineRenderer>();
@@ -131,7 +130,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         {
             if (BaseUtils.IsNull(_audioSimulator))
             {
-                _audioSimulator = _poolService.GetPoolable<SimulatedSoundEffect>(position, Quaternion.identity, size);
+                _audioSimulator = PoolHelper.PoolAt<SimulatedSoundEffect>(position, Quaternion.identity, size);
             }
 
             _audioSimulator.Transform.position = position;
@@ -144,7 +143,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
                 return;
 
             Focusable = focusable;
-            _aimIndicator = _poolService.GetPoolable<AimIndicator>(position, Quaternion.identity);
+            _aimIndicator = PoolHelper.PoolAt<AimIndicator>(position, Quaternion.identity);
         }
 
         protected virtual void DeactivateAim()

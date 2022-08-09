@@ -4,6 +4,7 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.Utils;
@@ -156,7 +157,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         {
             if (BaseUtils.IsNull(_state))
             {
-                _state = _poolService.GetPoolable<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude, parent: Transform, defaultParent: false);
+                _state = PoolHelper.PoolAt<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude);
             }
             else if (_state.StateType == stateType)
             {

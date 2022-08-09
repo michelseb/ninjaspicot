@@ -1,5 +1,5 @@
 ﻿using ZepLink.RiceNinja.Dynamics.Interfaces;
-using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Portals;
+using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {

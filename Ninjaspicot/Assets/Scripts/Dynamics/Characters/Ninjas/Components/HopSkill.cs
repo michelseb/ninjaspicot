@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components;
-using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {

@@ -3,7 +3,7 @@ using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ICollectionService<T, U> : IGameService where U : IManageable<T>
+    public interface ICollectionService<T, U> : ICollectionService, IGameService where U : IManageable<T>
     {   
         /// <summary>
         /// References stored by id (GUID) in a dictionary
@@ -36,5 +36,20 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// Get object with given name
         /// </summary>
         U FindByName(string name);
+    }
+
+    public interface ICollectionService : IGameService
+    {
+        /// <summary>
+        /// Add instance to collection
+        /// </summary>
+        /// <param name="instance"></param>
+        void AddBase(IManageable instance);
+
+        /// <summary>
+        /// Remove instance from collection by id
+        /// </summary>
+        /// <param name="id"></param>
+        void RemoveBase(IManageable id);
     }
 }

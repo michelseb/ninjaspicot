@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Cameras;
-using ZepLink.RiceNinja.Dynamics.Characters.Components;
-using ZepLink.RiceNinja.Dynamics.Characters.Hero.Components;
+using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Effects.Sounds;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.ServiceLocator.Services;
@@ -52,7 +52,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         public bool CanTake => !Dead;
 
         public IList<ISkill> Skills { get; } = new List<ISkill>();
-
 
         private const int GHOST_SOUND_FREQUENCY = 3;
         private const float FADE_SPEED = 5f;
@@ -175,12 +174,15 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             int iteration = 0;
             while (true)
             {
-                _poolService.GetPoolable<Ghost>(Transform.position, Transform.rotation);
+                PoolHelper.PoolAt<Ghost>(Transform.position, Transform.rotation);
+
                 if (iteration % GHOST_SOUND_FREQUENCY == 0)
                 {
-                    _poolService.GetPoolable<SoundEffect>(Transform.position, Quaternion.identity, 2);
+                    PoolHelper.PoolAt<SoundEffect>(Transform.position, Quaternion.identity, 2);
                 }
+                
                 iteration++;
+
                 yield return new WaitForSeconds(delay);
             }
         }

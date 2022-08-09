@@ -3,10 +3,11 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
+using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class TimeService : ITimeService, IActivable
+    public class TimeService : GameService, ITimeService, IActivable
     {
         public float TimeScale => Time.timeScale;
 

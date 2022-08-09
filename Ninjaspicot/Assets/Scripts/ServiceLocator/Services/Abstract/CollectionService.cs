@@ -1,35 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
-    public abstract class CollectionService<T, U> : ICollectionService<T, U> where U : IManageable<T>
+    public abstract class CollectionService<T, U> : GameService, ICollectionService<T, U> where U : IManageable<T>
     {
         public IDictionary<T, U> InstancesDictionary { get; } = new Dictionary<T, U>();
         public virtual IList<U> Collection => InstancesDictionary.Values.ToList();
-
-        public virtual GameObject ServiceObject { get; protected set; }
-
-        public virtual void Init(Transform parent)
-        {
-            ServiceObject = new GameObject(GetType().Name);
-            ServiceObject.transform.SetParent(parent);
-        }
 
         public void Add(U instance)
         {
             if (BaseUtils.IsNull(instance))
             {
-                Debug.LogError($"trying to add null instance of {GetType()} to collection");
+                Log($"trying to add null instance of {GetType()} to collection");
                 return;
             }
 
             if (InstancesDictionary.ContainsKey(instance.Id))
             {
-                Debug.LogError($"trying to add already existing instance of {GetType()} to collection");
+                Log($"trying to add already existing instance of {GetType()} to collection");
                 return;
             }
 
@@ -40,7 +31,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
         {
             if (!InstancesDictionary.ContainsKey(id))
             {
-                Debug.LogError($"trying to remove non-existing instance of {GetType()} to collection");
+                Log($"trying to remove non-existing instance of {GetType()} to collection");
                 return;
             }
 
@@ -51,7 +42,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
         {
             if (!InstancesDictionary.ContainsKey(id))
             {
-                Debug.LogError($"Instance of type {GetType()} with id {id} does not exist");
+                Log($"Instance of type {GetType()} with id {id} does not exist");
                 return default;
             }
 
@@ -61,6 +52,16 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
         public U FindByName(string name)
         {
             return Collection.FirstOrDefault(x => x.Name == name);
+        }
+
+        public void AddBase(IManageable instance)
+        {
+            Add((U)instance);
+        }
+
+        public void RemoveBase(IManageable id)
+        {
+            Remove((T)id);
         }
     }
 }
