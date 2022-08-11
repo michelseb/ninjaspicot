@@ -10,6 +10,11 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
     {
         protected Light2D _light;
 
+        protected virtual void Awake()
+        {
+            _light = GetComponentInChildren<Light2D>();
+        }
+
         public void Pool(Vector3 position, Quaternion rotation, float size = 1)
         {
         }

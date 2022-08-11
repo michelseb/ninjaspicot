@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Inputs;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ITouchService : IGameService
+    public interface ITouchService : IPoolService<Joystick>
     {
         /// <summary>
         /// Object being controlled

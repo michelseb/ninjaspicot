@@ -4,7 +4,6 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Inputs;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Helpers;
-using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -14,11 +13,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         Right
     }
 
-    public class TouchService : GameService, ITouchService
+    public class TouchService : PoolService<Joystick>, ITouchService
     {
-        [SerializeField] private bool _mobileTouch;
-        [SerializeField] private Joystick _joystick1;
-        [SerializeField] private Joystick _joystick2;
+        private bool _mobileTouch;
+        private Joystick _joystick1;
+        private Joystick _joystick2;
 
         public MonoBehaviour ServiceBehaviour { get; private set; }
 
@@ -80,12 +79,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (!LeftSideTouchStarting)
                 return false;
 
-            var uiCamera = _cameraService.UiCamera;
+            var mainCamera = _cameraService.MainCamera;
 
             CurrentControllable?.OnLeftSideTouchInit();
 
-            var touchPos = uiCamera.ScreenToWorldPoint(_leftTouch.Value);
-            _joystick1 = PoolHelper.PoolAt<Joystick>(touchPos);
+            var touchPos = mainCamera.ScreenToWorldPoint(_leftTouch.Value);
+            _joystick1 = PoolByName("LeftJoystick", touchPos);
             _joystick1.OnPointerDown();
             _leftTouchInitialized = true;
 
@@ -147,12 +146,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (!RightSideTouchStarting)
                 return false;
 
-            var uiCamera = _cameraService.UiCamera;
+            var mainCamera = _cameraService.MainCamera;
 
             CurrentControllable?.OnRightSideTouchInit();
 
-            var touchPos = uiCamera.ScreenToWorldPoint(_rightTouch.Value);
-            _joystick2 = PoolHelper.PoolAt<Joystick>(touchPos);
+            var touchPos = mainCamera.ScreenToWorldPoint(_rightTouch.Value);
+            _joystick2 = PoolByName("RightJoystick", touchPos);
             _joystick2.OnPointerDown();
             _rightTouchInitialized = true;
 

@@ -28,10 +28,5 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         {
             _zoneChanger.SetTrigger("LevelStart");
         }
-
-        public Vector2 ScreenToWorldPoint(Vector2 screenPoint)
-        {
-            return Camera.ScreenToWorldPoint(screenPoint);
-        }
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Scenes;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -23,12 +25,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private readonly ISpawnService _spawnService;
         private readonly IAudioService _audioService;
         private readonly IMapService _mapService;
+        private readonly ICameraService _cameraService;
 
-        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService)
+        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService, ICameraService cameraService)
         {
             _spawnService = spawnService;
             _audioService = audioService;
             _mapService = mapService;
+            _cameraService = cameraService;
         }
 
         public override void Init(Transform parent)
@@ -50,6 +54,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
 
             _spawnService.InitActiveSceneSpawns();
+            
+            var hero = PoolHelper.Pool<Hero>();
+            _cameraService.MainCamera.SetTracker(hero);
+            _spawnService.SpawnAtLastSpawningPosition(hero);
         }
 
         public void LoadLobby()

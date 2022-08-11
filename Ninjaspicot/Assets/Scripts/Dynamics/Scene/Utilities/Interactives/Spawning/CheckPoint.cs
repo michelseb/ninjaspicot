@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
-using ZepLink.RiceNinja.ServiceLocator.Services;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class CheckPoint : Dynamic, IPoolable
     {
         public bool Attained { get; private set; }
-        public IGameService InstanceService => ServiceFinder.Get<ISpawnService>();
 
         public void Attain()
         {

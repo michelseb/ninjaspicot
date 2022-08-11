@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives;
 using ZepLink.RiceNinja.Manageables.Abstract;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -14,6 +13,9 @@ namespace ZepLink.RiceNinja.ServiceLocator
         public static void Initialize()
         {
             var sl = ServiceFinder.Instance;
+
+            if (sl.IsRegistered<ICharacterService>())
+                return;
 
             sl.Register<ICharacterService>(new CharacterService());
             sl.Register<ILightService>(new LightService());
@@ -31,7 +33,7 @@ namespace ZepLink.RiceNinja.ServiceLocator
             var mapService = sl.Register<IMapService>(new MapService(brushService, tileService));
             sl.Register<ITutorialService>(new TutorialService(touchService, cameraService, coroutineService));
             sl.Register<IParallaxService>(new ParallaxService(cameraService));
-            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, mapService));
+            var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, mapService, cameraService));
             sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService));
 
             scenesService.InitialLoad();

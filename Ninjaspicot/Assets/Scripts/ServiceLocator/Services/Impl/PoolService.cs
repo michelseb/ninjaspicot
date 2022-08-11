@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 
@@ -8,11 +7,51 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     public class PoolService<T> : InstanceService<T>, IPoolService<T> where T : IPoolable
     {
         public override string Name => $"PoolService_{typeof(T).Name}";
-        protected override string ModelPath => $"Poolables/{GetType().Name}";
+        protected override string ModelPath => $"Poolables/{typeof(T).Name}";
 
-        public T PoolAt(Vector3 position, Quaternion rotation, float size)
+        public T PoolByName(string name, Vector3 position, Quaternion rotation, float size)
         {
-            var poolable = GetPoolable();
+            var model = _models.Values.FirstOrDefault(x => x.Name == name);
+
+            if (model == null)
+                return default;
+
+            return PoolAt(position, rotation, size, model);
+        }
+
+        public T PoolByName(string name, Vector3 position, Quaternion rotation)
+        {
+            return PoolByName(name, position, rotation, 1);
+        }
+
+        public T PoolByName(string name, Vector3 position)
+        {
+            return PoolByName(name, position, Quaternion.identity);
+        }
+
+        public T PoolByName(string name)
+        {
+            return PoolByName(name, Vector3.zero);
+        }
+
+        public IPoolable Pool(Vector3 position, Quaternion rotation, float size, IPoolable model)
+        {
+            return PoolAt(position, rotation, size, (T)model);
+        }
+
+        public IPoolable Pool(Vector3 position, Quaternion rotation, IPoolable model)
+        {
+            return PoolAt(position, rotation, (T)model);
+        }
+
+        public IPoolable Pool(Vector3 position, IPoolable model)
+        {
+            return PoolAt(position, (T)model);
+        }
+
+        public T PoolAt(Vector3 position, Quaternion rotation, float size, T model = default)
+        {
+            var poolable = model != null ? Create(model) : GetDefaultPoolable();
 
             if (poolable == null)
                 return default;
@@ -23,17 +62,17 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return poolable;
         }
 
-        public T PoolAt(Vector3 position, Quaternion rotation)
+        public T PoolAt(Vector3 position, Quaternion rotation, T model = default)
         {
-            return PoolAt(position, rotation, 1);
+            return PoolAt(position, rotation, 1, model);
         }
 
-        public T PoolAt(Vector3 position)
+        public T PoolAt(Vector3 position, T model = default)
         {
-            return PoolAt(position, Quaternion.identity, 1);
+            return PoolAt(position, Quaternion.identity, 1, model);
         }
 
-        private T GetPoolable()
+        private T GetDefaultPoolable()
         {
             var poolable = Collection.FirstOrDefault(p => p is MonoBehaviour mono && !mono.gameObject.activeSelf);
 
@@ -46,9 +85,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (poolableModel == null)
                 return default;
 
-            var service = ServiceFinder.Instance.GetCollectionFor<T>();
-
-            return (T)service.Create(poolableModel);
+            return Create(poolableModel);
         }
     }
 }

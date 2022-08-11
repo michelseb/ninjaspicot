@@ -36,5 +36,47 @@ namespace ZepLink.RiceNinja.Extensions
               && givenType.IsGenericType
               && givenType.GetGenericTypeDefinition() == genericType;
         }
+
+        public static bool IsInstanceOfGenericType(this Type type, Type genericType)
+        {
+            while (type != null)
+            {
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+                    return true;
+
+                type = type.BaseType;
+            }
+
+            return false;
+        }
+
+        public static Type GetGenericArgument(this Type type)
+        {
+            if (type.IsInterface)
+                return GetInterfaceGenericArgument(type);
+
+            while (type != null)
+            {
+                if (type.IsGenericType)
+                    return type.GetGenericArguments().Last();
+
+                type = type.BaseType;
+            }
+
+            return null;
+        }
+
+        private static Type GetInterfaceGenericArgument(this Type type)
+        {
+            while (type != null)
+            {
+                if (type.IsGenericType)
+                    return type.GetGenericArguments().Last();
+
+                type = type.GetInterfaces().First();
+            }
+
+            return null;
+        }
     }
 }

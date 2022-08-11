@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
@@ -44,9 +45,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 //    .MakeGenericMethod(brush.Instanciable.GetType())
                 //    .Invoke(_poolService, new object[] { (Vector3)coords });
                 var type = brush.Instanciable.GetType().FullName;
-                typeof(PoolHelper).GetMethod(nameof(PoolHelper.PoolAt), new Type[] { typeof(Vector3) })
+                typeof(PoolHelper).GetMethod(nameof(PoolHelper.PoolAt), new Type[] { typeof(Vector3), typeof(IPoolable) })
                     .MakeGenericMethod(brush.Instanciable.GetType())
-                    .Invoke(null, new object[] { (Vector3)coords });
+                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable });
             }
             else if (brush.Instanciable is TileObject tileObject)
             {

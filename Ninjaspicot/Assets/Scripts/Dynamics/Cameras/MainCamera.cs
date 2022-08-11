@@ -2,12 +2,13 @@
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Cameras
 {
-    public class MainCamera : Dynamic, ICamera
+    public class MainCamera : Dynamic, ICamera, IActivable
     {
         [SerializeField] private int _beginZoom;
 
@@ -30,18 +31,22 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         public ITracker CurrentTracker { get; private set; }
 
         private ICoroutineService _coroutineService;
+        public ICoroutineService CoroutineService { get { if (BaseUtils.IsNull(_coroutineService)) _coroutineService = ServiceFinder.Get<ICoroutineService>(); return _coroutineService; } }
 
         private float _screenRatio;
         private float _initialCamSize;
 
+        private void Awake()
+        {
+            Deactivate();
+        }
+
         private void Start()
         {
-            _coroutineService = ServiceFinder.Get<ICoroutineService>();
-
             Screen.orientation = ScreenOrientation.LandscapeLeft;
 
             _screenRatio = (float)Screen.height / Screen.width * .5f;
-            _initialCamSize = 200f * _screenRatio;
+            _initialCamSize = 50f * _screenRatio;
 
             _velocity = Vector3.zero;
             InstantZoom(_beginZoom);
@@ -58,9 +63,19 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                     break;
 
                 case CameraMode.Center:
-                    Center(_centerPos, CurrentTracker);
+                    Center(CurrentTracker, _centerPos);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Get touch position in world coords
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        public Vector2 ScreenToWorldPoint(Vector2 screenPoint)
+        {
+            return Camera.ScreenToWorldPoint(screenPoint);
         }
 
         //private void Update()
@@ -98,7 +113,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             //    _normalOffset = Vector3.zero;
             //}
 
-            var offset = Quaternion.Euler(0, 0, 90) * tracker.NormalVector * 25;
+            var offset = Quaternion.Euler(0, 0, 90) * tracker.NormalVector * 2.5f;
 
             Transform.position = Vector3.SmoothDamp(Transform.position, tracker.Transform.position + offset, ref _velocity, FOLLOW_DELAY);
         }
@@ -116,12 +131,27 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             Transform.position = new Vector3(pos.x, pos.y, Transform.position.z);
         }
 
-        private void Center(Vector3 centerPos, ITracker tracker)
+        private void Center(ITracker tracker)
+        {
+            Center(tracker?.Transform.position ?? Vector2.zero);
+        }
+
+        private void Center(ITracker tracker, Vector3 middle)
         {
             var trackerPosition = tracker?.Transform.position ?? Vector2.zero;
-            var middle = (trackerPosition + centerPos) / 2;
+            var center = (trackerPosition + middle) / 2;
 
-            Transform.position = Vector3.SmoothDamp(Transform.position, middle, ref _velocity, FOLLOW_DELAY);
+            Center(center);
+        }
+
+        private void CenterImmediate(ITracker target)
+        {
+            Transform.position = target?.Transform.position ?? Vector3.zero;
+        }
+
+        private void Center(Vector3 target)
+        { 
+            Transform.position = Vector3.SmoothDamp(Transform.position, target, ref _velocity, FOLLOW_DELAY);
         }
 
         public void SetFollowMode()
@@ -162,6 +192,9 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
 
         private IEnumerator ZoomIntro(float speed)
         {
+            CenterImmediate(CurrentTracker);
+            Activate();
+
             yield return new WaitForSecondsRealtime(2);
 
             while (Size > _initialCamSize)
@@ -185,7 +218,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             switch (type)
             {
                 case ZoomType.Progressive:
-                    _coroutineService.StartCoroutine(ZoomProgressive(zoomAmount));
+                    CoroutineService.StartCoroutine(ZoomProgressive(zoomAmount));
                     break;
 
                 case ZoomType.Instant:
@@ -193,11 +226,11 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                     break;
 
                 case ZoomType.Intro:
-                    _coroutineService.StartCoroutine(ZoomIntro(ZOOM_SPEED));
+                    CoroutineService.StartCoroutine(ZoomIntro(ZOOM_SPEED));
                     break;
 
                 case ZoomType.Init:
-                    _coroutineService.StartCoroutine(ReinitZoom());
+                    CoroutineService.StartCoroutine(ReinitZoom());
                     break;
             }
         }
@@ -235,6 +268,16 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         public void SetMode(CameraMode cameraMode)
         {
             CurrentMode = cameraMode;
+        }
+
+        public void Activate(IActivator activator = null)
+        {
+            Camera.enabled = true;
+        }
+
+        public void Deactivate(IActivator activator = null)
+        {
+            Camera.enabled = false;
         }
     }
 }

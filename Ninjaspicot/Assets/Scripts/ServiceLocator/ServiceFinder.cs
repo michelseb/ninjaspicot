@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Extensions;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.ServiceLocator.Services.Impl;
 
@@ -19,13 +20,19 @@ namespace ZepLink.RiceNinja.ServiceLocator
         
         private IDictionary<string, IGameService> _services = new Dictionary<string, IGameService>();
 
-        private IDictionary<string, IGameService> _poolServices = new Dictionary<string, IGameService>();
+        private IDictionary<Type, IPoolService> _poolServices = new Dictionary<Type, IPoolService>();
 
         private static ServiceFinder _instance;
         public static ServiceFinder Instance { get { if (_instance == null) _instance = new ServiceFinder(); return _instance; } }
 
         public T Get<T>() where T : IGameService
         {
+            // initialize services if not done yet
+            //if (_services.Count == 0)
+            //{
+            //    Initializer.Initialize();
+            //}
+
             var key = typeof(T).FullName;
 
             if (!_services.ContainsKey(key))
@@ -37,71 +44,21 @@ namespace ZepLink.RiceNinja.ServiceLocator
             return (T)_services[key];
         }
 
-        public IPoolService<T> GetPoolServiceFor<T>() where T : IPoolable
+        public T PoolFor<T>(Vector3 position, Quaternion rotation, float size, IPoolable model = default) where T : IPoolable
         {
-            var key = typeof(T).FullName;
+            var key = typeof(T);
 
             if (_poolServices.ContainsKey(key))
-                return (IPoolService<T>)_poolServices[key];
+                return (T)_poolServices[key].Pool(position, rotation, size, model);
 
-            var result = GetAssignableCollection<T>() ?? Register(new PoolService<T>());
+            var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Register(new PoolService<T>());
 
-            _poolServices.Add(key, result);
-
-            return result;
-        }
-
-        public IPoolService<T> GetAssignableCollection<T>() where T : IPoolable
-        {
-            var generics = _services.Where(x => x.GetType().IsGenericType).Select(y => y.GetType().GetGenericArguments()[1]).ToArray();
-
-            var result = _services.Values.FirstOrDefault(x =>
-            {
-                var type = x.GetType();
-
-                return type.IsGenericType &&
-                    type.GetGenericTypeDefinition() == typeof(T);// &&
-                    //typeof(T).IsAssignableFrom(type.GetGenericArguments()[0]);
-
-            });
-
-            return (IPoolService<T>)result;
+            return (T)service.Pool(position, rotation, size, model);
         }
 
         public bool IsRegistered<T>()
         {
             return _services.ContainsKey(typeof(T).FullName);
-        }
-
-        //public T RegisterCollection<T, U>(T service) where T : ICollectionService where U : IPoolable
-        //{
-        //    _poolServices.Add(typeof(U), service);
-        //    return Register(service);
-        //}
-
-
-        public IPoolService<T> GetCollectionFor<T>() where T : IPoolable
-        {
-            var name = typeof(T).FullName;
-
-            if (_poolServices.ContainsKey(name))
-                return (IPoolService<T>)_poolServices[name];
-
-            var key = _poolServices.Keys.FirstOrDefault();//x => x.IsAssignableFrom(typeof(T)));
-
-            IPoolService<T> result;
-
-            if (key != null && _poolServices.ContainsKey(key))
-            {
-                result = (IPoolService<T>)_poolServices[key];
-                _poolServices.Add(key, result);
-            }
-            else
-            {
-                result = Register<IPoolService<T>>(new PoolService<T>());
-            }
-
-            return result;
         }
 
         public T Register<T>(T service) where T: IGameService
@@ -116,9 +73,9 @@ namespace ZepLink.RiceNinja.ServiceLocator
 
             _services.Add(key, service);
 
-            if (service.GetType() == typeof(PoolService<>))
+            if (service.GetType().IsInstanceOfGenericType(typeof(PoolService<>)))
             {
-                _poolServices.Add(key, service);
+                _poolServices.Add(typeof(T).GetGenericArgument(), (IPoolService)service);
             }
 
             service.Init(_serviceParent);

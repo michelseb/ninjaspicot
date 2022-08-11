@@ -10,7 +10,7 @@ namespace ZepLink.RiceNinja.Dynamics.Abstract
         private int _id;
         public virtual int Id { get { if (_id == default) _id = gameObject.GetInstanceID(); return _id; } }
 
-        public virtual string Name => "Dynamic";
+        public virtual string Name => gameObject.name;
 
         private Transform _transform;
         public virtual Transform Transform { get { if (BaseUtils.IsNull(_transform)) _transform = transform; return _transform; } }
