@@ -9,5 +9,15 @@ namespace ZepLink.RiceNinja.Dynamics.Interfaces
         /// Gameobject transform
         /// </summary>
         Transform Transform { get; }
+
+        /// <summary>
+        /// Name of parent gameObject
+        /// </summary>
+        string ParentName => string.Empty;
+
+        /// <summary>
+        /// Instantiate as a child of this transform
+        /// </summary>
+        Transform Parent { get; }
     }
 }

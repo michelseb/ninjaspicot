@@ -8,15 +8,22 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class AudioService : CoroutineService<Guid, AudioFile>, IAudioService
+    public class AudioService : ScriptableObjectService<Guid, AudioFile>, ICoroutineService, IAudioService
     {
+        public override string ObjectsPath => "Audios/Objects";
+
         private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
         private AudioSource _globalAudioSource;
+
+        public IDictionary<string, Coroutine> RunningRoutines { get; } = new Dictionary<string, Coroutine>();
+        public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
+
 
         public override void Init(Transform parent)
         {
             base.Init(parent);
 
+            CoroutineServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
             _globalAudioSource = ServiceObject.AddComponent<AudioSource>();
         }
 

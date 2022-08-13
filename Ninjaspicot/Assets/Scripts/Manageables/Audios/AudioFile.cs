@@ -1,15 +1,21 @@
 ﻿using System;
 using UnityEngine;
-using ZepLink.RiceNinja.Manageables.Abstract;
+using ZepLink.RiceNinja.Manageables.Interfaces;
+using ZepLink.RiceNinja.ServiceLocator;
 
 namespace ZepLink.RiceNinja.Manageables.Audios
 {
-    [Serializable]
-    public class AudioFile : GuidManageable
+    [CreateAssetMenu(fileName = "Audio file", menuName = "Zeplink/Audio")]
+    public class AudioFile : ScriptableObject, IManageable<Guid>
     {
         [SerializeField] private string _name;
 
-        public override string Name => _name;
+        private Guid _id;
+        public Guid Id { get { if (_id == default) _id = Guid.NewGuid(); return _id; } }
+        public string Name => _name;
+
+        public ServiceFinder ServiceFinder => ServiceFinder.Instance;
+
         public AudioClip Clip;
     }
 }

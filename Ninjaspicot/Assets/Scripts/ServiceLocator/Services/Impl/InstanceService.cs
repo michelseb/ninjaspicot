@@ -4,16 +4,29 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class InstanceService<T> : CollectionService<int, T>, IInstanceService<T> where T : IInstanciable
+    public class InstanceService<T> : CollectionService<int, T>, IInstanceService<T> where T : IDynamic
     {
         protected virtual string ModelPath { get; } = string.Empty;
 
         protected Dictionary<int, T> _models = new Dictionary<int, T>();
-        protected Transform _parent;
-        protected Transform _instancesParent;
+
+        private Transform _instancesParent;
+        public virtual Transform InstancesParent 
+        { 
+            get 
+            {
+                if (BaseUtils.IsNull(_instancesParent))
+                {
+                    _instancesParent = GameObject.Find("Instances")?.transform ??
+                                       new GameObject("Instances").transform;
+                }
+                return _instancesParent; 
+            } 
+        }
 
         public override void Init(Transform parent)
         {
@@ -34,21 +47,15 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             var models = resources.Cast<GameObject>().Select(x => x.GetComponent<T>());
             _models = models.ToDictionary(t => t.Id, t => t);
-
-            parentName = ModelPath.Split('/').Last();
-            _parent = GameObject.Find(parentName)?.transform ?? new GameObject(parentName).transform;
-
-            if (_parent == null)
-                Debug.LogError($"No transform name matching instantiator parent for service {GetType()}");
-
-            _instancesParent = GameObject.Find("Instances")?.transform ?? new GameObject("Instances").transform;
-            _parent.SetParent(_instancesParent);
         }
 
         public T Create(T model, Vector3 position, Quaternion rotation)
         {
             if (EqualityComparer<T>.Default.Equals(model, default(T)) || model is not Dynamic dynamic)
                 return default(T);
+
+            var parent = model.Parent;
+            parent.SetParent(InstancesParent);
 
             var instance = Object.Instantiate(dynamic, position, rotation, model.Parent);
 

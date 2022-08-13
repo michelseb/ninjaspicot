@@ -3,7 +3,7 @@ using ZepLink.RiceNinja.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Interfaces
 {
-    public interface IPoolable : IInstanciable, IWakeable, IResettable
+    public interface IPoolable : IDynamic, IWakeable, IResettable
     {
         /// <summary>
         /// Pools poolable at given position, rotation and size

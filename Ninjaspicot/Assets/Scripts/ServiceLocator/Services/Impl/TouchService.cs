@@ -19,6 +19,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private Joystick _joystick1;
         private Joystick _joystick2;
 
+        public override Transform InstancesParent => _cameraService.UiCamera.Canvas.transform;
+
         public MonoBehaviour ServiceBehaviour { get; private set; }
 
         public bool LeftSideTouching => IsTouching(TouchType.Left);
@@ -84,7 +86,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnLeftSideTouchInit();
 
             var touchPos = mainCamera.ScreenToWorldPoint(_leftTouch.Value);
-            _joystick1 = PoolByName("LeftJoystick", touchPos);
+            _joystick1 = PoolAt(touchPos, "LeftJoystick");
             _joystick1.OnPointerDown();
             _leftTouchInitialized = true;
 
@@ -151,7 +153,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnRightSideTouchInit();
 
             var touchPos = mainCamera.ScreenToWorldPoint(_rightTouch.Value);
-            _joystick2 = PoolByName("RightJoystick", touchPos);
+            _joystick2 = PoolAt(touchPos, "RightJoystick");
             _joystick2.OnPointerDown();
             _rightTouchInitialized = true;
 

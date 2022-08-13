@@ -61,10 +61,7 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
             _handleImage = _handle.GetComponent<Image>();
             _initColor = _image.color;
             _alpha = _image.color.a;
-        }
 
-        protected virtual void Start()
-        {
             HandleRange = _handleRange;
             DeadZone = _deadZone;
 

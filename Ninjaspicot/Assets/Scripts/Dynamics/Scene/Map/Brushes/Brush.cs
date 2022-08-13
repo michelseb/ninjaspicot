@@ -17,8 +17,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
         public string Name => _name;
         public Color Color => _color;
 
-        private IInstanciable _instanciable;
-        public IInstanciable Instanciable
+        private IDynamic _instanciable;
+        public IDynamic Instanciable
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
                         return null;
                     }
                     
-                    if (_instanciableObject is not IInstanciable instanciable)
+                    if (_instanciableObject is not IDynamic instanciable)
                     {
                         if (_instanciableObject is not GameObject gameObject || !gameObject.TryGetComponent(out instanciable))
                         {

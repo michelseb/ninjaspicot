@@ -9,49 +9,24 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         public override string Name => $"PoolService_{typeof(T).Name}";
         protected override string ModelPath => $"Poolables/{typeof(T).Name}";
 
-        public T PoolByName(string name, Vector3 position, Quaternion rotation, float size)
+        public IPoolable Pool(Vector3 position, Quaternion rotation, float size, string modelName = default)
         {
-            var model = _models.Values.FirstOrDefault(x => x.Name == name);
-
-            if (model == null)
-                return default;
-
-            return PoolAt(position, rotation, size, model);
+            return PoolAt(position, rotation, size, modelName);
         }
 
-        public T PoolByName(string name, Vector3 position, Quaternion rotation)
+        public IPoolable Pool(Vector3 position, Quaternion rotation, string modelName = default)
         {
-            return PoolByName(name, position, rotation, 1);
+            return PoolAt(position, rotation, modelName);
         }
 
-        public T PoolByName(string name, Vector3 position)
+        public IPoolable Pool(Vector3 position, string modelName = default)
         {
-            return PoolByName(name, position, Quaternion.identity);
+            return PoolAt(position, modelName);
         }
 
-        public T PoolByName(string name)
+        public T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default)
         {
-            return PoolByName(name, Vector3.zero);
-        }
-
-        public IPoolable Pool(Vector3 position, Quaternion rotation, float size, IPoolable model)
-        {
-            return PoolAt(position, rotation, size, (T)model);
-        }
-
-        public IPoolable Pool(Vector3 position, Quaternion rotation, IPoolable model)
-        {
-            return PoolAt(position, rotation, (T)model);
-        }
-
-        public IPoolable Pool(Vector3 position, IPoolable model)
-        {
-            return PoolAt(position, (T)model);
-        }
-
-        public T PoolAt(Vector3 position, Quaternion rotation, float size, T model = default)
-        {
-            var poolable = model != null ? Create(model) : GetDefaultPoolable();
+            var poolable = GetDefaultPoolable(modelName);
 
             if (poolable == null)
                 return default;
@@ -62,30 +37,38 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return poolable;
         }
 
-        public T PoolAt(Vector3 position, Quaternion rotation, T model = default)
+        public T PoolAt(Vector3 position, Quaternion rotation, string modelName = default)
         {
-            return PoolAt(position, rotation, 1, model);
+            return PoolAt(position, rotation, 1, modelName);
         }
 
-        public T PoolAt(Vector3 position, T model = default)
+        public T PoolAt(Vector3 position, string modelName = default)
         {
-            return PoolAt(position, Quaternion.identity, 1, model);
+            return PoolAt(position, Quaternion.identity, 1, modelName);
         }
 
-        private T GetDefaultPoolable()
+        private T GetDefaultPoolable(string modelName)
         {
-            var poolable = Collection.FirstOrDefault(p => p is MonoBehaviour mono && !mono.gameObject.activeSelf);
+            var poolable = Collection
+                .Where(x => IsModelValid(x.Name, modelName))
+                .FirstOrDefault(p => p is MonoBehaviour mono && !mono.gameObject.activeSelf);
 
             if (poolable != null)
                 return poolable;
 
             // Create poolable if doesn't exist
-            var poolableModel = _models.Values.FirstOrDefault(x => x is T);
+            var poolableModel = _models.Values.FirstOrDefault(x => IsModelValid(x.Name, modelName));
 
             if (poolableModel == null)
                 return default;
 
             return Create(poolableModel);
+        }
+
+        private bool IsModelValid(string name, string modelName)
+        {
+            name = name.Replace("(Clone)", string.Empty);
+            return string.IsNullOrEmpty(modelName) || name == modelName;
         }
     }
 }

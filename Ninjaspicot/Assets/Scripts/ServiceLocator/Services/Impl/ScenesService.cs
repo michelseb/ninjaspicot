@@ -26,13 +26,15 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private readonly IAudioService _audioService;
         private readonly IMapService _mapService;
         private readonly ICameraService _cameraService;
+        private readonly ITouchService _touchService;
 
-        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService, ICameraService cameraService)
+        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService, ICameraService cameraService, ITouchService touchService)
         {
             _spawnService = spawnService;
             _audioService = audioService;
             _mapService = mapService;
             _cameraService = cameraService;
+            _touchService = touchService;
         }
 
         public override void Init(Transform parent)
@@ -56,7 +58,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _spawnService.InitActiveSceneSpawns();
             
             var hero = PoolHelper.Pool<Hero>();
+
             _cameraService.MainCamera.SetTracker(hero);
+            _touchService.SetControllable(hero);
             _spawnService.SpawnAtLastSpawningPosition(hero);
         }
 

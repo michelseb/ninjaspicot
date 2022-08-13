@@ -40,11 +40,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return GetExitIndexByEntranceId(portalId) != null;
         }
 
-        public Portal GetPortalById(int portalId)
-        {
-            return Collection.FirstOrDefault(t => t.Id == portalId);
-        }
-
         private IEnumerator CreateConnection(Portal entrance, int exitId)
         {
             Connecting = true;
@@ -54,7 +49,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (_scenesService.IsSceneLoading)
                 yield return null;
 
-            var exit = GetPortalById(exitId);
+            var exit = FindById(exitId);
 
             if (exit == null)
             {

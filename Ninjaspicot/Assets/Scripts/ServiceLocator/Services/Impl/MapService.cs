@@ -45,9 +45,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 //    .MakeGenericMethod(brush.Instanciable.GetType())
                 //    .Invoke(_poolService, new object[] { (Vector3)coords });
                 var type = brush.Instanciable.GetType().FullName;
-                typeof(PoolHelper).GetMethod(nameof(PoolHelper.PoolAt), new Type[] { typeof(Vector3), typeof(IPoolable) })
+                typeof(PoolHelper).GetMethod(nameof(PoolHelper.PoolAt), new Type[] { typeof(Vector3), typeof(string) })
                     .MakeGenericMethod(brush.Instanciable.GetType())
-                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable });
+                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable.Name });
             }
             else if (brush.Instanciable is TileObject tileObject)
             {

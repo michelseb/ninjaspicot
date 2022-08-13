@@ -7,7 +7,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services;
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
 {
     [CreateAssetMenu(fileName = "Tile", menuName = "Zeplink/Tile")]
-    public class TileObject : ScriptableObject, IInstanciable
+    public class TileObject : ScriptableObject, IDynamic
     {
         [SerializeField] private TileBase _tileModel;
         [SerializeField] private string _name;

@@ -20,8 +20,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {
     public abstract class JumpSkill<T> : SkillBase, IAudio where T : Trajectory, new()
     {
-        [SerializeField] protected int _maxJumps;
-        [SerializeField] protected float _strength;
+        protected float _strength;
+        protected int _maxJumps;
 
         public T Trajectory { get; protected set; }
         public Vector3 TrajectoryOrigin { get; set; }
@@ -30,7 +30,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public Vector3 AimTarget { get; set; }
         public virtual bool Ready => CanJump() && TrajectoryInUse;
         public virtual bool TrajectoryInUse => Trajectory != null && Trajectory.Used;
-        public Transform Parent => Owner.Transform;
+        public override Transform Parent => Owner.Transform;
 
         protected abstract string _soundName { get; }
         protected abstract float _soundIntensity { get; }
@@ -59,6 +59,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
         protected virtual void Start()
         {
+            // TODO : make this configurable
+            _maxJumps = 1;
+            _strength = 100;
+
             _jumps = _maxJumps;
             SetMaxJumps(_maxJumps);
             GainAllJumps();

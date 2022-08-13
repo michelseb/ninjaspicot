@@ -3,8 +3,13 @@ using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IInstanceService<T> : ICollectionService<int, T>, IGameService where T : IInstanciable
+    public interface IInstanceService<T> : ICollectionService<int, T>, IGameService where T : IDynamic
     {
+        /// <summary>
+        /// Parent of all instantiated objects
+        /// </summary>
+        Transform InstancesParent { get; }
+
         /// <summary>
         /// Returns model with given name
         /// </summary>

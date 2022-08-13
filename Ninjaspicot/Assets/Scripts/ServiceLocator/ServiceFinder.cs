@@ -27,12 +27,6 @@ namespace ZepLink.RiceNinja.ServiceLocator
 
         public T Get<T>() where T : IGameService
         {
-            // initialize services if not done yet
-            //if (_services.Count == 0)
-            //{
-            //    Initializer.Initialize();
-            //}
-
             var key = typeof(T).FullName;
 
             if (!_services.ContainsKey(key))
@@ -44,16 +38,21 @@ namespace ZepLink.RiceNinja.ServiceLocator
             return (T)_services[key];
         }
 
-        public T PoolFor<T>(Vector3 position, Quaternion rotation, float size, IPoolable model = default) where T : IPoolable
+        public T PoolFor<T>(Vector3 position, Quaternion rotation, float size, string modelName = default) where T : IPoolable
         {
             var key = typeof(T);
 
             if (_poolServices.ContainsKey(key))
-                return (T)_poolServices[key].Pool(position, rotation, size, model);
+                return (T)_poolServices[key].Pool(position, rotation, size, modelName);
 
-            var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Register(new PoolService<T>());
+            var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Register(MakePoolService<T>());
 
-            return (T)service.Pool(position, rotation, size, model);
+            return (T)service.Pool(position, rotation, size, modelName);
+        }
+
+        private IPoolService MakePoolService<T>() where T : IPoolable
+        {
+            return new PoolService<T>();
         }
 
         public bool IsRegistered<T>()
