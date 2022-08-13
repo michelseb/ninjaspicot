@@ -2,7 +2,7 @@
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class LightService : InstanceService<LightEffect>, ILightService
+    public class LightService : PoolService<LightEffect>, ILightService
     {
         protected override string ModelPath => "Lights";
 

@@ -3,8 +3,44 @@ using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IPoolService<T> : IInstanceService<T>, IPoolService where T : IPoolable
+    public interface IPoolService<T> : ICollectionService<int, T>, IPoolService where T : IPoolable
     {
+        /// <summary>
+        /// Parent of all instantiated objects
+        /// </summary>
+        Transform InstancesParent { get; }
+
+        /// <summary>
+        /// Returns model with given name
+        /// </summary>
+        /// <param name="name"></param>
+        T GetModelByName(string name);
+
+        /// <summary>
+        /// Create instance of model at given position, rotation and parent
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        T Create(T model, Vector3 position, Quaternion rotation);
+
+        /// <summary>
+        /// Create instance of model at given position
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        T Create(T model, Vector3 position);
+
+        /// <summary>
+        /// Create instance of model
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        T Create(T model);
+
         /// <summary>
         /// Pool poolable at position with rotation and size
         /// </summary>
