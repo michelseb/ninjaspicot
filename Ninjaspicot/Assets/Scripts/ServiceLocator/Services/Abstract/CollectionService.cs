@@ -10,7 +10,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
         public IDictionary<T, U> InstancesDictionary { get; } = new Dictionary<T, U>();
         public virtual IList<U> Collection => InstancesDictionary.Values.ToList();
 
-        public void Add(U instance)
+        public virtual void Add(U instance)
         {
             if (BaseUtils.IsNull(instance))
             {
@@ -27,7 +27,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
             InstancesDictionary.Add(instance.Id, instance);
         }
 
-        public void Remove(T id)
+        public virtual void Remove(T id)
         {
             if (!InstancesDictionary.ContainsKey(id))
             {

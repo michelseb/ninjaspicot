@@ -1,6 +1,8 @@
-﻿namespace ZepLink.RiceNinja.ServiceLocator.Services
+﻿using ZepLink.RiceNinja.Dynamics.Effects.Lights;
+
+namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface ILightService : IGameService
+    public interface ILightService : IPoolService<LightEffect>
     {
         /// <summary>
         /// Activate or deactivate all lights

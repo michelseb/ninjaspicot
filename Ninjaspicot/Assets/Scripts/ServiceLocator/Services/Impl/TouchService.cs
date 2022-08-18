@@ -86,7 +86,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnLeftSideTouchInit();
 
             var touchPos = mainCamera.ScreenToWorldPoint(_leftTouch.Value);
-            _joystick1 = PoolAt(touchPos, "LeftJoystick");
+            _joystick1 = PoolAt(_leftTouch.Value, "LeftJoystick");
             _joystick1.OnPointerDown();
             _leftTouchInitialized = true;
 
@@ -153,7 +153,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentControllable?.OnRightSideTouchInit();
 
             var touchPos = mainCamera.ScreenToWorldPoint(_rightTouch.Value);
-            _joystick2 = PoolAt(touchPos, "RightJoystick");
+            _joystick2 = PoolAt(_rightTouch.Value, "RightJoystick");
             _joystick2.OnPointerDown();
             _rightTouchInitialized = true;
 

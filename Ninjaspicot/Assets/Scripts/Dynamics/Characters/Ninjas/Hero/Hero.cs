@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Cameras;
 using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
+using ZepLink.RiceNinja.Dynamics.Characters.Hero.Components;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components;
 using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Effects.Sounds;
@@ -17,7 +18,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 {
-    public class Hero : Character, IPhysic, ITriggerable, IPoolable, IShootable, ITeleportable, IControllable, 
+    public class Hero : Character, IPhysic, ITriggerable, IPoolable, IShootable, ITeleportable, IControllable,
         ITracker, ISeeable, IHearable, ISpawnable, ISkilled, IActivator, IPicker
     {
         [SerializeField] float _ghostSpacing;
@@ -47,6 +48,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         public SpriteRenderer[] Renderers => GetComponentsInChildren<SpriteRenderer>();
         public LayerMask InitialLayerMask { get; private set; }
         public Vector3 NormalVector => ClimbSkill.CollisionNormal;
+        public Vector3 Direction => !ClimbSkill.Walking ? Vector3.zero : Quaternion.Euler(0, 0, -ClimbSkill.Direction * 90) * NormalVector;
         public Rigidbody2D Rigidbody => ClimbSkill.Rigidbody;
         public bool CanTeleport => !Dead;
         public bool CanTake => !Dead;
@@ -72,7 +74,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             Visible = true;
 
             HopSkill = _skillService.EquipSkill<HopSkill>(Transform);
-            ClimbSkill = _skillService.EquipSkill<ClimbSkill>(Transform);
+            ClimbSkill = _skillService.EquipSkill<HeroClimbSkill>(Transform);
             ChargeSkill = _skillService.EquipSkill<ChargeSkill>(Transform);
         }
 
@@ -174,13 +176,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             int iteration = 0;
             while (true)
             {
-                PoolHelper.PoolAt<Ghost>(Transform.position, Transform.rotation);
+                PoolHelper.PoolAt<Ghost>(Transform.position, Transform.rotation, 1f);
 
                 if (iteration % GHOST_SOUND_FREQUENCY == 0)
                 {
                     PoolHelper.PoolAt<SoundEffect>(Transform.position, Quaternion.identity, 2);
                 }
-                
+
                 iteration++;
 
                 yield return new WaitForSeconds(delay);
@@ -314,25 +316,45 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             StopDisplayGhosts();
         }
 
-        public void OnRightSideTouchInit() { }
+        public void OnRightSideTouchInit()
+        {
+            if (!ClimbSkill.Attached || !HopSkill.CanJump())
+                return;
+
+            ClimbSkill.Detach();
+            HopSkill.InitJump(Direction, NormalVector);
+        }
 
         public void OnRightSideTouch() { }
 
         public void OnRightSideDrag(Vector2 direction)
         {
-            HopSkill.DisplayTrajectory(direction);
+            if (!ClimbSkill.Attached)
+            {
+                _timeService.SlowDownImmediate();
+                _characterLight.Wake();
+                ChargeSkill.DisplayTrajectory(direction);
+            }
+            else
+            {
+                HopSkill?.CancelJump();
+            }
+            //HopSkill.DisplayTrajectory(direction);
         }
 
         public void OnRightSideDragEnd(Vector2 direction)
         {
+            _characterLight.Sleep();
+            _timeService.SetNormalTime();
             ClimbSkill.ReinitSpeed();
             StopDisplayGhosts();
 
-            if (HopSkill.Ready)
+            if (ChargeSkill.Ready)
             {
                 ClimbSkill.StopWalking(false);
                 ClimbSkill.Detach();
-                HopSkill.Jump(direction);
+                ChargeSkill.Jump(direction);
+                //HopSkill.Jump(direction);
             }
         }
 

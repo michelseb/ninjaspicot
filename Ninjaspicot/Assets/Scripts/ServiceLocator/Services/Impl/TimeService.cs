@@ -22,7 +22,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private const float DEFAULT_SLOWDOWN_TIMESCALE = .01f;
         private const float VOLUME_SLOWDOWN = .05f;
 
-        public virtual GameObject ServiceObject { get; protected set; }
         public MonoBehaviour ServiceBehaviour { get; private set; }
 
         public TimeService(IAudioService audioService)
@@ -30,12 +29,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _audioService = audioService;
         }
 
-        public void Init(Transform parent)
+        public override void Init(Transform parent)
         {
+            base.Init(parent);
+
             _slowDown = _audioService.FindByName("SlowDown");
-            
-            ServiceObject = new GameObject(nameof(TimeService));
-            ServiceObject.transform.SetParent(parent);
 
             ServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
 
@@ -50,6 +48,16 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         public void SlowDownProgressive()
         {
             SetTimeScaleProgressive(DEFAULT_SLOWDOWN_TIMESCALE);
+        }
+
+        public void RestoreProgressive()
+        {
+            SetTimeScaleProgressive(1);
+        }
+
+        public void SlowDownAndRestoreProgressive()
+        {
+
         }
 
         private IEnumerator SetProgressive(float targetTimeScale, float delay)

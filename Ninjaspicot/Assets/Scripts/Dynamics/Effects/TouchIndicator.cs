@@ -63,7 +63,7 @@ namespace ZepLink.RiceNinja.Dynamics.Effects
 
         public void Pool(Vector3 position, Quaternion rotation, float size)
         {
-            Transform.position = new Vector3(position.x, position.y, -5);
+            Transform.position = new Vector3(position.x, position.y, 5);
             Transform.rotation = rotation;
             _appear = StartCoroutine(Appear());
         }

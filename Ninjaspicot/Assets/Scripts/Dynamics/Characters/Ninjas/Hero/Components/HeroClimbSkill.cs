@@ -55,7 +55,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
 
             while (true)
             {
-                _speedFactor = GetHeroSpeed(_touchService.LeftDragDirection, CollisionNormal, CurrentSpeed);
+                var direction = Quaternion.Euler(0, 0, -90) * CollisionNormal;
+                _speedFactor = GetHeroSpeed(_touchService.LeftDragDirection, direction, CurrentSpeed);
                 _walkDirection = _touchService.LeftDragDirection;
                 if (_speedFactor == 0)
                 {
@@ -102,15 +103,16 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
             return true;
         }
 
-        private float GetHeroSpeed(Vector3 direction, Vector3 platformNormal, float speed)
+        private float GetHeroSpeed(Vector3 direction, Vector3 platformDefaultDirection, float speed)
         {
-            var dir = Vector3.Dot(direction, platformNormal);
-            var sign = Mathf.Sign(dir);
-
             var directionChange = (direction - _walkDirection).magnitude;
+
             //Keep old speed unless different direction
             if (_speedFactor != 0 && directionChange < .01f)
                 return Mathf.Clamp(_speedFactor, -1, 1) * speed;
+
+            var dir = Vector3.Dot(direction, platformDefaultDirection);
+            var sign = Mathf.Sign(dir);
 
             return sign * speed;
 

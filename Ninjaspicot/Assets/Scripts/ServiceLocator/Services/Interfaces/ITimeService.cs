@@ -13,6 +13,16 @@
         void SlowDownProgressive();
 
         /// <summary>
+        /// Restores time progressively with default values
+        /// </summary>
+        void RestoreProgressive();
+
+        /// <summary>
+        /// SlowdownProgressive then RestoreProgressive
+        /// </summary>
+        void SlowDownAndRestoreProgressive();
+
+        /// <summary>
         /// Set timescale progressively to given value within given delay
         /// </summary>
         /// <param name="timeScale"></param>

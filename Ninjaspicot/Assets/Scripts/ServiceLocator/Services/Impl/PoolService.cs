@@ -52,6 +52,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public T Create(T model, Vector3 position, Quaternion rotation)
         {
+            if (model == null)
+                return default(T);
+
             if (EqualityComparer<T>.Default.Equals(model, default(T)) || model is not Dynamic dynamic)
                 return default(T);
 
@@ -96,7 +99,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return PoolAt(position, modelName);
         }
 
-        public T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default)
+        public virtual T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default)
         {
             var poolable = GetDefaultPoolable(modelName);
 
@@ -119,7 +122,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return PoolAt(position, Quaternion.identity, 1, modelName);
         }
 
-        private T GetDefaultPoolable(string modelName)
+        protected T GetDefaultPoolable(string modelName)
         {
             var poolable = Collection
                 .Where(x => IsModelValid(x.Name, modelName))
@@ -137,7 +140,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return Create(poolableModel);
         }
 
-        private bool IsModelValid(string name, string modelName)
+        protected bool IsModelValid(string name, string modelName)
         {
             name = name.Replace("(Clone)", string.Empty);
             return string.IsNullOrEmpty(modelName) || name == modelName;

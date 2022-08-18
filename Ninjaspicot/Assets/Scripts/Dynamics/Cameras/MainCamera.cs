@@ -46,7 +46,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             Screen.orientation = ScreenOrientation.LandscapeLeft;
 
             _screenRatio = (float)Screen.height / Screen.width * .5f;
-            _initialCamSize = 50f * _screenRatio;
+            _initialCamSize = 17.85f * _screenRatio;
 
             _velocity = Vector3.zero;
             InstantZoom(_beginZoom);
@@ -76,6 +76,16 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         public Vector2 ScreenToWorldPoint(Vector2 screenPoint)
         {
             return Camera.ScreenToWorldPoint(screenPoint);
+        }
+
+        /// <summary>
+        /// Get touch position in world coords
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        public Vector2 WorldToScreenPoint(Vector2 screenPoint)
+        {
+            return Camera.WorldToScreenPoint(screenPoint);
         }
 
         //private void Update()
@@ -113,7 +123,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             //    _normalOffset = Vector3.zero;
             //}
 
-            var offset = Quaternion.Euler(0, 0, 90) * tracker.NormalVector * 2.5f;
+            var offset = tracker.NormalVector * 2.5f;
 
             Transform.position = Vector3.SmoothDamp(Transform.position, tracker.Transform.position + offset, ref _velocity, FOLLOW_DELAY);
         }
@@ -242,7 +252,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
 
         private IEnumerator DoShake(float duration, float strength)
         {
-            var pos = Transform.localPosition;
+            var pos = transform.localPosition;
 
             float ellapsed = 0;
 
@@ -251,7 +261,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                 float x = Random.Range(-1f, 1f) * strength;
                 float y = Random.Range(-1f, 1f) * strength;
 
-                Transform.localPosition = new Vector3(x, y, pos.z);
+                transform.localPosition = new Vector3(x, y, pos.z);
 
                 ellapsed += Time.deltaTime;
                 yield return null;

@@ -26,10 +26,12 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
 
         public virtual void Sleep()
         {
+            enabled = false;
         }
 
         public virtual void Wake()
         {
+            enabled = true;
         }
 
         public void SetColor(CustomColor color, float intensity = 1)

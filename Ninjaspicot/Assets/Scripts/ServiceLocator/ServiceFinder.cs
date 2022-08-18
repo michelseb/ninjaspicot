@@ -45,14 +45,12 @@ namespace ZepLink.RiceNinja.ServiceLocator
             if (_poolServices.ContainsKey(key))
                 return (T)_poolServices[key].Pool(position, rotation, size, modelName);
 
-            var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Register(MakePoolService<T>());
+            var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Get<IDefaultPoolService>();
+
+            if (service is IDefaultPoolService defaultPoolService)
+                return (T)defaultPoolService.PoolAt(position, rotation, size, typeof(T), modelName);
 
             return (T)service.Pool(position, rotation, size, modelName);
-        }
-
-        private IPoolService MakePoolService<T>() where T : IPoolable
-        {
-            return new PoolService<T>();
         }
 
         public bool IsRegistered<T>()

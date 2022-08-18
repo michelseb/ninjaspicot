@@ -20,13 +20,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {
     public abstract class JumpSkill<T> : SkillBase, IAudio where T : Trajectory, new()
     {
-        protected float _strength;
+        protected float _dashStrength;
+        protected float _jumpStrength;
         protected int _maxJumps;
 
         public T Trajectory { get; protected set; }
         public Vector3 TrajectoryOrigin { get; set; }
         public Vector3 TrajectoryDestination { get; set; }
-        public Vector2 ChargeDestination { get; set; }
         public Vector3 AimTarget { get; set; }
         public virtual bool Ready => CanJump() && TrajectoryInUse;
         public virtual bool TrajectoryInUse => Trajectory != null && Trajectory.Used;
@@ -45,6 +45,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected ICameraService _cameraService;
         protected IAudioService _audioService;
         protected ITimeService _timeService;
+        protected Vector3[] _positions;
 
         protected Coroutine _directJump;
 
@@ -61,15 +62,52 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             // TODO : make this configurable
             _maxJumps = 1;
-            _strength = 100;
+            _jumpStrength = 20;
+            _dashStrength = 30;
 
             _jumps = _maxJumps;
             SetMaxJumps(_maxJumps);
             GainAllJumps();
-           
+
             _impactSound = _audioService.FindByName("Impact");
 
             Active = true;
+        }
+
+        public virtual void InitJump(Vector3 direction, Vector3 normalVector)
+        {
+            if (!CanJump())
+                return;
+
+            LoseJump();
+            Rigidbody.velocity = Vector2.zero;
+
+
+
+            //var normalForce = normalVector.y >= 0 ? normalVector * _jumpStrength / 3 + Vector3.up * _jumpStrength / 3 : normalVector;
+            var forceToApply = GetJumpForce(direction, normalVector, _jumpStrength);//normalForce + direction * _jumpStrength;
+
+            Rigidbody.AddForce(forceToApply, ForceMode2D.Impulse);
+            //_timeService.SlowDownImmediate();
+            //_timeService.SetTimeScaleProgressive(1);
+        }
+
+        private Vector3 GetJumpForce(Vector3 direction, Vector3 normalVector, float strength)
+        {
+            // If under a roof, we just fall
+            if (normalVector.y < -.1f)
+                return normalVector;
+
+            Vector3 directionVector;
+
+            if (normalVector.y < .1f)
+            {
+                directionVector = normalVector + direction;
+                return directionVector.normalized * strength / 3;
+            }
+
+            directionVector = Vector3.up * 2 + direction;
+            return directionVector.normalized * strength;
         }
 
         public virtual void CalculatedJump(Vector2 velocity)
@@ -91,14 +129,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
                 _timeService.SetNormalTime();
             }
 
-            _cameraService.MainCamera.Shake(.3f, .1f);
+            //_cameraService.MainCamera.Shake(.3f, .1f);
 
             direction = direction.normalized;
 
             LoseJump();
 
+            //StartCoroutine(DoNormalJump2(-direction * _strength));
+
+            //Rigidbody.velocity = -direction * _strength;
             Rigidbody.velocity = Vector2.zero;
-            Rigidbody.AddForce(direction * _strength, ForceMode2D.Impulse);
+            Rigidbody.AddForce(-direction * _jumpStrength, ForceMode2D.Impulse);
 
             PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
@@ -108,6 +149,70 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             }
 
             Trajectory = null;
+        }
+
+        private IEnumerator DoNormalJump2(Vector2 trajectory)
+        {
+            Rigidbody.gravityScale = 0;
+            Rigidbody.isKinematic = false;
+
+            var oldPosition = Rigidbody.position;
+
+            Rigidbody.velocity = trajectory;
+
+            while (!Rigidbody.isKinematic)
+            {
+                while (Rigidbody.velocity.y > 0)
+                    yield return null;
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator DoNormalJump()
+        {
+            Rigidbody.gravityScale = 0;
+            Rigidbody.isKinematic = false;
+            int index = 1;
+            var currentTarget = GetTrajectoryPositionAtIndex(index);
+            var oldPosition = Rigidbody.position;
+            var velocity = Vector3.zero;
+            bool slowMoeing = false;
+            float slowMoTime = .3f;
+            var slowFactor = .00001f;
+
+            while (currentTarget != Vector3.zero)
+            {
+                if (slowMoTime > 0 && Mathf.Abs(currentTarget.y - oldPosition.y) < .1f)
+                {
+                    slowMoeing = true;
+                    slowFactor = .3f;
+                }
+
+                while (Vector3.Distance(Rigidbody.position, currentTarget) > .1f)
+                {
+                    slowMoTime -= Time.fixedDeltaTime;
+                    //slowMoeing = slowMoeing && slowMoTime > 0;
+                    if (slowMoeing && slowFactor > 0)
+                    {
+                        slowFactor -= Time.fixedDeltaTime;
+                    }
+                    if (slowFactor < 0)
+                    {
+                        slowFactor = 0;
+                    }
+
+                    Rigidbody.position = Vector3.SmoothDamp(Rigidbody.position, currentTarget, ref velocity, slowFactor);
+                    yield return new WaitForFixedUpdate();
+                }
+
+                index++;
+                oldPosition = currentTarget;
+                currentTarget = GetTrajectoryPositionAtIndex(index);
+            }
+
+            Rigidbody.gravityScale = 1;
+            Rigidbody.velocity = velocity;
         }
 
 
@@ -124,7 +229,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             LoseJump();
 
             Rigidbody.velocity = Vector2.zero;
-            Rigidbody.AddForce(direction * _strength * 3, ForceMode2D.Impulse);
+            Rigidbody.AddForce(direction * _jumpStrength * 3, ForceMode2D.Impulse);
             Rigidbody.gravityScale = 0;
 
             PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
@@ -147,7 +252,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (Trajectory == null || !Trajectory.Active)
                 return;
 
-            _audioService.PlaySound(this, _sound, _soundIntensity);
+            _audioService.PlaySound(this, JumpSound, _soundIntensity);
 
             Trajectory.StartFading();
         }
@@ -165,6 +270,22 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             TrajectoryOrigin = origin;
             TrajectoryDestination = destination;
+        }
+
+        private Vector3 GetTrajectoryPositionAtIndex(int index)
+        {
+            if (index == 1)
+            {
+                if (BaseUtils.IsNull(Trajectory))
+                    return default;
+
+                _positions = Trajectory.GetPositions();
+            }
+
+            if (index >= _positions.Length)
+                return default;
+
+            return _positions[index];
         }
 
         protected T GetTrajectory()
@@ -231,8 +352,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (!Active || GetJumps() <= 0)
                 return false;
 
-            return !CastUtils.BoxCast(transform.position, Vector2.one, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Id,
-            layer: (1 << LayerMask.NameToLayer("Obstacle")) | (1 << LayerMask.NameToLayer("DynamicObstacle")));
+            return !CastUtils.BoxCast(transform.position, Vector2.one * .1f, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Id,
+            layer: 1 << LayerMask.NameToLayer("Obstacle"));
         }
 
         public T SetTrajectory()
@@ -241,7 +362,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
                 return trajectory;
 
             Trajectory = GetTrajectory();
-            Trajectory.Strength = _strength;
+            Trajectory.Strength = _dashStrength;
 
             return Trajectory;
         }

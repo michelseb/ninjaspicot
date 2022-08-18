@@ -24,7 +24,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         public bool Collides { get; private set; }
         private Transform _targetTransform;
         protected override float _fadeSpeed => 5;
-        private const float CHARGE_LENGTH = 40f;
+        private const float CHARGE_LENGTH = 3f;
 
         protected override void Awake()
         {
@@ -34,7 +34,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
 
         public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
         {
-            _line.SetPosition(0, new Vector3(linePosition.x, linePosition.y, 0));
+            _line.SetPosition(0, linePosition);
 
             var chargePos = linePosition - direction.normalized * CHARGE_LENGTH;
             var chargeHit = StepClear(linePosition, chargePos - linePosition, CHARGE_LENGTH);

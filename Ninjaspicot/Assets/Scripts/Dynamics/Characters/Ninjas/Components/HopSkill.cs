@@ -13,6 +13,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             if (!Ready)
                 return;
+
+            NormalJump(direction);
         }
     }
 }

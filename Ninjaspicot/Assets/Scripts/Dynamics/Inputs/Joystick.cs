@@ -68,7 +68,7 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
             _canvas = GetComponentInParent<Canvas>();
 
             _cam = null;
-            if (_canvas?.renderMode == RenderMode.ScreenSpaceCamera)
+            if (_canvas?.renderMode == RenderMode.ScreenSpaceOverlay)
             {
                 _cam = _canvas.worldCamera;
             }
@@ -87,27 +87,21 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
             if (_cam == null)
                 return;
 
-            Vector2 position = RectTransformUtility.WorldToScreenPoint(_cam, _background.position);
-            Vector2 radius = _background.sizeDelta / 2;
-            _input = (touchPosition - position) / (radius * _canvas.scaleFactor);
+            var radius = _background.sizeDelta / 2;
+            _input = (touchPosition - BaseUtils.ToVector2(_background.position)) / (radius * _canvas.scaleFactor);
             FormatInput();
-            HandleInput(_input.magnitude, _input.normalized, radius, _cam);
+            _input = Vector2.ClampMagnitude(_input, _handleRange);
             _handle.anchoredPosition = _input * radius * _handleRange;
 
             if (follow)
             {
-                FollowDrag(_handle.anchoredPosition);
+                FollowDrag(touchPosition);
             }
         }
 
         protected void FollowDrag(Vector2 target)
         {
-            transform.position = Vector3.SmoothDamp(transform.position, _handle.TransformPoint(target), ref _joystickVelocity, .2f);
-        }
-
-        protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
-        {
-            _input = magnitude > Mathf.Max(_deadZone, 1) ? normalised : Vector2.zero;
+            transform.position = Vector3.SmoothDamp(transform.position, target, ref _joystickVelocity, .2f);
         }
 
         private void FormatInput()
@@ -204,7 +198,7 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
             while (col.a > 0)
             {
                 col = _image.color;
-                col.a -= Time.deltaTime * FADE_SPEED;
+                col.a -= Time.unscaledDeltaTime * FADE_SPEED;
                 _image.color = col;
                 yield return null;
             }
@@ -217,7 +211,7 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
             while (col.a < _alpha)
             {
                 col = _image.color;
-                col.a += Time.deltaTime * APPEAR_SPEED;
+                col.a += Time.unscaledDeltaTime * APPEAR_SPEED;
                 _image.color = col;
                 yield return null;
             }
@@ -226,7 +220,7 @@ namespace ZepLink.RiceNinja.Dynamics.Inputs
 
         public void Pool(Vector3 position, Quaternion rotation, float size)
         {
-            Transform.position = new Vector3(position.x, position.y, -5);
+            Transform.position = new Vector3(position.x, position.y, 5);
             Transform.rotation = rotation;
             _appear = StartCoroutine(Appear());
         }

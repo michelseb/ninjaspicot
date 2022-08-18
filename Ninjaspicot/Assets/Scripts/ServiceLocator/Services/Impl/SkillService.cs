@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
+using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -7,7 +8,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     {
         public T EquipSkill<T>(Transform instance) where T : SkillBase, new()
         {
-            return Equip<T>(instance);
+            if (!instance.TryGetComponent(out ISkilled skilled))
+                return default;
+
+            var result = Equip<T>(instance);
+            result.SetOwner(skilled);
+
+            return result;
         }
     }
 }

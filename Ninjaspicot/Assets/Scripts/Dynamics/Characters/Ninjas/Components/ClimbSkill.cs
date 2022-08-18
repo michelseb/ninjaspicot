@@ -1,7 +1,7 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
-using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
@@ -14,23 +14,26 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
         public HingeJoint2D WallJoint { get; set; }
         public Obstacle CurrentAttachment { get; set; }
-        public bool Attached { get; private set; }
+        public int FramesSinceDetached { get; private set; }
+        public bool Attached => WallJoint?.enabled == true;
         public bool CanWalk { get; set; }
         public bool Walking => _walkOnWalls != null;
         public float CurrentSpeed { get; set; }
+        public float Direction => Mathf.Sign(_speedFactor);
         public Transform ContactPoint { get; private set; }
         public Collider2D Collider { get { if (_collider == null) _collider = GetComponent<Collider2D>(); return _collider; } }
+        
+        //TODO => move to hero class (should not be in skill properties)
         public Vector3 CollisionNormal { get; private set; }
         public float ImpactVelocity { get; private set; }
         public bool Running { get; protected set; }
-        public Transform Parent => Owner.Transform;
 
         protected float _speedFactor;
         protected Vector3 _previousContactPoint;
         protected Coroutine _walkOnWalls;
         private float _velocityBeforePhysicsUpdate;
-        private float _detachTime;
-        private Vector2 _detachPos;
+        //private float _detachTime;
+        //private Vector2 _detachPos;
 
         public virtual void Awake()
         {
@@ -60,6 +63,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             _velocityBeforePhysicsUpdate = Rigidbody.velocity.magnitude;
         }
 
+        private void Update()
+        {
+            FramesSinceDetached++;
+        }
+
         private void OnCollisionEnter2D(Collision2D collision)
         {
             ImpactVelocity = _velocityBeforePhysicsUpdate;
@@ -70,28 +78,28 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             var contact = GetContactPoint(collision.contacts, _previousContactPoint);
             SetContactPosition(contact.point);
-            CollisionNormal = Quaternion.Euler(0, 0, -90) * contact.normal;
+            CollisionNormal = contact.normal;
         }
 
         public virtual bool Attach(Obstacle obstacle)
         {
-            if (Attached)
+            if (Attached || FramesSinceDetached < 2)
                 return false;
+
+            Debug.Log("Attach");
 
             var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
-            var deltaTime = Time.time - _detachTime;
-            var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
+            //var deltaTime = Time.time - _detachTime;
+            //var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
 
             // Threshold to attach
-            if (deltaTime < .05f && deltaPos < .6f)
-                return false;
+            //if (deltaTime < .05f && deltaPos < .6f)
+            //    return false;
 
             WallJoint.enabled = true;
             WallJoint.useMotor = false;
             WallJoint.anchor = anchorPos;
             WallJoint.connectedAnchor = WallJoint.anchor;
-
-            Attached = true;
 
             Rigidbody.gravityScale = 0;
             Rigidbody.velocity = Vector2.zero;
@@ -104,28 +112,20 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (!Attached)
                 return;
 
-            _detachTime = Time.time;
-            _detachPos = WallJoint.anchor;
-            Rigidbody.gravityScale = 1;
+            Debug.Log("Detach");
+
+            FramesSinceDetached = 0;
+            //_detachTime = Time.time;
+            //_detachPos = WallJoint.anchor;
             WallJoint.enabled = false;
             CurrentAttachment = null;
-            Attached = false;
+            Rigidbody.isKinematic = false;
+            Rigidbody.gravityScale = 1;
         }
 
         public ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
         {
-            ContactPoint2D resultContact = new ContactPoint2D();
-            float dist = 0;
-            foreach (ContactPoint2D contact in contacts)
-            {
-                if (Vector3.Distance(previousPos, contact.point) > dist)
-                {
-                    dist = Vector3.Distance(previousPos, contact.point);
-                    resultContact = contact;
-                }
-            }
-
-            return resultContact;
+            return contacts.OrderBy(c => Vector3.Distance(previousPos, c.point)).Last();
         }
 
         public Vector3 GetContactPosition()
@@ -188,7 +188,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public void StartRunning()
         {
             Running = true;
-            CurrentSpeed *= 2.5f;
+            CurrentSpeed = _speed * 2.5f;
         }
 
         public void ReinitSpeed()
@@ -197,32 +197,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             CurrentSpeed = _speed;
         }
 
-        public void LaunchQuickDeactivate()
-        {
-            Detach();
-        }
-
         public override void LandOn(Obstacle obstacle, Vector3 contactPoint)
         {
             if (!Active || obstacle == CurrentAttachment)
                 return;
 
-            Detach();
-
             if (!Attach(obstacle))
                 return;
 
+            Debug.Log("Land");
             CurrentAttachment = obstacle;
             CurrentAttachment = obstacle;
             SetContactPosition(contactPoint);
-        }
-
-        public void Pool(Vector3 position, Quaternion rotation, float size = 1)
-        {
-        }
-
-        public void DoReset()
-        {
         }
     }
 }

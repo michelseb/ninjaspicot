@@ -13,31 +13,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected override string _soundName => "Dash";
         protected override float _soundIntensity => 1f;
 
-        public virtual void Charge(Vector2 direction)
+        public Vector2 ChargeDestination => Trajectory?.GetLastPosition() ?? Transform.position;
+
+        public void Bounce(Vector3 targetPosition)
         {
-            var initialPos = Rigidbody.position;
-            var pos = initialPos;
-            var dir = (ChargeDestination - pos).normalized;
-            pos += dir;
-
-            while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
-            {
-                PoolHelper.PoolAt<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), Mathf.Max((ChargeDestination - pos).magnitude / 15, 1));
-                pos += dir * 10;
-            }
-
-            direction = direction.normalized;
-            Rigidbody.position = ChargeDestination - (direction * 7);
-
-            NormalJump(direction);
-            _cameraService.MainCamera.Shake(.3f, .5f);
+            Rigidbody.velocity = Vector2.zero;
+            Rigidbody.AddForce(((Transform.position - targetPosition).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
         }
-
-        //public void Bounce(Vector3 targetPosition)
-        //{
-        //    _stickiness.Rigidbody.velocity = Vector2.zero;
-        //    _stickiness.Rigidbody.AddForce(((_stickiness.Transform.position - targetPosition).normalized + Vector3.up * 2) * 15, ForceMode2D.Impulse);
-        //}
 
         public override void CommitJump()
         {
@@ -58,10 +40,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             }
 
             if (Trajectory.Target == null)
+            {
+                base.CommitJump();
                 return;
+            }
 
             //Bounce
-            //Bounce(Trajectory.Target.Transform.position);
+            Bounce(Trajectory.Target.Transform.position);
 
             Trajectory.Target.Die(Transform);
             Trajectory.Target = null;
@@ -76,6 +61,24 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             if (!Ready)
                 return;
+
+            var initialPos = Rigidbody.position;
+            var pos = initialPos;
+            var dir = (ChargeDestination - pos).normalized;
+            pos += dir;
+
+            while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
+            {
+                var ghostSize = Mathf.Max((ChargeDestination - pos).magnitude, 1);
+                PoolHelper.PoolAt<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), ghostSize);
+                pos += dir / 2;
+            }
+
+            direction = direction.normalized;
+            Rigidbody.position = ChargeDestination;
+
+            NormalJump(direction);
+            //_cameraService.MainCamera.Shake(.3f, .5f);
         }
     }
 }

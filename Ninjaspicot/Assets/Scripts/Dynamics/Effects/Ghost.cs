@@ -13,9 +13,11 @@ namespace ZepLink.RiceNinja.Dynamics.Effects
 
         private SpriteRenderer _renderer;
         private Vector3 _initSize;
+        private Color _initColor;
 
         private void Awake()
         {
+            _initColor = ColorUtils.GetColor(CustomColor.NightBlue, .5f);
             _renderer = GetComponent<SpriteRenderer>();
         }
 
@@ -36,6 +38,7 @@ namespace ZepLink.RiceNinja.Dynamics.Effects
 
         public void Pool(Vector3 position, Quaternion rotation, float size)
         {
+            InitColor();
             Transform.position = position;
             Transform.rotation = rotation;
             _initSize = Transform.localScale;
@@ -45,13 +48,22 @@ namespace ZepLink.RiceNinja.Dynamics.Effects
         public void Sleep()
         {
             gameObject.SetActive(false);
-            Transform.localScale = _initSize;
+
+            if (_initSize != Vector3.zero)
+            {
+                Transform.localScale = _initSize;
+            }
         }
 
         public void Wake()
         {
             gameObject.SetActive(true);
-            _renderer.color = ColorUtils.GetColor(CustomColor.NightBlue, .5f);
+            InitColor();
+        }
+
+        private void InitColor()
+        {
+            _renderer.color = _initColor;
         }
 
         public void DoReset()

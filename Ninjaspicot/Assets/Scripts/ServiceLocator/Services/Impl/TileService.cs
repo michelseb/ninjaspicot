@@ -24,6 +24,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                             typeof(Obstacle))
                         .GetComponent<Tilemap>();
 
+                    _tileMap.gameObject.layer = LayerMask.NameToLayer("Obstacle");
                     _tileMap.GetComponent<Rigidbody2D>().isKinematic = true;
 
                     _tileMap.orientation = Tilemap.Orientation.XY;

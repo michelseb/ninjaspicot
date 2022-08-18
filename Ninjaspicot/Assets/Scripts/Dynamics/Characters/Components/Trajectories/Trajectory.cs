@@ -28,8 +28,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         protected ICoroutineService _coroutineService;
 
         protected virtual float _fadeSpeed => .5f;
-        protected const int MAX_VERTEX = 300; //50
-        protected const float LENGTH = .01f;
+        protected const int MAX_VERTEX = 50; //50
+        protected const float LENGTH = .04f;
 
         protected virtual void Awake()
         {
@@ -49,7 +49,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
         {
             // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-            return Physics2D.CircleCast(origin, .8f, direction, distance,
+            return Physics2D.CircleCast(origin, .05f, direction, distance,
                         (1 << LayerMask.NameToLayer("Obstacle")) |
                         (1 << LayerMask.NameToLayer("DynamicObstacle")) |
                         (1 << LayerMask.NameToLayer("Enemy")) |
@@ -60,7 +60,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         protected virtual RaycastHit2D StepClearWall(Vector3 origin, Vector3 direction, float distance)
         {
             // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-            return Physics2D.CircleCast(origin, .8f, direction, distance,
+            return Physics2D.CircleCast(origin, .05f, direction, distance,
                         (1 << LayerMask.NameToLayer("Obstacle")) |
                         (1 << LayerMask.NameToLayer("DynamicObstacle")));
         }
@@ -154,6 +154,23 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
             _aimIndicator.Sleep();
             _aimIndicator = null;
             Focusable = null;
+        }
+
+        public Vector3[] GetPositions()
+        {
+            Vector3[] result = new Vector3[_line.positionCount];
+
+            for (int a = 0; a < _line.positionCount; a++)
+            {
+                result[a] = _line.GetPosition(a);
+            }
+
+            return result;
+        }
+
+        public Vector3 GetLastPosition()
+        {
+            return _line.GetPosition(_line.positionCount - 1);
         }
 
         protected virtual void ResetWidths()

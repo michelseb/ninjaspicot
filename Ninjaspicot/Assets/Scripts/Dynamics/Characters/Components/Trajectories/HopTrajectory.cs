@@ -22,7 +22,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
 
         public override void DrawTrajectory(Vector2 linePosition, Vector2 direction)
         {
-            var gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+            var gravity = Physics2D.gravity;
             direction = -direction.normalized;
             var velocity = direction * Strength;
 
@@ -33,28 +33,26 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
             {
                 velocity += gravity * LENGTH;
                 linePosition += velocity * LENGTH;
-                _line.SetPosition(i, new Vector3(linePosition.x, linePosition.y));
 
                 if (i > 1)
                 {
-                    var hit = StepClear(_line.GetPosition(i - 1), _line.GetPosition(i - 2) - _line.GetPosition(i - 1), .1f);
+                    var hit = StepClear(linePosition, BaseUtils.ToVector2(_line.GetPosition(i - 1)) - linePosition, LENGTH);
 
-                    if (!hit)
-                        continue;
-
-                    isContact = true;
-
-                    if (!HandleFocusableCast(hit, _line))
+                    if (hit)
                     {
-                        DeactivateAim();
+                        isContact = true;
 
-                        if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("DynamicWall"))
+                        if (!HandleFocusableCast(hit, _line))
                         {
+                            DeactivateAim();
+
                             _line.positionCount = i;
                             break;
                         }
                     }
                 }
+
+                _line.SetPosition(i, linePosition);
             }
 
             if (!isContact)

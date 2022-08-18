@@ -20,8 +20,6 @@ namespace ZepLink.RiceNinja.ServiceLocator
             sl.Register<ICharacterService>(new CharacterService());
             sl.Register<ILightService>(new LightService());
             sl.Register<ISkillService>(new SkillService());
-            sl.Register<ITrajectoryService>(new TrajectoryService());
-            //var poolService = sl.Register<IPoolService>(new PoolService());
             var audioService = sl.Register<IAudioService>(new AudioService());
             var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<Guid, GuidManageable>());
             var cameraService = sl.Register<ICameraService>(new CameraService());
@@ -36,6 +34,9 @@ namespace ZepLink.RiceNinja.ServiceLocator
             sl.Register<IParallaxService>(new ParallaxService(cameraService));
             var scenesService = sl.Register<IScenesService>(new ScenesService(spawnService, audioService, mapService, cameraService, touchService));
             sl.Register<IPortalService>(new PortalService(cameraService, zoneService, scenesService));
+
+            // Register last
+            sl.Register<IDefaultPoolService>(new DefaultPoolService());
 
             scenesService.InitialLoad();
         }

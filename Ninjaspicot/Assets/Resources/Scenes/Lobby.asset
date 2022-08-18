@@ -15,7 +15,8 @@ MonoBehaviour:
   _name: Lobby
   _audio: {fileID: 8300000, guid: b771dc66ed0226d469923a5ba4865bbf, type: 3}
   _index: 0
-  _map: {fileID: 2800000, guid: a2d45ea8ad9d2b54ba4cf9c78f63436d, type: 3}
+  _map: {fileID: 2800000, guid: 85812a8ecde40c2469015e3ba612ad25, type: 3}
+  _lightMap: {fileID: 2800000, guid: b51fc7cfcefafba4bbca519cf49927d6, type: 3}
   _image: {fileID: 0}
   _fontColor: 0
   _globalLightColor: 0
