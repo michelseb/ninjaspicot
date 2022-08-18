@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
@@ -21,6 +24,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void Generate(Texture2D map)
         {
+            if (map == null)
+                return;
+
             var localizedColors = map
                 .GetPixels32()
                 .Select((c, i) => (color: c, index: i))
@@ -30,6 +36,35 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             {
                 GenerateAt(localizedColor.Key, localizedColor.Value);
             }
+        }
+
+        public void GenerateLights(Texture2D lightMap)
+        {
+            if (lightMap == null)
+                return;
+
+            var lights = ColorUtils.FindShapes(lightMap);
+
+            foreach (var l in lights)
+            {
+                var pos = l[0];
+                var light = new GameObject("zone", typeof(Light2D)).GetComponent<Light2D>();
+                light.lightType = Light2D.LightType.Freeform;
+                SetShapePath(light, l.Select(x => new Vector3(x.x, x.y)).ToArray());
+
+                //light.transform.position = new Vector3(pos.x, pos.y);
+            }
+        }
+
+        void SetFieldValue<T>(object obj, string name, T val)
+        {
+            var field = obj.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            field?.SetValue(obj, val);
+        }
+
+        void SetShapePath(Light2D light, Vector3[] path)
+        {
+            SetFieldValue(light, "m_ShapePath", path);
         }
 
         private void GenerateAt(Vector3Int coords, Color color)
