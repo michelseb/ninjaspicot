@@ -7,7 +7,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Skills
     public abstract class SkillBase : Physic, ISkill
     {
         public override int Id => Owner.Id;
-        public override Transform Parent => Owner.Transform;
         public ISkilled Owner { get; protected set; }
         public bool Active { get; protected set; }
 
@@ -19,6 +18,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Skills
         public virtual void SetOwner(ISkilled owner)
         {
             Owner = owner;
+        }
+
+        public override Transform GetParent(Transform parentZone)
+        {
+            return Owner.Transform;
         }
     }
 }

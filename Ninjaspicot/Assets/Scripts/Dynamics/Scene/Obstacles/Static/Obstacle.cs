@@ -5,7 +5,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Obstacles
 {
-    public class Obstacle : Dynamic, IRaycastable//, IActivable
+    public class Obstacle : SceneryElement, IRaycastable//, IActivable
     {
         private Collider2D _collider;
         public Collider2D Collider => _collider;

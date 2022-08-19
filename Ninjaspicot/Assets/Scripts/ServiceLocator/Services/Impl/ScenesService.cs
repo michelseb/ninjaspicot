@@ -81,8 +81,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             CurrentScene = FindByName(sceneName);
             SwitchAudio(CurrentScene.Id);
 
-            _mapService.Generate(CurrentScene.Map);
-            _mapService.GenerateLights(CurrentScene.LightMap);
+            _mapService.Generate(CurrentScene.StructureMap);
+            _mapService.GenerateZones(CurrentScene.ZoneMap, CurrentScene.UtilitiesMap);
         }
 
         public void LoadById(int sceneId, bool unloadPrevious)

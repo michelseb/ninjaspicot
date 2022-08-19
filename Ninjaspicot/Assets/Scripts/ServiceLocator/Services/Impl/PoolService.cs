@@ -50,7 +50,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _models = models.ToDictionary(t => t.Id, t => t);
         }
 
-        public T Create(T model, Vector3 position, Quaternion rotation)
+        public T Create(T model, Vector3 position, Quaternion rotation, Transform zone = default)
         {
             if (model == null)
                 return default(T);
@@ -58,10 +58,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (EqualityComparer<T>.Default.Equals(model, default(T)) || model is not Dynamic dynamic)
                 return default(T);
 
-            var parent = model.Parent;
-            parent.SetParent(InstancesParent);
+            var parent = model.GetParent(zone);
+            parent.SetParent(zone ?? InstancesParent);
 
-            var instance = Object.Instantiate(dynamic, position, rotation, model.Parent);
+            var instance = Object.Instantiate(dynamic, position, rotation, parent);
 
             var component = instance.GetComponent<T>();
             Add(component);
@@ -69,14 +69,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return component;
         }
 
-        public T Create(T model, Vector3 position)
+        public T Create(T model, Vector3 position, Transform zone = default)
         {
-            return Create(model, position, Quaternion.identity);
+            return Create(model, position, Quaternion.identity, zone);
         }
 
-        public T Create(T model)
+        public T Create(T model, Transform zone = default)
         {
-            return Create(model, Vector3.zero);
+            return Create(model, Vector3.zero, zone);
         }
 
         public T GetModelByName(string name)
@@ -84,24 +84,24 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return _models.Values.FirstOrDefault(x => x.Name == name);
         }
 
-        public IPoolable Pool(Vector3 position, Quaternion rotation, float size, string modelName = default)
+        public IPoolable Pool(Vector3 position, Quaternion rotation, float size, string modelName = default, Transform zone = default)
         {
-            return PoolAt(position, rotation, size, modelName);
+            return PoolAt(position, rotation, size, modelName, zone);
         }
 
-        public IPoolable Pool(Vector3 position, Quaternion rotation, string modelName = default)
+        public IPoolable Pool(Vector3 position, Quaternion rotation, string modelName = default, Transform zone = default)
         {
-            return PoolAt(position, rotation, modelName);
+            return PoolAt(position, rotation, modelName, zone);
         }
 
-        public IPoolable Pool(Vector3 position, string modelName = default)
+        public IPoolable Pool(Vector3 position, string modelName = default, Transform zone = default)
         {
-            return PoolAt(position, modelName);
+            return PoolAt(position, modelName, zone);
         }
 
-        public virtual T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default)
+        public virtual T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default, Transform zone = default)
         {
-            var poolable = GetDefaultPoolable(modelName);
+            var poolable = GetDefaultPoolable(modelName, zone);
 
             if (poolable == null)
                 return default;
@@ -112,17 +112,17 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return poolable;
         }
 
-        public T PoolAt(Vector3 position, Quaternion rotation, string modelName = default)
+        public T PoolAt(Vector3 position, Quaternion rotation, string modelName = default, Transform zone = default)
         {
-            return PoolAt(position, rotation, 1, modelName);
+            return PoolAt(position, rotation, 1, modelName, zone);
         }
 
-        public T PoolAt(Vector3 position, string modelName = default)
+        public T PoolAt(Vector3 position, string modelName = default, Transform zone = default)
         {
-            return PoolAt(position, Quaternion.identity, 1, modelName);
+            return PoolAt(position, Quaternion.identity, 1, modelName, zone);
         }
 
-        protected T GetDefaultPoolable(string modelName)
+        protected T GetDefaultPoolable(string modelName, Transform zone = default)
         {
             var poolable = Collection
                 .Where(x => IsModelValid(x.Name, modelName))
@@ -137,7 +137,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (poolableModel == null)
                 return default;
 
-            return Create(poolableModel);
+            return Create(poolableModel, zone);
         }
 
         protected bool IsModelValid(string name, string modelName)

@@ -7,7 +7,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class Door : Dynamic, IActivable, IResettable
+    public class Door : SceneryElement, IActivable, IResettable
     {
         [SerializeField] private bool _startOpened;
 

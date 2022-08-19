@@ -26,6 +26,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             var zone = FindById(zoneId);
 
+            if (!zone.Initialized)
+            {
+                zone.Init();
+            }
+
             if (CurrentZone)
             {
                 CurrentZone.CloseForever();
@@ -34,15 +39,23 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             {
                 for (int i = 0; i < Collection.Count; i++)
                 {
-                    if (Collection[i] == zone)
+                    var z = Collection[i];
+                    
+                    if (z == zone)
                         continue;
 
-                    if (!Collection[i])
+                    if (!z)
                     {
                         Collection.RemoveAt(i);
                         continue;
                     }
-                    Collection[i].Close();
+
+                    if (!z.Initialized)
+                    {
+                        z.Init();
+                    }
+
+                    z.Close();
                 }
             }
 

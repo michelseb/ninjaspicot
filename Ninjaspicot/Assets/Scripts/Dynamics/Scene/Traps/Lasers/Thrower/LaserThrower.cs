@@ -19,7 +19,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Lasers
             if (!collision.CompareTag("hero"))
                 return;
 
-            PoolHelper.PoolAt<ThrownLaser>(Transform.position, Quaternion.identity);
+            PoolHelper.Pool<ThrownLaser>(Transform.position, Quaternion.identity);
         }
 
         public void Sleep()

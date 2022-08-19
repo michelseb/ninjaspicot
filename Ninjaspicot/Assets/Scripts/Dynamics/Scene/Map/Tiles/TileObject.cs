@@ -10,13 +10,16 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
     public class TileObject : ScriptableObject, IDynamic
     {
         [SerializeField] private TileBase _tileModel;
-        [SerializeField] private string _name;
 
         public int Id => GetInstanceID();
-        public string Name => _name;
+        public string Name => name;
         public ServiceFinder ServiceFinder => ServiceFinder.Instance;
-        public Transform Transform => throw new System.NotImplementedException();
-        public Transform Parent => ServiceFinder.Get<ITileService>().Tilemap.transform;
+        public Transform Transform => GetParent(null);
         public TileBase TileModel => _tileModel;
+
+        public Transform GetParent(Transform parentZone)
+        {
+            return ServiceFinder.Get<ITileService>().Tilemap.transform;
+        }
     }
 }

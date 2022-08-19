@@ -9,12 +9,11 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
     [CreateAssetMenu(fileName = "Tile Brush", menuName = "Zeplink/Brush")]
     public class Brush : ScriptableObject, IManageable<Color>
     {
-        [SerializeField] private string _name = "Brush";
         [SerializeField] private Object _instanciableObject;
         [SerializeField] private Color _color;
 
         public Color Id => _color;
-        public string Name => _name;
+        public string Name => name;
         public Color Color => _color;
 
         private IDynamic _instanciable;

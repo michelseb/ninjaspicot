@@ -22,24 +22,26 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// <param name="model"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T Create(T model, Vector3 position, Quaternion rotation);
+        T Create(T model, Vector3 position, Quaternion rotation, Transform zone = default);
 
         /// <summary>
         /// Create instance of model at given position
         /// </summary>
         /// <param name="model"></param>
         /// <param name="position"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T Create(T model, Vector3 position);
+        T Create(T model, Vector3 position, Transform zone = default);
 
         /// <summary>
         /// Create instance of model
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="position"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T Create(T model);
+        T Create(T model, Transform zone = default);
 
         /// <summary>
         /// Pool poolable at position with rotation and size
@@ -47,23 +49,29 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="size"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default);
+        T PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = default, Transform zone = default);
 
         /// <summary>
         /// Pool poolable at position and rotation
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T PoolAt(Vector3 position, Quaternion rotation, string modelName = default);
+        T PoolAt(Vector3 position, Quaternion rotation, string modelName = default, Transform zone = default);
 
         /// <summary>
         /// Pool poolable at position
         /// </summary>
         /// <param name="position"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        T PoolAt(Vector3 position, string modelName = default);
+        T PoolAt(Vector3 position, string modelName = default, Transform zone = default);
     }
 
     public interface IPoolService : IGameService
@@ -74,22 +82,28 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="size"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        IPoolable Pool(Vector3 position, Quaternion rotation, float size, string modelName = default);
+        IPoolable Pool(Vector3 position, Quaternion rotation, float size, string modelName = default, Transform zone = default);
 
         /// <summary>
         /// Pool poolable at position and rotation
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        IPoolable Pool(Vector3 position, Quaternion rotation, string modelName = default);
+        IPoolable Pool(Vector3 position, Quaternion rotation, string modelName = default, Transform zone = default);
 
         /// <summary>
         /// Pool poolable at position
         /// </summary>
         /// <param name="position"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        IPoolable Pool(Vector3 position, string modelName = default);
+        IPoolable Pool(Vector3 position, string modelName = default, Transform zone = default);
     }
 }

@@ -30,7 +30,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public Vector3 AimTarget { get; set; }
         public virtual bool Ready => CanJump() && TrajectoryInUse;
         public virtual bool TrajectoryInUse => Trajectory != null && Trajectory.Used;
-        public override Transform Parent => Owner.Transform;
 
         protected abstract string _soundName { get; }
         protected abstract float _soundIntensity { get; }
@@ -114,7 +113,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             LoseJump();
 
-            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
+            PoolHelper.Pool<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, velocity));
 
             if (TrajectoryInUse)
             {
@@ -141,7 +140,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.velocity = Vector2.zero;
             Rigidbody.AddForce(-direction * _jumpStrength, ForceMode2D.Impulse);
 
-            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
+            PoolHelper.Pool<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
             if (TrajectoryInUse)
             {
@@ -232,7 +231,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.AddForce(direction * _jumpStrength * 3, ForceMode2D.Impulse);
             Rigidbody.gravityScale = 0;
 
-            PoolHelper.PoolAt<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
+            PoolHelper.Pool<Dash>(Transform.position, Quaternion.LookRotation(Vector3.forward, direction));
 
             if (TrajectoryInUse)
             {
@@ -296,7 +295,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             }
 
             if (Trajectory == null || !Trajectory.Active || !(Trajectory is T))
-                return PoolHelper.PoolAt<T>(transform.position, Quaternion.identity);
+                return PoolHelper.Pool<T>(transform.position, Quaternion.identity);
 
             Trajectory.ReUse(Transform.position);
             return Trajectory;

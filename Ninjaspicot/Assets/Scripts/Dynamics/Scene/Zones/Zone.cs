@@ -15,16 +15,20 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
 {
     public class Zone : Dynamic, IWakeable
     {
-        [SerializeField] protected GameObject _centerObject;
+        protected ZoneCenter _zoneCenter;
         private Vector3? _center;
         public Vector3? Center
         {
             get
             {
-                if (_centerObject == null || !_centerObject.activeInHierarchy)
+                if (_zoneCenter == null || !_zoneCenter.gameObject.activeInHierarchy)
                     return null;
 
-                if (_center == null) _center = _centerObject.transform.position;
+                if (_center == null)
+                {
+                    _center = _zoneCenter.transform.position;
+                }
+                
                 return _center;
             }
         }
@@ -36,25 +40,35 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         protected List<Enemy> _enemies;
         protected Animator _animator;
         protected CheckPoint _checkpoint;
-        protected ISpawnService _spawnService;
-        protected IZoneService _zoneService;
         protected AmbiantLight _ambiant;
 
+        protected ISpawnService _spawnService;
+        protected IZoneService _zoneService;
+        protected IAnimationService _animationService;
+
+        public bool Initialized { get; protected set; }
         public bool DeathOccured => _enemies?.Any(e => e.Dead) ?? false;
 
         protected virtual void Awake()
         {
-            _animator = GetComponent<Animator>();
             _spawnService = ServiceFinder.Get<ISpawnService>();
+            _zoneService = ServiceFinder.Get<IZoneService>();
+            _animationService = ServiceFinder.Get<IAnimationService>();
+
+            _animator = GetComponent<Animator>();
+            _animator.runtimeAnimatorController = _animationService.FindByName("Zone").AnimatorController;
             _ambiant = GetComponentInChildren<AmbiantLight>();
         }
 
-        protected virtual void Start()
+        public virtual void Init()
         {
+            _zoneCenter = GetComponentInChildren<ZoneCenter>();
             _wakeables = GetComponentsInChildren<ISceneryWakeable>().ToList();
             _resettables = GetComponentsInChildren<IResettable>().ToList();
             _enemies = GetComponentsInChildren<Enemy>().ToList();
             _checkpoint = GetComponentInChildren<CheckPoint>();
+
+            Initialized = true;
         }
 
         public virtual void Open()

@@ -18,7 +18,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <param name="size"></param>
+        /// <param name="modelName"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, Type poolableType, string modelName = default);
+        IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, Type poolableType, string modelName = default, Transform zone = default);
     }
 }

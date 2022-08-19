@@ -38,7 +38,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Traps.Mines
             if (!collider.CompareTag("hero") || !collider.TryGetComponent(out Hero hero) || hero.Dead)
                 return;
 
-            PoolHelper.PoolAt<Explosion>(transform.position, transform.rotation);
+            PoolHelper.Pool<Explosion>(transform.position, transform.rotation);
             _audioService.PlaySound(_audioSource, "Explode");
             hero.Die(transform);
         }

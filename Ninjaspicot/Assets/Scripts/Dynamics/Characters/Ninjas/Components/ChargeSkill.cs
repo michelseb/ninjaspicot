@@ -26,7 +26,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (Trajectory.Collides && (Trajectory.Focusable == null || !Trajectory.Focusable.IsSilent))
             {
                 _audioService.PlaySound(AudioSource, _impactSound);
-                PoolHelper.PoolAt<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
+                PoolHelper.Pool<SoundEffect>(ChargeDestination, Quaternion.identity, 5);
             }
 
             if (Owner is IPicker picker)
@@ -70,7 +70,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             while (Vector3.Dot(pos - initialPos, ChargeDestination - pos) > 0)
             {
                 var ghostSize = Mathf.Max((ChargeDestination - pos).magnitude, 1);
-                PoolHelper.PoolAt<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), ghostSize);
+                PoolHelper.Pool<Ghost>(pos, Quaternion.AngleAxis(BaseUtils.GetAngleFromVector(dir) - 90, transform.forward), ghostSize);
                 pos += dir / 2;
             }
 

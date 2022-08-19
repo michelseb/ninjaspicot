@@ -20,9 +20,9 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
             _audioService = ServiceFinder.Get<IAudioService>();
         }
 
-        protected override void Start()
+        public override void Init()
         {
-            base.Start();
+            base.Init();
 
             _discoverSound = _audioService.FindByName("Discover");
         }

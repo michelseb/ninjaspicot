@@ -39,9 +39,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         public bool Attacking { get; protected set; }
         public bool Active { get; protected set; }
 
-        private Zone _zone;
-        public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
         #region IFocusable
         public bool IsSilent => true;
         public bool Taken => false;
@@ -157,7 +154,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         {
             if (BaseUtils.IsNull(_state))
             {
-                _state = PoolHelper.PoolAt<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude);
+                _state = PoolHelper.Pool<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude);
             }
             else if (_state.StateType == stateType)
             {

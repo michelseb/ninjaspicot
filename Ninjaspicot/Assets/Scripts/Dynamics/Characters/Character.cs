@@ -10,7 +10,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters
 {
-    public abstract class Character : Dynamic, IRaycastable, IKillable
+    public abstract class Character : SceneryElement, IRaycastable, IKillable
     {
         [SerializeField] protected CustomColor _lightColor;
         [SerializeField] protected bool _startAwake;

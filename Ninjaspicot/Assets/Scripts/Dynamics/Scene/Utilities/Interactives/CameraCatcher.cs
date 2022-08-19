@@ -7,7 +7,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class CameraCatcher : Dynamic, IActivable
+    public class CameraCatcher : SceneryElement, IActivable
     {
         [SerializeField] protected int _zoomAmount;
 

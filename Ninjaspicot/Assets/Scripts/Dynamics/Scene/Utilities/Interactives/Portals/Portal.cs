@@ -11,7 +11,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class Portal : Dynamic, IFocusable, IAudio
+    public class Portal : SceneryElement, IFocusable, IAudio
     {
         [SerializeField] private SpriteRenderer _imgInside;
         [SerializeField] private int _index;
@@ -23,9 +23,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
         public bool IsSilent => true;
         public bool Taken { get; set; }
         public Portal Other { get; private set; }
-
-        private Zone _zone;
-        public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
         private AudioSource _audioSource;
         public AudioSource AudioSource { get { if (_audioSource == null) _audioSource = GetComponent<AudioSource>(); return _audioSource; } }

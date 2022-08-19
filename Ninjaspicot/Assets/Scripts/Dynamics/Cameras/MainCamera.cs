@@ -149,9 +149,9 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         private void Center(ITracker tracker, Vector3 middle)
         {
             var trackerPosition = tracker?.Transform.position ?? Vector2.zero;
-            var center = (trackerPosition + middle) / 2;
+            var center = (trackerPosition + middle * 2) / 3;
 
-            Center(center);
+            Center(new Vector3(center.x, center.y, Transform.position.z));
         }
 
         private void CenterImmediate(ITracker target)
@@ -212,7 +212,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                 Size -= speed;
                 yield return null;
             }
-            SetFollowMode();
+            //SetFollowMode();
             //_hero.Jumper.Active = true;
         }
 
@@ -273,11 +273,6 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         public void SetTracker(ITracker tracker)
         {
             CurrentTracker = tracker;
-        }
-
-        public void SetMode(CameraMode cameraMode)
-        {
-            CurrentMode = cameraMode;
         }
 
         public void Activate(IActivator activator = null)

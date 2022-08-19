@@ -565,8 +565,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -0.0059757233, y: -0.0029572845, z: -0.024573803}
-    m_Extent: {x: 5.000079, y: 0.5014612, z: 5.0003276}
+    m_Center: {x: -0.059998035, y: -0.022337679, z: -0.12422657}
+    m_Extent: {x: 4.999699, y: 0.13574164, z: 4.999666}
   m_DirtyAABB: 0
 --- !u!183 &183676759694283910
 Cloth:
@@ -877,7 +877,7 @@ PrefabInstance:
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
       propertyPath: m_Intensity
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
@@ -892,12 +892,12 @@ PrefabInstance:
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
       propertyPath: m_PointLightInnerRadius
-      value: 0.2
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
       propertyPath: m_PointLightOuterRadius
-      value: 0.2
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}

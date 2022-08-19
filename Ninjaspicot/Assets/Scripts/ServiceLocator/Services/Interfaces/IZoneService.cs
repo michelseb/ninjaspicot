@@ -2,7 +2,7 @@
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
-    public interface IZoneService : IGameService
+    public interface IZoneService : ICollectionService<int, Zone>
     {
         /// <summary>
         /// Current zone

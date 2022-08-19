@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using ZepLink.RiceNinja.ServiceLocator.Services;
 
 namespace ZepLink.RiceNinja.Extensions
 {
@@ -73,7 +74,7 @@ namespace ZepLink.RiceNinja.Extensions
                 if (type.IsGenericType)
                     return type.GetGenericArguments().Last();
 
-                type = type.GetInterfaces().First();
+                type = type.GetInterfaces().FirstOrDefault(x => x.IsInstanceOfGenericType(typeof(IPoolService<>)) || x.IsInstanceOfGenericType(typeof(ICollectionService<,>)));
             }
 
             return null;

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator;
-using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Abstract
@@ -18,21 +17,19 @@ namespace ZepLink.RiceNinja.Dynamics.Abstract
         private Transform _transform;
         public virtual Transform Transform { get { if (BaseUtils.IsNull(_transform)) _transform = transform; return _transform; } }
 
-        private Transform _parent;
-        public virtual Transform Parent
-        {
-            get
-            {
-                if (BaseUtils.IsNull(_parent))
-                {
-                    _parent = GameObject.Find(ParentName)?.transform ?? new GameObject(ParentName).transform;
-                }
+        public ServiceFinder ServiceFinder => ServiceFinder.Instance;
 
-                return _parent;
+        public virtual Transform GetParent(Transform parentZone)
+        {
+
+            if (BaseUtils.IsNull(parentZone))
+            {
+                return GameObject.Find(ParentName)?.transform ?? new GameObject(ParentName).transform;
+            }
+            else
+            {
+                return parentZone.Find(ParentName)?.transform ?? new GameObject(ParentName).transform;
             }
         }
-
-
-        public ServiceFinder ServiceFinder => ServiceFinder.Instance;
     }
 }

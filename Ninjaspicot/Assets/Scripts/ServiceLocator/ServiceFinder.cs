@@ -38,19 +38,19 @@ namespace ZepLink.RiceNinja.ServiceLocator
             return (T)_services[key];
         }
 
-        public T PoolFor<T>(Vector3 position, Quaternion rotation, float size, string modelName = default) where T : IPoolable
+        public T PoolFor<T>(Vector3 position, Quaternion rotation, float size, string modelName = default, Transform zone = default) where T : IPoolable
         {
             var key = typeof(T);
 
             if (_poolServices.ContainsKey(key))
-                return (T)_poolServices[key].Pool(position, rotation, size, modelName);
+                return (T)_poolServices[key].Pool(position, rotation, size, modelName, zone);
 
             var service = _poolServices.FirstOrDefault(x => x.Key.IsAssignableFrom(typeof(T))).Value ?? Get<IDefaultPoolService>();
 
             if (service is IDefaultPoolService defaultPoolService)
-                return (T)defaultPoolService.PoolAt(position, rotation, size, typeof(T), modelName);
+                return (T)defaultPoolService.PoolAt(position, rotation, size, typeof(T), modelName, zone);
 
-            return (T)service.Pool(position, rotation, size, modelName);
+            return (T)service.Pool(position, rotation, size, modelName, zone);
         }
 
         public bool IsRegistered<T>()

@@ -38,21 +38,21 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _upToDate = false;
         }
 
-        public override IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = null)
+        public override IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, string modelName = null, Transform zone = default)
         {
-            return base.PoolAt(position, rotation, size, modelName);
+            return base.PoolAt(position, rotation, size, modelName, zone);
         }
 
-        public IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, Type poolableType, string modelName = null)
+        public IPoolable PoolAt(Vector3 position, Quaternion rotation, float size, Type poolableType, string modelName = null, Transform zone = default)
         {
             if (!Poolables.ContainsKey(poolableType) || !Poolables[poolableType].Any())
-                return Create(_models.Values.FirstOrDefault(x => IsModelValid(x.Name, modelName, x.GetType(), poolableType)), position, rotation);
+                return Create(_models.Values.FirstOrDefault(x => IsModelValid(x.Name, modelName, x.GetType(), poolableType)), position, rotation, zone);
 
             var poolList = Poolables[poolableType];
             var poolable = poolList.FirstOrDefault(x => !x.Transform.gameObject.activeSelf);
 
             if (poolable == null)
-                return Create(poolList.FirstOrDefault(x => IsModelValid(x.Name, modelName, x.GetType(), poolableType)), position, rotation);
+                return Create(poolList.FirstOrDefault(x => IsModelValid(x.Name, modelName, x.GetType(), poolableType)), position, rotation, zone);
 
             poolable.Wake();
             poolable.Pool(position, rotation, size);

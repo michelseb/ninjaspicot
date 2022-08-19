@@ -4,7 +4,7 @@ using ZepLink.RiceNinja.Dynamics.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class CheckPoint : Dynamic, IPoolable
+    public class CheckPoint : SceneryElement, IPoolable
     {
         public bool Attained { get; private set; }
 

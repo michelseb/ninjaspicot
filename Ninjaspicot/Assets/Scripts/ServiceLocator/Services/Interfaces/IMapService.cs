@@ -11,9 +11,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         void Generate(Texture2D map);
 
         /// <summary>
-        /// Scan texture2D and converts into freeform lights
+        /// Scan texture2D and converts into zones with freeform lights - and adds utilities as children of zones
         /// </summary>
-        /// <param name="lightMap"></param>
-        void GenerateLights(Texture2D lightMap);
+        /// <param name="zoneMap"></param>
+        /// <param name="utilitiesMap"></param>
+        void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap);
     }
 }

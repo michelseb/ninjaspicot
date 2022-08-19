@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
-using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Interfaces;
@@ -11,7 +10,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Bonuses
 {
-    public abstract class Bonus : Dynamic, IActivable, ISceneryWakeable, IRaycastable, IAudio
+    public abstract class Bonus : SceneryElement, IActivable, ISceneryWakeable, IRaycastable, IAudio
     {
         [SerializeField] protected bool _respawn;
         [SerializeField] protected float _respawnTime;

@@ -8,7 +8,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class Lamp : Dynamic, ISceneryWakeable, IFocusable, IActivable, IResettable
+    public class Lamp : SceneryElement, ISceneryWakeable, IFocusable, IActivable, IResettable
     {
         public Animator Animator { get; private set; }
 

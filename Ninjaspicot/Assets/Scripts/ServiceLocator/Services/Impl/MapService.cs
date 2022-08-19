@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Dynamics.Scenery.Map;
+using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.Utils;
@@ -15,11 +16,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     {
         private readonly IBrushService _brushService;
         private readonly ITileService _tileService;
+        private readonly IZoneService _zoneService;
 
-        public MapService(IBrushService brushService, ITileService tileService)
+        public MapService(IBrushService brushService, ITileService tileService, IZoneService zoneService)
         {
             _brushService = brushService;
             _tileService = tileService;
+            _zoneService = zoneService;
         }
 
         public void Generate(Texture2D map)
@@ -27,10 +30,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (map == null)
                 return;
 
-            var localizedColors = map
-                .GetPixels32()
-                .Select((c, i) => (color: c, index: i))
-                .ToDictionary(x => PixelToCoord(x.index, map.width), x => x.color);
+            var localizedColors = GetLocalizedColors(map);
 
             foreach (var localizedColor in localizedColors)
             {
@@ -38,21 +38,63 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
         }
 
-        public void GenerateLights(Texture2D lightMap)
+        private Dictionary<Vector3Int, Color32> GetLocalizedColors(Texture2D map)
         {
-            if (lightMap == null)
+            return map
+                .GetPixels32()
+                .Select((c, i) => (color: c, index: i))
+                .Where(x => x.color.a > 0)
+                .ToDictionary(x => PixelToCoord(x.index, map.width), x => x.color);
+        }
+
+        private Dictionary<Vector3Int, Color> GetLocalizedColors(Texture2D map, int startX, int startY, int width, int height)
+        {
+
+            var offsetIndex = startX + startY * map.width;
+            var offset = PixelToCoord(offsetIndex, map.width);
+
+            return map
+                .GetPixels(startX, startY, width, height)
+                .Select((c, i) => (color: c, index: i))
+                .Where(x => x.color.a > 0)
+                .ToDictionary(x => PixelToCoord(x.index, width) + offset, x => x.color);
+        }
+
+        public void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap)
+        {
+            if (zoneMap == null)
                 return;
 
-            var lights = ColorUtils.FindShapes(lightMap);
+            var zones = ColorUtils.FindShapes(zoneMap);
 
-            foreach (var l in lights)
+            foreach (var z in zones)
             {
-                var pos = l[0];
-                var light = new GameObject("zone", typeof(Light2D)).GetComponent<Light2D>();
-                light.lightType = Light2D.LightType.Freeform;
-                SetShapePath(light, l.Select(x => new Vector3(x.x, x.y)).ToArray());
+                var zoneObject = new GameObject("zone", typeof(Animator), typeof(Light2D), typeof(Zone));
+                var zone = zoneObject.GetComponent<Zone>();
+                _zoneService.Add(zone);
 
-                //light.transform.position = new Vector3(pos.x, pos.y);
+                var startX = z.Min(x => x.x);
+                var startY = z.Min(x => x.y);
+
+                var width = z.Max(x => x.x) - startX;
+                var height = z.Max(x => x.y) - startY;
+
+                var utilities = GetLocalizedColors(utilitiesMap, startX, startY, width, height);
+
+                foreach (var utility in utilities)
+                {
+                    GenerateAt(utility.Key, utility.Value, zone.Transform);
+                }
+
+                var light = zoneObject.GetComponent<Light2D>();
+                light.lightType = Light2D.LightType.Freeform;
+                light.intensity = 2f;
+                light.color = ColorUtils.NightBlue;
+
+                SetFieldValue(light, "m_ShapePath", z.Select(x => new Vector3(x.x, x.y)).ToArray());
+                SetFieldValue(light, "m_ShapeLightFalloffSize", 2f);
+
+                light.transform.position = Vector3.one * .5f;
             }
         }
 
@@ -62,12 +104,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             field?.SetValue(obj, val);
         }
 
-        void SetShapePath(Light2D light, Vector3[] path)
-        {
-            SetFieldValue(light, "m_ShapePath", path);
-        }
-
-        private void GenerateAt(Vector3Int coords, Color color)
+        private void GenerateAt(Vector3Int coords, Color color, Transform zone = default)
         {
             var brush = _brushService.FindById(color);
 
@@ -76,13 +113,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             if (brush.Instanciable.GetType().IsSubclassOf(typeof(MonoBehaviour)))
             {
-                //typeof(PoolService).GetMethod(nameof(PoolService.PoolAt), new Type[] { typeof(Vector3) })
-                //    .MakeGenericMethod(brush.Instanciable.GetType())
-                //    .Invoke(_poolService, new object[] { (Vector3)coords });
                 var type = brush.Instanciable.GetType().FullName;
-                typeof(PoolHelper).GetMethod(nameof(PoolHelper.PoolAt), new Type[] { typeof(Vector3), typeof(string) })
+
+                typeof(PoolHelper).GetMethod(nameof(PoolHelper.Pool), new Type[] { typeof(Vector3), typeof(string), typeof(Transform) })
                     .MakeGenericMethod(brush.Instanciable.GetType())
-                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable.Name });
+                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable.Name, zone });
             }
             else if (brush.Instanciable is TileObject tileObject)
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ZepLink.RiceNinja.Utils
@@ -59,13 +60,11 @@ namespace ZepLink.RiceNinja.Utils
             var width = texture.width;
             var data = CreateBWData(texture, 0.5f);
             var res = new List<List<Vector2i>>();
-            var maxCount = 20000; // safety switch
 
-            for (int start = FindShapeStart(data, 0); start != -1 && maxCount > 0; start = FindShapeStart(data, start + 1), --maxCount)
+            for (int start = FindShapeStart(data, 0); start != -1; start = FindShapeStart(data, start + 1))
             {
                 var shape = GetShapePoints(data, start, width);
                 res.Add(shape);
-                RemoveShape(data, width, shape);
             }
 
             return res;
@@ -112,23 +111,26 @@ namespace ZepLink.RiceNinja.Utils
         static List<Vector2i> GetShapePoints(byte[] aData, int aIndex, int aWidth)
         {
             var res = new List<Vector2i>();
+            var allPoints = new List<Vector2i>();
             var pointCache = new HashSet<int>();
             var dir = new Vector2i(1, 0);
             var start = new Vector2i(aIndex % aWidth, aIndex / aWidth);
             var point = start;
+            var deltaDir = new Vector2i();
 
             res.Add(point);
+            allPoints.Add(point);
 
             var done = false;
             var maxPoints = 40000;
 
             while (!done && --maxPoints > 0)
             {
-                var direction = dir.right;
+                var d = dir.right;
 
                 for (int i = 0; i < 7; i++)
                 {
-                    var current = point + direction;
+                    var current = point + d;
                     int index = current.x + current.y * aWidth;
                     // If we are back to the start or if we reached a point we already included
                     if (current == start || pointCache.Contains(index))
@@ -141,15 +143,30 @@ namespace ZepLink.RiceNinja.Utils
                         // valid point, so move on to that point and update dir
                         // so we know where we were coming from
                         point = current;
-                        dir = direction;
+                        dir = d;
+                        var newDelta = current - res.Last();
+                        if (deltaDir == newDelta)
+                        {
+                            res.RemoveAt(res.Count - 1);
+                        }
                         res.Add(current);
+                        allPoints.Add(current);
+                        deltaDir = newDelta;
                         pointCache.Add(index);
                         break;
                     }
                     // rotate 45° each iteration
-                    direction = direction.left45;
+                    d = d.left45;
                 }
             }
+
+            if (deltaDir.normalized == (res.First() - res.Last()).normalized)
+            {
+                res.RemoveAt(res.Count - 1);
+            }
+
+            RemoveShape(aData, aWidth, allPoints);
+
             return res;
         }
         // removes the pixels of a shape from the data array

@@ -176,11 +176,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             int iteration = 0;
             while (true)
             {
-                PoolHelper.PoolAt<Ghost>(Transform.position, Transform.rotation, 1f);
+                PoolHelper.Pool<Ghost>(Transform.position, Transform.rotation, 1f);
 
                 if (iteration % GHOST_SOUND_FREQUENCY == 0)
                 {
-                    PoolHelper.PoolAt<SoundEffect>(Transform.position, Quaternion.identity, 2);
+                    PoolHelper.Pool<SoundEffect>(Transform.position, Quaternion.identity, 2);
                 }
 
                 iteration++;

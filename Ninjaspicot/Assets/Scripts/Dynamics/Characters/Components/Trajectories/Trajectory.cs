@@ -130,7 +130,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         {
             if (BaseUtils.IsNull(_audioSimulator))
             {
-                _audioSimulator = PoolHelper.PoolAt<SimulatedSoundEffect>(position, Quaternion.identity, size);
+                _audioSimulator = PoolHelper.Pool<SimulatedSoundEffect>(position, Quaternion.identity, size);
             }
 
             _audioSimulator.Transform.position = position;
@@ -143,7 +143,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
                 return;
 
             Focusable = focusable;
-            _aimIndicator = PoolHelper.PoolAt<AimIndicator>(position, Quaternion.identity);
+            _aimIndicator = PoolHelper.Pool<AimIndicator>(position, Quaternion.identity);
         }
 
         protected virtual void DeactivateAim()

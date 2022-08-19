@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Interfaces
@@ -16,8 +17,8 @@ namespace ZepLink.RiceNinja.Dynamics.Interfaces
         string ParentName => string.Empty;
 
         /// <summary>
-        /// Instantiate as a child of this transform
+        /// Gets parent gameobject for this instance
         /// </summary>
-        Transform Parent { get; }
+        Transform GetParent(Transform parentZone);
     }
 }
