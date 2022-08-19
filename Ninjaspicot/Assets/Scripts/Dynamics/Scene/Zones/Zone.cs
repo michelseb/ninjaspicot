@@ -71,6 +71,14 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
             Initialized = true;
         }
 
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (!collision.CompareTag("hero"))
+                return;
+
+            _zoneService.SetZone(Id);
+        }
+
         public virtual void Open()
         {
             _animator.SetTrigger("Open");

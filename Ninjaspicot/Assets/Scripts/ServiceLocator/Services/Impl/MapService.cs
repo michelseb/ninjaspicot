@@ -69,12 +69,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             foreach (var z in zones)
             {
-                var zoneObject = new GameObject("zone", typeof(Animator), typeof(Light2D), typeof(Zone));
+                var zoneObject = new GameObject("zone", typeof(Animator), typeof(Light2D), typeof(PolygonCollider2D), typeof(Zone));
                 var zone = zoneObject.GetComponent<Zone>();
                 _zoneService.Add(zone);
 
                 var startX = z.Min(x => x.x);
                 var startY = z.Min(x => x.y);
+
+                var middle = new Vector2(z.Average(x => (float)x.x), z.Average(x => (float)x.y));
 
                 var width = z.Max(x => x.x) - startX;
                 var height = z.Max(x => x.y) - startY;
@@ -85,6 +87,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 {
                     GenerateAt(utility.Key, utility.Value, zone.Transform);
                 }
+
+                var collider = zoneObject.GetComponent<PolygonCollider2D>();
+                collider.isTrigger = true;
+                collider.points = z.Select(x => new Vector2(x.x, x.y) + new Vector2(1.5f * Mathf.Sign(x.x - middle.x), 1.5f * Mathf.Sign(x.y - middle.y))/*(new Vector2(x.x, x.y) - middle).normalized * 3*/).ToArray();
 
                 var light = zoneObject.GetComponent<Light2D>();
                 light.lightType = Light2D.LightType.Freeform;

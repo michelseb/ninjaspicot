@@ -33,7 +33,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             if (CurrentZone)
             {
-                CurrentZone.CloseForever();
+                CurrentZone.Close();
+                //CurrentZone.CloseForever();
             }
             else
             {
