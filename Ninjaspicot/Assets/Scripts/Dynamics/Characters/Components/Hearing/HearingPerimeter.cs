@@ -8,7 +8,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Hearing
 {
-    public abstract class HearingPerimeter : Dynamic, IActivable
+    public class HearingPerimeter : Dynamic, IActivable
     {
         public virtual float Size => _listener?.Range ?? 1f;
         public SoundMark SoundMark { get; private set; }

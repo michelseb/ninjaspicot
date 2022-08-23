@@ -16,16 +16,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         [SerializeField] protected float _hearingRange;
         [SerializeField] protected float _checkWonderTime;
         [SerializeField] protected float _returnWonderTime;
-        [SerializeField] protected float _timeBetweenCommunications;
-        [SerializeField] protected float _communicationTime;
 
         protected HearingPerimeter _hearingPerimeter;
         protected Rigidbody2D _rigidbody;
         protected ITimeService _timeService;
         protected AudioFile _reactionSound;
         protected Quaternion _initRotation;
-        protected float _remainingTimeBeforeCommunication;
-        protected float _remainingCommunicationTime;
         protected float _wonderTime;
         protected float _wonderElapsedTime;
 
@@ -55,7 +51,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             _reactionSound = _audioService.FindByName("RobotReact");
             _initRotation = _head.rotation;
 
-            Laser.Deactivate(null);
+            Laser?.Deactivate(null);
         }
 
         protected virtual void Update()
@@ -67,23 +63,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             Renderer.flipY = rot > 90 && rot < 270;
 
             HandleState(State.StateType);
-            HandleCommunications();
         }
 
         #region Handlers
-        protected virtual void HandleCommunications()
-        {
-            if (!IsState(StateType.Patrol) && !IsState(StateType.Guard))
-                return;
-
-            _remainingTimeBeforeCommunication -= Time.deltaTime;
-
-            if (_remainingTimeBeforeCommunication <= 0)
-            {
-                SetState(StateType.Communicate, State.StateType);
-            }
-        }
-
         protected virtual void HandleState(StateType stateType)
         {
             switch (stateType)
@@ -114,18 +96,14 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
                 case StateType.LookFor:
                     LookFor();
                     break;
-
-                case StateType.Communicate:
-                    Communicate();
-                    break;
             }
         }
         #endregion
 
         protected virtual void StartSleeping()
         {
-            Laser.Deactivate(null);
-            FieldOfView.Deactivate(null);
+            Laser?.Deactivate(null);
+            FieldOfView?.Deactivate(null);
         }
 
         protected virtual void StartWondering(StateType nextState)
@@ -135,7 +113,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
                 _audioService.PlaySound(_audioSource, _reactionSound, .4f);
             }
 
-            FieldOfView.Activate();
+            FieldOfView?.Activate();
             SetNextState(nextState);
             _wonderTime = GetReactionFactor(_initState);
             Renderer.color = ColorUtils.Red;
@@ -152,7 +130,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             SetNextState(StateType.Return);
             Renderer.color = ColorUtils.Red;
-            FieldOfView.Activate();
+            FieldOfView?.Activate();
         }
 
         protected virtual void StartChasing(ISeeable target)
@@ -167,44 +145,36 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             CurrentTarget = target;
             Renderer.color = ColorUtils.Red;
-            Laser.SetActive(true);
-            FieldOfView.Activate();
+            Laser?.SetActive(true);
+            FieldOfView?.Activate();
         }
 
         protected virtual void StartLookFor()
         {
             Renderer.color = ColorUtils.Yellow;
-            FieldOfView.Activate();
+            FieldOfView?.Activate();
         }
 
         protected virtual void StartReturning()
         {
             CurrentTarget = default;
             Renderer.color = ColorUtils.White;
-            Laser.SetActive(false);
-            FieldOfView.Activate();
-        }
-
-        protected virtual void StartCommunicate(StateType nextState)
-        {
-            FieldOfView.Deactivate();
-            _remainingTimeBeforeCommunication = _timeBetweenCommunications;
-            _remainingCommunicationTime = _communicationTime;
-            SetNextState(nextState);
+            Laser?.SetActive(false);
+            FieldOfView?.Activate();
         }
 
         protected virtual void StartGuarding()
         {
             Renderer.color = ColorUtils.White;
-            Laser.SetActive(false);
-            FieldOfView.Activate();
+            Laser?.SetActive(false);
+            FieldOfView?.Activate();
         }
 
         protected virtual void StartPatrolling()
         {
             Renderer.color = ColorUtils.White;
-            Laser.SetActive(false);
-            FieldOfView.Activate();
+            Laser?.SetActive(false);
+            FieldOfView?.Activate();
         }
 
 
@@ -224,17 +194,16 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         protected abstract void Chase(Vector3 targetPosition);
         protected abstract void Return();
         protected abstract void LookFor();
-        protected abstract void Communicate();
 
         public override void Sleep()
         {
             base.Sleep();
 
-            FieldOfView.Deactivate();
+            FieldOfView?.Deactivate();
             Laser?.Deactivate();
             _castArea.enabled = false;
-            _hearingPerimeter.EraseSoundMark();
-            _hearingPerimeter.Deactivate();
+            _hearingPerimeter?.EraseSoundMark();
+            _hearingPerimeter?.Deactivate();
         }
 
         public override void Wake()
@@ -242,11 +211,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             base.Wake();
 
             _castArea.enabled = true;
-            _hearingPerimeter.Activate();
+            _hearingPerimeter?.Activate();
 
             if (_initState != StateType.Sleep)
             {
-                FieldOfView.Activate();
+                FieldOfView?.Activate();
             }
         }
 
@@ -257,7 +226,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             if (killer != null)
             {
-                _rigidbody.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
+                _rigidbody?.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
             }
 
             base.Die(killer, sound, volume);
@@ -268,7 +237,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             StopAllCoroutines();
             _rigidbody.velocity = Vector2.zero;
             _rigidbody.angularVelocity = 0;
-            Laser.SetActive(false);
+            Laser?.SetActive(false);
             base.DoReset();
         }
 
@@ -315,9 +284,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
                 case StateType.Patrol:
                     return StartGuarding;
 
-                case StateType.Communicate:
-                    return () => StartCommunicate(nextState.Value);
-
                 default:
                     return null;
             }
@@ -331,7 +297,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             if (IsState(StateType.Chase) || (IsState(StateType.Wonder) && IsNextState(StateType.Check)))
                 return;
 
-            FieldOfView.Activate();
+            FieldOfView?.Activate();
             if (!IsState(StateType.Check) && !IsState(StateType.Chase))
             {
                 SetState(StateType.Wonder, StateType.Check);

@@ -75,9 +75,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         {
             // TODO : make this configurable
             _maxJumps = 2;
-            _jumpStrength = 30;
+            _jumpStrength = 26;
             _jumpHeight = .5f;
-            _jumpMaxHeight = 2;
+            _jumpMaxHeight = 2.5f;
             _dashStrength = 30;
 
             _jumps = _maxJumps;
@@ -263,7 +263,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
             while (t < 1 && originalVelocity.y > 0)
             {
-                var factor = Mathf.Lerp(1, .5f, t * 5);//-Mathf.Abs(1 - t) + 1);
+                var factor = Mathf.Lerp(1, .5f, t * 8);//-Mathf.Abs(1 - t) + 1);
                 Rigidbody.gravityScale = factor;
                 Rigidbody.velocity = originalVelocity * factor;/*new Vector2(Rigidbody.velocity.x, originalVelocity.y * factor);*/
                 originalVelocity += Physics2D.gravity * Time.fixedDeltaTime;
@@ -414,7 +414,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
                 return false;
 
             return !CastUtils.BoxCast(transform.position, Vector2.one * .1f, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Id,
-            layer: CastUtils.GetMask("Obstacle"));
+            layer: CastUtils.OBSTACLES);
         }
 
         public T SetTrajectory()

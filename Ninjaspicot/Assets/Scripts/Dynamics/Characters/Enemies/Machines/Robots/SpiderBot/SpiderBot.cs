@@ -14,7 +14,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
         private float _legsSpeed;
         public int MovingLegsIndex = 0;
-        public override Transform Transform => _body;
+        //public override Transform Transform => _body;
 
         public override SpriteRenderer Renderer
         {
@@ -59,12 +59,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             if (MoveSpeed == 0)
                 return;
 
-            _legsSpeed = Mathf.Abs(MoveSpeed) * 8;
+            _legsSpeed = Mathf.Abs(MoveSpeed) * 5;
         }
 
         private void CheckGround()
         {
-            var hit = CastUtils.RayCast(_body.position, new Vector2(MoveDirection, -1), 8, includeTriggers: false);
+            var hit = CastUtils.RayCast(_body.position, new Vector2(MoveDirection, -1), .8f, layerMask: CastUtils.OBSTACLES);
 
 
 
@@ -80,7 +80,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
         private void CheckWall()
         {
-            var hit = CastUtils.RayCast(_body.position, Vector3.right * MoveSpeed, 5, includeTriggers: false);
+            var hit = CastUtils.RayCast(_body.position, Vector3.right * MoveSpeed, .5f, layerMask: CastUtils.OBSTACLES);
 
             if (hit.collider != null)
             {
@@ -120,30 +120,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             while (elapsedTime < delay)
             {
                 elapsedTime += Time.deltaTime;
-                _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), RotateSpeed);
+                _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _body.TransformDirection(direction)), RotateSpeed);
                 yield return null;
             }
 
             _lookAt = null;
-        }
-        #endregion
-
-        #region Communicate
-        protected override void Communicate()
-        {
-            _remainingCommunicationTime -= Time.deltaTime;
-
-            if (_remainingCommunicationTime <= 0)
-            {
-                if (!BaseUtils.IsNull(Zone) && Zone.DeathOccured)
-                {
-                    Zone.ActivateAlarm();
-                }
-                else
-                {
-                    SetState(State.NextState);
-                }
-            }
         }
         #endregion
 

@@ -150,7 +150,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             for (var i = 0; i < 4; i++)
             {
                 if (structureMap.GetPixel(coords.x + direction.x, coords.y + direction.y) == Color.black)
-                    return Quaternion.LookRotation(Vector3.forward, (Vector2)direction);
+                    return Quaternion.LookRotation(Vector3.forward, -(Vector2)direction);
 
                 direction = new Vector2Int(direction.y, -direction.x);
             }

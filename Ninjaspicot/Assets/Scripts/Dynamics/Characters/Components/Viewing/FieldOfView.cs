@@ -37,9 +37,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
         private Quaternion _startAngle => _isHorizontal ? Quaternion.Euler(0, 0, -90) : Quaternion.identity;
         private Vector3 _startDirection => _isHorizontal ? Vector3.right : Vector3.up;
 
-        private int _colorPropertyId;
-        private int _emissionPropertyId;
-
         protected const float TRANSPARENCY = .5f;
 
         protected virtual void Awake()
@@ -54,9 +51,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                 _color = ColorUtils.GetColor(_customColor, TRANSPARENCY);
                 SetColor(_color);
             }
-
-            _colorPropertyId = Shader.PropertyToID("_Color");
-            _emissionPropertyId = Shader.PropertyToID("_EmissionColor");
 
 
             _angleStep = _viewAngle / _detailAmount;
@@ -207,8 +201,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
 
         protected void SetColor(Color color)
         {
-            _renderer.material.SetColor(_colorPropertyId, color);
-            _renderer.material.SetColor(_emissionPropertyId, color);
+            _renderer.material.SetColor(Shader.PropertyToID("_Color"), color);
+            _renderer.material.SetColor(Shader.PropertyToID("_EmissionColor"), color);
         }
 
         public void Activate(IActivator activator = default)

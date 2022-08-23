@@ -37,7 +37,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         {
             base.Start();
             _initRotation = _head.rotation;
-            _remainingTimeBeforeCommunication = _timeBetweenCommunications;
 
             if (_targetPosition.HasValue)
             {
@@ -139,25 +138,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
 
             _lookAt = null;
-        }
-        #endregion
-
-        #region Communicate
-        protected override void Communicate()
-        {
-            _remainingCommunicationTime -= Time.deltaTime;
-
-            if (_remainingCommunicationTime <= 0)
-            {
-                if (Zone.DeathOccured)
-                {
-                    Zone.ActivateAlarm();
-                }
-                else
-                {
-                    SetState(State.NextState);
-                }
-            }
         }
         #endregion
 

@@ -10,7 +10,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
         [SerializeField] private int _index;
 
         private Vector2 _currentTarget;
-        private const float REPLACEMENT_DISTANCE_THRESHOLD = 2f;
+        private const float REPLACEMENT_DISTANCE_THRESHOLD = .1f;
         private Coroutine _moveLeg;
         private SpiderBot _spiderBot;
         public float Speed => _spiderBot.MoveSpeed;
@@ -61,9 +61,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
 
         private IEnumerator MoveLeg()
         {
-            var upPos = _currentTarget + Vector2.up * 2;
+            var upPos = _currentTarget + Vector2.up * .2f;
 
-            while (Mathf.Abs(upPos.y - Transform.position.y) > .5f)
+            while (Mathf.Abs(upPos.y - Transform.position.y) > .05f)
             {
                 Transform.position = Vector3.MoveTowards(Transform.position, upPos, Time.deltaTime * _spiderBot.LegsSpeed);
                 yield return null;
@@ -71,7 +71,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
 
             _currentTarget = _legTarget.Transform.position; //+ _spiderBot.LegsStabilizationFactor * Transform.right * Mathf.Sign(_spiderBot.Speed);
 
-            while (Vector2.Distance(_currentTarget, Transform.position) > .5f)
+            while (Vector2.Distance(_currentTarget, Transform.position) > .05f)
             {
                 Transform.position = Vector3.MoveTowards(Transform.position, _currentTarget, Time.deltaTime * _spiderBot.LegsSpeed);
                 yield return null;

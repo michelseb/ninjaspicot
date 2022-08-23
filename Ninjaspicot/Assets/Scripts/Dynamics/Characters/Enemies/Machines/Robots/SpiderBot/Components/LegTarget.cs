@@ -34,20 +34,20 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
         public void CheckGround()
         {
             // Check down
-            var hit = CastUtils.RayCast(Transform.position, Vector3.down, 3, includeTriggers: false);
+            var hit = CastUtils.RayCast(Transform.position, Vector3.down, .5f, layerMask: CastUtils.OBSTACLES);
 
             if (hit.collider != null)
             {
-                Transform.position = hit.point + Vector2.up * .1f;
+                Transform.position = hit.point + Vector2.up * .02f;
                 return;
             }
 
             // Check up
-            hit = CastUtils.RayCast(Transform.position, Vector3.up, 6, includeTriggers: false);
+            hit = CastUtils.RayCast(Transform.position, Vector3.up, 1, layerMask: CastUtils.OBSTACLES);
 
             if (hit.collider != null)
             {
-                Transform.position = hit.point + Vector2.up * .1f;
+                Transform.position = hit.point + Vector2.up * .02f;
             }
         }
     }
