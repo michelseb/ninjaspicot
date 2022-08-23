@@ -15,6 +15,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public HingeJoint2D WallJoint { get; set; }
         public Obstacle CurrentAttachment { get; set; }
         public int FramesSinceDetached { get; private set; }
+        public bool AttachDeactivated => FramesSinceDetached < 2;
         public bool Attached => WallJoint?.enabled == true;
         public bool CanWalk { get; set; }
         public bool Walking => _walkOnWalls != null;
@@ -32,8 +33,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected Vector3 _previousContactPoint;
         protected Coroutine _walkOnWalls;
         private float _velocityBeforePhysicsUpdate;
-        //private float _detachTime;
-        //private Vector2 _detachPos;
 
         public virtual void Awake()
         {
@@ -83,18 +82,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
         public virtual bool Attach(Obstacle obstacle)
         {
-            if (Attached || FramesSinceDetached < 2)
+            if (Attached || AttachDeactivated)
                 return false;
 
-            Debug.Log("Attach");
-
             var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
-            //var deltaTime = Time.time - _detachTime;
-            //var deltaPos = (_detachPos - new Vector2(anchorPos.x, anchorPos.y)).magnitude;
-
-            // Threshold to attach
-            //if (deltaTime < .05f && deltaPos < .6f)
-            //    return false;
 
             WallJoint.enabled = true;
             WallJoint.useMotor = false;
@@ -112,11 +103,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (!Attached)
                 return;
 
-            Debug.Log("Detach");
-
             FramesSinceDetached = 0;
-            //_detachTime = Time.time;
-            //_detachPos = WallJoint.anchor;
             WallJoint.enabled = false;
             CurrentAttachment = null;
             Rigidbody.isKinematic = false;
@@ -205,7 +192,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (!Attach(obstacle))
                 return;
 
-            Debug.Log("Land");
             CurrentAttachment = obstacle;
             CurrentAttachment = obstacle;
             SetContactPosition(contactPoint);

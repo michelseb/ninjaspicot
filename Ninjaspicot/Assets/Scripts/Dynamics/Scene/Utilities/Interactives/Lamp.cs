@@ -2,19 +2,16 @@
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Effects.Lights;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
-using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Interfaces;
-using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
-    public class Lamp : SceneryElement, ISceneryWakeable, IFocusable, IActivable, IResettable
+    public class Lamp : SceneryElement, ISceneryWakeable, IFocusable, IActivable, IResettable, IPoolable
     {
         public Animator Animator { get; private set; }
+        public override bool AlignedToWall => true;
 
         protected LightEffect _light;
-        private Zone _zone;
-        public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
         public bool StayOn { get; set; }
         public bool IsSilent => false;
@@ -57,12 +54,14 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
             Sleep();
         }
 
-        public void Deactivate(IActivator activator = default) { }
-
-        public void DoReset()
+        public override void DoReset()
         {
+            base.DoReset();
+            
             _broken = false;
             Wake();
         }
+
+        public void Deactivate(IActivator activator = default) { }
     }
 }

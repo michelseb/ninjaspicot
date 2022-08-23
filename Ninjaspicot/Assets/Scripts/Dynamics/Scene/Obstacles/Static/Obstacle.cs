@@ -26,7 +26,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Obstacles
         {
             if (collision.gameObject.TryGetComponent(out IPhysic physic))
             {
-                Debug.Log("Contact with obstacle");
                 physic.LandOn(this, collision.contacts[0].point);
             }
         }

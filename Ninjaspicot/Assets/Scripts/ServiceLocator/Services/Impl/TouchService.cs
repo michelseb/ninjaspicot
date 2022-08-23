@@ -70,7 +70,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                     HandleLeftSideTouchEvent(DoubleTouching);
                 }
                 HandleLeftSideTouchEndEvent();
-                HandleRightSideTouchEndEvent(DoubleTouching);
+                HandleRightSideTouchDragEndEvent(DoubleTouching);
 
                 yield return null;
             }
@@ -193,7 +193,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             return true;
         }
 
-        private bool HandleRightSideTouchEndEvent(bool doubleTouching)
+        private bool HandleRightSideTouchDragEndEvent(bool doubleTouching)
         {
             if (!RightSideTouchEnding)
                 return false;
@@ -207,8 +207,21 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 CurrentControllable?.OnRightSideDragEnd(RightDragDirection);
             }
 
+            HandleRightSideTouchEndEvent();
+
             _joystick2.StartFading();
             _joystick2.OnPointerUp();
+            _rightTouchInitialized = false;
+
+            return true;
+        }
+
+        private bool HandleRightSideTouchEndEvent()
+        {
+            if (!RightSideTouchEnding)
+                return false;
+
+            CurrentControllable?.OnRightSideTouchEnd();
             _rightTouchInitialized = false;
 
             return true;

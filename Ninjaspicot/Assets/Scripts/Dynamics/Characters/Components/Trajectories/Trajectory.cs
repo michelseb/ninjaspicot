@@ -49,20 +49,15 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         protected virtual RaycastHit2D StepClear(Vector3 origin, Vector3 direction, float distance)
         {
             // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
-            return Physics2D.CircleCast(origin, .05f, direction, distance,
-                        (1 << LayerMask.NameToLayer("Obstacle")) |
-                        (1 << LayerMask.NameToLayer("DynamicObstacle")) |
-                        (1 << LayerMask.NameToLayer("Enemy")) |
-                        (1 << LayerMask.NameToLayer("Interactive")) |
-                        (1 << LayerMask.NameToLayer("Teleporter")));
+            return Physics2D.CircleCast(origin, .05f, direction, distance, 
+                CastUtils.GetMask("Obstacle", "DynamicObstacle", "Enemy", "Interactive", "Teleporter"));
         }
 
         protected virtual RaycastHit2D StepClearWall(Vector3 origin, Vector3 direction, float distance)
         {
             // Readapt radius if hero scale changes (otherwise cast hits the ground behind hero)
             return Physics2D.CircleCast(origin, .05f, direction, distance,
-                        (1 << LayerMask.NameToLayer("Obstacle")) |
-                        (1 << LayerMask.NameToLayer("DynamicObstacle")));
+                CastUtils.GetMask("Obstacle", "DynamicObstacle"));
         }
 
         public virtual void StartFading()

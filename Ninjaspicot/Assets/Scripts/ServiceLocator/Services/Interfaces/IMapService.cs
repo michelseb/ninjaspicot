@@ -15,6 +15,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// </summary>
         /// <param name="zoneMap"></param>
         /// <param name="utilitiesMap"></param>
-        void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap);
+        void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap, Texture2D structureMap);
     }
 }

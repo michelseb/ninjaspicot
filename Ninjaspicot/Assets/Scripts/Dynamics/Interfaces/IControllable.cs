@@ -22,6 +22,8 @@ namespace ZepLink.RiceNinja.Dynamics.Interfaces
         void OnRightSideDrag(Vector2 direction);
 
         void OnRightSideDragEnd(Vector2 direction);
+
+        void OnRightSideTouchEnd();
         #endregion
 
         #region DoubleTouch

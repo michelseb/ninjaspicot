@@ -85,7 +85,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
             Dead = true;
             ClimbSkill.Detach();
-            HopSkill?.CancelJump();
+            ChargeSkill?.CancelJump();
 
             if (killer != null)
             {
@@ -266,7 +266,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             Visible = true;
         }
 
-        public void Pool(Vector3 position, Quaternion rotation, float size = 1)
+        public override void Pool(Vector3 position, Quaternion rotation, float size = 1)
         {
             Transform.position = position;
         }
@@ -281,7 +281,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             gameObject.SetActive(true);
         }
 
-        public void DoReset()
+        public override void DoReset()
         {
             Sleep();
         }
@@ -318,14 +318,22 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnRightSideTouchInit()
         {
-            if (!ClimbSkill.Attached || !HopSkill.CanJump())
+            if (!ChargeSkill.CanJump())
                 return;
 
+            ChargeSkill.SetJumpPressing(true);
+            ChargeSkill.RestoreGravity();
+
             ClimbSkill.Detach();
-            HopSkill.InitJump(Direction, NormalVector);
+            ChargeSkill.InitJump(Direction, NormalVector);
         }
 
         public void OnRightSideTouch() { }
+
+        public void OnRightSideTouchEnd() 
+        {
+            ChargeSkill.SetJumpPressing(false);
+        }
 
         public void OnRightSideDrag(Vector2 direction)
         {
@@ -337,9 +345,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             }
             else
             {
-                HopSkill?.CancelJump();
+                ChargeSkill?.CancelJump();
             }
-            //HopSkill.DisplayTrajectory(direction);
         }
 
         public void OnRightSideDragEnd(Vector2 direction)
@@ -354,7 +361,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
                 ClimbSkill.StopWalking(false);
                 ClimbSkill.Detach();
                 ChargeSkill.Jump(direction);
-                //HopSkill.Jump(direction);
             }
         }
 
@@ -368,8 +374,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             if (!ClimbSkill.Attached || !ClimbSkill.CanWalk)
                 return;
 
-            ClimbSkill.StartRunning();
-            StartDisplayGhosts();
+            //ClimbSkill.StartRunning();
+            //StartDisplayGhosts();
         }
 
         public void OnDoubleTouchRightSideDragEnd(Vector2 direction)
@@ -423,8 +429,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void LandOn(Obstacle obstacle, Vector3 contactPoint)
         {
+            if (ClimbSkill.AttachDeactivated)
+                return;
+
             ClimbSkill.LandOn(obstacle, contactPoint);
-            HopSkill.LandOn(obstacle, contactPoint);
+            //HopSkill.LandOn(obstacle, contactPoint);
             ChargeSkill.LandOn(obstacle, contactPoint);
         }
     }

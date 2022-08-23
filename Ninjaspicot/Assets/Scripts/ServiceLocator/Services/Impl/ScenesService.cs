@@ -82,7 +82,18 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             SwitchAudio(CurrentScene.Id);
 
             _mapService.Generate(CurrentScene.StructureMap);
-            _mapService.GenerateZones(CurrentScene.ZoneMap, CurrentScene.UtilitiesMap);
+
+            Physics2D.SyncTransforms();
+            Physics2D.simulationMode = SimulationMode2D.Script;
+            Physics2D.Simulate(Time.fixedDeltaTime);
+            Physics2D.simulationMode = SimulationMode2D.FixedUpdate;
+
+            Physics.SyncTransforms();
+            Physics.autoSimulation = false;
+            Physics.Simulate(Time.fixedDeltaTime);
+            Physics.autoSimulation = true;
+
+            _mapService.GenerateZones(CurrentScene.ZoneMap, CurrentScene.UtilitiesMap, CurrentScene.StructureMap);
         }
 
         public void LoadById(int sceneId, bool unloadPrevious)

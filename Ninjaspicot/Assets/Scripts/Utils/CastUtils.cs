@@ -81,9 +81,9 @@ namespace ZepLink.RiceNinja.Utils
             return actualHits;
         }
 
-        public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+        public static RaycastHit2D RayCast(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, int layerMask = 0)
         {
-            RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers);
+            RaycastHit2D[] hits = RayCastAll(origin, direction, distance, ignore, includeTriggers, layerMask);
 
             if (hits.Length == 0)
                 return new RaycastHit2D();
@@ -109,11 +109,13 @@ namespace ZepLink.RiceNinja.Utils
             return hits[0];
         }
 
-        public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false)
+        public static RaycastHit2D[] RayCastAll(Vector2 origin, Vector2 direction, float distance = 0, int ignore = 0, bool includeTriggers = false, int layerMask = 0)
         {
-            var hits = distance > 0 ?
-                Physics2D.RaycastAll(origin, direction, distance) :
-                Physics2D.RaycastAll(origin, direction);
+            distance = distance > 0 ? distance : float.PositiveInfinity;
+
+            var hits = layerMask > 0 ?
+                Physics2D.RaycastAll(origin, direction, distance, layerMask) :
+                Physics2D.RaycastAll(origin, direction, distance);
 
             var actualHits = new List<RaycastHit2D>();
 
@@ -151,6 +153,30 @@ namespace ZepLink.RiceNinja.Utils
             }
 
             return actualHits.ToArray();
+        }
+
+        public static LayerMask GetMask(params string[] masks)
+        {
+            LayerMask result = default;
+
+            foreach (var mask in masks)
+            {
+                result |= 1 << LayerMask.NameToLayer(mask);
+            }
+
+            return result;
+        }
+
+        public static LayerMask AllButMasks(params string[] masks)
+        {
+            LayerMask result = default;
+
+            foreach (var mask in masks)
+            {
+                result |= ~(1 << LayerMask.NameToLayer(mask));
+            }
+
+            return result;
         }
     }
 }

@@ -11,9 +11,17 @@ using ZepLink.RiceNinja.Utils;
 
 public enum JumpMode
 {
-    Classic,
-    Charge,
-    Direct
+    Classic = 0,
+    Charge = 1,
+    Direct = 2
+}
+
+public enum JumpAction
+{
+    None = 0,
+    Jump = 1,
+    Dash = 2,
+    LetGo = 3
 }
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
@@ -22,12 +30,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
     {
         protected float _dashStrength;
         protected float _jumpStrength;
+        protected float _jumpHeight;
+        protected float _jumpMaxHeight;
+        protected float _heightAtJumpInit;
         protected int _maxJumps;
+        private Coroutine _slowDownMidAir;
 
         public T Trajectory { get; protected set; }
         public Vector3 TrajectoryOrigin { get; set; }
         public Vector3 TrajectoryDestination { get; set; }
         public Vector3 AimTarget { get; set; }
+        public JumpAction CurrentJumpAction { get; protected set; }
         public virtual bool Ready => CanJump() && TrajectoryInUse;
         public virtual bool TrajectoryInUse => Trajectory != null && Trajectory.Used;
 
@@ -45,6 +58,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected IAudioService _audioService;
         protected ITimeService _timeService;
         protected Vector3[] _positions;
+        protected bool _jumpPressing;
 
         protected Coroutine _directJump;
 
@@ -60,8 +74,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         protected virtual void Start()
         {
             // TODO : make this configurable
-            _maxJumps = 1;
-            _jumpStrength = 20;
+            _maxJumps = 2;
+            _jumpStrength = 30;
+            _jumpHeight = .5f;
+            _jumpMaxHeight = 2;
             _dashStrength = 30;
 
             _jumps = _maxJumps;
@@ -73,6 +89,24 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Active = true;
         }
 
+        private void FixedUpdate()
+        {
+            //Slow down at jump peak
+            if (CurrentJumpAction == JumpAction.Jump && 
+                _slowDownMidAir == null && 
+                Rigidbody.velocity.y > 0 && 
+                ((Rigidbody.position.y >= _jumpHeight + _heightAtJumpInit && !_jumpPressing) ||
+                Rigidbody.position.y > _jumpMaxHeight + _heightAtJumpInit))
+            {
+                _slowDownMidAir = StartCoroutine(SlowDownMidAir());
+            }
+        }
+
+        public void SetJumpPressing(bool pressing)
+        {
+            _jumpPressing = pressing;
+        }
+
         public virtual void InitJump(Vector3 direction, Vector3 normalVector)
         {
             if (!CanJump())
@@ -80,15 +114,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
             LoseJump();
             Rigidbody.velocity = Vector2.zero;
+            _heightAtJumpInit = Rigidbody.position.y;
 
-
-
-            //var normalForce = normalVector.y >= 0 ? normalVector * _jumpStrength / 3 + Vector3.up * _jumpStrength / 3 : normalVector;
-            var forceToApply = GetJumpForce(direction, normalVector, _jumpStrength);//normalForce + direction * _jumpStrength;
-
+            var forceToApply = GetJumpForce(direction, normalVector, _jumpStrength);
             Rigidbody.AddForce(forceToApply, ForceMode2D.Impulse);
-            //_timeService.SlowDownImmediate();
-            //_timeService.SetTimeScaleProgressive(1);
+
+            CurrentJumpAction = JumpAction.Jump;
         }
 
         private Vector3 GetJumpForce(Vector3 direction, Vector3 normalVector, float strength)
@@ -146,7 +177,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             {
                 CommitJump();
             }
-
+            CurrentJumpAction = JumpAction.Dash;
             Trajectory = null;
         }
 
@@ -214,6 +245,37 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.velocity = velocity;
         }
 
+        public void RestoreGravity()
+        {
+            if (_slowDownMidAir != null)
+            {
+                StopCoroutine(_slowDownMidAir);
+                _slowDownMidAir = null;
+            }
+
+            Rigidbody.gravityScale = 1;
+        }
+
+        private IEnumerator SlowDownMidAir()
+        {
+            var t = 0f;
+            var originalVelocity = Rigidbody.velocity;
+
+            while (t < 1 && originalVelocity.y > 0)
+            {
+                var factor = Mathf.Lerp(1, .5f, t * 5);//-Mathf.Abs(1 - t) + 1);
+                Rigidbody.gravityScale = factor;
+                Rigidbody.velocity = originalVelocity * factor;/*new Vector2(Rigidbody.velocity.x, originalVelocity.y * factor);*/
+                originalVelocity += Physics2D.gravity * Time.fixedDeltaTime;
+                t += Time.fixedDeltaTime * 3;
+
+                yield return new WaitForFixedUpdate();
+            }
+
+            Rigidbody.gravityScale = 1;
+            //Rigidbody.velocity = originalVelocity;
+            _slowDownMidAir = null;
+        }
 
         public virtual void LaunchDirectJump(Vector3 target)
         {
@@ -352,7 +414,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
                 return false;
 
             return !CastUtils.BoxCast(transform.position, Vector2.one * .1f, 0f, TrajectoryOrigin - TrajectoryDestination, 15f, Id,
-            layer: 1 << LayerMask.NameToLayer("Obstacle"));
+            layer: CastUtils.GetMask("Obstacle"));
         }
 
         public T SetTrajectory()
@@ -387,6 +449,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 
         public override void LandOn(Obstacle obstacle, Vector3 contactPoint)
         {
+            CurrentJumpAction = JumpAction.None;
             GainAllJumps();
         }
     }

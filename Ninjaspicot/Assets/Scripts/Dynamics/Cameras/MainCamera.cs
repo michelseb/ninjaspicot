@@ -154,9 +154,22 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             Center(new Vector3(center.x, center.y, Transform.position.z));
         }
 
-        private void CenterImmediate(ITracker target)
+        public void CenterImmediate()
         {
-            Transform.position = target?.Transform.position ?? Vector3.zero;
+            var trackerPosition = CurrentTracker?.Transform.position ?? Vector2.zero;
+            
+            Vector3 center;
+
+            if (_centerPos == default)
+            {
+                center = trackerPosition;
+            }
+            else
+            {
+                center = (trackerPosition + _centerPos * 2) / 3;
+            }
+
+            Transform.position = new Vector3(center.x, center.y, -5);
         }
 
         private void Center(Vector3 target)
@@ -202,7 +215,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
 
         private IEnumerator ZoomIntro(float speed)
         {
-            CenterImmediate(CurrentTracker);
+            CenterImmediate();
             Activate();
 
             yield return new WaitForSecondsRealtime(2);

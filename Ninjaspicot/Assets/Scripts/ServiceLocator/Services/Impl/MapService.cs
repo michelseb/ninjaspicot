@@ -38,16 +38,16 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
         }
 
-        private Dictionary<Vector3Int, Color32> GetLocalizedColors(Texture2D map)
+        private Dictionary<PoolSetting, Color32> GetLocalizedColors(Texture2D map)
         {
             return map
                 .GetPixels32()
                 .Select((c, i) => (color: c, index: i))
                 .Where(x => x.color.a > 0)
-                .ToDictionary(x => PixelToCoord(x.index, map.width), x => x.color);
+                .ToDictionary(x => new PoolSetting(PixelToCoord(x.index, map.width), Quaternion.identity), x => x.color);
         }
 
-        private Dictionary<Vector3Int, Color> GetLocalizedColors(Texture2D map, int startX, int startY, int width, int height)
+        private Dictionary<PoolSetting, Color> GetLocalizedColors(Texture2D map, Texture2D terrain, int startX, int startY, int width, int height)
         {
 
             var offsetIndex = startX + startY * map.width;
@@ -57,10 +57,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 .GetPixels(startX, startY, width, height)
                 .Select((c, i) => (color: c, index: i))
                 .Where(x => x.color.a > 0)
-                .ToDictionary(x => PixelToCoord(x.index, width) + offset, x => x.color);
+                .ToDictionary(x => new PoolSetting(PixelToCoord(x.index, width) + offset, GetTerrainAlignment(x.index, offsetIndex, width, terrain)), x => x.color);
         }
 
-        public void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap)
+        public void GenerateZones(Texture2D zoneMap, Texture2D utilitiesMap, Texture2D structureMap)
         {
             if (zoneMap == null)
                 return;
@@ -78,10 +78,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
                 var middle = new Vector2(z.Average(x => (float)x.x), z.Average(x => (float)x.y));
 
-                var width = z.Max(x => x.x) - startX;
-                var height = z.Max(x => x.y) - startY;
+                var width = z.Max(x => x.x) + 1 - startX;
+                var height = z.Max(x => x.y) + 1 - startY;
 
-                var utilities = GetLocalizedColors(utilitiesMap, startX, startY, width, height);
+                var utilities = GetLocalizedColors(utilitiesMap, structureMap, startX, startY, width, height);
 
                 foreach (var utility in utilities)
                 {
@@ -110,7 +110,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             field?.SetValue(obj, val);
         }
 
-        private void GenerateAt(Vector3Int coords, Color color, Transform zone = default)
+        private void GenerateAt(PoolSetting setting, Color color, Transform zone = default)
         {
             var brush = _brushService.FindById(color);
 
@@ -121,13 +121,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             {
                 var type = brush.Instanciable.GetType().FullName;
 
-                typeof(PoolHelper).GetMethod(nameof(PoolHelper.Pool), new Type[] { typeof(Vector3), typeof(string), typeof(Transform) })
+                typeof(PoolHelper).GetMethod(nameof(PoolHelper.Pool), new Type[] { typeof(Vector3), typeof(Quaternion), typeof(string), typeof(Transform) })
                     .MakeGenericMethod(brush.Instanciable.GetType())
-                    .Invoke(null, new object[] { (Vector3)coords, brush.Instanciable.Name, zone });
+                    .Invoke(null, new object[] { (Vector3)setting.Position, setting.Rotation, brush.Instanciable.Name, zone });
             }
             else if (brush.Instanciable is TileObject tileObject)
             {
-                _tileService.SetTile(coords, tileObject.TileModel);
+                _tileService.SetTile(setting.Position, tileObject.TileModel);
             }
         }
 
@@ -137,6 +137,37 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             var y = index / imgWidth;
 
             return new Vector3Int(x, y);
+        }
+
+        private Quaternion GetTerrainAlignment(int index, int offset, int width, Texture2D structureMap)
+        {
+            var structureMapWidth = structureMap.width;
+            var realIndex = offset + index % width + structureMapWidth * (index / width);
+
+            var coords = PixelToCoord(realIndex, structureMapWidth);
+            var direction = Vector2Int.right;
+
+            for (var i = 0; i < 4; i++)
+            {
+                if (structureMap.GetPixel(coords.x + direction.x, coords.y + direction.y) == Color.black)
+                    return Quaternion.LookRotation(Vector3.forward, (Vector2)direction);
+
+                direction = new Vector2Int(direction.y, -direction.x);
+            }
+
+            return Quaternion.identity;
+        }
+
+        public class PoolSetting
+        {
+            public Vector3Int Position { get; private set; }
+            public Quaternion Rotation { get; private set; }
+
+            public PoolSetting(Vector3Int position, Quaternion rotation)
+            {
+                Position = position;
+                Rotation = rotation;
+            }
         }
     }
 }

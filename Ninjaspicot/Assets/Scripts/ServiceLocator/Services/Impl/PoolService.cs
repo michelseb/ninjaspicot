@@ -61,10 +61,13 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             var parent = model.GetParent(zone);
             parent.SetParent(zone ?? InstancesParent);
 
-            var instance = Object.Instantiate(dynamic, position, rotation, parent);
+            var instance = Object.Instantiate(dynamic, parent);
 
             var component = instance.GetComponent<T>();
             Add(component);
+
+            component.Wake();
+            component.Pool(position, rotation);
 
             return component;
         }

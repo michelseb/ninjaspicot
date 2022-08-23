@@ -62,8 +62,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             CurrentZone = zone;
             CurrentZone.Open();
-
             UpdateCurrentZoneCameraBehavior();
+            //_cameraService.MainCamera.CenterImmediate();
         }
 
         public void OpenExtraZone(int zoneId)

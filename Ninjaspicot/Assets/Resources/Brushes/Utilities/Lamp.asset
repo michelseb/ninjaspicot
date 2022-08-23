@@ -10,10 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 009c8a03462423c4b9b1923607798764, type: 3}
-  m_Name: Checkpoint brush
+  m_Name: Lamp
   m_EditorClassIdentifier: 
-  _name: Brush
-  _instanciableObject: {fileID: 2382189022325609309, guid: bd365e0b7a2c2c34494165970996bc7e,
+  _instanciableObject: {fileID: 901537124465877554, guid: e22fe3cc22603a347b325f2716b96af6,
     type: 3}
-  _type: 0
   _color: {r: 1, g: 1, b: 0, a: 1}

@@ -70,7 +70,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
             _contactFilter = new ContactFilter2D
             {
                 useLayerMask = true,
-                layerMask = 1 << LayerMask.NameToLayer("Obstacle") | 1 << LayerMask.NameToLayer("DynamicObstacle") | 1 << LayerMask.NameToLayer("Enemy"),
+                layerMask = CastUtils.GetMask("Obstacle", "DynamicObstacle", "Enemy"),
                 useTriggers = false
             };
 
