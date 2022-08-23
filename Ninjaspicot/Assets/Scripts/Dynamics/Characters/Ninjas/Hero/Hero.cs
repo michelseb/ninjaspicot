@@ -332,13 +332,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnRightSideTouchEnd() 
         {
-            ChargeSkill.RestoreGravity();
             ChargeSkill.SetJumpPressing(false);
         }
 
         public void OnRightSideDrag(Vector2 direction)
         {
-            if (ChargeSkill.CanJump() && !ClimbSkill.Attached)
+            if (!ClimbSkill.Attached)
             {
                 _timeService.SlowDownImmediate();
                 _characterLight.Wake();
@@ -355,7 +354,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             _characterLight.Sleep();
             _timeService.SetNormalTime();
             ClimbSkill.ReinitSpeed();
-            ChargeSkill.RestoreGravity();
             StopDisplayGhosts();
 
             if (ChargeSkill.Ready)
@@ -368,7 +366,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnDoubleTouchRightSideDrag(Vector2 direction)
         {
-            OnRightSideDrag(direction);
+            ChargeSkill.DisplayTrajectory(direction);
         }
 
         public void OnDoubleTouchLeftSideDrag(Vector2 direction)
@@ -383,7 +381,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         public void OnDoubleTouchRightSideDragEnd(Vector2 direction)
         {
             ClimbSkill.ReinitSpeed();
-            ChargeSkill.RestoreGravity();
             StopDisplayGhosts();
 
             if (ChargeSkill.Ready)
