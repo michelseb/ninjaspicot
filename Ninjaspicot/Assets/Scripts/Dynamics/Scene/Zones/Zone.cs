@@ -135,7 +135,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         public void ActivateAlarm()
         {
             _ambiant.SetColor(CustomColor.DarkRed, 1.5f);
-            _enemies.ForEach(e => e.SetState(StateType.LookFor));
+            //_enemies.ForEach(e => e.SetState(StateType.LookFor));
         }
 
 

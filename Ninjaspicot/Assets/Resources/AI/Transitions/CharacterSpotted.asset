@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 524c48aff5488aa49bf862a732417d53, type: 3}
+  m_Name: CharacterSpotted
+  m_EditorClassIdentifier: 
+  Decision: {fileID: 11400000, guid: a2acad06de1da7643b71a3b9f7055147, type: 2}
+  YesState: {fileID: 11400000, guid: 880e5049b7b69c4448eb6dcd1306e31d, type: 2}
+  NoState: {fileID: 11400000, guid: b52d9b55cabe8b54d9ee9387aa02a9d5, type: 2}

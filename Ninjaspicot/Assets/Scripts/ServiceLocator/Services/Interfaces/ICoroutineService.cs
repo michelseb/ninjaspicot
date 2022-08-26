@@ -21,17 +21,23 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// </summary>
         /// <param name="routine"></param>
         /// <param name="stopPrevious"></param>
-        Coroutine StartCoroutine(IEnumerator routine, bool stopPrevious = true)
+        Coroutine StartCoroutine(IEnumerator routine, bool stopPrevious = true, string key = null)
         {
-            var name = nameof(routine);
-
-            if (stopPrevious && RunningRoutines.ContainsKey(name))
+            if (string.IsNullOrEmpty(key))
             {
-                StopCoroutine(name);
+                var name = routine.GetType().Name;
+                var start = name.IndexOf('<') + 1;
+                var end = name.IndexOf('>');
+                key = name.Substring(start, end - start);
             }
 
-            var coroutine = CoroutineServiceBehaviour.StartCoroutine(CoroutineWrapper(name, routine));
-            RunningRoutines.Add(name, coroutine);
+            if (stopPrevious && RunningRoutines.ContainsKey(key))
+            {
+                StopCoroutine(key);
+            }
+
+            var coroutine = CoroutineServiceBehaviour.StartCoroutine(CoroutineWrapper(key, routine));
+            RunningRoutines.Add(key, coroutine);
 
             return coroutine;
         }

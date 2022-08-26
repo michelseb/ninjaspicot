@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies.Components;
 using ZepLink.RiceNinja.Manageables.Audios;
-using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 {
@@ -48,161 +47,161 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
         }
 
-        #region Check
+        //#region Check
 
-        protected override void Check()
-        {
-            var deltaX = TargetPosition.x - Transform.position.x;
+        //protected override void Check()
+        //{
+        //    var deltaX = TargetPosition.x - Transform.position.x;
 
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), RotateSpeed);
+        //    _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, TargetPosition - Transform.position), RotateSpeed);
 
-            //var alignedWithTarget = 
+        //    //var alignedWithTarget = 
 
-            //if (alignedWithTarget && !Laser.Active)
-            //{
-            //    Laser.SetActive(true);
-            //}
+        //    //if (alignedWithTarget && !Laser.Active)
+        //    //{
+        //    //    Laser.SetActive(true);
+        //    //}
 
-            var direction = Vector2.right * Mathf.Sign(deltaX);
+        //    var direction = Vector2.right * Mathf.Sign(deltaX);
 
-            var wallNear = CastUtils.RayCast(_rigidbody.position, direction, 6, Id);
+        //    var wallNear = CastUtils.RayCast(_rigidbody.position, direction, 6, Id);
 
-            if (Mathf.Abs(deltaX) > 2 && !wallNear)
-            {
-                _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
-            }
-            else if (Vector2.Dot(BaseUtils.ToVector2(_head.right), BaseUtils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
-            {
-                _hearingPerimeter.EraseSoundMark();
-                SetState(StateType.Wonder, StateType.Return);
-            }
-        }
-        #endregion
+        //    if (Mathf.Abs(deltaX) > 2 && !wallNear)
+        //    {
+        //        _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
+        //    }
+        //    else if (Vector2.Dot(BaseUtils.ToVector2(_head.right), BaseUtils.ToVector2(TargetPosition - Transform.position).normalized) > .99f)
+        //    {
+        //        _hearingPerimeter.EraseSoundMark();
+        //        SetState(StateType.Wonder, StateType.Return);
+        //    }
+        //}
+        //#endregion
 
-        #region Chase
-        protected override void Chase(Vector3 target)
-        {
-            var deltaX = target.x - Transform.position.x;
+        //#region Chase
+        //protected override void Chase(Vector3 target)
+        //{
+        //    var deltaX = target.x - Transform.position.x;
 
-            var direction = Vector2.right * Mathf.Sign(deltaX);
+        //    var direction = Vector2.right * Mathf.Sign(deltaX);
 
-            var wallNear = CastUtils.RayCast(_rigidbody.position, direction, 6, Id);
-            if (Mathf.Abs(deltaX) > 2 && !wallNear)
-            {
-                _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
-            }
-
-
-            var targetNotVisible = CastUtils.LineCast(Transform.position, target, new int[] { Id, CurrentTarget.Id });
-
-            if (targetNotVisible)
-            {
-                Seeing = false;
-                SetState(StateType.Wonder, StateType.Return);
-            }
-
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), RotateSpeed);
-
-            //var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
-
-            //if (alignedWithTarget && !Laser.Active)
-            //{
-            //    Laser.SetActive(true);
-            //}
-
-        }
-        #endregion
-
-        #region LookFor
-
-        protected override void LookFor()
-        {
-            if (_lookAt == null)
-            {
-                _lookAt = StartCoroutine(LookAtRandom());
-            }
-            Guard();
-        }
-
-        protected virtual IEnumerator LookAtRandom()
-        {
-            float elapsedTime = 0;
-            float delay = 2;
-            var direction = Random.insideUnitCircle.normalized;
-
-            while (elapsedTime < delay)
-            {
-                elapsedTime += Time.deltaTime;
-                _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), RotateSpeed);
-                yield return null;
-            }
-
-            _lookAt = null;
-        }
-        #endregion
-
-        #region Return
-        protected override void Return()
-        {
-            var deltaX = _resetPosition.x - Transform.position.x;
-
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, _initRotation, RotateSpeed);
-
-            if (deltaX > 2)
-            {
-                _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * MoveSpeed);
-            }
-            else if (Vector2.Dot(BaseUtils.ToVector2(_head.right), BaseUtils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
-            {
-                SetState(StateType.Guard);
-            }
-        }
-        #endregion
-
-        #region Guard
-        protected override void Guard() { }
-        #endregion
-
-        #region Guard
-
-        protected override void Patrol()
-        {
-            if (_waitAtTarget != null)
-                return;
-
-            if (_lookAt == null)
-            {
-                if (_targetPosition.HasValue)
-                {
-                    _head.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
-                }
-                else
-                {
-                    Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), RotateSpeed);
-                }
-            }
-
-            if (_currentPathTarget == null)
-                return;
-
-            var direction = BaseUtils.ToVector2(_currentPathTarget.transform.position - Transform.position);
-
-            if (_targetPosition.HasValue)
-            {
-                _rigidbody.MovePosition(_rigidbody.position + direction.normalized * MoveSpeed);
-            }
-            else
-            {
-                _rigidbody.MovePosition(_rigidbody.position + BaseUtils.ToVector2(Transform.right) * MoveSpeed);
-            }
+        //    var wallNear = CastUtils.RayCast(_rigidbody.position, direction, 6, Id);
+        //    if (Mathf.Abs(deltaX) > 2 && !wallNear)
+        //    {
+        //        _rigidbody.MovePosition(_rigidbody.position + direction * MoveSpeed);
+        //    }
 
 
-            if (direction.magnitude < 1)
-            {
-                UpdateTarget(_currentPathTarget);
-            }
-        }
-        #endregion
+        //    var targetNotVisible = CastUtils.LineCast(Transform.position, target, new int[] { Id, CurrentTarget.Id });
+
+        //    if (targetNotVisible)
+        //    {
+        //        Seeing = false;
+        //        SetState(StateType.Wonder, StateType.Return);
+        //    }
+
+        //    _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, target - Transform.position), RotateSpeed);
+
+        //    //var alignedWithTarget = Vector2.Dot(Utils.ToVector2(_sprite.right), Utils.ToVector2(target - Transform.position).normalized) > .99f;
+
+        //    //if (alignedWithTarget && !Laser.Active)
+        //    //{
+        //    //    Laser.SetActive(true);
+        //    //}
+
+        //}
+        //#endregion
+
+        //#region LookFor
+
+        //protected override void LookFor()
+        //{
+        //    if (_lookAt == null)
+        //    {
+        //        _lookAt = StartCoroutine(LookAtRandom());
+        //    }
+        //    Guard();
+        //}
+
+        //protected virtual IEnumerator LookAtRandom()
+        //{
+        //    float elapsedTime = 0;
+        //    float delay = 2;
+        //    var direction = Random.insideUnitCircle.normalized;
+
+        //    while (elapsedTime < delay)
+        //    {
+        //        elapsedTime += Time.deltaTime;
+        //        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, Transform.TransformDirection(direction)), RotateSpeed);
+        //        yield return null;
+        //    }
+
+        //    _lookAt = null;
+        //}
+        //#endregion
+
+        //#region Return
+        //protected override void Return()
+        //{
+        //    var deltaX = _resetPosition.x - Transform.position.x;
+
+        //    _head.rotation = Quaternion.RotateTowards(_head.rotation, _initRotation, RotateSpeed);
+
+        //    if (deltaX > 2)
+        //    {
+        //        _rigidbody.MovePosition(_rigidbody.position + Vector2.right * Mathf.Sign(deltaX) * MoveSpeed);
+        //    }
+        //    else if (Vector2.Dot(BaseUtils.ToVector2(_head.right), BaseUtils.ToVector2(_resetPosition - Transform.position).normalized) > .99f)
+        //    {
+        //        SetState(StateType.Guard);
+        //    }
+        //}
+        //#endregion
+
+        //#region Guard
+        //protected override void Guard() { }
+        //#endregion
+
+        //#region Guard
+
+        //protected override void Patrol()
+        //{
+        //    if (_waitAtTarget != null)
+        //        return;
+
+        //    if (_lookAt == null)
+        //    {
+        //        if (_targetPosition.HasValue)
+        //        {
+        //            _head.rotation = Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _targetPosition.Value - Transform.position);
+        //        }
+        //        else
+        //        {
+        //            Transform.rotation = Quaternion.RotateTowards(Transform.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _currentPathTarget.transform.position - Transform.position), RotateSpeed);
+        //        }
+        //    }
+
+        //    if (_currentPathTarget == null)
+        //        return;
+
+        //    var direction = BaseUtils.ToVector2(_currentPathTarget.transform.position - Transform.position);
+
+        //    if (_targetPosition.HasValue)
+        //    {
+        //        _rigidbody.MovePosition(_rigidbody.position + direction.normalized * MoveSpeed);
+        //    }
+        //    else
+        //    {
+        //        _rigidbody.MovePosition(_rigidbody.position + BaseUtils.ToVector2(Transform.right) * MoveSpeed);
+        //    }
+
+
+        //    if (direction.magnitude < 1)
+        //    {
+        //        UpdateTarget(_currentPathTarget);
+        //    }
+        //}
+        //#endregion
 
         public override void Die(Transform killer = null, AudioFile sound = null, float volume = 1)
         {
@@ -285,6 +284,36 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             _waitAtTarget = null;
             SetNextPathTarget();
+        }
+
+        protected override MovementType GetPatrolMovementType()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override IEnumerator ExecuteNextMovement()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override IEnumerator MoveTo(Vector3 target)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override IEnumerator RotateTo(Vector3 target)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected override IEnumerator LaunchMovement(MovementType movementType)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Patrol()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

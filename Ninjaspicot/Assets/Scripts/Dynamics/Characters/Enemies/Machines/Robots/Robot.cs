@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components.Hearing;
-using ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing;
+using ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Components;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Components;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
@@ -10,7 +11,7 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 {
-    public abstract class Robot : Enemy, IListener, IViewer
+    public abstract class Robot : Enemy, IListener, IViewer, ISmart
     {
         [SerializeField] protected Transform _head;
         [SerializeField] protected float _hearingRange;
@@ -19,17 +20,23 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
         protected HearingPerimeter _hearingPerimeter;
         protected Rigidbody2D _rigidbody;
-        protected ITimeService _timeService;
         protected AudioFile _reactionSound;
         protected Quaternion _initRotation;
         protected float _wonderTime;
         protected float _wonderElapsedTime;
+        protected float _delayBetweenActions = .3f;
+        protected float _remainingTimeBeforeAction;
 
-        protected FieldOfView _fieldOfView;
-        public FieldOfView FieldOfView { get { if (BaseUtils.IsNull(_fieldOfView)) _fieldOfView = GetComponentInChildren<FieldOfView>(); return _fieldOfView; } }
+        protected ITimeService _timeService;
+        protected ICoroutineService _coroutineService;
+
+        protected Aim _aim;
+        public Aim Aim { get { if (BaseUtils.IsNull(_aim)) _aim = GetComponentInChildren<Aim>(); return _aim; } }
+
         protected RobotLaser _laser;
         public RobotLaser Laser { get { if (BaseUtils.IsNull(_laser)) _laser = GetComponentInChildren<RobotLaser>(); return _laser; } }
 
+        public MovementType CurrentMovement { get; protected set; }
         public ISeeable CurrentTarget { get; protected set; }
         public Transform TargetTransform => CurrentTarget?.Transform;
         public Vector3 TargetPosition { get; protected set; }
@@ -40,9 +47,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         protected override void Awake()
         {
             base.Awake();
+
             _rigidbody = GetComponent<Rigidbody2D>();
             _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
             _timeService = ServiceFinder.Get<ITimeService>();
+            _coroutineService = ServiceFinder.Get<ICoroutineService>();
         }
 
         protected override void Start()
@@ -62,144 +71,166 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             var rot = _head.rotation.eulerAngles.z;
             Renderer.flipY = rot > 90 && rot < 270;
 
-            HandleState(State.StateType);
+            //HandleState(State.StateType);
         }
 
-        #region Handlers
-        protected virtual void HandleState(StateType stateType)
+        //#region Handlers
+        //protected virtual void HandleState(StateType stateType)
+        //{
+        //    switch (stateType)
+        //    {
+        //        case StateType.Guard:
+        //            Guard();
+        //            break;
+        //        case StateType.Patrol:
+        //            Patrol();
+        //            break;
+
+        //        case StateType.Wonder:
+        //            Wonder();
+        //            break;
+
+        //        case StateType.Check:
+        //            Check();
+        //            break;
+
+        //        case StateType.Chase:
+        //            Chase(TargetTransform.position);
+        //            break;
+
+        //        case StateType.Return:
+        //            Return();
+        //            break;
+
+        //        case StateType.LookFor:
+        //            LookFor();
+        //            break;
+        //    }
+        //}
+        //#endregion
+
+        //protected virtual void StartSleeping()
+        //{
+        //    Laser?.Deactivate(null);
+        //    Aim?.Deactivate(null);
+        //}
+
+        //protected virtual void StartWondering(StateType nextState)
+        //{
+        //    if (!IsState(StateType.Chase))
+        //    {
+        //        _audioService.PlaySound(_audioSource, _reactionSound, .4f);
+        //    }
+
+        //    Aim?.Activate();
+        //    SetNextState(nextState);
+        //    _wonderTime = GetReactionFactor(_initState);
+        //    Renderer.color = ColorUtils.Red;
+        //    _wonderElapsedTime = 0;
+        //}
+
+
+        //protected virtual void StartChecking()
+        //{
+        //    if (IsNextState(StateType.Check))
+        //    {
+        //        _initRotation = Transform.rotation;
+        //    }
+
+        //    SetNextState(StateType.Return);
+        //    Renderer.color = ColorUtils.Red;
+        //    Aim?.Activate();
+        //}
+
+        //protected virtual void StartChasing(ISeeable target)
+        //{
+        //    if (target == default)
+        //        return;
+
+        //    if (IsState(StateType.Guard))
+        //    {
+        //        _initRotation = Transform.rotation;
+        //    }
+
+        //    CurrentTarget = target;
+        //    Renderer.color = ColorUtils.Red;
+        //    Laser?.SetActive(true);
+        //    Aim?.Activate();
+        //}
+
+        //protected virtual void StartLookFor()
+        //{
+        //    Renderer.color = ColorUtils.Yellow;
+        //    Aim?.Activate();
+        //}
+
+        //protected virtual void StartReturning()
+        //{
+        //    CurrentTarget = default;
+        //    Renderer.color = ColorUtils.White;
+        //    Laser?.SetActive(false);
+        //    Aim?.Activate();
+        //}
+
+        //protected virtual void StartGuarding()
+        //{
+        //    Renderer.color = ColorUtils.White;
+        //    Laser?.SetActive(false);
+        //    Aim?.Activate();
+        //}
+
+        //protected virtual void StartPatrolling()
+        //{
+        //    Renderer.color = ColorUtils.White;
+        //    Laser?.SetActive(false);
+        //    Aim?.Activate();
+        //}
+
+
+        //protected virtual void Wonder()
+        //{
+        //    _wonderElapsedTime += Time.deltaTime;
+
+        //    if (_wonderElapsedTime >= _wonderTime)
+        //    {
+        //        SetState(State.NextState);
+        //    }
+        //}
+
+        //protected abstract void Guard();
+        //protected abstract void Patrol();
+        //protected abstract void Check();
+        //protected abstract void Chase(Vector3 targetPosition);
+        //protected abstract void Return();
+        //protected abstract void LookFor();
+
+        protected abstract MovementType GetPatrolMovementType();
+        protected abstract IEnumerator MoveTo(Vector3 target);
+        protected abstract IEnumerator RotateTo(Vector3 target);
+        protected abstract IEnumerator LaunchMovement(MovementType movementType);
+
+        protected virtual IEnumerator ExecuteNextMovement()
         {
-            switch (stateType)
-            {
-                case StateType.Guard:
-                    Guard();
-                    break;
-                case StateType.Patrol:
-                    Patrol();
-                    break;
+            CurrentMovement = GetPatrolMovementType();
 
-                case StateType.Wonder:
-                    Wonder();
-                    break;
+            if (CurrentMovement == MovementType.None)
+                yield break;
 
-                case StateType.Check:
-                    Check();
-                    break;
-
-                case StateType.Chase:
-                    Chase(TargetTransform.position);
-                    break;
-
-                case StateType.Return:
-                    Return();
-                    break;
-
-                case StateType.LookFor:
-                    LookFor();
-                    break;
-            }
+            yield return StartCoroutine(ExecuteMovement(CurrentMovement));
         }
-        #endregion
 
-        protected virtual void StartSleeping()
+        protected virtual IEnumerator ExecuteMovement(MovementType movementType)
         {
-            Laser?.Deactivate(null);
-            FieldOfView?.Deactivate(null);
+            yield return StartCoroutine(LaunchMovement(CurrentMovement));
+
+            CurrentMovement = MovementType.None;
         }
-
-        protected virtual void StartWondering(StateType nextState)
-        {
-            if (!IsState(StateType.Chase))
-            {
-                _audioService.PlaySound(_audioSource, _reactionSound, .4f);
-            }
-
-            FieldOfView?.Activate();
-            SetNextState(nextState);
-            _wonderTime = GetReactionFactor(_initState);
-            Renderer.color = ColorUtils.Red;
-            _wonderElapsedTime = 0;
-        }
-
-
-        protected virtual void StartChecking()
-        {
-            if (IsNextState(StateType.Check))
-            {
-                _initRotation = Transform.rotation;
-            }
-
-            SetNextState(StateType.Return);
-            Renderer.color = ColorUtils.Red;
-            FieldOfView?.Activate();
-        }
-
-        protected virtual void StartChasing(ISeeable target)
-        {
-            if (target == default)
-                return;
-
-            if (IsState(StateType.Guard))
-            {
-                _initRotation = Transform.rotation;
-            }
-
-            CurrentTarget = target;
-            Renderer.color = ColorUtils.Red;
-            Laser?.SetActive(true);
-            FieldOfView?.Activate();
-        }
-
-        protected virtual void StartLookFor()
-        {
-            Renderer.color = ColorUtils.Yellow;
-            FieldOfView?.Activate();
-        }
-
-        protected virtual void StartReturning()
-        {
-            CurrentTarget = default;
-            Renderer.color = ColorUtils.White;
-            Laser?.SetActive(false);
-            FieldOfView?.Activate();
-        }
-
-        protected virtual void StartGuarding()
-        {
-            Renderer.color = ColorUtils.White;
-            Laser?.SetActive(false);
-            FieldOfView?.Activate();
-        }
-
-        protected virtual void StartPatrolling()
-        {
-            Renderer.color = ColorUtils.White;
-            Laser?.SetActive(false);
-            FieldOfView?.Activate();
-        }
-
-
-        protected virtual void Wonder()
-        {
-            _wonderElapsedTime += Time.deltaTime;
-
-            if (_wonderElapsedTime >= _wonderTime)
-            {
-                SetState(State.NextState);
-            }
-        }
-
-        protected abstract void Guard();
-        protected abstract void Patrol();
-        protected abstract void Check();
-        protected abstract void Chase(Vector3 targetPosition);
-        protected abstract void Return();
-        protected abstract void LookFor();
 
         public override void Sleep()
         {
             base.Sleep();
 
-            FieldOfView?.Deactivate();
+            Aim?.Deactivate();
             Laser?.Deactivate();
             _castArea.enabled = false;
             _hearingPerimeter?.EraseSoundMark();
@@ -215,7 +246,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             if (_initState != StateType.Sleep)
             {
-                FieldOfView?.Activate();
+                Aim?.Activate();
             }
         }
 
@@ -258,50 +289,50 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
         }
 
-        protected override Action GetActionFromState(StateType stateType, StateType? nextState = null)
-        {
-            switch (stateType)
-            {
-                case StateType.Sleep:
-                    return StartSleeping;
+        //protected override Action GetActionFromState(StateType stateType, StateType? nextState = null)
+        //{
+        //    switch (stateType)
+        //    {
+        //        case StateType.Sleep:
+        //            return StartSleeping;
 
-                case StateType.Wonder:
-                    return () => StartWondering(nextState.Value);
+        //        case StateType.Wonder:
+        //            return () => StartWondering(nextState.Value);
 
-                case StateType.Check:
-                    return StartChecking;
+        //        case StateType.Check:
+        //            return StartChecking;
 
-                case StateType.Chase:
-                    return () => StartChasing(CurrentTarget);
+        //        case StateType.Chase:
+        //            return () => StartChasing(CurrentTarget);
 
-                case StateType.Return:
-                    return StartReturning;
+        //        case StateType.Return:
+        //            return StartReturning;
 
-                case StateType.LookFor:
-                    return StartLookFor;
+        //        case StateType.LookFor:
+        //            return StartLookFor;
 
-                case StateType.Guard:
-                case StateType.Patrol:
-                    return StartGuarding;
+        //        case StateType.Guard:
+        //        case StateType.Patrol:
+        //            return StartGuarding;
 
-                default:
-                    return null;
-            }
-        }
+        //        default:
+        //            return null;
+        //    }
+        //}
 
         #region Events
         public void Hear(HearingArea hearingArea)
         {
-            TargetPosition = hearingArea.SourcePoint;
+            //TargetPosition = hearingArea.SourcePoint;
 
-            if (IsState(StateType.Chase) || (IsState(StateType.Wonder) && IsNextState(StateType.Check)))
-                return;
+            //if (IsState(StateType.Chase) || (IsState(StateType.Wonder) && IsNextState(StateType.Check)))
+            //    return;
 
-            FieldOfView?.Activate();
-            if (!IsState(StateType.Check) && !IsState(StateType.Chase))
-            {
-                SetState(StateType.Wonder, StateType.Check);
-            }
+            //Aim?.Activate();
+            //if (!IsState(StateType.Check) && !IsState(StateType.Chase))
+            //{
+            //    SetState(StateType.Wonder, StateType.Check);
+            //}
         }
 
         public void See(ISeeable seeable)
@@ -309,13 +340,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             if (Seeing)
                 return;
 
-            var raycast = CastUtils.LineCast(Transform.position, seeable.Transform.position, new int[] { Id, seeable.Id });
-
             // Visible when walking in the dark ?
-            if (!seeable.Visible /*&& !hero.Stickiness.Walking*/)
+            if (!seeable.Visible)
                 return;
 
-            if (raycast)
+            if (CastUtils.LineCast(Transform.position, seeable.Transform.position, new int[] { Id, seeable.Id }))
                 return;
 
             Seeing = true;
@@ -328,7 +357,32 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
                 CurrentTarget = seeable;
             }
 
-            SetState(StateType.Chase);
+            //SetState(StateType.Chase);
+        }
+
+        #endregion
+        //public abstract MovementType GetMovementType();
+
+        //public abstract void MoveTo(Vector3 target);
+
+        //public abstract void RotateTo(Vector3 target);
+
+        //public abstract void LaunchMovement(MovementType movementType);
+
+        #region Patrol
+        public virtual void Patrol()
+        {
+            if (_coroutineService.IsCoroutineRunning(nameof(ExecuteNextMovement)))
+                return;
+
+            if (_remainingTimeBeforeAction > 0)
+            {
+                _remainingTimeBeforeAction -= Time.deltaTime;
+                return;
+            }
+
+            _remainingTimeBeforeAction = _delayBetweenActions;
+            _coroutineService.StartCoroutine(ExecuteNextMovement());
         }
         #endregion
     }

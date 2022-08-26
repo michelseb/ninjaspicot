@@ -12,6 +12,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Hearing
     {
         public virtual float Size => _listener?.Range ?? 1f;
         public SoundMark SoundMark { get; private set; }
+        public bool Hearing { get; private set; }
 
         protected IListener _listener;
         protected bool _isActive;

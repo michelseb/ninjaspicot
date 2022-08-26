@@ -179,7 +179,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                 //Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
 
                 var results = new RaycastHit2D[1];
-                var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size);
+                var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size / 5);
                 if (hits > 0)
                 {
                     _vertices[i].Modified = true;

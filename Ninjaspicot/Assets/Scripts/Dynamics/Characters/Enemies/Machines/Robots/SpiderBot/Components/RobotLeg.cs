@@ -9,12 +9,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
         [SerializeField] private LegTarget _legTarget;
         [SerializeField] private int _index;
 
-        private Vector2 _currentTarget;
-        private const float REPLACEMENT_DISTANCE_THRESHOLD = .1f;
-        private Coroutine _moveLeg;
+        //private Vector2 _currentTarget;
+        //private const float REPLACEMENT_DISTANCE_THRESHOLD = .2f;
         private SpiderBot _spiderBot;
+        public int Index => _index;
         public float Speed => _spiderBot.MoveSpeed;
-        public bool Grounded => _moveLeg == null;
+        public bool Grounded { get; private set; }
 
         private void Awake()
         {
@@ -23,66 +23,60 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
 
         private void Start()
         {
+            Grounded = true;
             _legTarget.CheckGround();
-            InitTarget();
-        }
-        private void Update()
-        {
-            UpdateTarget();
+            //InitTarget();
         }
 
-        private void UpdateTarget()
-        {
-            if (_moveLeg != null || Vector3.Distance(_currentTarget, _legTarget.Transform.position) < REPLACEMENT_DISTANCE_THRESHOLD || _index != _spiderBot.MovingLegsIndex)
-                return;
+        //private void Update()
+        //{
+        //    UpdateTarget();
+        //}
 
-            LaunchMove();
-        }
+        //private void UpdateTarget()
+        //{
+        //    if (_moveLeg != null || Vector3.Distance(_currentTarget, _legTarget.Transform.position) < REPLACEMENT_DISTANCE_THRESHOLD || _index != _spiderBot.MovingLegsIndex)
+        //        return;
 
-        public void InitTarget()
-        {
-            //_legTarget.Transform.position += Vector3.right * (_liftTiming /*+ _spiderBot.LegsSpeed / 100*/);
-            _currentTarget = _legTarget.Transform.position;
-            //Transform.position = _currentTarget;
-        }
+        //    LaunchMove();
+        //}
 
-        public void FlipTarget()
-        {
-            var targetPos = _legTarget.Transform.position;
-            var legPos = Transform.position;
-            _legTarget.Transform.position = -targetPos + 2 * legPos;
-        }
+        //public void InitTarget()
+        //{
+        //    //_legTarget.Transform.position += Vector3.right * (_liftTiming /*+ _spiderBot.LegsSpeed / 100*/);
+        //    _currentTarget = _legTarget.Transform.position;
+        //    //Transform.position = _currentTarget;
+        //}
 
-        public void LaunchMove()
+        public IEnumerator LaunchMove()
         {
-            if (_moveLeg != null) StopCoroutine(_moveLeg);
-            _moveLeg = StartCoroutine(MoveLeg());
+            if (!Grounded)
+                yield break;
+
+            Grounded = false;
+
+            yield return StartCoroutine(MoveLeg());
         }
 
         private IEnumerator MoveLeg()
         {
-            var upPos = _currentTarget + Vector2.up * .2f;
+            var target = _legTarget.Transform;
+            var upPos = target.position + Transform.up * .2f;
 
-            while (Mathf.Abs(upPos.y - Transform.position.y) > .05f)
+            while (Mathf.Abs(upPos.y - Transform.position.y) > .01f)
             {
+                upPos = target.position + Transform.up * .2f;
                 Transform.position = Vector3.MoveTowards(Transform.position, upPos, Time.deltaTime * _spiderBot.LegsSpeed);
                 yield return null;
             }
 
-            _currentTarget = _legTarget.Transform.position; //+ _spiderBot.LegsStabilizationFactor * Transform.right * Mathf.Sign(_spiderBot.Speed);
-
-            while (Vector2.Distance(_currentTarget, Transform.position) > .05f)
+            while (Mathf.Abs(target.position.y - Transform.position.y) > .01f)
             {
-                Transform.position = Vector3.MoveTowards(Transform.position, _currentTarget, Time.deltaTime * _spiderBot.LegsSpeed);
+                Transform.position = Vector3.MoveTowards(Transform.position, target.position, Time.deltaTime * _spiderBot.LegsSpeed);
                 yield return null;
             }
 
-            //Transform.position = _currentTarget;
-            _moveLeg = null;
-
-            yield return new WaitForSeconds(Speed / 100);
-
-            _spiderBot.ChangeMovingLegs(1 - _index);
+            Grounded = true;
         }
     }
 }

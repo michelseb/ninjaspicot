@@ -12,9 +12,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
     {
         [SerializeField] private Transform _body;
 
-        private float _legsSpeed;
-        public int MovingLegsIndex = 0;
-        //public override Transform Transform => _body;
+        public int MovingLegsIndex { get; private set; }
+        public float LegsSpeed => MoveSpeed == 0 ? LegsSpeed : Mathf.Abs(MoveSpeed) * 3;
+        public float DelayBetweenLegSwitch => 1f / (2 * LegsSpeed + 1f);
 
         public override SpriteRenderer Renderer
         {
@@ -30,133 +30,136 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         }
 
         protected Coroutine _lookAt;
-
-        public float LegsSpeed => _legsSpeed;
-        private float _targetY;
-
         private List<RobotLeg> _robotLegs;
 
         protected override void Awake()
         {
             base.Awake();
+
             _robotLegs = GetComponentsInChildren<RobotLeg>().ToList();
         }
 
         protected override void Start()
         {
             base.Start();
-            _targetY = _body.position.y;
+
+            CurrentMovement = MovementType.Rotate;
+            //StartCoroutine(ExecuteMovement(CurrentMovement));
         }
 
-        protected override void Update()
+
+        private bool IsGapAhead()
         {
-            base.Update();
-            UpdateLegsSpeed();
+            return !CastUtils.RayCast(_body.position, new Vector2(2 * MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES);
         }
 
-        private void UpdateLegsSpeed()
+        private bool IsWallAhead()
         {
-            if (MoveSpeed == 0)
-                return;
-
-            _legsSpeed = Mathf.Abs(MoveSpeed) * 5;
+            return CastUtils.RayCast(_body.position, Transform.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES);
         }
 
-        private void CheckGround()
+        //#region Check
+        //protected override void Check()
+        //{
+        //}
+        //#endregion
+
+        //#region Chase
+        //protected override void Chase(Vector3 target)
+        //{
+        //}
+        //#endregion
+
+        //#region LookFor
+
+        //protected override void LookFor()
+        //{
+        //    if (_lookAt == null)
+        //    {
+        //        _lookAt = StartCoroutine(LookAtRandom());
+        //    }
+        //    Guard();
+        //}
+
+        //protected virtual IEnumerator LookAtRandom()
+        //{
+        //    float elapsedTime = 0;
+        //    float delay = 2;
+        //    var direction = Random.insideUnitCircle.normalized;
+
+        //    while (elapsedTime < delay)
+        //    {
+        //        elapsedTime += Time.deltaTime;
+        //        _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _body.TransformDirection(direction)), RotateSpeed);
+        //        yield return null;
+        //    }
+
+        //    _lookAt = null;
+        //}
+        //#endregion
+
+        //#region Return
+        //protected override void Return()
+        //{
+        //}
+        //#endregion
+
+        //#region Guard
+        //protected override void Guard() { }
+        //#endregion
+
+        protected override MovementType GetPatrolMovementType()
         {
-            var hit = CastUtils.RayCast(_body.position, new Vector2(MoveDirection, -1), .8f, layerMask: CastUtils.OBSTACLES);
+            return IsGapAhead() || IsWallAhead() ? MovementType.Rotate : MovementType.Move;
+            //if ()
+            //{
+            //    Flip();
+            //    return MovementType.Rotate;
+            //}
 
+            //if (_remainingTimeBeforeAction <= 0)
+            //{
+            //    _remainingTimeBeforeAction = DelayBetweenLegSwitch;
+            //    return MovementType.Move;
+            //}
 
+            //return MovementType.None;
+        }
 
-            if (hit.collider != null)
+        protected override IEnumerator MoveTo(Vector3 target)
+        {
+            SwitchMovingLegs();
+
+            var movingLegs = _robotLegs.Where(l => l.Index == MovingLegsIndex).ToArray();
+
+            var backLegName = $"backLegMove_{Id}"; 
+            var frontLegName = $"frontLegMove_{Id}"; 
+
+            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(), key: backLegName);
+            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(), key: frontLegName);
+
+            while (_coroutineService.IsCoroutineRunning(frontLegName) || _coroutineService.IsCoroutineRunning(backLegName))
             {
-                _targetY = hit.point.y + 2f;
-            }
-            else
-            {
-                Flip();
-            }
-        }
+                _body.Translate(_body.right * MoveSpeed * Time.deltaTime);
 
-        private void CheckWall()
-        {
-            var hit = CastUtils.RayCast(_body.position, Vector3.right * MoveSpeed, .5f, layerMask: CastUtils.OBSTACLES);
-
-            if (hit.collider != null)
-            {
-                Flip();
-            }
-        }
-
-        #region Check
-        protected override void Check()
-        {
-        }
-        #endregion
-
-        #region Chase
-        protected override void Chase(Vector3 target)
-        {
-        }
-        #endregion
-
-        #region LookFor
-
-        protected override void LookFor()
-        {
-            if (_lookAt == null)
-            {
-                _lookAt = StartCoroutine(LookAtRandom());
-            }
-            Guard();
-        }
-
-        protected virtual IEnumerator LookAtRandom()
-        {
-            float elapsedTime = 0;
-            float delay = 2;
-            var direction = Random.insideUnitCircle.normalized;
-
-            while (elapsedTime < delay)
-            {
-                elapsedTime += Time.deltaTime;
-                _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0f, 0f, 90f) * Quaternion.LookRotation(Vector3.forward, _body.TransformDirection(direction)), RotateSpeed);
                 yield return null;
             }
-
-            _lookAt = null;
         }
-        #endregion
 
-        #region Return
-        protected override void Return()
+        protected override IEnumerator RotateTo(Vector3 target)
         {
-        }
-        #endregion
+            var t = 0f;
+            var initRotation = _head.rotation;
+            var targetRotation = Quaternion.Euler(0, 0, 90) * Quaternion.LookRotation(Vector3.forward, target);
 
-        #region Guard
-        protected override void Guard() { }
-        #endregion
-
-        #region Guard
-        protected override void Patrol()
-        {
-            CheckGround();
-            CheckWall();
-            _body.Translate(_body.right * MoveSpeed * Time.deltaTime);
-
-            var targetPos = new Vector3(_body.position.x, _targetY);
-
-            if (!_robotLegs.Any(x => x.Grounded))
+            while (t < 1)
             {
-                targetPos += Vector3.down;
+                t += Time.deltaTime * RotateSpeed;
+                _head.rotation = Quaternion.Slerp(initRotation, targetRotation, t);
+
+                yield return null;
             }
-
-            //_body.position = Vector3.MoveTowards(_body.position, targetPos, Time.deltaTime * 5);
-            _head.rotation = Quaternion.RotateTowards(_head.rotation, Quaternion.Euler(0, 0, 90f) * Quaternion.LookRotation(Vector3.forward, _body.right * MoveDirection), RotateSpeed);
-
         }
-        #endregion
 
         public override void Die(Transform killer = null, AudioFile sound = null, float volume = 1)
         {
@@ -178,9 +181,39 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             base.DoReset();
         }
 
-        public void ChangeMovingLegs(int index)
+        private void SwitchMovingLegs()
         {
-            MovingLegsIndex = index;
+            MovingLegsIndex = 1 - MovingLegsIndex;
+            _remainingTimeBeforeAction = DelayBetweenLegSwitch;
+        }
+
+        //public override void MoveTo(Vector3 target)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //public override void RotateTo(Vector3 target)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //public override void LaunchMovement(MovementType movementType)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        protected override IEnumerator LaunchMovement(MovementType movementType)
+        {
+            switch (CurrentMovement)
+            {
+                case MovementType.Rotate:
+                    yield return StartCoroutine(RotateTo(_body.right * MoveDirection));
+                    break;
+
+                case MovementType.Move:
+                    yield return StartCoroutine(MoveTo(_body.right * MoveDirection));
+                    break;
+            }
         }
     }
 }

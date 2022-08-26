@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Effects;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
-using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
-using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.Utils;
@@ -23,18 +19,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         public float MoveSpeed => GetMovementSpeed();
         public float RotateSpeed => GetRotateSpeed();
 
-        protected StateEffect _state;
-        public StateEffect State
-        {
-            get
-            {
-                if (BaseUtils.IsNull(_state))
-                {
-                    SetState(_initState);
-                }
-                return _state;
-            }
-        }
+        //protected StateEffect _state;
+        //public StateEffect State
+        //{
+        //    get
+        //    {
+        //        if (BaseUtils.IsNull(_state))
+        //        {
+        //            SetState(_initState);
+        //        }
+        //        return _state;
+        //    }
+        //}
 
         public bool Attacking { get; protected set; }
         public bool Active { get; protected set; }
@@ -59,7 +55,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         protected override void Start()
         {
             base.Start();
-            MoveDirection = Mathf.Sign(MoveSpeed);
+            MoveDirection = Mathf.Sign(MoveSpeed * Transform.right.x);
             _resetPosition = Transform.position;
             _resetRotation = Renderer?.transform.rotation ?? Image.transform.rotation;
         }
@@ -121,7 +117,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
                 _animator.SetTrigger("Sleep");
             }
 
-            State.Sleep();
+            //State.Sleep();
         }
 
         public virtual void Wake()
@@ -146,49 +142,49 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
                 _animator.SetTrigger("Wake");
             }
 
-            SetState(_initState);
-            State.Wake();
+            //SetState(_initState);
+            //State.Wake();
         }
 
-        public void SetState(StateType stateType, StateType? nextState = null)
-        {
-            if (BaseUtils.IsNull(_state))
-            {
-                _state = PoolHelper.Pool<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude);
-            }
-            else if (_state.StateType == stateType)
-            {
-                return;
-            }
+        //public void SetState(StateType stateType, StateType? nextState = null)
+        //{
+        //    if (BaseUtils.IsNull(_state))
+        //    {
+        //        _state = PoolHelper.Pool<StateEffect>(Transform.position, Quaternion.identity, 1f / Transform.lossyScale.magnitude);
+        //    }
+        //    else if (_state.StateType == stateType)
+        //    {
+        //        return;
+        //    }
 
-            _state.SetState(stateType);
+        //    _state.SetState(stateType);
 
-            // Launch related action
-            GetActionFromState(stateType, nextState)?.Invoke();
-        }
+        //    // Launch related action
+        //    GetActionFromState(stateType, nextState)?.Invoke();
+        //}
 
-        public void SetNextState(StateType stateType)
-        {
-            State.SetNextState(stateType);
-        }
+        //public void SetNextState(StateType stateType)
+        //{
+        //    State.SetNextState(stateType);
+        //}
 
-        public bool IsState(StateType stateType)
-        {
-            return State.StateType == stateType;
-        }
+        //public bool IsState(StateType stateType)
+        //{
+        //    return State.StateType == stateType;
+        //}
 
-        public bool IsNextState(StateType stateType)
-        {
-            return State.NextState == stateType;
-        }
+        //public bool IsNextState(StateType stateType)
+        //{
+        //    return State.NextState == stateType;
+        //}
 
         public override void Die(Transform killer = null, AudioFile sound = null, float volume = 1)
         {
-            if (!BaseUtils.IsNull(_state))
-            {
-                Destroy(_state.gameObject);
-                _state = null;
-            }
+            //if (!BaseUtils.IsNull(_state))
+            //{
+            //    Destroy(_state.gameObject);
+            //    _state = null;
+            //}
 
             if (!BaseUtils.IsNull(_castArea))
             {
@@ -207,7 +203,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         public virtual void DoReset()
         {
             Attacking = false;
-            SetState(_initState);
+            //SetState(_initState);
             Transform.position = _resetPosition;
 
             if (Renderer != null)
@@ -228,12 +224,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
 
         protected virtual float GetRotateSpeed()
         {
-            return _rotateSpeed * Time.deltaTime * GetRotationSpeedFactor(State.StateType);
+            return _rotateSpeed * Time.deltaTime;// * GetRotationSpeedFactor(State.StateType);
         }
 
         protected virtual float GetMovementSpeed()
         {
-            return _moveSpeed * Time.deltaTime * GetMovementSpeedFactor(State.StateType) * MoveDirection;
+            return _moveSpeed * Time.deltaTime;// * GetMovementSpeedFactor(State.StateType) * MoveDirection;
         }
 
         protected virtual void Flip()
@@ -277,6 +273,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
             }
         }
 
-        protected abstract Action GetActionFromState(StateType stateType, StateType? nextState = null);
+        //protected abstract Action GetActionFromState(StateType stateType, StateType? nextState = null);
     }
 }

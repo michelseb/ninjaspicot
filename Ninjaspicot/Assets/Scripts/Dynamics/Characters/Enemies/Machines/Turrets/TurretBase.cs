@@ -206,9 +206,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Turrets
             throw new NotImplementedException();
         }
 
-        protected override Action GetActionFromState(StateType stateType, StateType? nextState = null)
-        {
-            return null;
-        }
+        //protected override Action GetActionFromState(StateType stateType, StateType? nextState = null)
+        //{
+        //    return null;
+        //}
     }
 }

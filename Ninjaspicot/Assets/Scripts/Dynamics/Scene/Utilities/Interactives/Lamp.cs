@@ -9,7 +9,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
     public class Lamp : SceneryElement, ISceneryWakeable, IFocusable, IActivable, IResettable, IPoolable
     {
         public Animator Animator { get; private set; }
-        public override bool AlignedToWall => true;
 
         protected LightEffect _light;
 
