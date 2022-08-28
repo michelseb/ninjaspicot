@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,7 +19,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public override string ObjectsPath => "Scenes";
 
-        public IDictionary<string, Coroutine> RunningRoutines { get; } = new Dictionary<string, Coroutine>();
+        public IDictionary<Guid, Coroutine> RunningRoutines { get; } = new Dictionary<Guid, Coroutine>();
 
         public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
 

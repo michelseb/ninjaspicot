@@ -48,35 +48,56 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
         //    //Transform.position = _currentTarget;
         //}
 
-        public IEnumerator LaunchMove()
+        public IEnumerator LaunchMove(float duration, float moveVector)
         {
             if (!Grounded)
                 yield break;
 
             Grounded = false;
 
-            yield return StartCoroutine(MoveLeg());
+            yield return StartCoroutine(MoveLeg(duration, moveVector));
         }
 
-        private IEnumerator MoveLeg()
+        private IEnumerator MoveLeg(float duration, float moveVector)
         {
             var target = _legTarget.Transform;
-            var upPos = target.position + Transform.up * .2f;
+            var moveDistance = duration * moveVector;
+            var halfDuration = duration / 2;
+            var halfDistance = moveDistance / 2;
+            var targetPos = target.position + new Vector3(halfDistance, Transform.up.y * halfDistance); //+ Transform.up * .2f;
 
-            while (Mathf.Abs(upPos.y - Transform.position.y) > .01f)
+            for (var i = 0; i < 2; i++)
             {
-                upPos = target.position + Transform.up * .2f;
-                Transform.position = Vector3.MoveTowards(Transform.position, upPos, Time.deltaTime * _spiderBot.LegsSpeed);
-                yield return null;
-            }
+                var initPos = Transform.position;
+                var t = 0f;
 
-            while (Mathf.Abs(target.position.y - Transform.position.y) > .01f)
-            {
-                Transform.position = Vector3.MoveTowards(Transform.position, target.position, Time.deltaTime * _spiderBot.LegsSpeed);
-                yield return null;
+                while (t < halfDuration)
+                {
+                    Transform.position = Vector3.Lerp(initPos, targetPos, t / halfDuration);
+                    t += Time.deltaTime;
+
+                    yield return null;
+                }
+
+                targetPos = target.position + Transform.right * halfDistance;
             }
 
             Grounded = true;
+
+            //while (Mathf.Abs(upPos.y - Transform.position.y) > .01f)
+            //{
+            //    upPos = target.position + Transform.up * .2f;
+            //    Transform.position = Vector3.MoveTowards(Transform.position, upPos, Time.deltaTime * _spiderBot.LegsSpeed);
+            //    yield return null;
+            //}
+
+            //while (Mathf.Abs(target.position.y - Transform.position.y) > .01f)
+            //{
+            //    Transform.position = Vector3.MoveTowards(Transform.position, target.position, Time.deltaTime * _spiderBot.LegsSpeed);
+            //    yield return null;
+            //}
+
+            //Grounded = true;
         }
     }
 }

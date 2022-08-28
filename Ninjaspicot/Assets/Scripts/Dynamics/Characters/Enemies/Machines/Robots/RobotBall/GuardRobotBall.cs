@@ -35,7 +35,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         protected override void Start()
         {
             base.Start();
-            _initRotation = _head.rotation;
+            //_initRotation = _head.rotation;
 
             if (_targetPosition.HasValue)
             {

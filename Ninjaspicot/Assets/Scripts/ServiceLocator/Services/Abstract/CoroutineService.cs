@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 
@@ -6,7 +7,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
 {
     public class CoroutineService<T, U> : CollectionService<T, U>, ICoroutineService where U : IManageable<T>
     {
-        public IDictionary<string, Coroutine> RunningRoutines { get; } = new Dictionary<string, Coroutine>();
+        public IDictionary<Guid, Coroutine> RunningRoutines { get; } = new Dictionary<Guid, Coroutine>();
 
         public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
 

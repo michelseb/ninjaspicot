@@ -21,11 +21,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         protected HearingPerimeter _hearingPerimeter;
         protected Rigidbody2D _rigidbody;
         protected AudioFile _reactionSound;
-        protected Quaternion _initRotation;
+        //protected Quaternion _initRotation;
         protected float _wonderTime;
         protected float _wonderElapsedTime;
         protected float _delayBetweenActions = .3f;
         protected float _remainingTimeBeforeAction;
+        private Guid _movementId;
 
         protected ITimeService _timeService;
         protected ICoroutineService _coroutineService;
@@ -52,13 +53,14 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
             _timeService = ServiceFinder.Get<ITimeService>();
             _coroutineService = ServiceFinder.Get<ICoroutineService>();
+            _remainingTimeBeforeAction = _delayBetweenActions;
         }
 
         protected override void Start()
         {
             base.Start();
             _reactionSound = _audioService.FindByName("RobotReact");
-            _initRotation = _head.rotation;
+            //_initRotation = _head.rotation;
 
             Laser?.Deactivate(null);
         }
@@ -68,8 +70,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             if (!Active)
                 return;
 
-            var rot = _head.rotation.eulerAngles.z;
-            Renderer.flipY = rot > 90 && rot < 270;
+            var rot = _head.localRotation.eulerAngles.z % 360;
+            Renderer.flipY = rot >= 0 && rot < 180;
 
             //HandleState(State.StateType);
         }
@@ -372,7 +374,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         #region Patrol
         public virtual void Patrol()
         {
-            if (_coroutineService.IsCoroutineRunning(nameof(ExecuteNextMovement)))
+            if (_coroutineService.IsCoroutineRunning(_movementId))
                 return;
 
             if (_remainingTimeBeforeAction > 0)
@@ -382,7 +384,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
 
             _remainingTimeBeforeAction = _delayBetweenActions;
-            _coroutineService.StartCoroutine(ExecuteNextMovement());
+            _movementId = _coroutineService.StartCoroutine(ExecuteNextMovement());
         }
         #endregion
     }

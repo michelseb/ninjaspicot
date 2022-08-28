@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// <summary>
         /// Coroutines that are currently running
         /// </summary>
-        IDictionary<string, Coroutine> RunningRoutines { get; }
+        IDictionary<Guid, Coroutine> RunningRoutines { get; }
 
         /// <summary>
         /// Behaviour attached to service object that can run coroutines
@@ -20,42 +21,30 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// Run a coroutine on service behaviour and stops previous it if needed
         /// </summary>
         /// <param name="routine"></param>
-        /// <param name="stopPrevious"></param>
-        Coroutine StartCoroutine(IEnumerator routine, bool stopPrevious = true, string key = null)
+        Guid StartCoroutine(IEnumerator routine)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                var name = routine.GetType().Name;
-                var start = name.IndexOf('<') + 1;
-                var end = name.IndexOf('>');
-                key = name.Substring(start, end - start);
-            }
-
-            if (stopPrevious && RunningRoutines.ContainsKey(key))
-            {
-                StopCoroutine(key);
-            }
+            var key = Guid.NewGuid();
 
             var coroutine = CoroutineServiceBehaviour.StartCoroutine(CoroutineWrapper(key, routine));
             RunningRoutines.Add(key, coroutine);
 
-            return coroutine;
+            return key;
         }
 
         /// <summary>
         /// Stops a running coroutine
         /// </summary>
         /// <param name="name"></param>
-        void StopCoroutine(string name)
+        void StopCoroutine(Guid id)
         {
-            if (!RunningRoutines.ContainsKey(name))
+            if (!RunningRoutines.ContainsKey(id))
             {
-                Debug.LogError($"Routine with name {name} could not be stopped because it was not declared");
+                Debug.LogError($"Routine with id {id} could not be stopped because it was not declared");
                 return;
             }
 
-            CoroutineServiceBehaviour.StopCoroutine(RunningRoutines[name]);
-            EndCoroutine(name);
+            CoroutineServiceBehaviour.StopCoroutine(RunningRoutines[id]);
+            EndCoroutine(id);
         }
 
         /// <summary>
@@ -70,32 +59,32 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         }
 
         /// <summary>
-        /// Is coroutine with given name running
+        /// Is coroutine with given id running
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        bool IsCoroutineRunning(string name)
+        bool IsCoroutineRunning(Guid id)
         {
-            return RunningRoutines.ContainsKey(name);
+            return RunningRoutines.ContainsKey(id);
         }
 
-        private void EndCoroutine(string name)
+        private void EndCoroutine(Guid id)
         {
-            if (!RunningRoutines.ContainsKey(name))
+            if (!RunningRoutines.ContainsKey(id))
             {
-                Debug.LogError($"Routine with name {name} could not be ended because it was not declared");
+                Debug.LogError($"Routine with id {id} could not be ended because it was not declared");
                 return;
             }
 
-            RunningRoutines.Remove(name);
+            RunningRoutines.Remove(id);
         }
 
-        private IEnumerator CoroutineWrapper(string name, IEnumerator coroutine)
+        private IEnumerator CoroutineWrapper(Guid id, IEnumerator coroutine)
         {
             while (coroutine.MoveNext())
                 yield return coroutine.Current;
 
-            EndCoroutine(name);
+            EndCoroutine(id);
         }
     }
 }

@@ -13,8 +13,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         [SerializeField] private Transform _body;
 
         public int MovingLegsIndex { get; private set; }
-        public float LegsSpeed => MoveSpeed == 0 ? LegsSpeed : Mathf.Abs(MoveSpeed) * 3;
+        public float LegsSpeed => MoveSpeed == 0 ? LegsSpeed : MoveSpeed * 100;
         public float DelayBetweenLegSwitch => 1f / (2 * LegsSpeed + 1f);
+        private const float STEP_DURATION = .5f;
 
         public override SpriteRenderer Renderer
         {
@@ -39,23 +40,20 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             _robotLegs = GetComponentsInChildren<RobotLeg>().ToList();
         }
 
-        protected override void Start()
-        {
-            base.Start();
-
-            CurrentMovement = MovementType.Rotate;
-            //StartCoroutine(ExecuteMovement(CurrentMovement));
-        }
-
-
         private bool IsGapAhead()
         {
-            return !CastUtils.RayCast(_body.position, new Vector2(2 * MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES);
+            var cast = CastUtils.RayCast(_body.position, new Vector2(2 * MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES).collider == null;
+            Debug.Log("Gap ahead : " + cast);
+            
+            return cast;
         }
 
         private bool IsWallAhead()
         {
-            return CastUtils.RayCast(_body.position, Transform.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES);
+            var cast = CastUtils.RayCast(_body.position, Vector2.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES).collider != null;
+            Debug.Log("Wall ahead : " + cast);
+            
+            return cast;
         }
 
         //#region Check
@@ -132,15 +130,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             var movingLegs = _robotLegs.Where(l => l.Index == MovingLegsIndex).ToArray();
 
-            var backLegName = $"backLegMove_{Id}"; 
-            var frontLegName = $"frontLegMove_{Id}"; 
+            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(STEP_DURATION, MoveVector));
+            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(STEP_DURATION, MoveVector));
 
-            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(), key: backLegName);
-            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(), key: frontLegName);
+            var t = 0f;
+            var moveDistance = STEP_DURATION * MoveVector;
+            var initPos = _body.position;
+            var targetPos = initPos + _body.right * moveDistance;
 
-            while (_coroutineService.IsCoroutineRunning(frontLegName) || _coroutineService.IsCoroutineRunning(backLegName))
+            while (_coroutineService.IsCoroutineRunning(frontLegMove) || _coroutineService.IsCoroutineRunning(backLegMove))
             {
-                _body.Translate(_body.right * MoveSpeed * Time.deltaTime);
+                t += Time.deltaTime;
+                _body.position = Vector3.Lerp(initPos, targetPos, t);//.Translate(Transform.right * MoveVector);
 
                 yield return null;
             }
@@ -154,7 +155,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             while (t < 1)
             {
-                t += Time.deltaTime * RotateSpeed;
+                t += RotateSpeed;
                 _head.rotation = Quaternion.Slerp(initRotation, targetRotation, t);
 
                 yield return null;
@@ -207,11 +208,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             switch (CurrentMovement)
             {
                 case MovementType.Rotate:
-                    yield return StartCoroutine(RotateTo(_body.right * MoveDirection));
+                    Flip();
+                    yield return StartCoroutine(RotateTo(Vector2.right * MoveDirection));
                     break;
 
                 case MovementType.Move:
-                    yield return StartCoroutine(MoveTo(_body.right * MoveDirection));
+                    yield return StartCoroutine(MoveTo(default));
                     break;
             }
         }

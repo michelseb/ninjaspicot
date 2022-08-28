@@ -15,7 +15,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
         private AudioSource _globalAudioSource;
 
-        public IDictionary<string, Coroutine> RunningRoutines { get; } = new Dictionary<string, Coroutine>();
+        public IDictionary<Guid, Coroutine> RunningRoutines { get; } = new Dictionary<Guid, Coroutine>();
         public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
 
 

@@ -933,7 +933,7 @@ MonoBehaviour:
   _startAwake: 0
   _initState: 5
   _castArea: {fileID: 6909560911363664720}
-  _rotateSpeed: 90
+  _rotateSpeed: 5
   _moveSpeed: 30
   _head: {fileID: 2222234644949283292}
   _hearingRange: 60
@@ -1625,7 +1625,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7721702690441353852}
-  m_LocalRotation: {x: -0, y: -0, z: -0.7071103, w: 0.7071034}
+  m_LocalRotation: {x: 0, y: -0, z: 0.7071068, w: -0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1636,7 +1636,7 @@ RectTransform:
   - {fileID: 7057273969163453310}
   m_Father: {fileID: 931615805354912249}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 270}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 4.3935547, y: -0.054286674}

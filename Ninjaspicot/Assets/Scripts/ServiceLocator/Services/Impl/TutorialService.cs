@@ -30,7 +30,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         private float _initialDistanceToInstruction;
         private Queue<string> _instructions;
-        private Coroutine _tutorialLauncher;
+        private Guid _tutorialLauncher;
         private Image _containerImage;
 
         private Hero _hero;
@@ -94,7 +94,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         private void OnTriggerStay2D(Collider2D collision)
         {
-            if (_tutorialLauncher == null && !_started && collision.CompareTag("hero") && _hero.ClimbSkill.Attached)
+            if (_tutorialLauncher == default && !_started && collision.CompareTag("hero") && _hero.ClimbSkill.Attached)
             {
                 _tutorialLauncher = _coroutineService.StartCoroutine(LaunchTutorial());
             }
@@ -239,7 +239,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             InitTutorial(0);
             _started = true;
-            _tutorialLauncher = null;
+            _tutorialLauncher = default;
         }
 
         private void InitTutorial(int tutorialId)

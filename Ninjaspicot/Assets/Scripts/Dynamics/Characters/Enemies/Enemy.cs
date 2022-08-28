@@ -14,10 +14,21 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         [SerializeField] protected float _rotateSpeed;
         [SerializeField] protected float _moveSpeed;
 
+        /// <summary>
+        /// Move direction (between -1 and 1)
+        /// </summary>
         public float MoveDirection { get; set; }
 
+        /// <summary>
+        /// Move magnitude
+        /// </summary>
         public float MoveSpeed => GetMovementSpeed();
         public float RotateSpeed => GetRotateSpeed();
+
+        /// <summary>
+        /// Move speed * Move direction
+        /// </summary>
+        public float MoveVector => MoveDirection * MoveSpeed;
 
         //protected StateEffect _state;
         //public StateEffect State
