@@ -24,7 +24,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         //protected Quaternion _initRotation;
         protected float _wonderTime;
         protected float _wonderElapsedTime;
-        protected float _delayBetweenActions = .3f;
+        protected float _delayBetweenActions = .1f;
         protected float _remainingTimeBeforeAction;
         private Guid _movementId;
 
@@ -53,7 +53,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             _hearingPerimeter = GetComponentInChildren<HearingPerimeter>();
             _timeService = ServiceFinder.Get<ITimeService>();
             _coroutineService = ServiceFinder.Get<ICoroutineService>();
-            _remainingTimeBeforeAction = _delayBetweenActions;
+            _remainingTimeBeforeAction = 3f;
         }
 
         protected override void Start()

@@ -11,11 +11,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
     public class SpiderBot : Robot
     {
         [SerializeField] private Transform _body;
-
+        [SerializeField] private float _stepDuration = .3f;
         public int MovingLegsIndex { get; private set; }
         public float LegsSpeed => MoveSpeed == 0 ? LegsSpeed : MoveSpeed * 100;
-        public float DelayBetweenLegSwitch => 1f / (2 * LegsSpeed + 1f);
-        private const float STEP_DURATION = .5f;
 
         public override SpriteRenderer Renderer
         {
@@ -38,6 +36,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             base.Awake();
 
             _robotLegs = GetComponentsInChildren<RobotLeg>().ToList();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
+            _robotLegs.ForEach(x => x.SetBody(_body));
         }
 
         private bool IsGapAhead()
@@ -130,18 +135,19 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             var movingLegs = _robotLegs.Where(l => l.Index == MovingLegsIndex).ToArray();
 
-            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(STEP_DURATION, MoveVector));
-            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(STEP_DURATION, MoveVector));
+            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, MoveVector));
+            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, MoveVector));
 
             var t = 0f;
-            var moveDistance = STEP_DURATION * MoveVector;
-            var initPos = _body.position;
-            var targetPos = initPos + _body.right * moveDistance;
+            var moveDistance = _stepDuration * MoveVector;
+            var initPosX = _body.position.x;
+            var targetPosX = initPosX + moveDistance;
 
             while (_coroutineService.IsCoroutineRunning(frontLegMove) || _coroutineService.IsCoroutineRunning(backLegMove))
             {
                 t += Time.deltaTime;
-                _body.position = Vector3.Lerp(initPos, targetPos, t);//.Translate(Transform.right * MoveVector);
+                var xTarget = Mathf.Lerp(initPosX, targetPosX, t);
+                _body.position = new Vector3(xTarget, _body.position.y, _body.position.z);
 
                 yield return null;
             }
@@ -185,7 +191,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         private void SwitchMovingLegs()
         {
             MovingLegsIndex = 1 - MovingLegsIndex;
-            _remainingTimeBeforeAction = DelayBetweenLegSwitch;
         }
 
         //public override void MoveTo(Vector3 target)

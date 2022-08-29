@@ -1,20 +1,22 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Components
 {
     public class RobotLeg : Dynamic
     {
-        [SerializeField] private LegTarget _legTarget;
         [SerializeField] private int _index;
 
-        //private Vector2 _currentTarget;
-        //private const float REPLACEMENT_DISTANCE_THRESHOLD = .2f;
         private SpiderBot _spiderBot;
         public int Index => _index;
         public float Speed => _spiderBot.MoveSpeed;
         public bool Grounded { get; private set; }
+
+        private Transform _body;
+        private Vector3 _deltaPos;
 
         private void Awake()
         {
@@ -24,33 +26,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
         private void Start()
         {
             Grounded = true;
-            _legTarget.CheckGround();
-            //InitTarget();
         }
 
-        //private void Update()
-        //{
-        //    UpdateTarget();
-        //}
-
-        //private void UpdateTarget()
-        //{
-        //    if (_moveLeg != null || Vector3.Distance(_currentTarget, _legTarget.Transform.position) < REPLACEMENT_DISTANCE_THRESHOLD || _index != _spiderBot.MovingLegsIndex)
-        //        return;
-
-        //    LaunchMove();
-        //}
-
-        //public void InitTarget()
-        //{
-        //    //_legTarget.Transform.position += Vector3.right * (_liftTiming /*+ _spiderBot.LegsSpeed / 100*/);
-        //    _currentTarget = _legTarget.Transform.position;
-        //    //Transform.position = _currentTarget;
-        //}
+        public void SetBody(Transform body)
+        {
+            _body = body;
+            _deltaPos = Transform.position - body.position;
+        }
 
         public IEnumerator LaunchMove(float duration, float moveVector)
         {
-            if (!Grounded)
+            if (!Grounded || _body == null)
                 yield break;
 
             Grounded = false;
@@ -60,44 +46,54 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
 
         private IEnumerator MoveLeg(float duration, float moveVector)
         {
-            var target = _legTarget.Transform;
             var moveDistance = duration * moveVector;
-            var halfDuration = duration / 2;
-            var halfDistance = moveDistance / 2;
-            var targetPos = target.position + new Vector3(halfDistance, Transform.up.y * halfDistance); //+ Transform.up * .2f;
+            var checkPos = _body.position + _deltaPos + Vector3.right * moveDistance;
 
-            for (var i = 0; i < 2; i++)
+            var casts = new RaycastHit2D[]
             {
-                var initPos = Transform.position;
-                var t = 0f;
+                CastUtils.RayCast(checkPos, -_body.up, .5f, layerMask: CastUtils.OBSTACLES),
+                CastUtils.RayCast(checkPos, _body.up, 1, layerMask: CastUtils.OBSTACLES)
+            };
+            Debug.DrawRay(checkPos, -_body.up, Color.red, 1);
 
-                while (t < halfDuration)
-                {
-                    Transform.position = Vector3.Lerp(initPos, targetPos, t / halfDuration);
-                    t += Time.deltaTime;
+            var target = casts.FirstOrDefault(c => c).point;
 
-                    yield return null;
-                }
-
-                targetPos = target.position + Transform.right * halfDistance;
+            if (target == default)
+            {
+                Grounded = true;
+                yield break;
             }
 
+            var originBodyY = _body.localPosition.y;
+            var initPos = Transform.position;
+            var halfDuration = duration / 2;
+            var halfDistance = moveDistance / 2;
+            var meanHeight = (target.y + initPos.y) / 2;
+            var targetPos = new Vector3(initPos.x + halfDistance, meanHeight + Transform.up.y * Mathf.Abs(halfDistance));
+
+            yield return StartCoroutine(LegInterpolate(halfDuration, Transform.position, targetPos, originBodyY, originBodyY + Transform.up.y));
+            yield return StartCoroutine(LegInterpolate(halfDuration, Transform.position, target, _body.localPosition.y, originBodyY));
+
+            _body.localPosition = new Vector3(_body.localPosition.x, originBodyY);
+
             Grounded = true;
+        }
 
-            //while (Mathf.Abs(upPos.y - Transform.position.y) > .01f)
-            //{
-            //    upPos = target.position + Transform.up * .2f;
-            //    Transform.position = Vector3.MoveTowards(Transform.position, upPos, Time.deltaTime * _spiderBot.LegsSpeed);
-            //    yield return null;
-            //}
+        private IEnumerator LegInterpolate(float duration, Vector3 initPos, Vector3 targetPos, float initBodyY, float targetBodyY)
+        {
+            var t = 0f;
 
-            //while (Mathf.Abs(target.position.y - Transform.position.y) > .01f)
-            //{
-            //    Transform.position = Vector3.MoveTowards(Transform.position, target.position, Time.deltaTime * _spiderBot.LegsSpeed);
-            //    yield return null;
-            //}
+            while (t < duration)
+            {
+                Transform.position = Vector3.Lerp(initPos, targetPos, t / duration);
 
-            //Grounded = true;
+                var bodyTargetY = Mathf.Lerp(initBodyY, targetBodyY, t / duration);
+                _body.localPosition = new Vector3(_body.localPosition.x, bodyTargetY);
+
+                t += Time.deltaTime;
+
+                yield return null;
+            }
         }
     }
 }
