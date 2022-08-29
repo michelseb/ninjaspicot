@@ -211,7 +211,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
             Sleep();
         }
 
-        public virtual void DoReset()
+        public override void DoReset()
         {
             Attacking = false;
             //SetState(_initState);

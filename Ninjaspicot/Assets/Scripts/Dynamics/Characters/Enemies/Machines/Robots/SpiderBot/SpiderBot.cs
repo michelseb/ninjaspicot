@@ -12,8 +12,15 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
     {
         [SerializeField] private Transform _body;
         [SerializeField] private float _stepDuration = .3f;
+        [SerializeField] private float _stepDistance = .5f;
+
         public int MovingLegsIndex { get; private set; }
-        public float LegsSpeed => MoveSpeed == 0 ? LegsSpeed : MoveSpeed * 100;
+
+        private Vector3 _bodyOffset;
+
+        // Caching legs to recover body rotation
+        private Transform _legIndex0;
+        private Transform _legIndex1;
 
         public override SpriteRenderer Renderer
         {
@@ -43,21 +50,45 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             base.Start();
 
             _robotLegs.ForEach(x => x.SetBody(_body));
+
+            _bodyOffset = _body.position - GetLegMeanPosition();
+
+            _legIndex0 = _robotLegs.FirstOrDefault(l => l.Index == 0).Transform;
+            _legIndex1 = _robotLegs.FirstOrDefault(l => l.Index == 1).Transform;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var meanPosition = GetLegMeanPosition();
+            _body.position = meanPosition + _bodyOffset;
+            _body.rotation = Quaternion.Euler(0, 0, 90) * GetBodyRotation();
+        }
+
+        private Vector3 GetLegMeanPosition()
+        {
+            return _robotLegs.Select(l => l.Transform.position).Aggregate((sum, vector) => sum + vector) / _robotLegs.Count;
+        }
+
+        private Quaternion GetBodyRotation()
+        {
+            return Quaternion.LookRotation(Vector3.forward, _legIndex0.position - _legIndex1.position);
         }
 
         private bool IsGapAhead()
         {
-            var cast = CastUtils.RayCast(_body.position, new Vector2(2 * MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES).collider == null;
+            var cast = CastUtils.RayCast(_head.position, new Vector2(MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES).collider == null;
             Debug.Log("Gap ahead : " + cast);
-            
+
             return cast;
         }
 
         private bool IsWallAhead()
         {
-            var cast = CastUtils.RayCast(_body.position, Vector2.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES).collider != null;
+            var cast = CastUtils.RayCast(_head.position, Vector2.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES).collider != null;
             Debug.Log("Wall ahead : " + cast);
-            
+
             return cast;
         }
 
@@ -135,22 +166,14 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             var movingLegs = _robotLegs.Where(l => l.Index == MovingLegsIndex).ToArray();
 
-            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, MoveVector));
-            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, MoveVector));
+            var movePoint = _stepDistance * MoveDirection;
 
-            var t = 0f;
-            var moveDistance = _stepDuration * MoveVector;
-            var initPosX = _body.position.x;
-            var targetPosX = initPosX + moveDistance;
+            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint));
+            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint));
 
             while (_coroutineService.IsCoroutineRunning(frontLegMove) || _coroutineService.IsCoroutineRunning(backLegMove))
-            {
-                t += Time.deltaTime;
-                var xTarget = Mathf.Lerp(initPosX, targetPosX, t);
-                _body.position = new Vector3(xTarget, _body.position.y, _body.position.z);
-
                 yield return null;
-            }
+
         }
 
         protected override IEnumerator RotateTo(Vector3 target)

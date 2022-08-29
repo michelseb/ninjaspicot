@@ -17,6 +17,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         [SerializeField] protected float _hearingRange;
         [SerializeField] protected float _checkWonderTime;
         [SerializeField] protected float _returnWonderTime;
+        [SerializeField] protected float _delayBetweenActions = .1f;
 
         protected HearingPerimeter _hearingPerimeter;
         protected Rigidbody2D _rigidbody;
@@ -24,7 +25,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         //protected Quaternion _initRotation;
         protected float _wonderTime;
         protected float _wonderElapsedTime;
-        protected float _delayBetweenActions = .1f;
         protected float _remainingTimeBeforeAction;
         private Guid _movementId;
 

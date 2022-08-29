@@ -34,19 +34,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
             _deltaPos = Transform.position - body.position;
         }
 
-        public IEnumerator LaunchMove(float duration, float moveVector)
+        public IEnumerator LaunchMove(float duration, float moveDistance)
         {
             if (!Grounded || _body == null)
                 yield break;
 
             Grounded = false;
 
-            yield return StartCoroutine(MoveLeg(duration, moveVector));
+            yield return StartCoroutine(MoveLeg(duration, moveDistance));
         }
 
-        private IEnumerator MoveLeg(float duration, float moveVector)
+        private IEnumerator MoveLeg(float duration, float moveDistance)
         {
-            var moveDistance = duration * moveVector;
             var checkPos = _body.position + _deltaPos + Vector3.right * moveDistance;
 
             var casts = new RaycastHit2D[]
@@ -54,7 +53,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
                 CastUtils.RayCast(checkPos, -_body.up, .5f, layerMask: CastUtils.OBSTACLES),
                 CastUtils.RayCast(checkPos, _body.up, 1, layerMask: CastUtils.OBSTACLES)
             };
-            Debug.DrawRay(checkPos, -_body.up, Color.red, 1);
+            
+            //Debug.DrawRay(checkPos, -_body.up, Color.red, 1);
 
             var target = casts.FirstOrDefault(c => c).point;
 
@@ -64,36 +64,32 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
                 yield break;
             }
 
-            var originBodyY = _body.localPosition.y;
+            var moveSpeed = Mathf.Abs(moveDistance) / duration;
             var initPos = Transform.position;
             var halfDuration = duration / 2;
             var halfDistance = moveDistance / 2;
             var meanHeight = (target.y + initPos.y) / 2;
             var targetPos = new Vector3(initPos.x + halfDistance, meanHeight + Transform.up.y * Mathf.Abs(halfDistance));
 
-            yield return StartCoroutine(LegInterpolate(halfDuration, Transform.position, targetPos, originBodyY, originBodyY + Transform.up.y));
-            yield return StartCoroutine(LegInterpolate(halfDuration, Transform.position, target, _body.localPosition.y, originBodyY));
-
-            _body.localPosition = new Vector3(_body.localPosition.x, originBodyY);
+            yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, targetPos));
+            yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, target));
 
             Grounded = true;
         }
 
-        private IEnumerator LegInterpolate(float duration, Vector3 initPos, Vector3 targetPos, float initBodyY, float targetBodyY)
+        private IEnumerator LegInterpolate(float duration, float speed, Vector3 initPos, Vector3 targetPos)
         {
             var t = 0f;
 
             while (t < duration)
             {
                 Transform.position = Vector3.Lerp(initPos, targetPos, t / duration);
-
-                var bodyTargetY = Mathf.Lerp(initBodyY, targetBodyY, t / duration);
-                _body.localPosition = new Vector3(_body.localPosition.x, bodyTargetY);
-
-                t += Time.deltaTime;
+                t += Time.deltaTime * speed;
 
                 yield return null;
             }
+
+            Transform.position = targetPos;
         }
     }
 }

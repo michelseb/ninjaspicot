@@ -841,14 +841,16 @@ MonoBehaviour:
   _startAwake: 0
   _initState: 5
   _castArea: {fileID: 6909560911363664720}
-  _rotateSpeed: 5
+  _rotateSpeed: 2
   _moveSpeed: 50
   _head: {fileID: 2222234644949283292}
   _hearingRange: 60
   _checkWonderTime: 1
   _returnWonderTime: 3
+  _delayBetweenActions: 0.1
   _body: {fileID: 6451305632618726178}
   _stepDuration: 0.3
+  _stepDistance: 0.2
 --- !u!114 &4290168603039662412
 MonoBehaviour:
   m_ObjectHideFlags: 0
