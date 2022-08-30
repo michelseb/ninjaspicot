@@ -7329,11 +7329,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7430314514506290238, guid: b58802812ee1103448b86cd061689ccc,
         type: 3}
-      propertyPath: _size
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 7430314514506290238, guid: b58802812ee1103448b86cd061689ccc,
-        type: 3}
       propertyPath: _startAngle
       value: -90
       objectReference: {fileID: 0}

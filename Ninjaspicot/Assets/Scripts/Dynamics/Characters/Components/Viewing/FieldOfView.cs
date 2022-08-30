@@ -23,10 +23,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
 
         protected Mesh _mesh;
         protected MeshFilter _filter;
-        protected IRaycastable _parent;
         protected PolygonCollider2D _collider;
         protected MeshRenderer _renderer;
-        protected Color _color;
         private Vertex[] _vertices;
         private ContactFilter2D _contactFilter;
         private bool _isVisible;
@@ -44,14 +42,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
             _renderer = GetComponent<MeshRenderer>();
             _filter = GetComponent<MeshFilter>();
             _collider = GetComponent<PolygonCollider2D>();
-            _parent = Transform.parent?.GetComponent<IRaycastable>();
 
             if (_customColor != CustomColor.None)
             {
-                _color = ColorUtils.GetColor(_customColor, TRANSPARENCY);
-                SetColor(_color);
+                SetColor(ColorUtils.GetColor(_customColor, TRANSPARENCY));
             }
-
 
             _angleStep = _viewAngle / _detailAmount;
             _angleAxis = Quaternion.AngleAxis(_viewAngle / 2f, Vector3.forward) * _startAngle;
@@ -108,14 +103,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
         private Mesh InitMesh(float size, int pointCount)
         {
             var mesh = new Mesh();
-
-            var initRotation = Transform.rotation;
-
-            _vertices = new Vertex[pointCount + 1];
             var uvs = new Vector2[pointCount + 1];
             var triangles = new int[pointCount * 3];
             var colliderPoints = new List<Vector2> { Vector2.zero };
 
+            _vertices = new Vertex[pointCount + 1];
             _vertices[0] = new Vertex(Vector2.zero);
             uvs[0] = Vector2.zero;
 
@@ -131,13 +123,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                     direction = Quaternion.Euler(0, 0, -_angleStep) * direction;
                 }
 
-                var vertexVector = direction * size;
+                var vertexVector = new Vector3(
+                    direction.x * (1 / Transform.lossyScale.x),
+                    direction.y * (1 / Transform.lossyScale.y),
+                    direction.z * (1 / Transform.lossyScale.z)) * size;
+
                 _vertices[i] = new Vertex(vertexVector);
                 uvs[i] = new Vector2(vertexVector.x, vertexVector.y);
 
                 if (i % colliderInterval == 1)
                 {
-                    colliderPoints.Add(direction * size);
+                    colliderPoints.Add(vertexVector);
                 }
 
                 if (i < pointCount)
@@ -149,7 +145,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                 }
             }
 
-            colliderPoints.Add(direction * size);
+            colliderPoints.Add(new Vector3(
+                    direction.x * (1 / Transform.lossyScale.x),
+                    direction.y * (1 / Transform.lossyScale.y),
+                    direction.z * (1 / Transform.lossyScale.z)) * size);
 
             mesh.vertices = _vertices.Select(x => x.DefaultPos).ToArray();
             mesh.triangles = triangles;
@@ -176,10 +175,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                     direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
                 }
 
-                //Debug.DrawRay(_transform.position, direction * size, Color.yellow); //=> gourmand
+                Debug.DrawRay(Transform.position, direction * size, Color.yellow); //=> gourmand
 
                 var results = new RaycastHit2D[1];
-                var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size / 5);
+                var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size);
                 if (hits > 0)
                 {
                     _vertices[i].Modified = true;
