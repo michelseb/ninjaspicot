@@ -175,7 +175,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components.Viewing
                     direction = Quaternion.AngleAxis(-_angleStep, Vector3.forward).normalized * direction;
                 }
 
-                Debug.DrawRay(Transform.position, direction * size, Color.yellow); //=> gourmand
+                //Debug.DrawRay(Transform.position, direction * size, Color.yellow); //=> gourmand
 
                 var results = new RaycastHit2D[1];
                 var hits = Physics2D.Raycast(Transform.position, direction, _contactFilter, results, size);

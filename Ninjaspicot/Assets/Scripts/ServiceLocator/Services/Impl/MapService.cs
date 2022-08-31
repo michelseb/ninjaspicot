@@ -36,6 +36,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             {
                 GenerateAt(localizedColor.Key, localizedColor.Value);
             }
+
+            _tileService.GenerateShadows();
         }
 
         private Dictionary<PoolSetting, Color32> GetLocalizedColors(Texture2D map)

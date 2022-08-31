@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
+using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 using ZepLink.RiceNinja.Utils;
@@ -8,6 +10,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
     public class TileService : CollectionService<Vector3Int, Dynamics.Scenery.Map.Tile>, ITileService
     {
+        private ShadowCaster _caster;
+
         private Tilemap _tileMap;
         public Tilemap Tilemap
         {
@@ -21,14 +25,28 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                             typeof(TilemapRenderer),
                             typeof(TilemapCollider2D),
                             typeof(CompositeCollider2D),
+                            typeof(CompositeShadowCaster2D),
+                            typeof(ShadowCaster),
                             typeof(Obstacle))
                         .GetComponent<Tilemap>();
 
+                    _tileMap.gameObject.isStatic = true;
                     _tileMap.gameObject.layer = LayerMask.NameToLayer("Obstacle");
                     _tileMap.GetComponent<Rigidbody2D>().isKinematic = true;
 
                     _tileMap.orientation = Tilemap.Orientation.XY;
                     _tileMap.transform.SetParent(grid.transform);
+
+                    var collider = _tileMap.GetComponent<TilemapCollider2D>();
+
+                    collider.usedByComposite = true;
+                    collider.extrusionFactor = .1f;
+
+                    var composite = _tileMap.GetComponent<CompositeCollider2D>();
+
+                    composite.offsetDistance = .1f;
+
+                    _caster = _tileMap.GetComponent<ShadowCaster>();
                 }
 
                 return _tileMap;
@@ -38,6 +56,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         public void SetTile(Vector3Int coords, TileBase tile)
         {
             Tilemap.SetTile(coords, tile);
+        }
+
+        public void GenerateShadows()
+        {
+            _caster?.Generate();
         }
     }
 }

@@ -68,6 +68,15 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
             return RunningRoutines.ContainsKey(id);
         }
 
+        /// <summary>
+        /// Execute action with tiny delay (.01 sec)
+        /// </summary>
+        /// <param name="action"></param>
+        void ExecuteNextFrame(Action action)
+        {
+            CoroutineServiceBehaviour.Invoke(action.Method.Name, .01f);
+        }
+
         private void EndCoroutine(Guid id)
         {
             if (!RunningRoutines.ContainsKey(id))

@@ -16,8 +16,10 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
         private Color _initColor;
         private float _initIntensity;
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             _animator = GetComponent<Animator>();
             _light = GetComponent<Light2D>();
             _initColor = _light.color;

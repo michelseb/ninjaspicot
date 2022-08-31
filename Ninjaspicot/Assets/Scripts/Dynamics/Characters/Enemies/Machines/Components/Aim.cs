@@ -10,10 +10,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Components
         public bool TargetInRange { get; internal set; }
         public bool TargetInView { get; internal set; }
 
-        // TODO : Handle vision with events ? (possible to pass args ?)
-        public delegate void ViewAction();
-        public event ViewAction OnView;
-
         protected virtual void Update()
         {
             if (!Active)

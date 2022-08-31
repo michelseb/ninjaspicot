@@ -850,7 +850,7 @@ MonoBehaviour:
   _delayBetweenActions: 0.1
   _body: {fileID: 6451305632618726178}
   _stepDuration: 0.3
-  _stepDistance: 0.2
+  _stepDistance: 0.3
 --- !u!114 &4290168603039662412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6725,6 +6725,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
         type: 3}
+      propertyPath: m_PointLightInnerRadius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
+        type: 3}
+      propertyPath: m_PointLightOuterRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3443929097045683638, guid: 1c625cc13688e8444bc2b84a06504ebe,
+        type: 3}
       propertyPath: m_LocalBounds.m_Center.y
       value: -0.00000011920929
       objectReference: {fileID: 0}
@@ -7325,7 +7335,7 @@ PrefabInstance:
     - target: {fileID: 7430314514506290235, guid: b58802812ee1103448b86cd061689ccc,
         type: 3}
       propertyPath: m_Name
-      value: FieldOfView
+      value: Aim
       objectReference: {fileID: 0}
     - target: {fileID: 7430314514506290238, guid: b58802812ee1103448b86cd061689ccc,
         type: 3}

@@ -232,11 +232,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         {
             base.Sleep();
 
-            Aim?.Deactivate();
-            Laser?.Deactivate();
+            Aim.Deactivate();
+            Laser.Deactivate();
             _castArea.enabled = false;
-            _hearingPerimeter?.EraseSoundMark();
-            _hearingPerimeter?.Deactivate();
+            _hearingPerimeter.EraseSoundMark();
+            _hearingPerimeter.Deactivate();
         }
 
         public override void Wake()
@@ -244,7 +244,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             base.Wake();
 
             _castArea.enabled = true;
-            _hearingPerimeter?.Activate();
+            _hearingPerimeter.Activate();
 
             if (_initState != StateType.Sleep)
             {

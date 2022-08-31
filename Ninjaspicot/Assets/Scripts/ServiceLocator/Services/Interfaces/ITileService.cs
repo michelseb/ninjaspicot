@@ -15,5 +15,10 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// </summary>
         /// <param name="tile"></param>
         void SetTile(Vector3Int coords, TileBase tile);
+
+        /// <summary>
+        /// Generate shadows for tilemap
+        /// </summary>
+        void GenerateShadows();
     }
 }
