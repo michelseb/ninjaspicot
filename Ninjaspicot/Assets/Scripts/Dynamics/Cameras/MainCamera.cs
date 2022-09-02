@@ -258,9 +258,9 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             }
         }
 
-        public void Shake(float duration, float strength)
+        public void Shake()
         {
-            _coroutineService.StartCoroutine(DoShake(duration, strength));
+            _coroutineService.StartCoroutine(DoShake(.1f, .1f));
         }
 
         private IEnumerator DoShake(float duration, float strength)
@@ -280,7 +280,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                 yield return null;
             }
 
-            Transform.localPosition = pos;
+            transform.localPosition = pos;
         }
 
         public void SetTracker(ITracker tracker)

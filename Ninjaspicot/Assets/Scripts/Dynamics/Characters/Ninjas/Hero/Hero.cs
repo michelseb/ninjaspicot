@@ -26,6 +26,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         public int LastTrigger { get; private set; }
         public bool Detected { get; private set; }
         public bool Visible { get; private set; }
+        public int RevealerCount { get; private set; }
 
         #region Skills
         public HopSkill HopSkill { get; private set; }
@@ -38,6 +39,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         private ITouchService _touchService;
         private IZoneService _zoneService;
         private ISkillService _skillService;
+        private ILightService _lightService;
 
         private Cloth _cape;
         private Coroutine _displayGhosts;
@@ -67,6 +69,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             _touchService = ServiceFinder.Get<ITouchService>();
             _zoneService = ServiceFinder.Get<IZoneService>();
             _skillService = ServiceFinder.Get<ISkillService>();
+            _lightService = ServiceFinder.Get<ILightService>();
 
             _uiCamera = UICamera.Instance;
             _cape = GetComponentInChildren<Cloth>();
@@ -258,11 +261,22 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public virtual void Hide()
         {
-            Visible = false;
+            RevealerCount--;
+
+            if (RevealerCount <= 0)
+            {
+                Renderer.color = ColorUtils.Grey;
+                _lightService.DimmAmbiant();
+                Visible = false;
+                RevealerCount = 0;
+            }
         }
 
         public virtual void Reveal()
         {
+            RevealerCount++;
+            Renderer.color = ColorUtils.White;
+            _lightService.BrightenAmbiant();
             Visible = true;
         }
 
@@ -330,7 +344,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnRightSideTouch() { }
 
-        public void OnRightSideTouchEnd() 
+        public void OnRightSideTouchEnd()
         {
             ChargeSkill.RestoreGravity();
             ChargeSkill.SetJumpPressing(false);
@@ -363,6 +377,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
                 ClimbSkill.StopWalking(false);
                 ClimbSkill.Detach();
                 ChargeSkill.Jump(direction);
+                _lightService.ChromaBlast();
+                _cameraService.MainCamera.Shake();
             }
         }
 

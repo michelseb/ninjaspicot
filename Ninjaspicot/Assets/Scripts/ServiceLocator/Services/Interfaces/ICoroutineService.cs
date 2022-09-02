@@ -39,7 +39,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         {
             if (!RunningRoutines.ContainsKey(id))
             {
-                Debug.LogError($"Routine with id {id} could not be stopped because it was not declared");
+                Debug.LogWarning($"Routine with id {id} could not be stopped because it was not declared");
                 return;
             }
 

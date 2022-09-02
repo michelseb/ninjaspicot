@@ -18,11 +18,11 @@ namespace ZepLink.RiceNinja.ServiceLocator
                 return;
 
             sl.Register<ICharacterService>(new CharacterService());
-            sl.Register<ILightService>(new LightService());
             sl.Register<ISkillService>(new SkillService());
             sl.Register<IAnimationService>(new AnimationService());
             var audioService = sl.Register<IAudioService>(new AudioService());
             var coroutineService = sl.Register<ICoroutineService>(new CoroutineService<Guid, GuidManageable>());
+            sl.Register<ILightService>(new LightService(coroutineService));
             var cameraService = sl.Register<ICameraService>(new CameraService());
             var zoneService = sl.Register<IZoneService>(new ZoneService(cameraService));
             var timeService = sl.Register<ITimeService>(new TimeService(audioService));

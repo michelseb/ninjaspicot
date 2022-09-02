@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 9131827216875105256}
   - component: {fileID: -2423949984176087067}
   - component: {fileID: 8982027021254741701}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Rice Ninja
   m_TagString: hero
   m_Icon: {fileID: 0}

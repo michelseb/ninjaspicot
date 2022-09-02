@@ -10,6 +10,7 @@ namespace ZepLink.RiceNinja.Utils
         Red,
         DarkRed,
         Green,
+        Grey,
         White,
         Blue,
         Yellow,
@@ -22,6 +23,7 @@ namespace ZepLink.RiceNinja.Utils
     {
         public static Color Red => new Color(0.87f, 0.23f, 0.23f, 1);
         public static Color Green => new Color(0, 1, 0.5f, 1);
+        public static Color Grey => new Color(.6f, .6f, .6f, 1);
         public static Color White => new Color(1, 1, 1, 1);
         public static Color Blue => new Color(0, 0.8f, 1);
         public static Color NightBlue => new Color(0, .1f, .2f);
@@ -34,6 +36,7 @@ namespace ZepLink.RiceNinja.Utils
         {
             { CustomColor.White, White },
             { CustomColor.Green, Green },
+            { CustomColor.Grey, Grey },
             { CustomColor.Red, Red },
             { CustomColor.Blue, Blue },
             { CustomColor.Yellow, Yellow },

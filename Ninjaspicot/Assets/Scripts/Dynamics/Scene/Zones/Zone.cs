@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
-using ZepLink.RiceNinja.Dynamics.Characters;
 using ZepLink.RiceNinja.Dynamics.Characters.Enemies;
 using ZepLink.RiceNinja.Dynamics.Effects.Lights;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
@@ -38,13 +37,14 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         [SerializeField] private List<GameObject> _additionalResettables;
         protected List<IResettable> _resettables;
         protected List<Enemy> _enemies;
-        protected Animator _animator;
         protected CheckPoint _checkpoint;
+
         protected AmbiantLight _ambiant;
+        public AmbiantLight Ambiant { get { if (BaseUtils.IsNull(_ambiant)) _ambiant = GetComponentInChildren<AmbiantLight>(); return _ambiant; } }
 
         protected ISpawnService _spawnService;
         protected IZoneService _zoneService;
-        protected IAnimationService _animationService;
+        protected ILightService _lightService;
 
         public bool Initialized { get; protected set; }
         public bool DeathOccured => _enemies?.Any(e => e.Dead) ?? false;
@@ -53,11 +53,8 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
         {
             _spawnService = ServiceFinder.Get<ISpawnService>();
             _zoneService = ServiceFinder.Get<IZoneService>();
-            _animationService = ServiceFinder.Get<IAnimationService>();
+            _lightService = ServiceFinder.Get<ILightService>();
 
-            _animator = GetComponent<Animator>();
-            _animator.runtimeAnimatorController = _animationService.FindByName("Zone").AnimatorController;
-            _ambiant = GetComponentInChildren<AmbiantLight>();
         }
 
         public virtual void Init()
@@ -67,7 +64,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
             _resettables = GetComponentsInChildren<IResettable>().ToList();
             _enemies = GetComponentsInChildren<Enemy>().ToList();
             _checkpoint = GetComponentInChildren<CheckPoint>();
-
+            //_animator.SetTrigger("Open");
             Initialized = true;
         }
 
@@ -77,23 +74,26 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
                 return;
 
             _zoneService.SetZone(Id);
+            _lightService.SetAmbiant(Ambiant);
         }
 
         public virtual void Open()
         {
-            _animator.SetTrigger("Open");
+            Ambiant.Wake();
+            //_animator.SetTrigger("Open");
             Wake();
         }
 
         public virtual void Close()
         {
-            _animator.SetTrigger("Close");
+            Ambiant.Sleep();
+            //_animator.SetTrigger("Close");
             Sleep();
         }
 
         public virtual void CloseForever()
         {
-            _animator.SetTrigger("Close");
+            //_animator.SetTrigger("Close");
             Sleep();
             Destroy(gameObject, 2f);
         }
@@ -134,7 +134,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Zones
 
         public void ActivateAlarm()
         {
-            _ambiant.SetColor(CustomColor.DarkRed, 1.5f);
+            Ambiant.SetColor(CustomColor.DarkRed, 1.5f);
             //_enemies.ForEach(e => e.SetState(StateType.LookFor));
         }
 

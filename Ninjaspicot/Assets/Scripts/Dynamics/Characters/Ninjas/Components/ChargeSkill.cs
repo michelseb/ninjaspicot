@@ -78,7 +78,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             Rigidbody.position = ChargeDestination;
 
             NormalJump(direction);
-            //_cameraService.MainCamera.Shake(.3f, .5f);
         }
     }
 }

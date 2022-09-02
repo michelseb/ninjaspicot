@@ -7342,6 +7342,11 @@ PrefabInstance:
       propertyPath: _startAngle
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 8083020993304209799, guid: b58802812ee1103448b86cd061689ccc,
+        type: 3}
+      propertyPath: _size
+      value: 2.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b58802812ee1103448b86cd061689ccc, type: 3}
 --- !u!4 &1377300805626659849 stripped

@@ -10,7 +10,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
     {
         public Animator Animator { get; private set; }
 
-        protected LightEffect _light;
+        protected RevealingLight _light;
 
         public bool StayOn { get; set; }
         public bool IsSilent => false;
@@ -22,7 +22,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
         protected virtual void Awake()
         {
             Animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
-            _light = GetComponent<LightEffect>();
+            _light = GetComponentInChildren<RevealingLight>();
         }
 
         public virtual void Wake()

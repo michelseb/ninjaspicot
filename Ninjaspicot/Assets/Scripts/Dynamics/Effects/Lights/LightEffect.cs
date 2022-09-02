@@ -8,11 +8,11 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
 {
     public abstract class LightEffect : Dynamic, IPoolable
     {
-        protected Light2D _light;
+        public Light2D Light { get; protected set; }
 
         protected virtual void Awake()
         {
-            _light = GetComponentInChildren<Light2D>();
+            Light = GetComponentInChildren<Light2D>();
         }
 
         public void Pool(Vector3 position, Quaternion rotation, float size = 1)
@@ -41,8 +41,8 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
 
         public void SetColor(Color color, float intensity = 1)
         {
-            _light.color = color;
-            _light.intensity = intensity;
+            Light.color = color;
+            Light.intensity = intensity;
         }
     }
 }

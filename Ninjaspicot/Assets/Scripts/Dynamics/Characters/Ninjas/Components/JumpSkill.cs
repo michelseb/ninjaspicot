@@ -159,8 +159,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
                 _timeService.SetNormalTime();
             }
 
-            //_cameraService.MainCamera.Shake(.3f, .1f);
-
             direction = direction.normalized;
 
             LoseJump();

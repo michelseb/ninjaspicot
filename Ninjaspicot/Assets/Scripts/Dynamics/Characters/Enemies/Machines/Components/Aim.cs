@@ -10,18 +10,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Components
         public bool TargetInRange { get; internal set; }
         public bool TargetInView { get; internal set; }
 
-        protected virtual void Update()
-        {
-            if (!Active)
-                return;
+        //protected virtual void Update()
+        //{
+        //    if (!Active)
+        //        return;
 
-            var dist = Vector3.Distance(Viewer.CurrentTarget.Transform.position, Transform.position);
-            TargetInRange = dist < _size;
-            if (!TargetInRange && TargetInView)
-            {
-                TargetInView = false;
-            }
-        }
+        //    var dist = Vector3.Distance(Viewer.CurrentTarget.Transform.position, Transform.position);
+        //    TargetInRange = dist < _size;
+        //    if (!TargetInRange && TargetInView)
+        //    {
+        //        TargetInView = false;
+        //    }
+        //}
 
         protected override void OnTriggerEnter2D(Collider2D collider)
         {

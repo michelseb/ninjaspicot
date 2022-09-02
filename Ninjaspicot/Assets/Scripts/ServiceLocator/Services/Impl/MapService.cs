@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using ZepLink.RiceNinja.Dynamics.Effects.Lights;
 using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Helpers;
@@ -71,7 +72,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             foreach (var z in zones)
             {
-                var zoneObject = new GameObject("zone", typeof(Animator), typeof(Light2D), typeof(PolygonCollider2D), typeof(Zone));
+                var zoneObject = new GameObject("zone", typeof(PolygonCollider2D), typeof(Zone));
                 var zone = zoneObject.GetComponent<Zone>();
                 _zoneService.Add(zone);
 
@@ -93,8 +94,14 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 var collider = zoneObject.GetComponent<PolygonCollider2D>();
                 collider.isTrigger = true;
                 collider.points = z.Select(x => new Vector2(x.x, x.y) + new Vector2(1.5f * Mathf.Sign(x.x - middle.x), 1.5f * Mathf.Sign(x.y - middle.y))/*(new Vector2(x.x, x.y) - middle).normalized * 3*/).ToArray();
+                collider.transform.position = Vector3.one * .5f;
 
-                var light = zoneObject.GetComponent<Light2D>();
+
+                var ambiant = new GameObject("ambiant", typeof(AmbiantLight), typeof(Light2D)/*, typeof(Animator)*/);
+                ambiant.transform.SetParent(zone.Transform);
+
+                var light = ambiant.GetComponent<Light2D>();
+
                 light.lightType = Light2D.LightType.Freeform;
                 light.intensity = 2f;
                 light.color = ColorUtils.NightBlue;
