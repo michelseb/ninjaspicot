@@ -22,12 +22,12 @@ namespace ZepLink.RiceNinja.Helpers
 
     public static class InterpolationHelper
     {
-        public static void Lerp<T>(IList<Interpolation<T>> interpolations) where T : struct
+        public static void Lerp<T>(ref T value, IList<Interpolation<T>> interpolations) where T : struct
         {
             switch (typeof(T).Name)
             {
                 case "Vector3":
-                    ServiceFinder.Instance.Get<ICoroutineService>().StartCoroutine(LerpVector((IList<Interpolation<Vector3>>)interpolations));
+                    //ServiceFinder.Instance.Get<ICoroutineService>().StartCoroutine(LerpVector((Vector3)value, (IList<Interpolation<Vector3>>)interpolations));
                     break;
 
                 case "Quaternion":
@@ -41,18 +41,18 @@ namespace ZepLink.RiceNinja.Helpers
             }
         }
 
-        private static IEnumerator LerpVector(IList<Interpolation<Vector3>> interpolations)
-        {
-            float t = 0f;
+        //private static IEnumerator LerpVector(ref Vector3 value, IList<Interpolation<Vector3>> interpolations)
+        //{
+        //    float t = 0f;
 
-            while (t < 1)
-            {
+        //    while (t < 1)
+        //    {
 
 
-                t += Time.deltaTime;
-                yield return null;
-            }
+        //        t += Time.deltaTime;
+        //        yield return null;
+        //    }
 
-        }
+        //}
     }
 }

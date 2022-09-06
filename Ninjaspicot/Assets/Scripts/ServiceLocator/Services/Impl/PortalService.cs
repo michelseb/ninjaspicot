@@ -8,7 +8,7 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class PortalService : CoroutineService<int, Portal>, IPortalService
+    public class PortalService : CollectionService<int, Portal>, IPortalService
     {
         private IDictionary<int, int> _doorEntranceExitPairs = new Dictionary<int, int>();
 
@@ -17,17 +17,18 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private readonly ICameraService _cameraService;
         private readonly IZoneService _zoneService;
         private readonly IScenesService _scenesService;
-
+        private readonly ICoroutineService _coroutineService;
 
 
         public const int TRANSFER_SPEED = 3; //Seconds needed to go between 2 portals
         public const float EJECT_SPEED = 100; //How strongly transferred entity is ejected
 
-        public PortalService(ICameraService cameraService, IZoneService zoneService, IScenesService scenesService)
+        public PortalService(ICameraService cameraService, IZoneService zoneService, IScenesService scenesService, ICoroutineService coroutineService)
         {
             _cameraService = cameraService;
             _zoneService = zoneService;
             _scenesService = scenesService;
+            _coroutineService = coroutineService;
         }
 
         private int? GetExitIndexByEntranceId(int entranceId)
@@ -76,7 +77,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (otherId == null)
                 return;
 
-            CoroutineServiceBehaviour.StartCoroutine(CreateConnection(entrance, otherId.Value));
+            _coroutineService.StartCoroutine(CreateConnection(entrance, otherId.Value));
         }
 
         public void ClosePreviousScene(int entranceId)
@@ -100,7 +101,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void Teleport(ITeleportable teleportable, Portal entrance, Portal exit)
         {
-            CoroutineServiceBehaviour.StartCoroutine(DoTeleport(teleportable, entrance, exit));
+            _coroutineService.StartCoroutine(DoTeleport(teleportable, entrance, exit));
         }
 
         public IEnumerator DoTeleport(ITeleportable teleportable, Portal entrance, Portal exit)

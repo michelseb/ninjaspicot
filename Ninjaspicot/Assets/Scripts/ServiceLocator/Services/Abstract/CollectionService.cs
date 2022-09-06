@@ -42,7 +42,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Abstract
         {
             if (!InstancesDictionary.ContainsKey(id))
             {
-                Log($"Instance of type {GetType()} with id {id} does not exist");
+                Log($"Instance of type {typeof(U)} with id {id} does not exist");
                 return default;
             }
 

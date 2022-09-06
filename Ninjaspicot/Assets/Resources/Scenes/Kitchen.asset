@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8aa21aff4574244bae65efd362a7fa, type: 3}
   m_Name: Kitchen
   m_EditorClassIdentifier: 
-  _name: Kitchen
   _audio: {fileID: 8300000, guid: d2746596d8b9f934389c7fab2639d82a, type: 3}
-  _index: 1
+  _index: 2
+  _structureMap: {fileID: 0}
+  _zoneMap: {fileID: 0}
+  _utilitiesMap: {fileID: 0}
   _image: {fileID: 0}
   _fontColor: 0
   _globalLightColor: 0

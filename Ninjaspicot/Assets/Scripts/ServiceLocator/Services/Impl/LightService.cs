@@ -15,16 +15,18 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         private Volume _volume;
 
         private readonly ICoroutineService _coroutineService;
+        private readonly ICameraService _cameraService;
 
         private IDictionary<int, Guid> _lightUpdateRoutines;
 
 
-        public LightService(ICoroutineService coroutineService)
+        public LightService(ICoroutineService coroutineService, ICameraService cameraService)
         {
             _coroutineService = coroutineService;
+            _cameraService = cameraService;
 
             _lightUpdateRoutines = new Dictionary<int, Guid>();
-            _volume = UnityEngine.Object.FindObjectOfType<Volume>();
+            _volume = _cameraService.MainCamera.Transform.GetComponentInChildren<Volume>();
             //_volume.enabled = false;
         }
 
@@ -47,7 +49,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             StopPrevious(CurrentAmbiant.Id);
 
-            _lightUpdateRoutines[CurrentAmbiant.Id] = _coroutineService.StartCoroutine(DoBrighten(CurrentAmbiant.Light, .2f));
+            _coroutineService.StartCoroutine(DoBrighten(CurrentAmbiant.Light, .2f), out Guid id);
+
+            _lightUpdateRoutines[CurrentAmbiant.Id] = id;
             //CurrentAmbiant.Brighten();
         }
 
@@ -58,7 +62,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             StopPrevious(CurrentAmbiant.Id);
 
-            _lightUpdateRoutines[CurrentAmbiant.Id] = _coroutineService.StartCoroutine(DoDimm(CurrentAmbiant.Light, 1f));
+            _coroutineService.StartCoroutine(DoDimm(CurrentAmbiant.Light, 1f), out Guid id);
+
+            _lightUpdateRoutines[CurrentAmbiant.Id] = id;
             //CurrentAmbiant.Dimm();
         }
 
@@ -88,7 +94,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             while (t < duration)
             {
-                chroma.intensity.value = Mathf.Lerp(.6f, 0, t / duration);
+                chroma.intensity.value = Mathf.Lerp(1f, 0, t / duration);
                 t += Time.deltaTime;
 
                 yield return null;

@@ -96,7 +96,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         {
             if (_tutorialLauncher == default && !_started && collision.CompareTag("hero") && _hero.ClimbSkill.Attached)
             {
-                _tutorialLauncher = _coroutineService.StartCoroutine(LaunchTutorial());
+                _coroutineService.StartCoroutine(LaunchTutorial(), out _tutorialLauncher);
             }
         }
 

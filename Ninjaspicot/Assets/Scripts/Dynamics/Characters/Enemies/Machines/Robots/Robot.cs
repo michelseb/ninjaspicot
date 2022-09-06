@@ -354,8 +354,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             // Temps de réaction
             if (TargetTransform == null)
             {
-                _timeService.SlowDownImmediate();
-                _timeService.SetTimeScaleProgressive(1);
+                //_timeService.SlowDownImmediate();
+                //_timeService.SetTimeScaleProgressive(1);
                 CurrentTarget = seeable;
             }
 
@@ -384,7 +384,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
 
             _remainingTimeBeforeAction = _delayBetweenActions;
-            _movementId = _coroutineService.StartCoroutine(ExecuteNextMovement());
+            _coroutineService.StartCoroutine(ExecuteNextMovement(), out _movementId);
         }
         #endregion
     }

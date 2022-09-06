@@ -18,6 +18,7 @@ TagManager:
   - Bonus
   - Interactive
   - UICamera
+  - Fire
   layers:
   - Default
   - TransparentFX

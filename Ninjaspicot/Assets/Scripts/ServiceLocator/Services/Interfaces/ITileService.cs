@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
+using ZepLink.RiceNinja.Dynamics.Scenery.Map;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services
 {
@@ -9,6 +10,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// Game tilemap
         /// </summary>
         Tilemap Tilemap { get; }
+
+        /// <summary>
+        /// Shadow caster
+        /// </summary>
+        ShadowCaster Caster { get; }
 
         /// <summary>
         /// Sets tile on tilemap

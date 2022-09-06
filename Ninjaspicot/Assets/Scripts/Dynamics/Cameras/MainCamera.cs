@@ -51,7 +51,6 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             _velocity = Vector3.zero;
             InstantZoom(_beginZoom);
             //SetFollowMode(_tracker);
-            Zoom(ZoomType.Intro);
         }
 
         private void Update()
@@ -241,7 +240,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             switch (type)
             {
                 case ZoomType.Progressive:
-                    CoroutineService.StartCoroutine(ZoomProgressive(zoomAmount));
+                    StartCoroutine(ZoomProgressive(zoomAmount));
                     break;
 
                 case ZoomType.Instant:
@@ -249,18 +248,18 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
                     break;
 
                 case ZoomType.Intro:
-                    CoroutineService.StartCoroutine(ZoomIntro(ZOOM_SPEED));
+                    StartCoroutine(ZoomIntro(ZOOM_SPEED));
                     break;
 
                 case ZoomType.Init:
-                    CoroutineService.StartCoroutine(ReinitZoom());
+                    StartCoroutine(ReinitZoom());
                     break;
             }
         }
 
         public void Shake()
         {
-            _coroutineService.StartCoroutine(DoShake(.1f, .1f));
+            StartCoroutine(DoShake(.1f, .1f));
         }
 
         private IEnumerator DoShake(float duration, float strength)
@@ -286,6 +285,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         public void SetTracker(ITracker tracker)
         {
             CurrentTracker = tracker;
+            Zoom(ZoomType.Intro);
         }
 
         public void Activate(IActivator activator = null)

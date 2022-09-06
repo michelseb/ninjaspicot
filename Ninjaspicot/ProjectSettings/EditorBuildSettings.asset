@@ -11,10 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Levels/Lobby.unity
     guid: e687421e15379e94f9ad685937285870
-  - enabled: 1
+  - enabled: 0
     path: Assets/Levels/Tutorial.unity
     guid: ac795909a1162d94cb98fd04af12f38a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Levels/Kitchen.unity
     guid: a28ea13fafeafc24dbd5be3c5844fe77
   m_configObjects: {}

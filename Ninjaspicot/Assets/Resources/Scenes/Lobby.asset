@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8aa21aff4574244bae65efd362a7fa, type: 3}
   m_Name: Lobby
   m_EditorClassIdentifier: 
-  _name: Lobby
   _audio: {fileID: 8300000, guid: b771dc66ed0226d469923a5ba4865bbf, type: 3}
-  _index: 0
+  _index: 1
   _structureMap: {fileID: 2800000, guid: 0c1499399bc9f804f8105c3748834baa, type: 3}
   _zoneMap: {fileID: 2800000, guid: b51fc7cfcefafba4bbca519cf49927d6, type: 3}
   _utilitiesMap: {fileID: 2800000, guid: 127c6d5361630414aadb4cd1ec26fca3, type: 3}
   _image: {fileID: 0}
+  _background: {fileID: 21300000, guid: fa90fd0261658be40b8f9b046ffd3f08, type: 3}
   _fontColor: 0
   _globalLightColor: 0
   _frontLightColor: 0

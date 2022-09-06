@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator;
 using ZepLink.RiceNinja.Utils;
@@ -14,6 +15,7 @@ namespace ZepLink.RiceNinja.Manageables.Scenes
         [SerializeField] private Texture2D _zoneMap;
         [SerializeField] private Texture2D _utilitiesMap;
         [SerializeField] private Sprite _image;
+        [SerializeField] private Sprite _background;
         [SerializeField] private CustomColor _fontColor;
         [SerializeField] private CustomColor _globalLightColor;
         [SerializeField] private CustomColor _frontLightColor;
@@ -25,6 +27,7 @@ namespace ZepLink.RiceNinja.Manageables.Scenes
         public Texture2D ZoneMap => _zoneMap;
         public Texture2D UtilitiesMap => _utilitiesMap;
         public Sprite Img => _image;
+        public Sprite Background => _background;
         public CustomColor FontColor => _fontColor;
         public CustomColor GlobalLightColor => _globalLightColor;
         public CustomColor FrontLightColor => _frontLightColor;
@@ -33,6 +36,7 @@ namespace ZepLink.RiceNinja.Manageables.Scenes
 
         public void Load()
         {
+            SceneManager.SetActiveScene(SceneManager.GetSceneAt(Id));
             Loaded = true;
         }
 

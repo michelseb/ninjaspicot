@@ -11,6 +11,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
     public class TileService : CollectionService<Vector3Int, Dynamics.Scenery.Map.Tile>, ITileService
     {
         private ShadowCaster _caster;
+        public ShadowCaster Caster { get { if (BaseUtils.IsNull(_caster)) _caster = Tilemap.GetComponent<ShadowCaster>(); return _caster; } }
 
         private Tilemap _tileMap;
         public Tilemap Tilemap
@@ -45,8 +46,6 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                     var composite = _tileMap.GetComponent<CompositeCollider2D>();
 
                     composite.offsetDistance = .1f;
-
-                    _caster = _tileMap.GetComponent<ShadowCaster>();
                 }
 
                 return _tileMap;
@@ -60,7 +59,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void GenerateShadows()
         {
-            _caster?.Generate();
+            Caster.Generate();
         }
     }
 }

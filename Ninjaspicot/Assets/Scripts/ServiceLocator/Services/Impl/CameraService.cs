@@ -13,6 +13,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
     public class CameraService : CollectionService<int, ICamera>, ICameraService
     {
+        private GameObject _camerasContainer;
+        public GameObject CamerasContainer { get { if (BaseUtils.IsNull(_camerasContainer)) _camerasContainer = GameObject.Find("Cameras"); return _camerasContainer; } }
+
         private MainCamera _mainCamera;
         public MainCamera MainCamera { get { if (BaseUtils.IsNull(_mainCamera)) _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<MainCamera>(); return _mainCamera; } }
 

@@ -2,35 +2,29 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ZepLink.RiceNinja.Dynamics.Abstract;
+using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities
 {
-    public class Background : Dynamic
+    public class Background : Dynamic, IPoolable
     {
-        [SerializeField] private Sprite _image;
         [SerializeField] private float _depth;
 
+        private Sprite _image;
         private List<RectTransform> _images;
         private Transform _cameraPosition;
         private Material _litMaterial;
+
         private ICameraService _cameraService;
 
-        private void Start()
+        private void Awake()
         {
             _cameraService = ServiceFinder.Get<ICameraService>();
 
             _litMaterial = Resources.Load<Material>("Sprite-Lit-Default");
             _cameraPosition = _cameraService.MainCamera.Transform;
-
-            _images = new List<RectTransform>
-            {
-                CreateImage(_image, new Vector2(0, 0)),
-                CreateImage(_image, new Vector2(1, 0)),
-                CreateImage(_image, new Vector2(0, 1)),
-                CreateImage(_image, new Vector2(1, 1))
-            };
         }
 
         private void Update()
@@ -49,6 +43,26 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities
             }
         }
 
+        public void SetImage(Sprite image)
+        {
+            _image = image;
+
+            if (_images?.Count > 0)
+            {
+                _images.ForEach(x => x.GetComponent<Image>().sprite = image);
+            }
+            else
+            {
+                _images = new List<RectTransform>
+                {
+                    CreateImage(_image, new Vector2(0, 0)),
+                    CreateImage(_image, new Vector2(1, 0)),
+                    CreateImage(_image, new Vector2(0, 1)),
+                    CreateImage(_image, new Vector2(1, 1))
+                };
+            }
+        }
+
         private RectTransform CreateImage(Sprite sprite, Vector2 pivot)
         {
             var imageObject = new GameObject("backgroundImage", typeof(Image));
@@ -59,8 +73,15 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities
             imageObject.AddComponent<ParallaxObject>().SetParallaxFactor(_depth);
 
             var rectTransform = imageObject.GetComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(Screen.width / 6, Screen.height / 6);
+            //var middle = new Vector2(.5f, .5f);
+            //var width = .5f;
+            //var height = .5f;
+            rectTransform.sizeDelta = new Vector2(Screen.width / 60, Screen.height / 60);
+            //rectTransform.anchoredPosition = Vector2.zero;
             rectTransform.pivot = pivot;
+            //rectTransform.anchorMin = new Vector2(middle.x - width / 2, middle.y - height / 2);
+            //rectTransform.anchorMax = new Vector2(middle.x + width / 2, middle.y + height / 2);
+
             rectTransform.parent = transform;
 
             return rectTransform;
@@ -87,6 +108,15 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities
                     img.position += Vector3.up * img.rect.height;
                 }
             });
+        }
+
+        public void Pool(Vector3 position, Quaternion rotation, float size = 1)
+        {
+            Transform.position = position;
+        }
+
+        public void DoReset()
+        {
         }
     }
 }

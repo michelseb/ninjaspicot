@@ -26,10 +26,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Bonuses
         protected bool _active;
         protected bool _taken;
 
-        private Zone _zone;
-        public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-
         protected virtual void Awake()
         {
             _colliders = GetComponentsInChildren<Collider2D>();

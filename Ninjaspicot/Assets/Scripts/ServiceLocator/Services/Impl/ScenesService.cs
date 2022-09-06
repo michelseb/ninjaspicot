@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter;
+using ZepLink.RiceNinja.Dynamics.Scenery.Utilities;
 using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Scenes;
@@ -12,84 +12,90 @@ using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class ScenesService : ScriptableObjectService<int, SceneInfos>, ICoroutineService, IScenesService
+    public class ScenesService : ScriptableObjectService<int, SceneInfos>, IScenesService
     {
         public bool IsSceneLoading { get; private set; }
         public SceneInfos CurrentScene { get; private set; }
 
         public override string ObjectsPath => "Scenes";
 
-        public IDictionary<Guid, Coroutine> RunningRoutines { get; } = new Dictionary<Guid, Coroutine>();
-
-        public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
-
         private readonly ISpawnService _spawnService;
         private readonly IAudioService _audioService;
-        private readonly IMapService _mapService;
         private readonly ICameraService _cameraService;
         private readonly ITouchService _touchService;
+        private readonly IUtilitiesService _utilitiesService;
+        private readonly ICoroutineService _coroutineService;
 
-        public ScenesService(ISpawnService spawnService, IAudioService audioService, IMapService mapService, ICameraService cameraService, ITouchService touchService)
+        public ScenesService(ISpawnService spawnService, IAudioService audioService, ICameraService cameraService,
+            ITouchService touchService, IUtilitiesService utilitiesService, ICoroutineService coroutineService)
         {
             _spawnService = spawnService;
             _audioService = audioService;
-            _mapService = mapService;
             _cameraService = cameraService;
             _touchService = touchService;
+            _utilitiesService = utilitiesService;
+            _coroutineService = coroutineService;
         }
 
-        public override void Init(Transform parent)
-        {
-            base.Init(parent);
-
-            CoroutineServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
-        }
-
-        public void InitialLoad(int sceneIndex = 0)
+        public IEnumerator InitialLoad(int sceneIndex = 0)
         {
             if (sceneIndex < 2)
             {
-                LoadLobby();
+                yield return _coroutineService.StartCoroutine(LoadLobby());
             }
             else
             {
-                LoadById(sceneIndex, true);
+                yield return _coroutineService.StartCoroutine(LoadById(sceneIndex, true));
+                //yield return _coroutineService.StartCoroutine(LoadById(sceneIndex, true), out _);
             }
 
             _spawnService.InitActiveSceneSpawns();
-            
+
             var hero = PoolHelper.Pool<Hero>();
 
+            _spawnService.SpawnAtLastSpawningPosition(hero);
             _cameraService.MainCamera.SetTracker(hero);
             _touchService.SetControllable(hero);
-            _spawnService.SpawnAtLastSpawningPosition(hero);
         }
 
-        public void LoadLobby()
+        public IEnumerator LoadLobby()
         {
             var lobby = FindByName("Lobby");
-            LoadByName(lobby.name, false);
-            SwitchAudio(0);
-            lobby.Load();
+
+            _coroutineService.StartCoroutine(LoadByName(lobby.name, false), out Guid load);
+
+            while (_coroutineService.IsCoroutineRunning(load))
+                yield return null;
 
             // Wake lobby wakeables
             BaseUtils.FindObjectsOfTypeInScene<ISceneryWakeable>("Lobby").ForEach(w => w.Wake());
         }
 
-        public void LoadByName(string sceneName, bool unloadPrevious)
+        private IEnumerator LoadByName(string sceneName, bool unloadPrevious)
         {
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-            CurrentScene = FindByName(sceneName);
-            SwitchAudio(CurrentScene.Id);
+            //SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
 
-            _mapService.Generate(CurrentScene.StructureMap);
-            _mapService.GenerateZones(CurrentScene.ZoneMap, CurrentScene.UtilitiesMap, CurrentScene.StructureMap);
+            var scene = FindByName(sceneName);
+
+            if (scene == null)
+                yield break;
+
+            _coroutineService.StartCoroutine(LoadAdditional(scene), out Guid load);
+
+            while (_coroutineService.IsCoroutineRunning(load))
+                yield return null;
+
+            Enable(scene);
+
+            _utilitiesService.Generate(CurrentScene.ZoneMap, CurrentScene.UtilitiesMap, CurrentScene.StructureMap);
+            
+            PoolHelper.Pool<Background>().SetImage(CurrentScene.Background);
         }
 
-        public void LoadById(int sceneId, bool unloadPrevious)
+        public IEnumerator LoadById(int sceneId, bool unloadPrevious)
         {
             var scene = FindById(sceneId);
-            LoadByName(scene.Name, unloadPrevious);
+            yield return _coroutineService.StartCoroutine(LoadByName(scene.Name, unloadPrevious));
         }
 
         private void SwitchAudio(int sceneId)
@@ -100,10 +106,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             _audioService.PlayGlobal(scene.Audio, 1);
         }
 
-        private IEnumerator LoadAdditional(int portalId)
+        private IEnumerator LoadAdditional(SceneInfos scene)
         {
-            var scene = GetSceneByPortalId(portalId);
-
             if (scene == null || scene.Loaded)
                 yield break;
 
@@ -119,30 +123,44 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (!operation.isDone)
                 yield return null;
 
-            Enable(scene);
             IsSceneLoading = false;
         }
 
         private void Enable(SceneInfos sceneInfos)
         {
             var sceneToLoad = SceneManager.GetSceneByName(sceneInfos.Name);
-            if (sceneToLoad.IsValid())
-            {
-                //SceneManager.MoveGameObjectToScene(Hero.Instance.gameObject, sceneToLoad);
-                SceneManager.SetActiveScene(sceneToLoad);
-                _spawnService.InitActiveSceneSpawns();
-                CurrentScene = sceneInfos;
-                SwitchAudio(sceneToLoad.buildIndex);
-                sceneInfos.Load();
-            }
+
+            if (!sceneToLoad.IsValid())
+                return;
+
+            SceneManager.MoveGameObjectToScene(_cameraService.CamerasContainer, sceneToLoad);
+            SceneManager.SetActiveScene(sceneToLoad);
+            _spawnService.InitActiveSceneSpawns();
+            CurrentScene = sceneInfos;
+            SwitchAudio(sceneToLoad.buildIndex);
+            sceneInfos.Load();
         }
 
         public void StartLoadingByPortalId(int portalId)
         {
-            if (IsSceneLoading)
+            var scene = GetSceneByPortalId(portalId);
+
+            StartLoading(scene);
+        }
+
+        public void StartLoadingById(int sceneId)
+        {
+            var scene = FindById(sceneId);
+
+            StartLoading(scene);
+        }
+
+        private void StartLoading(SceneInfos scene)
+        {
+            if (IsSceneLoading || scene == null)
                 return;
 
-            CoroutineServiceBehaviour.StartCoroutine(LoadAdditional(portalId));
+            _coroutineService.StartCoroutine(LoadAdditional(scene));
             IsSceneLoading = true;
         }
 

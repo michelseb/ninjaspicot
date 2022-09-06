@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditor.Animations;
 using UnityEngine;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 using ZepLink.RiceNinja.ServiceLocator;
@@ -15,6 +14,6 @@ namespace ZepLink.RiceNinja.Manageables.Animations
 
         public ServiceFinder ServiceFinder => ServiceFinder.Instance;
 
-        public AnimatorController AnimatorController;
+        public RuntimeAnimatorController AnimatorController;
     }
 }

@@ -6,7 +6,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Bonuses
 {
     public class ExtraJump : Bonus, IResettable
     {
-        public virtual void DoReset()
+        public override void DoReset()
         {
             if (_temporaryDeactivate != null)
             {

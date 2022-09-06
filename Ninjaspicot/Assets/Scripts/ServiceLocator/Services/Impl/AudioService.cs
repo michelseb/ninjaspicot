@@ -8,22 +8,24 @@ using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
 namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 {
-    public class AudioService : ScriptableObjectService<Guid, AudioFile>, ICoroutineService, IAudioService
+    public class AudioService : ScriptableObjectService<Guid, AudioFile>, IAudioService
     {
         public override string ObjectsPath => "Audios/Objects";
 
         private Dictionary<int, string> _playedClips = new Dictionary<int, string>();
         private AudioSource _globalAudioSource;
 
-        public IDictionary<Guid, Coroutine> RunningRoutines { get; } = new Dictionary<Guid, Coroutine>();
-        public MonoBehaviour CoroutineServiceBehaviour { get; private set; }
+        private ICoroutineService _coroutineService;
 
+        public AudioService(ICoroutineService coroutineService)
+        {
+            _coroutineService = coroutineService;
+        }
 
         public override void Init(Transform parent)
         {
             base.Init(parent);
 
-            CoroutineServiceBehaviour = ServiceObject.AddComponent<ServiceBehaviour>();
             _globalAudioSource = ServiceObject.AddComponent<AudioSource>();
         }
 
@@ -72,7 +74,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void SetVolumeProgressive(AudioSource source, float targetvolume, float timePeriod)
         {
-            CoroutineServiceBehaviour.StartCoroutine(DoSetVolumeProgressive(source, targetvolume, timePeriod));
+            _coroutineService.StartCoroutine(DoSetVolumeProgressive(source, targetvolume, timePeriod));
         }
 
         public void SetGlobalVolumeProgressive(float targetvolume, float timePeriod)

@@ -71,7 +71,7 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
             _audioService.PlaySound(_audioSource, _bang, .5f);
         }
 
-        public void DoReset()
+        public override void DoReset()
         {
             if (!_startOpened)
             {

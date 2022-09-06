@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -79,7 +80,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         private bool IsGapAhead()
         {
             var cast = CastUtils.RayCast(_head.position, new Vector2(MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES).collider == null;
-            Debug.Log("Gap ahead : " + cast);
+            //Debug.Log("Gap ahead : " + cast);
 
             return cast;
         }
@@ -87,7 +88,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
         private bool IsWallAhead()
         {
             var cast = CastUtils.RayCast(_head.position, Vector2.right * MoveDirection, 1f, layerMask: CastUtils.OBSTACLES).collider != null;
-            Debug.Log("Wall ahead : " + cast);
+            //Debug.Log("Wall ahead : " + cast);
 
             return cast;
         }
@@ -168,8 +169,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
 
             var movePoint = _stepDistance * MoveDirection;
 
-            var frontLegMove = _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint));
-            var backLegMove = _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint));
+            _coroutineService.StartCoroutine(_robotLegs.FirstOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint), out Guid frontLegMove);
+            _coroutineService.StartCoroutine(_robotLegs.LastOrDefault(l => l.Index == MovingLegsIndex).LaunchMove(_stepDuration, movePoint), out Guid backLegMove);
 
             while (_coroutineService.IsCoroutineRunning(frontLegMove) || _coroutineService.IsCoroutineRunning(backLegMove))
                 yield return null;

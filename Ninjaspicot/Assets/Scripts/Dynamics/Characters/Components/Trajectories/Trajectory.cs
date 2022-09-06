@@ -64,7 +64,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Components
         {
             Used = false;
 
-            _coroutineService.StartCoroutine(FadeAway());
+            StartCoroutine(FadeAway());
             DeactivateAim();
         }
 
