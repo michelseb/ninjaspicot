@@ -17,7 +17,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
         private AudioFile _runAudio;
         private Vector3 _previousPosition;
         private Vector3 _walkDirection;
-        private Vector3 _rotateVelocity;
 
         public override void Awake()
         {
@@ -28,7 +27,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
             _audioSource = GetComponent<AudioSource>();
             _walkAudio = _audioService.FindByName("Walk");
             _runAudio = _audioService.FindByName("Run");
-            _rotateVelocity = Vector3.zero;
         }
 
         public override void Start()
