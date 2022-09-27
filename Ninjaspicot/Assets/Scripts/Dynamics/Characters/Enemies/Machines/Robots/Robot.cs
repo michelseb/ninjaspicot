@@ -262,6 +262,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
                 _rigidbody?.AddForce((Transform.position - killer.position).normalized * 50, ForceMode2D.Impulse);
             }
 
+            _head.gameObject.SetActive(false);
+
             base.Die(killer, sound, volume);
         }
 

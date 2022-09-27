@@ -82,6 +82,9 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             var cast = CastUtils.RayCast(_head.position, new Vector2(MoveDirection, -Transform.up.y), 1.5f, layerMask: CastUtils.OBSTACLES).collider == null;
             //Debug.Log("Gap ahead : " + cast);
 
+            if (cast)
+                Die();
+
             return cast;
         }
 
@@ -210,6 +213,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots
             }
 
             base.DoReset();
+        }
+
+        protected override Vector2 GetExplosionOrigin(Transform killer = null)
+        {
+            return killer == null ? _head.position : killer.position;
         }
 
         private void SwitchMovingLegs()

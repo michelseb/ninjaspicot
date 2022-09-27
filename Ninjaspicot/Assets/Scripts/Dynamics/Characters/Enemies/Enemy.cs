@@ -13,6 +13,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         [SerializeField] protected Collider2D _castArea;
         [SerializeField] protected float _rotateSpeed;
         [SerializeField] protected float _moveSpeed;
+        [SerializeField] protected Ragdoll _ragdoll;
 
         /// <summary>
         /// Move direction (between -1 and 1)
@@ -59,6 +60,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
         protected override void Awake()
         {
             base.Awake();
+
             _animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
             Active = _startAwake;
         }
@@ -207,8 +209,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
                 Collider.enabled = false;
             }
 
+            _ragdoll?.gameObject.SetActive(true);
+
+
+            _ragdoll?.Activate(GetExplosionOrigin(killer));
+
             Dead = true;
             Sleep();
+        }
+
+        protected virtual Vector2 GetExplosionOrigin(Transform killer = null)
+        {
+            return killer == null ? Transform.position : killer.position;
         }
 
         public override void DoReset()
