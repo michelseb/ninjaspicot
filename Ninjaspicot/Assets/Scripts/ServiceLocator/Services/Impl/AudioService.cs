@@ -76,27 +76,11 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         public void SetVolumeProgressive(AudioSource source, float targetvolume, float timePeriod)
         {
             InterpolationHelper<AudioSource, float>.Execute(new AudioVolumeInterpolation(source, source.volume, targetvolume, timePeriod));
-            //_coroutineService.StartCoroutine(DoSetVolumeProgressive(source, targetvolume, timePeriod));
         }
 
         public void SetGlobalVolumeProgressive(float targetvolume, float timePeriod)
         {
             SetVolumeProgressive(_globalAudioSource, targetvolume, timePeriod);
-        }
-
-        private IEnumerator DoSetVolumeProgressive(AudioSource source, float targetVolume, float timePeriod)
-        {
-            var t = 0f;
-            var initVolume = source.volume;
-
-            while (t < timePeriod)
-            {
-                source.volume = Mathf.Lerp(initVolume, targetVolume, t);
-                t += Time.deltaTime;
-                yield return null;
-            }
-
-            source.volume = targetVolume;
         }
 
         public void PlayGlobal(string clipName, float volume = 1f)

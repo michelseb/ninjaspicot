@@ -12,10 +12,8 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
         private Zone _zone;
         public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
 
-        protected override void Awake()
+        protected virtual void Awake()
         {
-            base.Awake();
-
             _animator = GetComponent<Animator>();
         }
 

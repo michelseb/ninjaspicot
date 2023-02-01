@@ -14,7 +14,19 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         /// </summary>
         /// <param name="active"></param>
         void SetLightsActivation(bool active);
-        
+
+        /// <summary>
+        /// Makes a given light effect brighter
+        /// </summary>
+        /// <param name="lightEffect"></param>
+        void Brighten(LightEffect lightEffect);
+
+        /// <summary>
+        /// Makes given light effect dimmer
+        /// </summary>
+        /// <param name="lightEffect"></param>
+        void Dimm(LightEffect lightEffect);
+
         /// <summary>
         /// Makes current ambiant light brighter
         /// </summary>

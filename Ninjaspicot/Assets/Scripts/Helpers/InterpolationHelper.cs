@@ -20,7 +20,7 @@ namespace ZepLink.RiceNinja.Helpers
     //    internal abstract void Complete();
     //}
 
-    public abstract class Interpolation<T, U> where T : Component where U : struct
+    public abstract class Interpolation<T, U> where T : Object where U : struct
     {
         public T Reference { get; }
         public U Value { get; protected set; }
@@ -98,6 +98,22 @@ namespace ZepLink.RiceNinja.Helpers
         internal override void Apply()
         {
             Reference.intensity = Value;
+        }
+    }
+
+    public class BloomIntensityInterpolation : Interpolation<Bloom, float>
+    {
+        public BloomIntensityInterpolation(Bloom reference, float origin, float target, float duration) : base(reference, origin, target, duration) { }
+
+        internal override void Apply()
+        {
+            Reference.intensity.value = Value;
+        }
+
+        internal override void Process(ref float elapsed)
+        {
+            Value = Mathf.Lerp(Origin, Target, elapsed / Duration);
+            elapsed += Time.deltaTime;
         }
     }
 

@@ -78,12 +78,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 var light = ambiant.GetComponent<Light2D>();
 
                 light.lightType = Light2D.LightType.Freeform;
-                light.intensity = 2f;
+                light.intensity = .5f;
                 light.color = ColorUtils.NightBlue;
 
                 ReflectionUtils.SetFieldValue(light, "m_ShapePath", z.Select(x => new Vector3(x.x, x.y)).ToArray());
                 ReflectionUtils.SetFieldValue(light, "m_ShapeLightFalloffSize", 2f);
-                ReflectionUtils.SetFieldValue(light, "m_ApplyToSortingLayers", new[] { 0, 1, 2, 3 });
+                //ReflectionUtils.SetFieldValue(light, "m_ApplyToSortingLayers", new[] { 0, 1, 2, 3 });
 
                 light.transform.position = Vector3.one * .5f;
             }

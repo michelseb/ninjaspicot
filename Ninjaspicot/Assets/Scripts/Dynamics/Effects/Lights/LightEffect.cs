@@ -2,17 +2,34 @@
 using UnityEngine.Rendering.Universal;
 using ZepLink.RiceNinja.Dynamics.Abstract;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
+using ZepLink.RiceNinja.Helpers;
+using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
 {
     public abstract class LightEffect : Dynamic, IPoolable
     {
-        public Light2D Light { get; protected set; }
+        protected float _initIntensity;
+        protected Color _initColor;
+
+        protected ILightService _lightService;
+
+        private Light2D _light;
+        public Light2D Light
+        {
+            get { if (BaseUtils.IsNull(_light)) _light = GetComponentInChildren<Light2D>(); return _light; }
+        }
 
         protected virtual void Awake()
         {
-            Light = GetComponentInChildren<Light2D>();
+            _lightService = ServiceFinder.Get<ILightService>();
+        }
+
+        protected virtual void Start()
+        {
+            _initIntensity = Light.intensity;
+            _initColor = Light.color;
         }
 
         public void Pool(Vector3 position, Quaternion rotation, float size = 1)
@@ -21,17 +38,24 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
 
         public virtual void DoReset()
         {
-            Sleep();
-        }
-
-        public virtual void Sleep()
-        {
-            enabled = false;
+            Light.color = _initColor;
+            Light.intensity = _initIntensity;
         }
 
         public virtual void Wake()
         {
-            enabled = true;
+            if (Light == null || _initIntensity == 0)
+                return;
+
+            InterpolationHelper<Light2D, float>.Execute(new LightIntensityInterpolation(Light, Light.intensity, Light.intensity, _initIntensity, .3f));
+        }
+
+        public virtual void Sleep()
+        {
+            if (Light == null)
+                return;
+
+            InterpolationHelper<Light2D, float>.Execute(new LightIntensityInterpolation(Light, Light.intensity, Light.intensity, 0, .3f));
         }
 
         public void SetColor(CustomColor color, float intensity = 1)

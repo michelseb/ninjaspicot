@@ -42,6 +42,16 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             }
         }
 
+        public void Brighten(LightEffect lightEffect)
+        {
+            _coroutineService.StartCoroutine(DoBrighten(lightEffect.Light, .2f), out Guid id);
+        }
+
+        public void Dimm(LightEffect lightEffect)
+        {
+            _coroutineService.StartCoroutine(DoDimm(lightEffect.Light, .2f), out Guid id);
+        }
+
         public void BrightenAmbiant()
         {
             if (BaseUtils.IsNull(CurrentAmbiant))
@@ -62,7 +72,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             StopPrevious(CurrentAmbiant.Id);
 
-            _coroutineService.StartCoroutine(DoDimm(CurrentAmbiant.Light, 1f), out Guid id);
+            _coroutineService.StartCoroutine(DoDimm(CurrentAmbiant.Light, .2f), out Guid id);
 
             _lightUpdateRoutines[CurrentAmbiant.Id] = id;
             //CurrentAmbiant.Dimm();
@@ -107,7 +117,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
         {
             var initialIntensity = light.intensity;
 
-            var initialVolume = light.volumeIntensity;
+            //var initialVolume = light.volumeIntensity;
             //_volume.enabled = true;
             //var targetVolume = Mathf.Clamp01(initialVolume * intensityFactor);
             //light.volumeIntensityEnabled = true;
@@ -121,7 +131,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (t < duration)
             {
                 var interpolation = t / duration;
-                light.intensity = Mathf.Lerp(initialIntensity, 2, interpolation);
+                light.intensity = Mathf.Lerp(initialIntensity, 1, interpolation);
                 bloom.intensity.value = Mathf.Lerp(initBloom, 1, interpolation);
                 //light.volumeIntensity = Mathf.Lerp(initialVolume, targetVolume, t);
                 t += Time.deltaTime;
@@ -142,7 +152,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (t < duration)
             {
                 var interpolation = t / duration;
-                light.intensity = Mathf.Lerp(initialIntensity, 1, interpolation);
+                light.intensity = Mathf.Lerp(initialIntensity, .5f, interpolation);
                 bloom.intensity.value = Mathf.Lerp(initBloom, 0, interpolation);
                 //light.volumeIntensity = Mathf.Lerp(initialVolume, targetVolume, t);
                 t += Time.deltaTime;

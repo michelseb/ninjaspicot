@@ -36,6 +36,7 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
                 return;
 
             _seeables.Add(id, seeable);
+            _lightService.Brighten(this);
             seeable.Reveal();
         }
 
@@ -47,6 +48,7 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
                 return;
 
             seeable.Hide();
+            _lightService.Dimm(this);
             _seeables.Remove(id);
         }
 
