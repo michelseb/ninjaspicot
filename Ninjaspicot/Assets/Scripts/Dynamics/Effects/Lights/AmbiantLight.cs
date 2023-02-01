@@ -2,7 +2,6 @@
 using UnityEngine.Rendering.Universal;
 using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Interfaces;
-using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Effects.Lights

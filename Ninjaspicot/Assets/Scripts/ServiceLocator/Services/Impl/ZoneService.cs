@@ -90,6 +90,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (CurrentZone.Center.HasValue)
             {
                 _cameraService.MainCamera.SetCenterMode(CurrentZone.Center.Value);
+                _cameraService.MainCamera.CenterImmediate();
             }
             else
             {

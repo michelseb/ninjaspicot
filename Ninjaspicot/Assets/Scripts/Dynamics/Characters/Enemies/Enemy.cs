@@ -3,6 +3,7 @@ using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Interfaces;
 using ZepLink.RiceNinja.Interfaces;
 using ZepLink.RiceNinja.Manageables.Audios;
+using ZepLink.RiceNinja.ServiceLocator.Services;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
@@ -211,7 +212,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies
 
             _ragdoll?.gameObject.SetActive(true);
 
-
+            ServiceFinder.Get<ITimeService>().SlowDownAndRestoreProgressive();
             _ragdoll?.Activate(GetExplosionOrigin(killer));
 
             Dead = true;

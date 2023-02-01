@@ -57,7 +57,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void SlowDownAndRestoreProgressive()
         {
-
+            SlowDownImmediate();
+            RestoreProgressive();
         }
 
         private IEnumerator SetProgressive(float targetTimeScale, float delay)

@@ -148,7 +148,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
         private void Center(ITracker tracker, Vector3 middle)
         {
             var trackerPosition = tracker?.Transform.position ?? Vector2.zero;
-            var center = (trackerPosition + middle * 2) / 3;
+            var center = (trackerPosition + middle * 3) / 4;
 
             Center(new Vector3(center.x, center.y, Transform.position.z));
         }
@@ -165,7 +165,7 @@ namespace ZepLink.RiceNinja.Dynamics.Cameras
             }
             else
             {
-                center = (trackerPosition + _centerPos * 2) / 3;
+                center = (trackerPosition + _centerPos * 3) / 4;
             }
 
             Transform.position = new Vector3(center.x, center.y, -5);

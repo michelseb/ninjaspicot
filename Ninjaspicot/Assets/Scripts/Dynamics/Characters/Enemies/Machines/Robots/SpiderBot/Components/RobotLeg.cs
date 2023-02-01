@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Abstract;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Components
@@ -71,25 +72,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Enemies.Machines.Robots.Componen
             var meanHeight = (target.y + initPos.y) / 2;
             var targetPos = new Vector3(initPos.x + halfDistance, meanHeight + Transform.up.y * Mathf.Abs(halfDistance));
 
-            yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, targetPos));
-            yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, target));
+            yield return StartCoroutine(InterpolationHelper<Transform, Vector3>.Interpolate(new TransformPositionInterpolation(Transform, targetPos, halfDuration, moveSpeed)));
+            yield return StartCoroutine(InterpolationHelper<Transform, Vector3>.Interpolate(new TransformPositionInterpolation(Transform, target, halfDuration, moveSpeed)));
+
+            //yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, targetPos));
+            //yield return StartCoroutine(LegInterpolate(halfDuration, moveSpeed, Transform.position, target));
 
             Grounded = true;
-        }
-
-        private IEnumerator LegInterpolate(float duration, float speed, Vector3 initPos, Vector3 targetPos)
-        {
-            var t = 0f;
-
-            while (t < duration)
-            {
-                Transform.position = Vector3.Lerp(initPos, targetPos, t / duration);
-                t += Time.deltaTime * speed;
-
-                yield return null;
-            }
-
-            Transform.position = targetPos;
         }
     }
 }

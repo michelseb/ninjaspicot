@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using ZepLink.RiceNinja.Helpers;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.ServiceLocator.Services.Abstract;
 
@@ -74,7 +75,8 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
         public void SetVolumeProgressive(AudioSource source, float targetvolume, float timePeriod)
         {
-            _coroutineService.StartCoroutine(DoSetVolumeProgressive(source, targetvolume, timePeriod));
+            InterpolationHelper<AudioSource, float>.Execute(new AudioVolumeInterpolation(source, source.volume, targetvolume, timePeriod));
+            //_coroutineService.StartCoroutine(DoSetVolumeProgressive(source, targetvolume, timePeriod));
         }
 
         public void SetGlobalVolumeProgressive(float targetvolume, float timePeriod)
