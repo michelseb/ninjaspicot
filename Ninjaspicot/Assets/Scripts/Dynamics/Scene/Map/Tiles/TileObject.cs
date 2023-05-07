@@ -10,12 +10,14 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
     public class TileObject : ScriptableObject, IDynamic
     {
         [SerializeField] private TileBase _tileModel;
+        [SerializeField] private bool _canAttachTo;
 
         public int Id => GetInstanceID();
         public string Name => name;
         public ServiceFinder ServiceFinder => ServiceFinder.Instance;
         public Transform Transform => GetParent(null);
         public TileBase TileModel => _tileModel;
+        public bool IsAttachable => _canAttachTo;
 
         public Transform GetParent(Transform parentZone)
         {

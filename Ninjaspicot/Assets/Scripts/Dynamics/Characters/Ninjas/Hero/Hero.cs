@@ -31,15 +31,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         #region Skills
         public HopSkill HopSkill { get; private set; }
         public ChargeSkill ChargeSkill { get; private set; }
-        public ClimbSkill ClimbSkill { get; private set; }
+        public HeroClimbSkill ClimbSkill { get; private set; }
         #endregion
+
+        public EnergyBar EnergyBar { get; private set; }
 
         private ITimeService _timeService;
         private ISpawnService _spawnService;
-        private ITouchService _touchService;
         private IZoneService _zoneService;
         private ISkillService _skillService;
         private ILightService _lightService;
+        private IComponentService _componentService;
 
         private Cloth _cape;
         private Coroutine _displayGhosts;
@@ -60,16 +62,20 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         private const int GHOST_SOUND_FREQUENCY = 3;
         private const float FADE_SPEED = 5f;
 
+        private float _baseSize;
+        private float _stretchSize;
+        private float _meanSize;
+
         protected override void Awake()
         {
             base.Awake();
 
             _timeService = ServiceFinder.Get<ITimeService>();
             _spawnService = ServiceFinder.Get<ISpawnService>();
-            _touchService = ServiceFinder.Get<ITouchService>();
             _zoneService = ServiceFinder.Get<IZoneService>();
             _skillService = ServiceFinder.Get<ISkillService>();
             _lightService = ServiceFinder.Get<ILightService>();
+            _componentService = ServiceFinder.Get<IComponentService>();
 
             _uiCamera = UICamera.Instance;
             _cape = GetComponentInChildren<Cloth>();
@@ -79,6 +85,50 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             HopSkill = _skillService.EquipSkill<HopSkill>(Transform);
             ClimbSkill = _skillService.EquipSkill<HeroClimbSkill>(Transform);
             ChargeSkill = _skillService.EquipSkill<ChargeSkill>(Transform);
+
+            EnergyBar = _componentService.Equip<EnergyBar>(Transform);
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
+            // TODO => Go through all use cases
+            EnergyBar.SetMaxValue(2f);
+            EnergyBar.RegainAll();
+
+            _baseSize = Transform.localScale.x;
+            _stretchSize = Transform.localScale.y;
+            _meanSize = (_baseSize + _stretchSize) / 2;
+        }
+
+        protected virtual void OnEnable()
+        {
+            //EnergyBar.OnEnergyConsumed += ClimbSkill.StopWalking;
+            ClimbSkill.OnWalkStart += Shrink;
+            ClimbSkill.OnWalkEnd += Stretch;
+        }
+
+        protected virtual void OnDisable()
+        {
+            //EnergyBar.OnEnergyConsumed -= ClimbSkill.StopWalking;
+            ClimbSkill.OnWalkStart -= Shrink;
+            ClimbSkill.OnWalkEnd -= Stretch;
+        }
+
+        protected virtual void Update()
+        {
+            if (ClimbSkill.Walking)
+            {
+                if (Vector3.Dot(NormalVector, Vector3.up) <= 0)
+                {
+                    EnergyBar.UseEnergy();
+                }
+                else
+                {
+                    EnergyBar.RegainAll();
+                }
+            }
         }
 
         public override void Die(Transform killer = null, AudioFile sound = null, float volume = 1f)
@@ -150,6 +200,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
                 Destroy(trigger.gameObject);
             }
             _trigger = null;
+        }
+
+        public void Shrink()
+        {
+            //Transform.localScale = Vector3.one * _meanSize;
+            InterpolationHelper<Transform, Vector3>.Execute(new TransformScaleInterpolation(Transform, Vector3.one * _meanSize, .1f));
+        }
+
+        public void Stretch()
+        {
+            InterpolationHelper<Transform, Quaternion>.Execute(new TransformRotationInterpolation(Transform, Quaternion.Euler(NormalVector.x, NormalVector.y, NormalVector.z), .1f));
+            InterpolationHelper<Transform, Vector3>.Execute(new TransformScaleInterpolation(Transform, new Vector3(_baseSize, _stretchSize), .1f));
         }
 
         public bool IsTriggeredBy(int id)
@@ -254,11 +316,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             SetWalkingActivation(active, grounded);
         }
 
-        public virtual bool NeedsToWalk()
-        {
-            return _touchService.LeftSideTouchDragging;
-        }
-
         public virtual void Hide()
         {
             RevealerCount--;
@@ -317,10 +374,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnLeftSideDrag()
         {
-            if (!ClimbSkill.Attached || !ClimbSkill.CanWalk)
-                return;
+            ChargeSkill.AirMove();
 
-            ClimbSkill.StartWalking();
+            if (ClimbSkill.Attached && ClimbSkill.CanWalk) // && EnergyBar.HasEnergy)
+            {
+                ClimbSkill.StartWalking();
+            }
         }
 
         public void OnLeftSideTouchEnd()
@@ -328,6 +387,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             ClimbSkill.ReinitSpeed();
             ClimbSkill.StopWalking(true);
             StopDisplayGhosts();
+
+            Rigidbody.velocity = new Vector2(0, Rigidbody.velocity.y);
         }
 
         public void OnRightSideTouchInit()
@@ -337,16 +398,22 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
             ChargeSkill.SetJumpPressing(true);
             ChargeSkill.RestoreGravity();
+            ChargeSkill.ResetAirSpeedFactor();
 
             ClimbSkill.Detach();
             ChargeSkill.InitJump(Direction, NormalVector);
+            Stretch();
         }
 
-        public void OnRightSideTouch() { }
+        public void OnRightSideTouch()
+        {
+            ChargeSkill.SlowDown();
+        }
 
         public void OnRightSideTouchEnd()
         {
             ChargeSkill.RestoreGravity();
+            ChargeSkill.ResetAirSpeedFactor();
             ChargeSkill.SetJumpPressing(false);
         }
 
@@ -370,12 +437,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             _timeService.SetNormalTime();
             ClimbSkill.ReinitSpeed();
             ChargeSkill.RestoreGravity();
+            ChargeSkill.ResetAirSpeedFactor();
             StopDisplayGhosts();
 
             if (ChargeSkill.Ready)
             {
                 ClimbSkill.StopWalking(false);
-                ClimbSkill.Detach();
                 ChargeSkill.Jump(direction);
                 _lightService.ChromaBlast();
                 _cameraService.MainCamera.Shake();
@@ -389,8 +456,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
 
         public void OnDoubleTouchLeftSideDrag(Vector2 direction)
         {
-            if (!ClimbSkill.Attached || !ClimbSkill.CanWalk)
-                return;
+            ChargeSkill.AirMove();
 
             //ClimbSkill.StartRunning();
             //StartDisplayGhosts();
@@ -400,12 +466,12 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
         {
             ClimbSkill.ReinitSpeed();
             ChargeSkill.RestoreGravity();
+            ChargeSkill.ResetAirSpeedFactor();
             StopDisplayGhosts();
 
             if (ChargeSkill.Ready)
             {
                 ClimbSkill.StopWalking(false);
-                ClimbSkill.Detach();
                 ChargeSkill.Jump(direction);
             }
         }
@@ -440,8 +506,6 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             ClimbSkill.StopWalking(false);
             ClimbSkill.Rigidbody.velocity = Vector2.zero;
             ClimbSkill.Rigidbody.rotation = 0;
-            ClimbSkill.Rigidbody.isKinematic = false;
-            ClimbSkill.CurrentAttachment = null;
             Dead = false;
             Renderer.color = Color.white;
         }
@@ -454,6 +518,11 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.MainCharacter
             ClimbSkill.LandOn(obstacle, contactPoint);
             //HopSkill.LandOn(obstacle, contactPoint);
             ChargeSkill.LandOn(obstacle, contactPoint);
+
+            if (ClimbSkill.Walking)
+            {
+                Shrink();
+            }
         }
     }
 }

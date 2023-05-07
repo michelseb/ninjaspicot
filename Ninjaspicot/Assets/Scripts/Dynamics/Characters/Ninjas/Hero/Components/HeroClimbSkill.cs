@@ -5,6 +5,7 @@ using ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
 using ZepLink.RiceNinja.Manageables.Audios;
 using ZepLink.RiceNinja.ServiceLocator.Services;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
 {
@@ -61,6 +62,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
                 var direction = Quaternion.Euler(0, 0, -90) * CollisionNormal;
                 _speedFactor = GetHeroSpeed(_touchService.LeftDragDirection, direction, CurrentSpeed);
                 _walkDirection = _touchService.LeftDragDirection;
+
                 if (_speedFactor == 0)
                 {
                     Rigidbody.velocity = Vector2.zero;
@@ -77,7 +79,19 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Hero.Components
 
                 jointMotor.motorSpeed = _speedFactor;
                 hinge.motor = jointMotor;
+
                 hinge.anchor = Transform.InverseTransformPoint(GetContactPosition());
+
+                var dot = Vector3.Dot(CollisionNormal, Vector3.up);
+                Debug.Log("Attach dot :" + dot);
+
+                var needsDetach = dot < .1f && CastUtils.RayCast(Transform.position, -CollisionNormal, 1f, includeTriggers: true, layerMask: CastUtils.TRIGGERS);
+
+                if (needsDetach)
+                {
+                    Detach();
+                    yield break;
+                }
 
                 yield return null;
             }

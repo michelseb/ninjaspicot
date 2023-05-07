@@ -85,6 +85,41 @@ namespace ZepLink.RiceNinja.Helpers
         }
     }
 
+    public class TransformRotationInterpolation : Interpolation<Transform, Quaternion>
+    {
+        public TransformRotationInterpolation(Transform transform, Quaternion origin, Quaternion target, float duration) : base(transform, origin, target, duration) { }
+        public TransformRotationInterpolation(Transform transform, Quaternion target, float duration) : this(transform, transform.rotation, target, duration) { }
+
+        internal override void Process(ref float elapsed)
+        {
+            Value = Quaternion.Lerp(Origin, Target, elapsed / Duration);
+            elapsed += Time.deltaTime;
+        }
+
+        internal override void Apply()
+        {
+            Reference.rotation = Value;
+        }
+    }
+
+
+    public class TransformScaleInterpolation : Interpolation<Transform, Vector3>
+    {
+        public TransformScaleInterpolation(Transform transform, Vector3 origin, Vector3 target, float duration) : base(transform, origin, target, duration) { }
+        public TransformScaleInterpolation(Transform transform, Vector3 target, float duration) : this(transform, transform.localScale, target, duration) { }
+
+        internal override void Process(ref float elapsed)
+        {
+            Value = Vector3.Lerp(Origin, Target, elapsed / Duration);
+            elapsed += Time.deltaTime;
+        }
+
+        internal override void Apply()
+        {
+            Reference.localScale = Value;
+        }
+    }
+
     public class LightIntensityInterpolation : Interpolation<Light2D, float>
     {
         public LightIntensityInterpolation(Light2D light, float value, float origin, float target, float duration) : base(light, value, origin, target, duration) { }

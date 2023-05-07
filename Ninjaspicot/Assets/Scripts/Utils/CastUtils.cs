@@ -11,6 +11,7 @@ namespace ZepLink.RiceNinja.Utils
         public const int EXPENSIVE_FRAME_INTERVAL = 3;
 
         public static LayerMask OBSTACLES => GetMask("Obstacle");
+        public static LayerMask TRIGGERS => GetMask("Trigger");
 
         public static RaycastHit2D BoxCast(Vector2 origine, Vector2 size, float angle, Vector2 direction, float distance, int ignore = 0, bool display = false, bool includeTriggers = false, int layer = ~0)
         {

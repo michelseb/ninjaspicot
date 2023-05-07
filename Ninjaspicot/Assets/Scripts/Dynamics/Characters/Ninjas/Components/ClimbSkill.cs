@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using ZepLink.RiceNinja.Dynamics.Characters.Components.Skills;
 using ZepLink.RiceNinja.Dynamics.Scenery.Obstacles;
+using ZepLink.RiceNinja.Utils;
 
 namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
 {
     public class ClimbSkill : SkillBase
     {
-        [SerializeField] protected float _speed;
+        [SerializeField] protected float _groundSpeed;
 
         protected Collider2D _collider;
 
@@ -28,6 +30,10 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public Vector3 CollisionNormal { get; private set; }
         public float ImpactVelocity { get; private set; }
         public bool Running { get; protected set; }
+
+        public Action OnWalkStart;
+        public Action OnWalkEnd;
+
 
         protected float _speedFactor;
         protected Vector3 _previousContactPoint;
@@ -85,11 +91,17 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (Attached || AttachDeactivated)
                 return false;
 
-            var anchorPos = Transform.InverseTransformPoint(GetContactPosition());
+            var dot = Vector2.Dot(CollisionNormal, Vector2.up);
+            Debug.Log("Attach dot :" + dot);
+
+            var cannotAttach = dot < .1f && CastUtils.RayCast(Transform.position, -CollisionNormal, 1f, includeTriggers: true, layerMask: CastUtils.TRIGGERS);
+
+            if (cannotAttach)
+                return false;
 
             WallJoint.enabled = true;
             WallJoint.useMotor = false;
-            WallJoint.anchor = anchorPos;
+            WallJoint.anchor = Transform.InverseTransformPoint(GetContactPosition());
             WallJoint.connectedAnchor = WallJoint.anchor;
 
             Rigidbody.gravityScale = 0;
@@ -108,6 +120,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             CurrentAttachment = null;
             Rigidbody.isKinematic = false;
             Rigidbody.gravityScale = 1;
+            Rigidbody.AddForce(CollisionNormal * 2, ForceMode2D.Impulse);
         }
 
         public ContactPoint2D GetContactPoint(ContactPoint2D[] contacts, Vector3 previousPos) //WOOOOHOOO ça marche !!!!!
@@ -126,6 +139,8 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             ContactPoint.position = position;
         }
 
+        public virtual void StopWalking() => StopWalking(false);
+
         public virtual void StopWalking(bool stayGrounded)
         {
             if (_walkOnWalls != null)
@@ -137,12 +152,18 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (!Attached)
                 return;
 
+            OnWalkEnd();
+
             _speedFactor = 0;
             Rigidbody.velocity = Vector2.zero;
             Rigidbody.angularVelocity = 0;
             WallJoint.useMotor = false;
             Rigidbody.isKinematic = stayGrounded;
 
+            if (!stayGrounded)
+            {
+                Detach();
+            }
         }
 
         public virtual void StartWalking()
@@ -150,6 +171,7 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
             if (_walkOnWalls != null || !Active)
                 return;
 
+            OnWalkStart();
             Rigidbody.isKinematic = false;
             _walkOnWalls = StartCoroutine(WalkOnWalls(WallJoint));
         }
@@ -175,13 +197,13 @@ namespace ZepLink.RiceNinja.Dynamics.Characters.Ninjas.Components
         public void StartRunning()
         {
             Running = true;
-            CurrentSpeed = _speed * 2.5f;
+            CurrentSpeed = _groundSpeed * 2.5f;
         }
 
         public void ReinitSpeed()
         {
             Running = false;
-            CurrentSpeed = _speed;
+            CurrentSpeed = _groundSpeed;
         }
 
         public override void LandOn(Obstacle obstacle, Vector3 contactPoint)

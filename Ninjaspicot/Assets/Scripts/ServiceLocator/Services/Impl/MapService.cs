@@ -49,7 +49,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             if (brush.Instanciable is not TileObject tileObject)
                 return;
 
-            _tileService.SetTile(setting.Position, tileObject.TileModel);
+            _tileService.SetTile(setting.Position, tileObject.TileModel, tileObject.IsAttachable);
         }
     }
 }

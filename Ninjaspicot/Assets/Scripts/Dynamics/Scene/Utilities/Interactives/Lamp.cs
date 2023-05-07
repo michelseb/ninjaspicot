@@ -8,8 +8,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 {
     public class Lamp : SceneryElement, ISceneryWakeable, IFocusable, IActivable, IResettable, IPoolable
     {
-        //public Animator Animator { get; private set; }
-
         protected RevealingLight _light;
 
         public bool StayOn { get; set; }
@@ -21,7 +19,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
 
         protected virtual void Awake()
         {
-            //Animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
             _light = GetComponentInChildren<RevealingLight>();
         }
 
@@ -31,7 +28,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
                 return;
 
             _light.Wake();
-            //Animator.SetTrigger("TurnOn");
         }
 
         public virtual void Sleep()
@@ -39,7 +35,6 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Utilities.Interactives
             if (!StayOn)
             {
                 _light.Sleep();
-                //Animator.SetTrigger("TurnOff");
             }
         }
 

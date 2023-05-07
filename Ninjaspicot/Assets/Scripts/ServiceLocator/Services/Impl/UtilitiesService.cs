@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using ZepLink.RiceNinja.Dynamics.Effects.Lights;
@@ -72,7 +71,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
                 collider.transform.position = Vector3.one * .5f;
 
 
-                var ambiant = new GameObject("ambiant", typeof(AmbiantLight), typeof(Light2D)/*, typeof(Animator)*/);
+                var ambiant = new GameObject("ambiant", typeof(AmbiantLight), typeof(Light2D));
                 ambiant.transform.SetParent(zone.Transform);
 
                 var light = ambiant.GetComponent<Light2D>();
@@ -118,7 +117,9 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
             for (var i = 0; i < 4; i++)
             {
-                if (structureMap.GetPixel(coords.x + direction.x, coords.y + direction.y) == Color.black)
+                var pixel = structureMap.GetPixel(coords.x + direction.x, coords.y + direction.y);
+
+                if (pixel.r == 0 && pixel.g == 0 && pixel.a == 1)
                     return Quaternion.LookRotation(Vector3.forward, -(Vector2)direction);
 
                 direction = new Vector2Int(direction.y, -direction.x);

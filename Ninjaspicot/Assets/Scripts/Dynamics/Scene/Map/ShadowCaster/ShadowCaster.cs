@@ -39,7 +39,12 @@ namespace ZepLink.RiceNinja.Dynamics.Scenery.Map
 
         public void Generate()
         {
-            DestroyAllChildren();
+            // Destroy old shadow casters
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("shadow_caster"))
+                    Destroy(child.gameObject);
+            }
 
             for (int i = 0; i < TilemapCollider.pathCount; i++)
             {

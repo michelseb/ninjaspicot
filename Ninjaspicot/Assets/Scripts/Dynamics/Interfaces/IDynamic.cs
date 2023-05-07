@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using ZepLink.RiceNinja.Dynamics.Scenery.Zones;
 using ZepLink.RiceNinja.Manageables.Interfaces;
 
 namespace ZepLink.RiceNinja.Dynamics.Interfaces

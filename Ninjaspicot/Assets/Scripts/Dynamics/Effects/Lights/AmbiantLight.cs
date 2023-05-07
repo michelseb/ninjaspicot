@@ -8,15 +8,5 @@ namespace ZepLink.RiceNinja.Dynamics.Effects.Lights
     {
         private Zone _zone;
         public Zone Zone { get { if (BaseUtils.IsNull(_zone)) _zone = GetComponentInParent<Zone>(); return _zone; } }
-
-        public void Brighten()
-        {
-            //Animator.SetTrigger("Brighten");
-        }
-
-        public void Dimm()
-        {
-            //Animator.SetTrigger("Dimm");
-        }
     }
 }

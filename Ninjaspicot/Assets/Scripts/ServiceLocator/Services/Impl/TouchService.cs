@@ -15,7 +15,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
 
     public class TouchService : PoolService<Joystick>, ITouchService
     {
-        private bool _mobileTouch;
+        private bool _mobileTouch = true;
         private Joystick _joystick1;
         private Joystick _joystick2;
 

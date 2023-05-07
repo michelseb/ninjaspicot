@@ -14,7 +14,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
         Coroutine StartCoroutine(IEnumerator routine);
 
         /// <summary>
-        /// Run a coroutine on service behaviour and stops previous it if needed
+        /// Run a coroutine on service behaviour and keep track of it
         /// </summary>
         /// <param name="routine"></param>
         Coroutine StartCoroutine(IEnumerator routine, out Guid id);

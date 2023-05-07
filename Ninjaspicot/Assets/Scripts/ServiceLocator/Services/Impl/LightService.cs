@@ -131,7 +131,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (t < duration)
             {
                 var interpolation = t / duration;
-                light.intensity = Mathf.Lerp(initialIntensity, 1, interpolation);
+                light.intensity = Mathf.Lerp(initialIntensity, 2, interpolation);
                 bloom.intensity.value = Mathf.Lerp(initBloom, 1, interpolation);
                 //light.volumeIntensity = Mathf.Lerp(initialVolume, targetVolume, t);
                 t += Time.deltaTime;
@@ -152,7 +152,7 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services.Impl
             while (t < duration)
             {
                 var interpolation = t / duration;
-                light.intensity = Mathf.Lerp(initialIntensity, .5f, interpolation);
+                light.intensity = Mathf.Lerp(initialIntensity, .7f, interpolation);
                 bloom.intensity.value = Mathf.Lerp(initBloom, 0, interpolation);
                 //light.volumeIntensity = Mathf.Lerp(initialVolume, targetVolume, t);
                 t += Time.deltaTime;

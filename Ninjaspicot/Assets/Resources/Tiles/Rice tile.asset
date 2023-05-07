@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95595dfed0155c44790274fabca331a9, type: 3}
   m_Name: Rice tile
   m_EditorClassIdentifier: 
-  _tileModel: {fileID: 11400000, guid: 8a5f80153a362f945ac201585a95f5c1, type: 2}
-  _name: Rice tile
+  _tileModel: {fileID: 11400000, guid: 17ceaa53c1ce6ae4e82373e8e9206cdf, type: 2}
+  _canAttachTo: 1

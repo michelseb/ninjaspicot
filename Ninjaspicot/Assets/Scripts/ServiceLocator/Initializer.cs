@@ -15,6 +15,7 @@ namespace ZepLink.RiceNinja.ServiceLocator
                 return;
 
             sl.Register<ICharacterService>(new CharacterService());
+            sl.Register<IComponentService>(new ComponentService());
             sl.Register<ISkillService>(new SkillService());
             sl.Register<IAnimationService>(new AnimationService());
             var coroutineService = sl.Register<ICoroutineService>(new CoroutineService());

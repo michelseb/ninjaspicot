@@ -18,9 +18,12 @@ namespace ZepLink.RiceNinja.ServiceLocator.Services
 
         /// <summary>
         /// Sets tile on tilemap
+        /// If not isAttachable then add trigger to detach characters from platform
         /// </summary>
+        /// <param name="coords"></param>
         /// <param name="tile"></param>
-        void SetTile(Vector3Int coords, TileBase tile);
+        /// <param name="isAttachable"></param>
+        void SetTile(Vector3Int coords, TileBase tile, bool isAttachable);
 
         /// <summary>
         /// Generate shadows for tilemap
